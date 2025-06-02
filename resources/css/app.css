@@ -1,0 +1,23 @@
+/* The following @tailwind directives must be processed by Tailwind CLI or a build tool */
+@tailwind base;
+  @tailwind components;
+  @tailwind utilities;
+  :root {
+  font-family: 'Cairo', ui-sans-serif, system-ui, sans-serif, 
+                 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-sans: 'Cairo', ui-sans-serif, system-ui, sans-serif, 
+                 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-serif: 'Cairo', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+  
+}
+/* Custom styles */
+header {
+  display: flex;
+  padding-left:64px;
+  padding-right: 64px;
+  padding-top: 20px;
+  padding-bottom: 12px;
+  gap: 40px;
+  height: 80px;
+  
+}
