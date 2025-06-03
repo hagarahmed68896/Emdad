@@ -74,6 +74,21 @@ return [
     'passwordConfirm' => 'Passwords do not match',
     'nameError' => 'Name is required',
     'passwordNumber' => 'Password should contain letters and numbers',
+    'bussniss_data' => 'Business Data',
+    'attach' => 'Attach',
+    'file_format' => 'Upload PDF or image files',
+    'commercial_registration' => 'Commercial Registration',
+    'commercial_registrationMSG' => 'Enter Commercial Registration Number',
+    'commercial_reg_or_certificate' => 'Commercial Registration or Freelance Certificate',
+    'national_address' => 'National Address',
+    'national_addressMSG' => 'Enter National Address',
+    'national_address_attach' => 'Attach National Address Document',
+    'iban' => 'IBAN',
+    'ibanMSG' => 'Enter IBAN Number',
+    'iban_attach' => 'Attach IBAN Document',
+    'tax_certificate' => 'Tax Certificate',
+    'tax_certificateMSG' => 'Enter Tax Certificate Number',
+    'tax_certificate_attach' => 'Attach Tax Certificate Document',
 
 
 ];

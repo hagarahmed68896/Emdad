@@ -284,7 +284,6 @@
                             class="bg-white rounded-lg shadow-lg  p-6 relative w-[660px] h-[320px]">
 
                             <!-- Drag & Drop Box -->
-                            <!-- Drag & Drop Box -->
                             <div class="border-2 border-dashed border-gray-300 p-6 rounded-md flex flex-col items-center justify-center text-gray-600 m-2 w-[600px] h-[210px]"
                                 @drop.prevent="handleDrop" @dragover.prevent>
                                 <template x-if="imagePreview">
@@ -368,7 +367,7 @@
         $currentLang = app()->getLocale();
     @endphp
     <!-- Language -->
-    <div class="btn-group flex items-center justify-between" style="color: #212121;  width:90px; height:24px; ">
+    <div class="btn-group flex items-center " style="color: #212121;  width:90px; height:24px; ">
 
         <button type="button" class="btn  w-[25px] h-[25px] border-none" data-bs-toggle="dropdown"
             aria-expanded="false">

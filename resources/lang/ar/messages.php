@@ -74,6 +74,23 @@ return [
     'passwordString' => 'ينبغي أن تحتوي كلمة المرور على حرف كبير واحد على الأقل.',
     'passwordConfirm' => 'كلمات المرور غير متطابقة',
     'passwordNumber' => 'يُفضل أن تحتوي كلمة المرور على حروف وأرقام.',
+    'bussniss_data' => 'بيانات النشاط التجاري',
+    'national_id' => 'الهوية الوطنية',
+    'national_idMSG' => 'أدخل رقم الهوية الوطنية',
+    'attach' => 'إرفاق ',
+    'file_format' => 'قم برفع مستند PDF أو صورة واضحة',
+    'commercial_registration'=> 'رقم السجل التجاري',
+    'commercial_registrationMSG' => 'أدخل رقم السجل التجاري',
+    'commercial_reg_or_certificate' => 'السجل التجاري أو شهادة العمل الحر',
+    'national_address' => 'العنوان الوطني',
+    'national_addressMSG' => 'أدخل العنوان الوطني',
+    'national_address_attach' =>'إرفق العنوان الوطني',
+    'iban' => 'رقم الحساب المصرفي الدولي (ايبان)',
+    'ibanMSG' => 'أدخل رقم الايبان',
+    'iban_attach' => 'إرفق رقم الايبان',
+    'tax_certificate' => ' الشهادة الضربية',
+    'tax_certificateMSG' => 'أدخل الرقم الضريبي',
+    'tax_certificate_attach' => ' الشهادة الضربية',
 
                             
 

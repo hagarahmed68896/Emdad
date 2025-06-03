@@ -19,8 +19,8 @@ $validator = Validator::make($request->all(), [
     'email' => 'required|email|unique:users,email',
     'password' => 'required|string|min:8|confirmed',
     'phone_number' => 'required|string|max:15',
-    'account_type' => 'required|in:supplier,customer',
-    'terms' => 'accepted'
+    'terms' => 'accepted',
+    'account_type' => 'required|string|in:supplier,customer',
 
 ],
 [

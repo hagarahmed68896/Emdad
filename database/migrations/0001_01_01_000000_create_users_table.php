@@ -20,13 +20,19 @@ return new class extends Migration
             $table->string('password');
 
             $table->string('national_id')->nullable();
+            $table->string('national_id_attach')->nullable();
             $table->string('commercial_registration')->nullable();
+            $table->string('commercial_registration_attach')->nullable();
             $table->string('national_address')->nullable();
+            $table->string('national_address_attach')->nullable();
             $table->string('iban')->nullable();
+            $table->string('iban_attach')->nullable();
             $table->string('tax_certificate')->nullable();
+            $table->string('tax_certificate_attach')->nullable();
             $table->string('profile_picture')->nullable();
             //type of account: 'supplier' or 'customer'
-            $table->enum('account_type', ['supplier', 'customer']);
+            $table->string('account_type');
+
             
     
             $table->timestamp('email_verified_at')->nullable();
