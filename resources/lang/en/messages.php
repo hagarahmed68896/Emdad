@@ -112,6 +112,14 @@ return [
     'search_with'=> 'Search with',
     'recent_Searches'=> 'Recent Searches',
     'contact_us'=> 'Didn\'t get your question?Contact us',
+    'contactUs' => 'Contact us',
+    'contactDescription'=> 'We are here to help you and answer to your questions',
+    'mailMessage' => 'Enter Email',
+    'selectExplanation'=> 'Select your explanation',
+    'expType' => 'explination Type',
+    'msg'=> 'Message/Question',
+    'send'=> 'Send Now',
+    'writeQuestion'=> 'Write your question or explination here...',
 
 
 ];
