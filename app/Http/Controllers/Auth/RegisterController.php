@@ -6,19 +6,20 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
-// use Laravel\Pail\ValueObjects\Origin\Console;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class RegisterController extends Controller
 {
     public function register(Request $request)
     {
+        
 $validator = Validator::make($request->all(), [
     'full_name' => 'required|string|max:255',
     'email' => 'required|email|unique:users,email',
-    'password' => 'required|string|min:8|confirmed',
-    'phone_number' => 'required|string|max:15',
+    'password' => 'required|string|min:8|confirmed|regex:/[A-Z]/|regex:/[0-9]/',
+    'phone_number' => 'required|string|max:15|unique:users,phone_number',
     'terms' => 'accepted',
     'account_type' => 'required|string|in:supplier,customer',
 
@@ -32,6 +33,7 @@ $validator = Validator::make($request->all(), [
     'password.string' => __('messages.passwordString'),
     'password.confirmed' => __('messages.passwordConfirm'),
     'phone_number.required' => __('messages.phoneMSG'),
+    'phone_number.unique'=> __('messages.phone_number_Unique'),
 
 ]);
 if ($validator->fails()) {
@@ -49,6 +51,7 @@ $user = User::create([
 
         Auth::login($user);
         Log::info('User registered successfully: ' . $user->email);
-        return redirect()->route('home')->with('success', __('messages.register_success'));
+return redirect()->back()->with('success', __('messages.register_success'));
+
     }
 }

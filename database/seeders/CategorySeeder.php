@@ -14,8 +14,8 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         Category::create(['name_en' => 'All', 'name_ar' => 'الجميع', 'slug' => 'all']);
-        Category::create(['name_en' => 'Electronics', 'name_ar' => 'الالكترونيات', 'slug' => 'electronics']);
-        Category::create(['name_en' => 'Home Appliances', 'name_ar' => 'الاجهزة الكهربائية', 'slug' => 'home-appliances']);
+        Category::create(['name_en' => 'Electronics', 'name_ar' => 'الإلكترونيات', 'slug' => 'electronics']);
+        Category::create(['name_en' => 'Home Appliances', 'name_ar' => 'الاجهزة الكهربائية', 'slug' => 'electrical-appliances']);
         Category::create(['name_en' => 'Industrial Equipment', 'name_ar' => 'المعدات الصناعية', 'slug' => 'industrial-equipment']);
         Category::create(['name_en' => 'Tools & Equipment', 'name_ar' => 'العدد والأدوات', 'slug' => 'tools-equipment']);
         Category::create(['name_en' => 'Testing Supplies', 'name_ar' => 'مستلزمات بحثية', 'slug' => 'testing-supplies']);

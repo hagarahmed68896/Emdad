@@ -91,6 +91,31 @@ return [
     'tax_certificate' => ' الشهادة الضربية',
     'tax_certificateMSG' => 'أدخل الرقم الضريبي',
     'tax_certificate_attach' => ' الشهادة الضربية',
+    'otpLoginRequired' => 'يرجى تسجيل الدخول أولاً',
+    'footer_description' => 'إمداد توفر لك تجربة شراء موثوقة تربطك بموردين موثوقين في مختلف القطاعات ، مع توفير حلول تسوق بالجملة بسهولة وسرعة.',
+    'fast_links' => 'روابط سريعة',
+    'home' => 'الرئيسية',
+    'favorites' => 'المفضلة',
+    'cart'=> 'السلة',
+    'categoris' => 'الفئات',
+    'clothing'=> 'الأزياء',
+    'Office_supplies'=> 'مستلزمات مكتبية',
+    'electrical-appliances' => 'الأجهزة الكهربائية',
+    'browse_all_categories'=> 'تصفح جميع الفئات',
+    'important_informations' => 'معلومات مهمة',
+    'common_questions'=> 'الأسئلة الشائعة',
+    'login_as_supplier' => 'التسجيل كمورد',
+    'add_product'=> 'أضف منتح',
+    'phone_number_Unique' => 'رقم الهاتف مستخدم بالفعل',
+    'not_recieve'=> 'لم تصلك الرسالة؟',
+    'resend' => 'اعادة الارسال',
+    'use_phone_instead' => ' أو استخدم رقم الهاتف بدلاً من البريد الإلكتروني',
+    'use_email_instead'=> ' أو استخدم البريد الإلكتروني بدلاً من رقم الهاتف',
+    'confirm'=> 'تحقق',
+    'search_with'=> 'البحث حسب',
+    'recent_Searches'=> 'البحوث الأخيرة',
+
+
 
                             
 

@@ -9,8 +9,15 @@ use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
+    public function showLoginForm()
+    {
+        // This method simply returns the view for your login page.
+        // Make sure you have a Blade file at 'resources/views/auth/login.blade.php'
+        return view('layouts.app');
+    }
     public function login(Request $request)
     {
+
         $request->validate([
         'email' => 'required|email',
         'password' => 'required|string|min:8',
