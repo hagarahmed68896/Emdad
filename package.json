@@ -1,13 +1,12 @@
 {
     "private": true,
     "type": "module",
-"scripts": {
-  "build": "vite build",
-  "dev": "vite",
-  "laravel": "php artisan serve",
-  "dev:all": "concurrently \"npm run dev\" \"npm run laravel\""
-}
-,
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite",
+        "laravel": "php artisan serve",
+        "dev:all": "concurrently \"npm run dev\" \"npm run laravel\""
+    },
     "devDependencies": {
         "@fortawesome/fontawesome-free": "^6.7.2",
         "@tailwindcss/postcss": "^4.1.7",
@@ -20,5 +19,8 @@
         "postcss": "^8.5.3",
         "tailwindcss": "^4.1.7",
         "vite": "^6.2.4"
+    },
+    "dependencies": {
+        "@preline/collapse": "^3.1.0"
     }
 }

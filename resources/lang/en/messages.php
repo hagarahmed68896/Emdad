@@ -111,6 +111,7 @@ return [
     'confirm' => 'Confirm',
     'search_with'=> 'Search with',
     'recent_Searches'=> 'Recent Searches',
+    'contact_us'=> 'Didn\'t get your question?Contact us',
 
 
 ];

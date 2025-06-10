@@ -48,9 +48,9 @@
     <div class="text-right ">
         <h4 class="font-bold text-lg mb-2 underline">{{__('messages.important_informations')}}</h4>
         <ul class="text-right">
-            <li class="mb-2"><a href="#" class="hover:text-white transition-colors duration-300">{{__('messages.Electronics')}}</a></li>
-            <li class="mb-2"><a href="#" class="hover:text-white transition-colors duration-300">{{__('messages.terms_and_conditions')}}</a></li>
-            <li class="mb-2"><a href="#" class="hover:text-white transition-colors duration-300">{{__('messages.privacy_policy')}}</a></li>
+            <li class="mb-2 "><a href="{{ route('common_questions') }}" class="hover:text-white transition-colors duration-300">{{__('messages.common_questions')}}</a></li>
+            <li class="mb-2"><a href="{{ route('terms') }}"  class="hover:text-white transition-colors duration-300">{{__('messages.terms_and_conditions')}}</a></li>
+            <li class="mb-2"><a href="{{ route('privacy') }}" class="hover:text-white transition-colors duration-300">{{__('messages.privacy_policy')}}</a></li>
         </ul>
     </div>
     <!-- Suppliers Section -->

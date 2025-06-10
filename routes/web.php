@@ -47,3 +47,11 @@ Route::get('language/{locale}', function ($locale) {
 Route::get('/privacy-policy', function () {
     return view('privacy'); 
 })->name('privacy');
+
+Route::get('/terms-conditions', function () {
+    return view('terms'); 
+})->name('terms');
+
+Route::get('/common_questions', function () {
+    return view('common_questions'); 
+})->name('common_questions');

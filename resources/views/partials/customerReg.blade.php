@@ -216,7 +216,7 @@
                                 {{ old('terms') ? 'checked' : '' }}> {{-- Added old() helper to keep checkbox checked --}}
                             <label for="terms" class="ml-2 text-[16px] text-[#212121]">
                                 {{ __('messages.accept_terms') }}
-                                <a href="#" @click="" class="text-[#185D31] underline">
+                                <a href="{{ route('terms') }}"  class="text-[#185D31] underline">
                                     {{ __('messages.terms_and_conditions') }}
                                 </a>
                                 {{ __('messages.and') }}

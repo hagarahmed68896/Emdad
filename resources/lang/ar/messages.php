@@ -114,6 +114,7 @@ return [
     'confirm'=> 'تحقق',
     'search_with'=> 'البحث حسب',
     'recent_Searches'=> 'البحوث الأخيرة',
+    'contact_us'=> 'لم تجد سؤالك؟ تواصل معنا ',
 
 
 
