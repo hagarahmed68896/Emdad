@@ -155,26 +155,49 @@
         }
     }
 </script>
+<style>
+    .profile-menu {
+        border: 1px solid #e0e0e0;
+        border-radius: 0.75rem;
+        background-color: #fff;
+        text-align: right;
+        position: absolute !important;
+        transform: translate(0, 0) !important;
+        top: 100% !important;
+        left: 0 !important;
+    }
 
+    .dropdown-item {
+        font-size: 14px;
+        border-radius: 12PX;
+        padding-top: 12px;
+        padding-right: 10px;
+        color: #696969;
+        font-weight: 400;
+        height: 49px;
+    }
 
-
-
+    .dropdown-item:hover {
+        background-color: #185D31;
+        color: #FFFFFF;
+        font-weight: 500;
+    }
+</style>
 
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+
 
 <script>
     document.addEventListener('alpine:init', () => {
         Alpine.data('searchBoxComponent', () => ({
-            // This component handles the category dropdown and search history
-            // No specific state is needed here if it's primarily for the overall form.
-            // The nested x-data for categoryOpen and searchText will manage their own state.
         }));
 
         Alpine.data('imageUploadComponent', () => ({
             showUploadModal: false,
             imagePreview: null,
-            uploadedFile: null, // To hold the actual File object
-            imageUrl: '', // For URL input
+            uploadedFile: null, 
+            imageUrl: '', 
 
             handleImageUpload(event) {
                 const file = event.target.files[0];
@@ -208,7 +231,7 @@
                 // It needs to submit the image (either file or URL) to the backend.
 
                 const form = document.querySelector(
-                '.main-search-form'); // Give your form a class for easy selection
+                    '.main-search-form'); // Give your form a class for easy selection
                 const formData = new FormData(form); // Get existing form data
 
                 if (this.uploadedFile) {
@@ -756,18 +779,49 @@
 
 
     <!-- Create Account -->
-    @include('partials.login')
 
+    <div class="user-profile-section">
+        @auth
+            <div class="d-flex p-[24px]">
+
+                <div class="dropdown" x-data={profile:false} >
+                    <a class="btn p-0 border-0 bg-transparent" @click="profile = !profile"
+                        aria-expanded="false" id="dropdownButton">
+                            <img  src="{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : asset('images/default_avatar.png') }}"
+                             class="w-10 h-10 rounded-full object-cover"
+                            id="profileImage" style="cursor: pointer;">
+                    </a>
+
+                    <ul x-show="profile" class="profile-menu  dropdown-menu-end shadow w-[296px] h-[368px] rounded-lg p-3"
+                        id="dropdownMenu" style="min-width: 250px; ">
+                        <li class="d-flex  mb-2 border-bottom pb-3">
+                            <img src="{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : asset('images/default_avatar.png') }}"
+                             class="w-10 h-10 me-2 rounded-full object-cover">
+
+                            <div>
+                                <span class="text-[16px] text-[#121212]">{{ Auth::user()->full_name }}</span><br>
+                                <small class="text-muted text-[14px]">{{ Auth::user()->email }}</small>
+                            </div>
+                        </li>
+                        <li class="items-center pt-2"><a class="dropdown-item pb-4" href="#">{{__('messages.MyAccount')}}</a></li>
+                        <li><a class="dropdown-item pb-4" href="#">{{__('messages.MyOrders')}}</a></li>
+                        <li><a class="dropdown-item pb-4" href="#">{{__('messages.Fav')}}</a></li>
+                        <li><a class="dropdown-item pb-4" href="#">{{__('messages.settings_notifications')}}</a></li>
+                        <li><a class="dropdown-item pb-4" href="#">{{__('messages.logout')}}</a></li>
+                    </ul>
+                </div>
+
+            </div>
+        @else
+            @include('partials.login')
+
+        @endauth
+    </div>
 
 
 
 
 </header>
-
-
-
-
-
 
 
 {{-- category-bar --}}
@@ -783,3 +837,19 @@
         <p>Categories not loaded</p>
     @endif
 </div>
+
+
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const profileImage = document.getElementById('profileImage');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+        profileImage.addEventListener('click', function() {
+            // Toggle the dropdown menu
+            const dropdown = new bootstrap.Dropdown(dropdownMenu);
+            dropdown.toggle();
+        });
+    });
+</script>

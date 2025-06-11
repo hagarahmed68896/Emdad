@@ -120,6 +120,10 @@ return [
     'msg'=> 'Message/Question',
     'send'=> 'Send Now',
     'writeQuestion'=> 'Write your question or explination here...',
+    'MyAccount'=> 'My Account',
+    'MyOrders'=> 'My Orders',
+    'Fav'=> 'Favorite',
+    'settings_notifications'=> 'Settings and Notifications',
 
 
 ];

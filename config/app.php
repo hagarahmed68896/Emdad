@@ -127,9 +127,14 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
-// 'providers' => [
-//     Illuminate\View\ViewServiceProvider::class,
-// ],
+    //    'providers' => [
+    //        Illuminate\View\ViewServiceProvider::class,
+    //        Laravel\Socialite\SocialiteServiceProvider::class,
+    //    ],
+    //   'aliases' => Illuminate\Support\Facades\Facade::defaultAliases()->merge([ // Use defaultAliases() to include Laravel's default aliases
+    //     'Session' => Illuminate\Support\Facades\Session::class, // <-- Your Session alias
+    //     'Socialite' => Laravel\Socialite\Facades\Socialite::class, // <-- Your Socialite alias
+    //     // 'PDF' => Barryvdh\DomPDF\Facade::class, // Example of another custom alias
+    // ])->toArray(), // Don't forget toArray() if using merge
 
-
-];
+   ];

@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name') }}</title>
     <link rel="icon" type="image/png" href="{{ asset('images/Logo.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -14,6 +15,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap');
     </style>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
 </head>
 
 <body>

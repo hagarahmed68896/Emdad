@@ -123,6 +123,10 @@ return [
     'msg'=> 'نص الرسالة / السؤال',
     'send'=> 'أرسل الآن',
     'writeQuestion'=> ' اكتب سؤالك أو استفسارك هنا...',
+    'MyAccount'=> 'حسابي',
+    'MyOrders' => 'طلباتي',
+    'Fav'=> 'المفضلة',
+    'settings_notifications'=> 'إعدادات الإشعارات',
 
 
 

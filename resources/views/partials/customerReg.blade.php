@@ -225,7 +225,6 @@
                                 </a>
                             </label>
                             @error('terms')
-                                {{-- Error display for terms checkbox --}}
                                 <div class="text-[#d33] mt-1">{{ $message }}</div>
                             @enderror
                         </div>

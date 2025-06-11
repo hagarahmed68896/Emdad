@@ -23,6 +23,12 @@ class User extends Authenticatable
         'password',
         'phone_number',
         'account_type',
+        'google_id',  
+        'facebook_id', 
+        'provider',   
+        'provider_id', 
+        'profile_picture_url',
+
     ];
 
     /**

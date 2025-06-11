@@ -155,13 +155,13 @@
                     <div class="space-y-4">
                         <div class="flex items-center justify-center h-[48px] w-full bg-[#F8F9FA] rounded-[12px]">
                             <img class="ml-3" src="{{ asset('images/Google.svg') }}" alt="">
-                            <a href="#" class="ml-2 text-[#212121] text-[16px] hover:underline">
+                            <a href="{{ route('login.google') }}"  class="ml-2 text-[#212121] text-[16px] hover:underline">
                                 {{ __('messages.login_with_google') }}
                             </a>
                         </div>
                         <div class="flex items-center justify-center h-[48px] w-full bg-[#F8F9FA] rounded-[12px]">
                             <img class="ml-3" src="{{ asset('images/Facebook.svg') }}" alt="">
-                            <a href="#" class="ml-2 text-[#212121] text-[16px] hover:underline">
+                            <a href="{{ route('login.facebook') }}" class="ml-2 text-[#212121] text-[16px] hover:underline">
                                 {{ __('messages.login_with_facebook') }}
                             </a>
                         </div>
