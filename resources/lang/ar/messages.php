@@ -127,6 +127,7 @@ return [
     'MyOrders' => 'طلباتي',
     'Fav'=> 'المفضلة',
     'settings_notifications'=> 'إعدادات الإشعارات',
+    'previous'=> 'السابق',
 
 
 

@@ -19,7 +19,7 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/auth/facebook/redirect', [SocialLoginController::class, 'redirectToFacebook'])->name('login.facebook');
     Route::get('/auth/facebook/callback', [SocialLoginController::class, 'handleFacebookCallback']);
-   
+
 });
     Route::match(['get', 'post'], '/supplier', [SupplierController::class, 'register'])->name('register.supplier');
 

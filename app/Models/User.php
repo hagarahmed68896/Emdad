@@ -27,7 +27,7 @@ class User extends Authenticatable
         'facebook_id', 
         'provider',   
         'provider_id', 
-        'profile_picture_url',
+        'profile_picture',
 
     ];
 

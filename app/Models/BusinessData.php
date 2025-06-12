@@ -8,6 +8,7 @@ class BusinessData extends Model
 {
      protected $fillable = [
         'user_id',
+        'company_name',
         'national_id',
         'national_id_attach',
         'commercial_registration',
@@ -18,7 +19,7 @@ class BusinessData extends Model
         'iban_attach',
         'tax_certificate',
         'tax_certificate_attach',
-    ];
+    ]; 
     public function user()
     {
         return $this->belongsTo(User::class);

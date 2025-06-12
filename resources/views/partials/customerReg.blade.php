@@ -98,9 +98,8 @@
                                     class="border-[#767676] border-[1px] rounded-r-[12px] px-3 pt-[16px] pb-[8px] text-[16px] h-[56px] text-[#767676]">
                                     966+
                                 </span>
-                                <input type="tel" name="phone_number" required pattern="[0-9]*" inputmode="numeric"
+                                <input type="tel" name="phone_number" required pattern="[0-9]*" inputmode="numeric" 
                                     placeholder="{{ __('messages.phoneMSG') }}" value="{{ old('phone_number') }}"
-                                    {{-- Added old() helper --}}
                                     class="ml-[-1px] block w-full px-3 py-2 border-[1px] border-[#767676] rounded-l-[12px] h-[56px] text-right">
                             </div>
                             @error('phone_number')

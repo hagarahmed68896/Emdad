@@ -124,6 +124,7 @@ return [
     'MyOrders'=> 'My Orders',
     'Fav'=> 'Favorite',
     'settings_notifications'=> 'Settings and Notifications',
+    'previous'=> 'Previous',
 
 
 ];

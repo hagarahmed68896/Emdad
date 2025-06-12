@@ -15,14 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('full_name');
             $table->string('email')->unique();
-            $table->string('company_name')->nullable();
             $table->string('phone_number')->nullable();
             $table->string('password');
             $table->string('profile_picture')->nullable();
             //type of account: 'supplier' or 'customer'
-            $table->string('account_type');
-
-            
+            $table->string('account_type');            
     
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();

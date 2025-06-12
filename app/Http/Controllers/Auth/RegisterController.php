@@ -19,7 +19,7 @@ $validator = Validator::make($request->all(), [
     'full_name' => 'required|string|max:255',
     'email' => 'required|email|unique:users,email',
     'password' => 'required|string|min:8|confirmed|regex:/[A-Z]/|regex:/[0-9]/',
-    'phone_number' => 'required|string|max:15|unique:users,phone_number',
+    'phone_number' => 'required|string|max:10|unique:users,phone_number',
     'terms' => 'accepted',
     'account_type' => 'required|string|in:supplier,customer',
 

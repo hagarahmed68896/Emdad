@@ -12,8 +12,9 @@ return new class extends Migration
     public function up(): void
     {
             Schema::create('business_data', function (Blueprint $table) {
-            $table->id(); // Primary key
+            $table->id(); 
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Foreign key to users table
+            $table->string('company_name')->nullable();
             $table->string('national_id')->nullable();
             $table->string('national_id_attach')->nullable();
             $table->string('commercial_registration')->nullable();

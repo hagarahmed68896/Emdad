@@ -12,7 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            Schema::table('users', function (Blueprint $table) {
             $table->string('google_id')->nullable()->after('email');
             $table->string('facebook_id')->nullable()->after('google_id');
             // Optional: Add a column to track the provider type
@@ -23,7 +22,7 @@ return new class extends Migration
             $table->unique(['google_id']);
             $table->unique(['facebook_id']);
         });
-        });
+     
     }
 
     /**
