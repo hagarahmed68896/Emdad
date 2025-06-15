@@ -71,14 +71,27 @@
     }
 </style>
 @php
-    $hasRegisterErrors = $errors->has('full_name') || $errors->has('email') || $errors->has('phone_number') || $errors->has('password') || $errors->has('confirm_password');
+    $loginErrors = $errors->has('email') || $errors->has('password');
+    $registerErrors = $errors->has('full_name') || $errors->has('phone_number') || $errors->has('confirm_password');
+@endphp
+@php
+    $showLogin = session('showLoginModal') || $errors->has('email') || $errors->has('password');
 @endphp
 
+<div x-data="{
+    showLogin: {{ json_encode($showLogin) }},
+    showRegister: false,
+    showOTP: false,
+    userType: 'customer',
+    accountData: true,
+    bussnissdata: false,
+    // Add a state to check if there are login errors
+    hasLoginErrors: {{ json_encode($loginErrors) }}
+}"
+{{-- Only allow closing if there are no login errors --}}
+@click.self="!hasLoginErrors && (showLogin = false)">
 
-<div x-data="{ showLogin:  {{ $errors->any() ? 'true' : 'false' }}, 
-    showRegister:  {{ $errors->any() ? 'true' : 'false' }}, 
-    showOTP:  {{ $errors->any() ? 'true' : 'false' }}, 
-    userType: 'customer', accountData: true, bussnissdata: false }">
+
     <div class="flex items-center space-x-4">
         <button @click="showLogin = true"
             class="w-[120px] h-[40px] bg-[#185D31] px-4 py-2 rounded-[12px] cursor-pointer text-white flex items-center justify-center font-semibold text-sm">
@@ -87,9 +100,10 @@
     </div>
 
 
-    <div x-show="showLogin" x-transition x-cloak
-        class="fixed inset-0 z-[50] flex items-center justify-center bg-black bg-opacity-50"
-        style="backdrop-filter: blur(2px);" @click.self="showLogin = false">
+  <div x-show="showLogin" x-transition x-cloak
+    class="fixed inset-0 z-[50] flex items-center justify-center bg-black bg-opacity-50"
+    style="backdrop-filter: blur(2px);" >
+
         <div style="background-image: url('{{ asset('images/4d2a165c129977b25a433b916ddfa33f089dcf9f.jpg') }}');"
             class="relative w-[90%] h-auto bg-cover bg-center flex flex-col justify-center items-center p-[24px] no-repeat overflow-visible rounded-lg shadow-lg">
             <button @click="showLogin = false"
@@ -99,8 +113,19 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
-            <div class="relative bg-white w-full w-[588px] h-auto p-[24px] rounded-[12px] shadow-xl">
-                <form method="POST" action="{{ route('login') }}">
+      {{-- Display errors here directly --}}
+            @if ($errors->any())
+                <div class="alert alert-danger mb-4 text-red-600 font-semibold">
+                    @foreach ($errors->all() as $error)
+                        <div>{{ $error }}</div>
+                    @endforeach
+                </div>
+            @endif
+
+
+            <form method="POST" action="{{ route('login') }}">
+                <div class="relative bg-white w-full w-[588px] h-auto p-[24px] rounded-[12px] shadow-xl">
+
                     @csrf
                     <p class="text-[32px] text-[#212121] font-bold">{{ __('messages.login') }}</p>
                     <p class="text-[20px] text-[#767676] mb-4">{{ __('messages.loginMSG') }}</p>
@@ -113,10 +138,16 @@
                             <img class="h-[24px] w-[24px] object-cover text-[#767676] mr-4"
                                 src="{{ asset('images/mail-send-envelope--envelope-email-message-unopened-sealed-close--Streamline-Core.svg') }}"
                                 alt="">
-                            <input type="email" name="email" required placeholder="example@gmail.com"
+                            <input type="email" name="email" value="{{ old('email') }}" required
+                                placeholder="example@gmail.com"
                                 class="block w-full px-3 py-2 border-none h-[56px] focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                         </div>
+                              {{-- Display specific email error --}}
+                        @error('email')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
+
                     <div class="mb-4">
                         <label for="password" class="block font-bold text-[20px] text-[#212121]">
                             {{ __('messages.password') }}
@@ -129,7 +160,26 @@
                             <input type="password" name="password" required
                                 placeholder="{{ __('messages.passwordMSG') }}"
                                 class="block w-full px-3 py-2 border-none h-[56px] focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <button @click.prevent="showPassword = !showPassword"
+                                class="ml-2 px-2 text-sm text-[#212121]">
+                                <span x-show="!showPassword"><img
+                                        src="{{ asset('images/interface-edit-view-off--disable-eye-eyeball-hide-off-view--Streamline-Core.svg') }}"
+                                        alt=""></span>
+                                <span x-show="showPassword">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                        fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
+                                        <path
+                                            d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z" />
+                                        <path
+                                            d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0" />
+                                    </svg>
+                                </span>
+                            </button>
                         </div>
+                           {{-- Display specific password error --}}
+                        @error('password')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div class="flex items-center mb-4 justify-between">
                         <div class="flex items-center">
@@ -155,13 +205,15 @@
                     <div class="space-y-4">
                         <div class="flex items-center justify-center h-[48px] w-full bg-[#F8F9FA] rounded-[12px]">
                             <img class="ml-3" src="{{ asset('images/Google.svg') }}" alt="">
-                            <a href="{{ route('login.google') }}"  class="ml-2 text-[#212121] text-[16px] hover:underline">
+                            <a href="{{ route('login.google') }}"
+                                class="ml-2 text-[#212121] text-[16px] hover:underline">
                                 {{ __('messages.login_with_google') }}
                             </a>
                         </div>
                         <div class="flex items-center justify-center h-[48px] w-full bg-[#F8F9FA] rounded-[12px]">
                             <img class="ml-3" src="{{ asset('images/Facebook.svg') }}" alt="">
-                            <a href="{{ route('login.facebook') }}" class="ml-2 text-[#212121] text-[16px] hover:underline">
+                            <a href="{{ route('login.facebook') }}"
+                                class="ml-2 text-[#212121] text-[16px] hover:underline">
                                 {{ __('messages.login_with_facebook') }}
                             </a>
                         </div>
@@ -175,14 +227,15 @@
                             </a>
                         </p>
                     </div>
-                </form>
-            </div>
+                </div>
+            </form>
+
         </div>
     </div>
 
 
 
-@include('partials.customerReg')
+    @include('partials.customerReg')
 
 
 

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name_en');
             $table->string('name_ar');
             $table->string('slug')->unique();
+            $table->string('iconUrl');
             $table->timestamps();
         });
     }

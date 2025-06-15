@@ -14,34 +14,33 @@ class RegisterController extends Controller
 {
     public function register(Request $request)
     {
-        
-$validator = Validator::make($request->all(), [
-    'full_name' => 'required|string|max:255',
-    'email' => 'required|email|unique:users,email',
-    'password' => 'required|string|min:8|confirmed|regex:/[A-Z]/|regex:/[0-9]/',
-    'phone_number' => 'required|string|max:10|unique:users,phone_number',
-    'terms' => 'accepted',
-    'account_type' => 'required|string|in:supplier,customer',
+        $validator = Validator::make($request->all(), [
+            'full_name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8|confirmed|regex:/[A-Z]/|regex:/[0-9]/',
+            'phone_number' => 'required|string|max:10|unique:users,phone_number',
+            'terms' => 'accepted',
+            'account_type' => 'required|string|in:supplier,customer',
+        ],
+        [
+            'full_name.required' => __('messages.nameError'),
+            'email.required' => __('messages.emailError'),
+            'email.email' => __('messages.emailValid'),
+            'email.unique' => __('messages.emailUnique'),
+            'password.min' => __('messages.passwordMin'),
+            'password.string' => __('messages.passwordString'),
+            'password.confirmed' => __('messages.passwordConfirm'),
+            'phone_number.required' => __('messages.phoneMSG'),
+            'phone_number.unique'=> __('messages.phone_number_Unique'),
+        ]);
 
-],
-[
-    'full_name.required' => __('messages.nameError'),
-    'email.required' => __('messages.emailError'),
-    'email.email' => __('messages.emailValid'),
-    'email.unique' => __('messages.emailUnique'),
-    'password.min' => __('messages.passwordMin'),
-    'password.string' => __('messages.passwordString'),
-    'password.confirmed' => __('messages.passwordConfirm'),
-    'phone_number.required' => __('messages.phoneMSG'),
-    'phone_number.unique'=> __('messages.phone_number_Unique'),
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
 
-]);
-if ($validator->fails()) {
-    return redirect()->back()
-        ->withErrors($validator)
-        ->withInput();
-}
-$user = User::create([
+        $user = User::create([
             'full_name' => $request->full_name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
@@ -51,7 +50,8 @@ $user = User::create([
 
         Auth::login($user);
         Log::info('User registered successfully: ' . $user->email);
-return redirect()->back()->with('success', __('messages.register_success'));
 
+        // Flash a session variable to indicate OTP should be shown
+        return redirect()->back()->with('show_otp_modal', true)->with('success', __('messages.register_success'));
     }
 }

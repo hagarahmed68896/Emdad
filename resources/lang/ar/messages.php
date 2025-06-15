@@ -128,6 +128,8 @@ return [
     'Fav'=> 'المفضلة',
     'settings_notifications'=> 'إعدادات الإشعارات',
     'previous'=> 'السابق',
+    'satisfied_customers'=> 'العملاء الراضين',
+    'fast_deliver'=> 'توصيل سريع',
 
 
 

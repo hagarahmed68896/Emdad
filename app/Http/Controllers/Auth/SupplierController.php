@@ -4,12 +4,13 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Auth; // Not directly used in register method, but kept for context
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\BusinessData;
-use Illuminate\Support\Facades\Storage; // IMPORTANT: Ensure this is imported for file storage
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB; // <--- ADDED: Import the DB facade
 
 class SupplierController extends Controller
 {
@@ -21,13 +22,14 @@ class SupplierController extends Controller
      */
     public function register(Request $request)
     {
+        dd($request->all());
+
         // Validate the incoming request data
-        // Added 'max:2048' (2MB) for file sizes to prevent excessively large uploads.
         $request->validate([
             'full_name' => 'required|string|max:255',
             'company_name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'phone_number' => 'required|string|max:10|unique:users,phone_number', // Matches your form's name="phone_number"
+            'phone_number' => 'required|string|max:10|unique:users,phone_number',
             'password' => 'required|string|min:8|confirmed',
             'national_id' => 'required|string|max:255',
             'national_id_attach' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
@@ -40,46 +42,64 @@ class SupplierController extends Controller
             'tax_certificate' => 'required|string|max:255',
             'tax_certificate_attach' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
             'terms' => 'accepted',
+            'account_type' => 'required|in:supplier', // <--- ADDED: Validation for account_type
         ]);
 
+        // This array will keep track of uploaded file paths for potential deletion on rollback
+        $uploadedFilePaths = [];
+
+        // Helper closure to handle file uploads and return only the filename
+        $uploadFileAndGetFilename = function ($fileInputName) use ($request, &$uploadedFilePaths) {
+            if ($request->hasFile($fileInputName)) {
+                $file = $request->file($fileInputName);
+                if (is_array($file)) {
+                    $file = reset($file);
+                }
+                // Store the file in the 'uploads' directory on the 'public' disk.
+                $path = $file->store('uploads', 'public');
+                $uploadedFilePaths[] = $path; // Store the full path for rollback
+                // Return only the base filename to store in the database.
+                return basename($path);
+            }
+            return null; // No file uploaded for this field
+        };
+
         try {
+            // <--- ADDED: Start a database transaction
+            DB::beginTransaction();
+
+            // Store files and get their filenames.
+            // We do this before user creation, but track paths for rollback.
+            $nationalIdAttach = $uploadFileAndGetFilename('national_id_attach');
+            $commercialRegistrationAttach = $uploadFileAndGetFilename('commercial_registration_attach');
+            $nationalAddressAttach = $uploadFileAndGetFilename('national_address_attach');
+            $ibanAttach = $uploadFileAndGetFilename('iban_attach');
+            $taxCertificateAttach = $uploadFileAndGetFilename('tax_certificate_attach');
+
+
             // 1. Create the User record
-            // 'company_name' logically belongs to the User, as a general attribute of the account.
             $user = User::create([
                 'full_name' => $request->full_name,
-                'company_name' => $request->company_name, // Saving company_name with the User model
                 'email' => $request->email,
-                'phone_number' => $request->phone_number, // Ensure this matches your User model's column
+                'phone_number' => $request->phone_number,
                 'password' => Hash::make($request->password),
-                'account_type' => $request->account_type,
+                'account_type' => 'supplier', // <--- CHANGED: Hardcoded 'supplier' for this controller
             ]);
 
             // 2. Prepare the BusinessData record, linked to the new user
             $businessData = new BusinessData();
             $businessData->user_id = $user->id; // Link to the newly created user
 
-            // Helper closure to handle file uploads and return only the filename
-            $uploadFileAndGetFilename = function ($fileInputName) use ($request) {
-                if ($request->hasFile($fileInputName)) {
-                    // Store the file in the 'uploads' directory on the 'public' disk.
-                    // This makes the file publicly accessible via /storage/uploads/filename.
-                    $path = $request->file($fileInputName)->store('uploads', 'public');
-                    // Return only the base filename to store in the database.
-                    return basename($path);
-                }
-                return null; // No file uploaded for this field
-            };
-
-            // 3. Process each file attachment and save its filename to BusinessData
-            $businessData->national_id_attach = $uploadFileAndGetFilename('national_id_attach');
-            $businessData->commercial_registration_attach = $uploadFileAndGetFilename('commercial_registration_attach');
-            $businessData->national_address_attach = $uploadFileAndGetFilename('national_address_attach');
-            $businessData->iban_attach = $uploadFileAndGetFilename('iban_attach');
-            $businessData->tax_certificate_attach = $uploadFileAndGetFilename('tax_certificate_attach');
+            // 3. Assign uploaded filenames to BusinessData
+            $businessData->national_id_attach = $nationalIdAttach;
+            $businessData->commercial_registration_attach = $commercialRegistrationAttach;
+            $businessData->national_address_attach = $nationalAddressAttach;
+            $businessData->iban_attach = $ibanAttach;
+            $businessData->tax_certificate_attach = $taxCertificateAttach;
 
             // 4. Fill in other business-specific data fields
-            // NOTE: company_name is NOT saved here, as it's already with the User model.
             $businessData->national_id = $request->national_id;
+            $businessData->company_name = $request->company_name;
             $businessData->commercial_registration = $request->commercial_registration;
             $businessData->national_address = $request->national_address;
             $businessData->iban = $request->iban;
@@ -88,15 +108,26 @@ class SupplierController extends Controller
             // 5. Save the BusinessData record to the database
             $businessData->save();
 
+            // <--- ADDED: Commit the transaction if all operations are successful
+            DB::commit();
 
-            return redirect()->route('home')->with('success', 'Registration successful!');
+            return back()->withInput()->with('success', 'Registration successful! Your account is awaiting approval.');
 
         } catch (\Exception $e) {
+            // <--- ADDED: Rollback the transaction if any error occurs
+            DB::rollBack();
+
+            // <--- ADDED: Delete any files that were uploaded during this failed attempt
+            foreach ($uploadedFilePaths as $path) {
+                Storage::disk('public')->delete($path);
+            }
+
             // Catch any errors during the process, log them, and provide user feedback
             Log::error('Supplier registration failed: ' . $e->getMessage(), [
                 'exception' => $e,
-                'request_data' => $request->all(),
-                'trace' => $e->getTraceAsString(), 
+                // <--- CHANGED: Exclude sensitive data like password from logs
+                'request_data' => $request->except('password', 'password_confirmation'),
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return back()->withInput()->withErrors([

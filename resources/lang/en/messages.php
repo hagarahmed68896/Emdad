@@ -125,6 +125,8 @@ return [
     'Fav'=> 'Favorite',
     'settings_notifications'=> 'Settings and Notifications',
     'previous'=> 'Previous',
+    'satisfied_customers'=> 'Satisfied customers',
+    'fast_deliver'=> 'Fast Delivery',
 
 
 ];
