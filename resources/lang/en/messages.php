@@ -127,6 +127,11 @@ return [
     'previous'=> 'Previous',
     'satisfied_customers'=> 'Satisfied customers',
     'fast_deliver'=> 'Fast Delivery',
+    'all'=> 'All',
+    'recommend'=> 'Recommend for you',
+    'refresh'=> 'Refresh',
+    'delete'=> 'Delete',
+ 
 
 
 ];

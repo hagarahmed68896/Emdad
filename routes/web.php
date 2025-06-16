@@ -8,6 +8,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Auth\SupplierController;
 use App\Http\Controllers\OtpController;
 use App\Http\Controllers\Auth\SocialLoginController;
+use App\Http\Controllers\ProductSuggestionController;
 use App\Models\Product;
 use Illuminate\Http\Request;
 Route::middleware('guest')->group(function () {
@@ -36,19 +37,10 @@ Route::get('/', [HomeController::class, 'index'])->name(name: 'home');
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 Route::get('/products', [CategoryController::class, 'index'])->name('products.index');
 Route::get('/products/category/{slug}', [CategoryController::class, 'filterByCategory'])->name('products.filterByCategory');
-Route::get('/products/suggestions', function (Request $request) {
-    $query = $request->input('query');
-    $suggestions = [];
-    if ($query) {
-        $suggestions = Product::where('name', 'like', '%' . $query . '%')
-                              ->select('name')
-                              ->distinct()
-                              ->limit(10)
-                              ->pluck('name')
-                              ->toArray();
-    }
-    return response()->json($suggestions);
-});
+
+// routes/api.php (recommended for API endpoints)
+Route::get('/products/suggestions', [ProductSuggestionController::class, 'getSuggestions']);
+
 Route::get('language/{locale}', function ($locale) {
     if (in_array($locale, ['en', 'ar'])) {
         session(['locale' => $locale]);

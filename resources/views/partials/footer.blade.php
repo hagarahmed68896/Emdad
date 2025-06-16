@@ -31,7 +31,7 @@
             </ul>
         </div>
         <div class="text-center md:text-right">
-            <h4 class="font-bold text-lg mb-2 underline">الفئات</h4>
+            <h4 class="font-bold text-lg mb-2 underline">{{__('messages.categories')}}</h4>
             <ul>
                 <li class="mb-2"><a href="#" class="hover:text-white transition-colors duration-300">{{__('messages.Electronics')}}</a></li>
                 <li class="mb-2"><a href="#" class="hover:text-white transition-colors duration-300">{{__('messages.clothing')}}</a></li>

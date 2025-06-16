@@ -130,6 +130,11 @@ return [
     'previous'=> 'السابق',
     'satisfied_customers'=> 'العملاء الراضين',
     'fast_deliver'=> 'توصيل سريع',
+    'all'=> 'الكل',
+    'categories' => 'الفئات',
+    'recommend' => 'اقتراحتنا لك',
+    'refresh' => 'تحديث',
+    'delete'=> 'إزالة',
 
 
 
