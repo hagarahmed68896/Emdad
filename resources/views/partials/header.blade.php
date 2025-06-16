@@ -460,13 +460,15 @@
     }
 </style>
 
-<header class="bg-white flex flex-wrap items-center justify-between py-2 shadow-md px-[64px]">
-    <div class="flex items-center h-auto w-auto max-w-[72px] shrink-0">
+<header class="bg-white flex flex-wrap items-center justify-between py-2 shadow-md h-auto w-full md:px-[64px] px-[20px]">
+    
+    <div class="flex items-center h-auto w-auto max-w-[72px]">
         <img src="{{ asset('images/Logo.png') }}" alt="Logo">
     </div>
 
     <div x-data="{ open: false }"
-        class="relative inline-block text-[12px] tracking-[0%] w-auto max-w-[150px] mx-4 md:w-[120px] md:h-[36px] shrink-0">
+        class="relative inline-block text-[12px] tracking-[0%] w-auto max-w-[150px] lg:mx-4
+         sm:mx-1 md:w-[120px] md:h-[36px] shrink-0  ">
         <div @click="open = !open"
             class="flex items-center cursor-pointer p-1 hover:border font-normal rounded-[4px] space-x-1 h-full w-full justify-center">
             <img src="https://s.alicdn.com/@icon/flag/assets/sa.png" alt="SA" class="w-[24px] h-[24px] ml-2" />
@@ -478,7 +480,7 @@
         </div>
 
         <div x-show="open" @click.away="open = false" x-transition
-            class="absolute z-10 mt-2 w-[calc(100vw-32px)] left-1/2 -translate-x-1/2 bg-white border border-gray-200 rounded-lg shadow-lg p-4
+            class="absolute z-10 mt-2 w-[calc(100vw-32px)] left-0 sm:right-0  bg-white border border-gray-200 rounded-lg shadow-lg p-4
                    md:w-[350px] md:left-auto md:right-0 md:translate-x-0">
             <div class="flex flex-col mb-4">
                 <p class="font-cairo font-bold text-[20px] leading-[150%] tracking-[0%] text-right align-middle mb-3">
@@ -509,6 +511,7 @@
         </div>
     </div>
 
+
     <div id="mapModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
         <div class="bg-white w-full max-w-4xl rounded-lg shadow-lg relative mx-4 md:mx-auto">
             <div class="p-4 border-b">
@@ -530,7 +533,7 @@
         </div>
     </div>
 
-    <div class="w-full  mt-2 md:mt-0 md:flex-grow md:max-w-2xl mx-8">
+    <div class="w-full  md:flex-grow md:max-w-2xl mx-8 ">
         <form action="{{ route('search') }}" method="GET" class="main-search-form">
             <div class="flex border rounded-[12px] bg-[#F8F9FA] items-center py-1 px-2 relative">
 
@@ -770,7 +773,7 @@
         $currentLang = app()->getLocale();
     @endphp
     <!-- Language -->
-    <div class="btn-group flex items-center " style="color: #212121;  width:90px; height:24px; ">
+    <div class="btn-group flex items-center md:order-4 sm:order-2 " style="color: #212121;  width:90px; height:24px; ">
 
         <button type="button" class="btn  w-[16px]  border-none" data-bs-toggle="dropdown" aria-expanded="false">
             <img src="{{ asset('images/Vector (2).svg') }}" alt="">
@@ -796,7 +799,7 @@
         </div>
     </div>
 
-    <div class="flex items-center w-auto justify-end gap-x-4 ml-4 shrink-0 md:w-[100px] md:justify-between md:ml-0">
+    <div class="flex items-center w-auto justify-end gap-x-4 ml-4 shrink-0 md:w-[100px] md:justify-between md:ml-0 order-5">
         <a href="#" class="relative w-[18px] h-[18px]">
             <img src="{{ asset('images/Vector.svg') }}" alt="Favorites Icon">
         </a>
@@ -809,7 +812,7 @@
         </a>
     </div>
 
-    <div class="user-profile-section  shrink-0">
+    <div class="user-profile-section  shrink-0 md:order-6 sm:order-3 ">
         @auth
             <div class="p-[24px]">
                 <div class="dropdown" x-data="{ profile: false }">
@@ -858,15 +861,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
 {{-- category-bar --}}
 <div
     class="categories bg-white w-full sm:flex sm:items-center sm:justify-between sm:px-[64px] pt-4 pb-3 space-y-3 sm:space-y-0  flex-col sm:flex-row  relative">
@@ -884,7 +878,7 @@
         </a>
 
 
-        <div class="relative text-left w-full max-w-xs mx-auto" x-data="{ openIndex: null }">
+        <div class="relative text-left w-full max-w-xs mx-auto z-20" x-data="{ openIndex: null }">
             <!-- Main Dropdown Menu -->
             <div id="mainDropdownMenu"
                 class="origin-top-right mt-3 absolute w-[314px] rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-10"
