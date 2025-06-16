@@ -131,6 +131,8 @@ return [
     'recommend'=> 'Recommend for you',
     'refresh'=> 'Refresh',
     'delete'=> 'Delete',
+    'failed_email'=> 'Email is not exists',
+    'incorrect_password'=> 'Incorrect Password',
  
 
 

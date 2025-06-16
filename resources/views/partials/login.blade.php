@@ -1,3 +1,4 @@
+
 <style>
     .entity_type_selector {
         display: flex;
@@ -79,8 +80,8 @@
 @endphp
 
 <div x-data="{
-    showLogin: {{ json_encode($showLogin) }},
-    showRegister: false,
+   showLogin: {{ session('showLoginModal', false) ? 'true' : 'false' }},
+    showRegister: {{ session('showRegisterModal', false) ? 'true' : 'false' }},
     showOTP: false,
     userType: 'customer',
     accountData: true,
@@ -100,139 +101,190 @@
     </div>
 
 
-  <div x-show="showLogin" x-transition x-cloak
-    class="fixed inset-0 z-[50] flex items-center justify-center bg-black bg-opacity-50"
-    style="backdrop-filter: blur(2px);" >
+<div x-show="showLogin" x-transition x-cloak
+    class="fixed inset-0 z-[50] flex items-center justify-center bg-black bg-opacity-50">
 
-        <div style="background-image: url('{{ asset('images/4d2a165c129977b25a433b916ddfa33f089dcf9f.jpg') }}');"
-            class="relative w-[90%] h-auto bg-cover bg-center flex flex-col justify-center items-center p-[24px] no-repeat overflow-visible rounded-lg shadow-lg">
-            <button @click="showLogin = false"
-                class="absolute top-3 right-3 z-50 bg-white p-1 rounded-full text-gray-500 hover:text-gray-700 focus:outline-none z-10">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-      {{-- Display errors here directly --}}
-            @if ($errors->any())
-                <div class="alert alert-danger mb-4 text-red-600 font-semibold">
-                    @foreach ($errors->all() as $error)
-                        <div>{{ $error }}</div>
-                    @endforeach
+    <div style="background-image: url('{{ asset('images/4d2a165c129977b25a433b916ddfa33f089dcf9f.jpg') }}');"
+        class="relative w-[90%] h-auto bg-cover bg-center flex flex-col justify-center items-center p-[24px] no-repeat overflow-visible rounded-lg shadow-lg">
+
+        <button @click="showLogin = false"
+            class="absolute top-3 right-3 z-50 bg-white p-1 rounded-full text-gray-500 hover:text-gray-700 focus:outline-none z-10">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        {{-- The global error display at the top is REMOVED as AJAX handles specific field errors --}}
+        {{-- You can add a general alert here if needed for non-validation errors --}}
+
+        {{-- IMPORTANT: Add x-data, @submit.prevent, and the submitForm method here --}}
+        <form method="POST" action="{{ route('login') }}"
+            x-data="{
+                formData: { email: '', password: '', remember: false },
+                errors: {},
+                loading: false,
+                submitForm() {
+                    this.loading = true;
+                    this.errors = {}; // Clear previous errors
+
+                    axios.post(this.$el.action, this.formData)
+                        .then(response => {
+                            this.loading = false;
+                            // Check for a redirect URL from the server
+                            if (response.data.redirect) {
+                                window.location.href = response.data.redirect;
+                            } else {
+                                // Handle other success cases if any, e.g., show a success message
+                                // For login, typically it's always a redirect on success
+                                console.log('Login successful, but no redirect URL provided.', response.data);
+                            }
+                        })
+                        .catch(error => {
+                            this.loading = false;
+                            if (error.response) {
+                                if (error.response.status === 422) {
+                                    // Validation errors from Laravel
+                                    this.errors = error.response.data.errors;
+                                } else {
+                                    // Other HTTP errors (e.g., 500 server error)
+                                    console.error('Server error:', error.response.data);
+                                    // You might want a general error message for the user here
+                                    alert('An unexpected server error occurred. Please try again.');
+                                }
+                            } else {
+                                // Network error or other unexpected issues
+                                console.error('Network or other error:', error);
+                                alert('Could not connect to the server. Please check your internet connection.');
+                            }
+                        });
+                }
+            }"
+            @submit.prevent="submitForm"> {{-- Prevent default form submission for AJAX --}}
+
+            <div class="relative bg-white w-full w-[588px] h-auto p-[24px] rounded-[12px] shadow-xl">
+
+                @csrf {{-- CSRF token is still required for AJAX POST requests --}}
+                <p class="text-[32px] text-[#212121] font-bold">{{ __('messages.login') }}</p>
+                <p class="text-[20px] text-[#767676] mb-4">{{ __('messages.loginMSG') }}</p>
+
+                <div class="mb-4">
+                    <label for="email" class="block font-bold text-[20px] text-[#212121]">
+                        {{ __('messages.email') }}
+                    </label>
+                    <div class="flex items-center mt-2 border-[1px] rounded-[12px] overflow-hidden"
+                        :class="{'border-[#d33]': errors.email, 'border-[#767676]': !errors.email}">
+                        <img class="h-[24px] w-[24px] object-cover text-[#767676] mr-4"
+                            src="{{ asset('images/mail-send-envelope--envelope-email-message-unopened-sealed-close--Streamline-Core.svg') }}"
+                            alt="">
+                        {{-- Use x-model to bind input to formData --}}
+                        <input type="email" name="email" id="email" required
+                            placeholder="example@gmail.com" x-model="formData.email"
+                            class="block w-full px-3 py-2 border-none h-[56px] focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                    {{-- Display specific email error using Alpine.js --}}
+                    <template x-if="errors.email">
+                        <p class="text-red-500 text-xs mt-1" x-text="errors.email"></p>
+                    </template>
                 </div>
-            @endif
 
-
-            <form method="POST" action="{{ route('login') }}">
-                <div class="relative bg-white w-full w-[588px] h-auto p-[24px] rounded-[12px] shadow-xl">
-
-                    @csrf
-                    <p class="text-[32px] text-[#212121] font-bold">{{ __('messages.login') }}</p>
-                    <p class="text-[20px] text-[#767676] mb-4">{{ __('messages.loginMSG') }}</p>
-                    <div class="mb-4">
-                        <label for="email" class="block font-bold text-[20px] text-[#212121]">
-                            {{ __('messages.email') }}
-                        </label>
-                        <div
-                            class="flex items-center mt-2 border-[1px] border-[#767676] rounded-[12px] overflow-hidden">
-                            <img class="h-[24px] w-[24px] object-cover text-[#767676] mr-4"
-                                src="{{ asset('images/mail-send-envelope--envelope-email-message-unopened-sealed-close--Streamline-Core.svg') }}"
-                                alt="">
-                            <input type="email" name="email" value="{{ old('email') }}" required
-                                placeholder="example@gmail.com"
-                                class="block w-full px-3 py-2 border-none h-[56px] focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                        </div>
-                              {{-- Display specific email error --}}
-                        @error('email')
-                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                        @enderror
+                <div class="mb-4">
+                    <label for="password" class="block font-bold text-[20px] text-[#212121]">
+                        {{ __('messages.password') }}
+                    </label>
+                    <div class="flex items-center mt-2 border-[1px] rounded-[12px] overflow-hidden"
+                        :class="{'border-[#d33]': errors.password, 'border-[#767676]': !errors.password}">
+                        <img class="h-[24px] w-[24px] object-cover text-[#767676] mr-4"
+                            src="{{ asset('images/interface-lock--combination-combo-lock-locked-padlock-secure-security-shield-keyhole--Streamline-Core.svg') }}"
+                            alt="">
+                        {{-- Use x-model to bind input to formData --}}
+                        <input type="password" name="password" id="password" required
+                            placeholder="{{ __('messages.passwordMSG') }}" x-model="formData.password"
+                            class="block w-full px-3 py-2 border-none h-[56px] focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        {{-- Password visibility toggle --}}
+                        <button @click.prevent="this.type = (this.type === 'password' ? 'text' : 'password')"
+                            class="ml-2 px-2 text-sm text-[#212121]">
+                            <span x-show="this.type === 'password'"><img
+                                    src="{{ asset('images/interface-edit-view-off--disable-eye-eyeball-hide-off-view--Streamline-Core.svg') }}"
+                                    alt=""></span>
+                            <span x-show="this.type === 'text'">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                    fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
+                                    <path
+                                        d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z" />
+                                    <path
+                                        d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0" />
+                                </svg>
+                            </span>
+                        </button>
                     </div>
+                    {{-- Display specific password error using Alpine.js --}}
+                    <template x-if="errors.password">
+                        <p class="text-red-500 text-xs mt-1" x-text="errors.password"></p>
+                    </template>
+                </div>
 
-                    <div class="mb-4">
-                        <label for="password" class="block font-bold text-[20px] text-[#212121]">
-                            {{ __('messages.password') }}
+                <div class="flex items-center mb-4 justify-between">
+                    <div class="flex items-center">
+                        {{-- Use x-model for remember checkbox --}}
+                        <input type="checkbox" id="remember" name="remember" x-model="formData.remember"
+                            class="h-4 w-4 ml-2 text-[#185D31] focus:ring-[#185D31] border-[#185D31] rounded">
+                        <label for="remember" class="ml-2 text-[16px] text-[#212121]">
+                            {{ __('messages.remember_me') }}
                         </label>
-                        <div
-                            class="flex items-center mt-2 border-[1px] border-[#767676] rounded-[12px] overflow-hidden">
-                            <img class="h-[24px] w-[24px] object-cover text-[#767676] mr-4"
-                                src="{{ asset('images/interface-lock--combination-combo-lock-locked-padlock-secure-security-shield-keyhole--Streamline-Core.svg') }}"
-                                alt="">
-                            <input type="password" name="password" required
-                                placeholder="{{ __('messages.passwordMSG') }}"
-                                class="block w-full px-3 py-2 border-none h-[56px] focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            <button @click.prevent="showPassword = !showPassword"
-                                class="ml-2 px-2 text-sm text-[#212121]">
-                                <span x-show="!showPassword"><img
-                                        src="{{ asset('images/interface-edit-view-off--disable-eye-eyeball-hide-off-view--Streamline-Core.svg') }}"
-                                        alt=""></span>
-                                <span x-show="showPassword">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                        fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
-                                        <path
-                                            d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z" />
-                                        <path
-                                            d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0" />
-                                    </svg>
-                                </span>
-                            </button>
-                        </div>
-                           {{-- Display specific password error --}}
-                        @error('password')
-                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                        @enderror
                     </div>
-                    <div class="flex items-center mb-4 justify-between">
-                        <div class="flex items-center">
-                            <input type="checkbox" id="remember" name="remember"
-                                class="h-4 w-4 ml-2 text-[#185D31] focus:ring-[#185D31] border-[#185D31] rounded">
-                            <label for="remember" class="ml-2 text-[16px] text-[#212121]">
-                                {{ __('messages.remember_me') }}
-                            </label>
+                    <a href="#" class="text-[16px] text-[#185D31] hover:underline">
+                        {{ __('messages.forgot_password') }}
+                    </a>
+                </div>
+
+                {{-- Submit button with loading state --}}
+                <button type="submit" :disabled="loading"
+                    class="w-full bg-[#185D31] text-white p-[12px] h-[48px] rounded-md hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <span x-show="!loading">{{ __('messages.login') }}</span>
+                    <span x-show="loading">
+                        <div class="animate-spin inline-block w-6 h-6 border-[3px] border-current border-t-transparent text-white rounded-full" role="status" aria-label="loading">
+                            <span class="sr-only">Loading...</span>
                         </div>
-                        <a href="#" class="text-[16px] text-[#185D31] hover:underline">
-                            {{ __('messages.forgot_password') }}
+                    </span>
+                </button>
+
+    
+                <div class="flex items-center justify-center my-4 text-[#EDEDED]">
+                    <hr class="flex-grow border-t border-gray-400">
+                    <span class="text-sm text-gray-500 font-medium mx-4">{{ __('messages.or') }}</span>
+                    <hr class="flex-grow border-t border-gray-400">
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-center h-[48px] w-full bg-[#F8F9FA] rounded-[12px]">
+                        <img class="ml-3" src="{{ asset('images/Google.svg') }}" alt="">
+                        <a href="{{ route('login.google') }}"
+                            class="ml-2 text-[#212121] text-[16px] hover:underline">
+                            {{ __('messages.login_with_google') }}
                         </a>
                     </div>
-                    <button type="submit"
-                        class="w-full bg-[#185D31] text-white p-[12px] h-[48px] rounded-md hover:bg-green-800">
-                        {{ __('messages.login') }}
-                    </button>
-                    <div class="flex items-center justify-center my-4 text-[#EDEDED]">
-                        <hr class="flex-grow border-t border-gray-400">
-                        <span class="text-sm text-gray-500 font-medium mx-4">{{ __('messages.or') }}</span>
-                        <hr class="flex-grow border-t border-gray-400">
-                    </div>
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-center h-[48px] w-full bg-[#F8F9FA] rounded-[12px]">
-                            <img class="ml-3" src="{{ asset('images/Google.svg') }}" alt="">
-                            <a href="{{ route('login.google') }}"
-                                class="ml-2 text-[#212121] text-[16px] hover:underline">
-                                {{ __('messages.login_with_google') }}
-                            </a>
-                        </div>
-                        <div class="flex items-center justify-center h-[48px] w-full bg-[#F8F9FA] rounded-[12px]">
-                            <img class="ml-3" src="{{ asset('images/Facebook.svg') }}" alt="">
-                            <a href="{{ route('login.facebook') }}"
-                                class="ml-2 text-[#212121] text-[16px] hover:underline">
-                                {{ __('messages.login_with_facebook') }}
-                            </a>
-                        </div>
-                    </div>
-                    <div class="text-center mt-4">
-                        <p class="text-[16px] text-[#212121]">
-                            {{ __('messages.dont_have_account') }}
-                            <a href="#" @click="showRegister = true; showLogin = false"
-                                class="text-[#185D31] underline">
-                                {{ __('messages.create__new_account') }}
-                            </a>
-                        </p>
+                    <div class="flex items-center justify-center h-[48px] w-full bg-[#F8F9FA] rounded-[12px]">
+                        <img class="ml-3" src="{{ asset('images/Facebook.svg') }}" alt="">
+                        <a href="{{ route('login.facebook') }}"
+                            class="ml-2 text-[#212121] text-[16px] hover:underline">
+                            {{ __('messages.login_with_facebook') }}
+                        </a>
                     </div>
                 </div>
-            </form>
+                <div class="text-center mt-4">
+                    <p class="text-[16px] text-[#212121]">
+                        {{ __('messages.dont_have_account') }}
+                        <a href="#" @click="showRegister = true; showLogin = false"
+                            class="text-[#185D31] underline">
+                            {{ __('messages.create__new_account') }}
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </form>
 
-        </div>
     </div>
-
+</div>
 
 
     @include('partials.customerReg')
@@ -243,3 +295,4 @@
 
 
 </div>
+

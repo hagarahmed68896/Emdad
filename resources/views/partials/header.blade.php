@@ -450,12 +450,12 @@
     }
 
     @media (max-width: 770px) {
+
         /* Change 640px to your desired breakpoint */
         .dropdown-text,
-        .individualCategories
-        {
-        display: none;
-    }
+        .individualCategories {
+            display: none;
+        }
 
     }
 </style>
@@ -495,7 +495,7 @@
 </div> --}}
 
     <div x-data="{ open: false }"
-         class="deliver relative inline-block text-[12px] tracking-[0%] w-auto max-w-[150px] lg:mx-4
+        class="deliver relative inline-block text-[12px] tracking-[0%] w-auto max-w-[150px] lg:mx-4
          sm:mx-1 md:w-[120px] md:h-[36px] shrink-0  ">
         <div @click="open = !open"
             class="flex items-center cursor-pointer p-1 hover:border font-normal rounded-[4px] space-x-1 h-full w-full justify-center">
@@ -517,7 +517,7 @@
                     {{ __('messages.deliverySiteMSG') }}</p>
             </div>
             <div>
-                <a href=""
+                <a href="#" @click="showLogin = true"
                     class="w-full h-[40px] bg-[#185D31] px-4 py-2 rounded-[12px] cursor-pointer text-[14px] text-white flex items-center justify-center">
                     {{ __('messages.addLocation') }}
                 </a>
@@ -758,9 +758,9 @@
 
                         {{-- Recent Searches Section --}}
                         <div x-show="recentSearches.length > 0 && searchText.length === 0">
-                            <div
-                                class="px-3 py-3  uppercase border-b flex justify-between items-center">
-                                <span class="font-bold text-[#121212] text-[20px]">{{ __('messages.recent_Searches') }}</span>
+                            <div class="px-3 py-3  uppercase border-b flex justify-between items-center">
+                                <span
+                                    class="font-bold text-[#121212] text-[20px]">{{ __('messages.recent_Searches') }}</span>
                                 <button type="button" @click="clearAllRecentSearches()"
                                     class="flex justify-between text-gray-400 hover:text-gray-700">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -796,7 +796,8 @@
                         <div x-show="productSuggestions.length > 0 || searchText.length === 0 || loadingSuggestions">
                             <div class="px-3 py-3 text-gray-700  text-xs uppercase border-b flex justify-between items-center"
                                 :class="{ 'mt-2': recentSearches.length > 0 && searchText.length === 0 }">
-                                <span class="text-[20px] sm:text-[14px] text-[#212121] font-bold">{{ __('messages.recommend') }}</span>
+                                <span
+                                    class="text-[20px] sm:text-[14px] text-[#212121] font-bold">{{ __('messages.recommend') }}</span>
                                 <button type="button" @click="refreshSuggestions()"
                                     class="flex justify-between text-gray-400 hover:text-gray-700">
 
@@ -836,57 +837,57 @@
                 </div>
 
                 {{-- Image Upload Component (Unchanged) --}}
-<div x-data="imageUploadComponent()" class="relative flex items-center justify-center mx-2 shrink-0">
-    <label @click="showUploadModal = true" class="cursor-pointer hover:text-black text-[#767676]">
-        <img src="{{ asset('images/Group (3).svg') }}" alt="Upload Image" class="w-[20px] h-[20px]">
-    </label>
+                <div x-data="imageUploadComponent()" class="relative flex items-center justify-center mx-2 shrink-0">
+                    <label @click="showUploadModal = true" class="cursor-pointer hover:text-black text-[#767676]">
+                        <img src="{{ asset('images/Group (3).svg') }}" alt="Upload Image" class="w-[20px] h-[20px]">
+                    </label>
 
-    {{-- This is now the ONLY main container for the modal --}}
-    <div x-show="showUploadModal" x-cloak @click.away="showUploadModal = false"
-        class="absolute top-full -left-20   mt-2 bg-white shadow-lg rounded-lg py-2 z-30
+                    {{-- This is now the ONLY main container for the modal --}}
+                    <div x-show="showUploadModal" x-cloak @click.away="showUploadModal = false"
+                        class="absolute top-full -left-20   mt-2 bg-white shadow-lg rounded-lg py-2 z-30
                sm:w-[660px] sm:h-[320px]">
-        {{-- The content div inside, responsible for its own padding --}}
-        <div class="p-6 relative w-full h-full">
-            <button @click="showUploadModal = false"
-                class="absolute top-3 right-3 text-gray-500 hover:text-gray-700">
-                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-            <div class="border-2 border-dashed border-gray-300 p-6 rounded-md flex flex-col items-center justify-center text-gray-600 m-2 h-[180px] sm:w-[600px] sm:h-[210px]"
-                @drop.prevent="handleDrop" @dragover.prevent>
-                <template x-if="imagePreview">
-                    <img :src="imagePreview" alt="Preview"
-                        class="w-32 h-32 object-contain mb-2" />
-                </template>
-                <template x-if="!imagePreview">
-                    <div class="flex flex-col items-center justify-center">
-                        <img src="{{ asset('images/Frame 3508.svg') }}" alt=""
-                            class="w-[48px] h-[48px] mb-2">
-                        <p class="text-center text-sm">
-                            {{ __('messages.dragPhoto') }}
-                            <label for="imageInput"
-                                class="text-green-700 underline cursor-pointer block">
-                                {{ __('messages.attachFile') }}
-                            </label>
-                        </p>
+                        {{-- The content div inside, responsible for its own padding --}}
+                        <div class="p-6 relative w-full h-full">
+                            <button @click="showUploadModal = false"
+                                class="absolute top-3 right-3 text-gray-500 hover:text-gray-700">
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                            <div class="border-2 border-dashed border-gray-300 p-6 rounded-md flex flex-col items-center justify-center text-gray-600 m-2 h-[180px] sm:w-[600px] sm:h-[210px]"
+                                @drop.prevent="handleDrop" @dragover.prevent>
+                                <template x-if="imagePreview">
+                                    <img :src="imagePreview" alt="Preview"
+                                        class="w-32 h-32 object-contain mb-2" />
+                                </template>
+                                <template x-if="!imagePreview">
+                                    <div class="flex flex-col items-center justify-center">
+                                        <img src="{{ asset('images/Frame 3508.svg') }}" alt=""
+                                            class="w-[48px] h-[48px] mb-2">
+                                        <p class="text-center text-sm">
+                                            {{ __('messages.dragPhoto') }}
+                                            <label for="imageInput"
+                                                class="text-green-700 underline cursor-pointer block">
+                                                {{ __('messages.attachFile') }}
+                                            </label>
+                                        </p>
+                                    </div>
+                                </template>
+                                <input type="file" id="imageInput" accept="image/*" class="hidden"
+                                    @change="handleImageUpload">
+                            </div>
+                            <div class="flex flex-col sm:flex-row mt-4 mb-4 items-center justify-between">
+                                <input type="text" x-model="imageUrl" placeholder="{{ __('messages.imageURL') }}"
+                                    class="border border-gray-300 px-3 py-2 rounded w-full sm:w-[400px] text-sm mb-2 sm:mb-0" />
+                                <button type="button" @click="submitImage"
+                                    class="bg-green-800 text-white px-6 py-2 rounded text-sm w-full sm:w-auto">
+                                    {{ __('messages.Search') }}
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                </template>
-                <input type="file" id="imageInput" accept="image/*" class="hidden"
-                    @change="handleImageUpload">
-            </div>
-            <div class="flex flex-col sm:flex-row mt-4 mb-4 items-center justify-between">
-                <input type="text" x-model="imageUrl" placeholder="{{ __('messages.imageURL') }}"
-                    class="border border-gray-300 px-3 py-2 rounded w-full sm:w-[400px] text-sm mb-2 sm:mb-0" />
-                <button type="button" @click="submitImage"
-                    class="bg-green-800 text-white px-6 py-2 rounded text-sm w-full sm:w-auto">
-                    {{ __('messages.Search') }}
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+                </div>
 
                 <div class="shrink-0">
                     <button type="submit"
@@ -910,8 +911,7 @@
         $currentLang = app()->getLocale();
     @endphp
     <!-- Language -->
-    <div class="language btn-group flex items-center md:order-4 sm:order-2 "
-        style="color: #212121;  width:90px; height:24px; ">
+    <div class="language btn-group flex items-center  " style="color: #212121;  width:90px; height:24px; ">
 
         <button type="button" class="btn  w-[16px]  border-none" data-bs-toggle="dropdown" aria-expanded="false">
             <img src="{{ asset('images/Vector (2).svg') }}" alt="">
@@ -938,33 +938,36 @@
     </div>
 
     <div
-        class="icons flex items-center w-auto justify-end gap-x-4 ml-4 shrink-0 md:w-[100px] md:justify-between md:ml-0 order-5">
+        class="icons flex items-center w-auto justify-end gap-x-4 ml-4 shrink-0 md:w-[100px] md:justify-between md:ml-0 ">
         <a href="#" class="relative w-[18px] h-[18px]">
             <img src="{{ asset('images/Vector.svg') }}" alt="Favorites Icon">
         </a>
         <a href="#" class="relative w-[18px] h-[18px]">
             <img src="{{ asset('images/Group.svg') }}" alt="Cart Icon">
         </a>
-        <a href="#" class="relative w-[18px] h-[18px]">
-            <img src="{{ asset('images/interface-alert-alarm-bell-2--alert-bell-ring-notification-alarm--Streamline-Core.svg') }}"
-                alt="Notifications Icon">
-        </a>
+        {{-- This content will only be rendered if a user IS logged in --}}
+        @auth
+            <a href="#" class="relative w-[18px] h-[18px]">
+                <img src="{{ asset('images/interface-alert-alarm-bell-2--alert-bell-ring-notification-alarm--Streamline-Core.svg') }}"
+                 >
+            </a>
+        @endauth
     </div>
 
-    <div class="user-profile-section  shrink-0 md:order-6 sm:order-3 ">
+    <div class="user-profile-section  shrink-0  ">
         @auth
-            <div class="p-[24px]">
+            <div class="p-[15px]">
                 <div class="dropdown" x-data="{ profile: false }">
                     <a class="btn p-0 border-0 bg-transparent" @click="profile = !profile" aria-expanded="false"
                         id="dropdownButton">
-                        <img src="{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : asset('images/default_avatar.png') }}"
+                        <img src="{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : asset('images/Unknown_person.jpg') }}"
                             class="w-10 h-10 rounded-full object-cover" id="profileImage" style="cursor: pointer;">
                     </a>
                     <ul x-show="profile" @click.away="profile = false"
-                        class="profile-menu shadow w-[296px] h-auto rounded-lg p-3 absolute right-0 mt-2 bg-white z-50"
+                        class="profile-menu shadow w-[296px] h-auto rounded-lg p-3 absolute left-0 mt-2 bg-white z-50"
                         style="min-width: 250px;">
                         <li class="flex items-center mb-2 border-b pb-3">
-                            <img src="{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : asset('images/default_avatar.png') }}"
+                            <img src="{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : asset('images/Unknown_person.jpg') }}"
                                 class="w-10 h-10 me-2 rounded-full object-cover">
                             <div>
                                 <span class="text-base text-[#121212]">{{ Auth::user()->full_name }}</span><br>
@@ -985,7 +988,7 @@
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit"
-                                    class="dropdown-item pb-4 w-full text-left text-gray-700 hover:bg-gray-100 px-3 py-2 rounded">
+                                    class="dropdown-item pb-4 w-full  text-gray-700 hover:bg-gray-100 px-3 py-2 rounded">
                                     {{ __('messages.logout') }}
                                 </button>
                             </form>

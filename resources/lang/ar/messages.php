@@ -135,6 +135,8 @@ return [
     'recommend' => 'اقتراحتنا لك',
     'refresh' => 'تحديث',
     'delete'=> 'إزالة',
+    'failed_email'=> 'البريد الالكتروني غير مسجل',
+    'incorrect_password'=> 'الرقم السري غير صحيح',
 
 
 
