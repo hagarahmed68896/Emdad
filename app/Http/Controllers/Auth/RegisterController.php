@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\ValidationException;
 
 class RegisterController extends Controller
 {
@@ -18,7 +17,7 @@ class RegisterController extends Controller
             'full_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed|regex:/[A-Z]/|regex:/[0-9]/',
-            'phone_number' => 'required|string|max:10|unique:users,phone_number',
+            'phone_number' => 'required|digits:9|unique:users,phone_number',
             'terms' => 'accepted',
             'account_type' => 'required|string|in:supplier,customer',
         ],
@@ -29,15 +28,16 @@ class RegisterController extends Controller
             'email.unique' => __('messages.emailUnique'),
             'password.min' => __('messages.passwordMin'),
             'password.string' => __('messages.passwordString'),
+            'password.regex'=> __('messages.passwordRegex'),
             'password.confirmed' => __('messages.passwordConfirm'),
             'phone_number.required' => __('messages.phoneMSG'),
             'phone_number.unique'=> __('messages.phone_number_Unique'),
+            'phone_number.digits' => __('messages.phone_number_max'),
+            'terms.accepted' => __('messages.acceptTermsError'),
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+            return response()->json(['errors' => $validator->errors()], 422);
         }
 
         $user = User::create([
@@ -48,10 +48,12 @@ class RegisterController extends Controller
             'account_type' => $request->account_type,
         ]);
 
-        Auth::login($user);
-        Log::info('User registered successfully: ' . $user->email);
+        Auth::login($user); // User is logged in on the server
 
-        // Flash a session variable to indicate OTP should be shown
-        return redirect()->back()->with('show_otp_modal', true)->with('success', __('messages.register_success'));
+        return response()->json([
+            'success' => true,
+            // You can optionally return user data here if needed for client-side state updates
+            // 'user' => $user->only(['id', 'full_name', 'email', 'account_type']),
+        ], 200);
     }
 }

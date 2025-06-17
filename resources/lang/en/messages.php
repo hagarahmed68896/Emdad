@@ -133,7 +133,8 @@ return [
     'delete'=> 'Delete',
     'failed_email'=> 'Email is not exists',
     'incorrect_password'=> 'Incorrect Password',
- 
+    'passwordRegex'=> 'The password must contain at least one uppercase letter, one lowercase letter, one number.',
+    'phone_number_max'=>'phone number must be 9 numbers'
 
 
 ];

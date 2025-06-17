@@ -42,7 +42,6 @@ class LoginController extends Controller
         // If user not found, send 'email' specific error
         if (!$user) {
             return response()->json(['errors' => ['email' => __('messages.failed_email')]], 422);
-            // Note: You'll need to add 'failed_email' to your resources/lang/en/auth.php
             // For example: 'failed_email' => 'No account found with that email address.',
         }
 
@@ -54,7 +53,6 @@ class LoginController extends Controller
 
         // If authentication fails at this point, it means the email was correct but the password was not
         return response()->json(['errors' => ['password' => __('messages.incorrect_password')]], 422);
-        // Note: You'll need to add 'password' (or similar) to your resources/lang/en/auth.php
         // For example: 'password' => 'The provided password is incorrect.',
     }
 

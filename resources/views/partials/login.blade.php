@@ -83,6 +83,7 @@
    showLogin: {{ session('showLoginModal', false) ? 'true' : 'false' }},
     showRegister: {{ session('showRegisterModal', false) ? 'true' : 'false' }},
     showOTP: false,
+    showPassword: false,
     userType: 'customer',
     accountData: true,
     bussnissdata: false,
@@ -188,7 +189,7 @@
                     </template>
                 </div>
 
-                <div class="mb-4">
+                <div class="mb-4" x-data="{showPassword: false}">
                     <label for="password" class="block font-bold text-[20px] text-[#212121]">
                         {{ __('messages.password') }}
                     </label>
@@ -198,25 +199,25 @@
                             src="{{ asset('images/interface-lock--combination-combo-lock-locked-padlock-secure-security-shield-keyhole--Streamline-Core.svg') }}"
                             alt="">
                         {{-- Use x-model to bind input to formData --}}
-                        <input type="password" name="password" id="password" required
+                        <input :type="showPassword ? 'text' : 'password'" name="password" id="password" required
                             placeholder="{{ __('messages.passwordMSG') }}" x-model="formData.password"
                             class="block w-full px-3 py-2 border-none h-[56px] focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                         {{-- Password visibility toggle --}}
-                        <button @click.prevent="this.type = (this.type === 'password' ? 'text' : 'password')"
-                            class="ml-2 px-2 text-sm text-[#212121]">
-                            <span x-show="this.type === 'password'"><img
-                                    src="{{ asset('images/interface-edit-view-off--disable-eye-eyeball-hide-off-view--Streamline-Core.svg') }}"
-                                    alt=""></span>
-                            <span x-show="this.type === 'text'">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                    fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
-                                    <path
-                                        d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z" />
-                                    <path
-                                        d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0" />
-                                </svg>
-                            </span>
-                        </button>
+                                <button @click.prevent="showPassword = !showPassword"
+                                    class="ml-2 px-2 text-sm text-[#212121]">
+                                    <span x-show="!showPassword"><img
+                                            src="{{ asset('images/interface-edit-view-off--disable-eye-eyeball-hide-off-view--Streamline-Core.svg') }}"
+                                            alt=""></span>
+                                    <span x-show="showPassword">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                            fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
+                                            <path
+                                                d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z" />
+                                            <path
+                                                d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0" />
+                                        </svg>
+                                    </span>
+                                </button>
                     </div>
                     {{-- Display specific password error using Alpine.js --}}
                     <template x-if="errors.password">

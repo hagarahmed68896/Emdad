@@ -411,13 +411,23 @@
                 </div>
             </div>
 
-            <div class="mb-3">
-                <input type="checkbox" id="terms" name="terms" required
-                    class="ml-1 h-[15px] w-[15px] text-[#185D31] bg-[#185D31] focus:ring-[#185D31] border-[#185D31] rounded">
-                <label for="terms" class="ml-2 text-[16px] text-[#212121]">
-                    {{ __('messages.accept_terms') }}
-                </label>
-            </div>
+                   <div class="mb-3">
+                        <input type="checkbox" id="terms" name="terms" x-model="formData.terms" required
+                            class="ml-1 h-[15px] w-[15px] text-[#185D31] bg-[#185D31] focus:ring-[#185D31] border-[#185D31] rounded">
+                        <label for="terms" class="ml-2 text-[16px] text-[#212121]">
+                            {{ __('messages.accept_terms') }}
+                            <a href="{{ route('terms') }}" class="text-[#185D31] underline">
+                                {{ __('messages.terms_and_conditions') }}
+                            </a>
+                            {{ __('messages.and') }}
+                            <a href="{{ route('privacy') }}" class="text-[#185D31] underline">
+                                {{ __('messages.privacy_policy') }}
+                            </a>
+                        </label>
+                        <template x-if="errors.terms">
+                            <div class="text-[#d33] mt-1 text-xs" x-text="errors.terms[0]"></div>
+                        </template>
+                    </div>
             <button type="submit"
                 class="w-full bg-[#185D31] text-white p-[12px] h-[48px] rounded-[12px] hover:bg-green-800">
                 {{ __('messages.register') }}

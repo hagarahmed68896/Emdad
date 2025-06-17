@@ -136,7 +136,9 @@ return [
     'refresh' => 'تحديث',
     'delete'=> 'إزالة',
     'failed_email'=> 'البريد الالكتروني غير مسجل',
-    'incorrect_password'=> 'الرقم السري غير صحيح',
+    'incorrect_password'=> ' كلمة المرور غير صحيحة',
+    'passwordRegex'=> 'كلمة المرور يجب ان تحتوي علي الاقل علي حرف كبير ورقم',
+    'phone_number_max'=> 'رقم الهاتف يحب أن يكون 9 ارقام',
 
 
 
