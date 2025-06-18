@@ -8,9 +8,9 @@ class BusinessData extends Model
 {
      protected $fillable = [
         'user_id',
-        'company_name',
         'national_id',
         'national_id_attach',
+        'company_name',
         'commercial_registration',
         'commercial_registration_attach',
         'national_address',

@@ -24,7 +24,7 @@
         .faq-item.open .faq-answer {
             max-height: 500px;
         }
-    </style>
+    </style>1
 
     <div class="container flex bg-white ">
         <div class="row mb-2 mt-4">

@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'phone_number',
+        'address',
         'account_type',
         'google_id',  
         'facebook_id', 
@@ -53,4 +54,18 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+public function getFirstNameAttribute()
+{
+    $names = preg_split('/\s+/', trim($this->full_name), -1, PREG_SPLIT_NO_EMPTY);
+    return $names[0] ?? '';
+}
+
+public function getLastNameAttribute()
+{
+    $names = preg_split('/\s+/', trim($this->full_name), -1, PREG_SPLIT_NO_EMPTY);
+    return implode(' ', array_slice($names, 1));
+}
+
+
 }

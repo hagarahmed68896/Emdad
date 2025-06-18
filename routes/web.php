@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\SupplierController;
 use App\Http\Controllers\OtpController;
 use App\Http\Controllers\Auth\SocialLoginController;
 use App\Http\Controllers\ProductSuggestionController;
+use App\Http\Controllers\ProfileController;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -40,7 +41,23 @@ Route::middleware('web')->group(function () {
     // Authenticated routes
     Route::middleware('auth')->group(function () {
         Route::post('logout', [LoginController::class, 'logout'])->name('logout');
-    });
+    //         Route::get('/account',function(){
+    //     return view('/profile/account');
+    // })->name('profile');
+
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+
+    // Route to handle updating user details
+    Route::post('/profile/update-details', [ProfileController::class, 'updateDetails'])->name('profile.updateDetails');
+
+    // Route to handle updating user password
+    Route::post('/profile/update-password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
+
+    // >>> IMPORTANT: Add these two lines if they are missing or incorrect <<<
+    Route::post('/profile/update-profile-picture', [ProfileController::class, 'updateProfilePicture'])->name('profile.updateProfilePicture');
+    Route::post('/profile/remove-profile-picture', [ProfileController::class, 'removeProfilePicture'])->name('profile.removeProfilePicture');
+
+});
 
     // Public routes that also benefit from session (e.g., for language changes)
     Route::get('/', [HomeController::class, 'index'])->name(name: 'home');
@@ -69,5 +86,6 @@ Route::middleware('web')->group(function () {
     Route::get('/common_questions', function () {
         return view('common_questions');
     })->name('common_questions');
+
 
 }); // End of the 'web' middleware group

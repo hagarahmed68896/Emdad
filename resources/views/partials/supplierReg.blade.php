@@ -1,47 +1,52 @@
 {{-- supplier section --}}
 <template x-if="userType === 'supplier'">
     <form method="POST" action="{{ route('register.supplier') }}" x-show="userType === 'supplier'"
-        enctype="multipart/form-data">
+        enctype="multipart/form-data"
+        @submit.prevent="submitForm" {{-- Prevent default form submission and call Alpine's submitForm --}}
+    >
         @csrf
         <div x-show="accountData" x-cloak>
             <p class="text-[24px] font-bold mb-4 mt-3"> {{ __('messages.account_data') }}
             </p>
-            <input type="hidden" name="account_type" value="supplier">
+
+            {{-- Hidden input for account_type; formData.account_type will handle the value --}}
+            <input type="hidden" name="account_type" x-model="formData.account_type">
+
             <div class="mb-3">
                 <label for="full_name" class="block font-bold text-[20px] text-[#212121]">
                     {{ __('messages.full_name') }}
                 </label>
-                <div
-                    class="flex items-center mt-2 border-[1px] border-[#767676] rounded-[12px] overflow-hidden">
+                <div class="flex items-center mt-2 border-[1px] rounded-[12px] overflow-hidden"
+                    :class="{ 'border-[#d33]': errors.full_name, 'border-[#767676]': !errors.full_name }">
                     <img class="h-[24px] w-[24px] object-cover text-[#767676] mr-4"
                         src="{{ asset('images/interface-user-circle--circle-geometric-human-person-single-user--Streamline-Core.svg') }}"
                         alt="">
-                    <input type="text" name="full_name" required
+                    <input type="text" name="full_name" x-model="formData.full_name" required
                         placeholder="{{ __('messages.nameMSG') }}"
                         class="block w-full px-3 py-2 border-none h-[56px] focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                 </div>
-                @error('full_name')
-                    <div class="error">{{ $message }}</div>
-                @enderror
-
+                <template x-if="errors.full_name">
+                    <div class="text-[#d33] mt-1 text-xs" x-text="errors.full_name[0]"></div>
+                </template>
             </div>
+
             <div class="mb-3">
                 <label for="company_name" class="block font-bold text-[20px] text-[#212121]">
                     {{ __('messages.company_name') }}
                 </label>
                 <div
-                    class="flex items-center mt-2 border-[1px] border-[#767676] rounded-[12px] overflow-hidden">
+                    class="flex items-center mt-2 border-[1px] rounded-[12px] overflow-hidden"
+                    :class="{'border-[#d33]': errors.company_name, 'border-[#767676]': !errors.company_name }">
                     <img class="h-[24px] w-[24px] object-cover text-[#767676] mr-4"
                         src="{{ asset('images/shopping-bag-suitcase-1--product-business-briefcase--Streamline-Core.svg') }}"
                         alt="">
-                    <input type="text" name="company_name" required
+                    <input type="text" name="company_name" x-model="formData.company_name" required
                         placeholder="{{ __('messages.company_nameMSG') }}"
                         class="block w-full px-3 py-2 border-none h-[56px] focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                 </div>
-                @error('company_name')
-                    <div class="error">{{ $message }}</div>
-                @enderror
-
+                <template x-if="errors.company_name">
+                    <div class="text-[#d33] mt-1 text-xs" x-text="errors.company_name[0]"></div>
+                </template>
             </div>
 
             <div class="mb-3">
@@ -49,19 +54,20 @@
                     {{ __('messages.email') }}
                 </label>
                 <div
-                    class="flex items-center mt-2 border-[1px] border-[#767676] rounded-[12px] overflow-hidden">
+                    class="flex items-center mt-2 border-[1px] rounded-[12px] overflow-hidden"
+                    :class="{'border-[#d33]': errors.email, 'border-[#767676]': !errors.email }">
                     <img class="h-[24px] w-[24px] object-cover text-[#767676] mr-4"
                         src="{{ asset('images/mail-send-envelope--envelope-email-message-unopened-sealed-close--Streamline-Core.svg') }}"
                         alt="">
-                    <input type="email" name="email" required
+                    <input type="email" name="email" x-model="formData.email" required
                         placeholder= "example@gmail.com"
                         class="block w-full px-3 py-2 border-none h-[56px] focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                 </div>
-                @error('email')
-                    <div class="error">{{ $message }}</div>
-                @enderror
-
+                <template x-if="errors.email">
+                    <div class="text-[#d33] mt-1 text-xs" x-text="errors.email[0]"></div>
+                </template>
             </div>
+
             <div class="mb-3">
                 <label for="phone_number" class="block font-bold text-[20px] text-[#212121]">
                     {{ __('messages.phone_number') }}
@@ -71,25 +77,25 @@
                         class="border-[#767676] border-[1px] rounded-r-[12px] px-3 pt-[16px] pb-[8px] text-[16px] h-[56px] text-[#767676]">
                         966+
                     </span>
-                    <input type="tel" id="phone_number" name="phone_number" required
-                        placeholder="{{ __('messages.phoneMSG') }}" pattern="[0-9]*" inputmode="numeric"
-                        class="ml-[-1px] block w-full px-3 py-2 border-[1px] border-[#767676] rounded-l-[12px] h-[56px] text-right">
-                    @error('phone_number')
-                        <div class="error">{{ $message }}</div>
-                    @enderror
+                    <input type="tel" id="phone_number" name="phone_number" x-model="formData.phone_number" required
+                        placeholder="{{ __('messages.phoneMSG') }}" pattern="[0-9]*" inputmode="numeric" maxlength="9"
+                        class="ml-[-1px] block w-full px-3 py-2 border-[1px] rounded-l-[12px] h-[56px] text-right"
+                        :class="{'border-[#d33]': errors.phone_number, 'border-[#767676]': !errors.phone_number }">
                 </div>
+                <template x-if="errors.phone_number">
+                    <div class="text-[#d33] mt-1 text-xs" x-text="errors.phone_number[0]"></div>
+                </template>
             </div>
 
-
-            <div class="mb-3" x-data="{ password: '', confirmPassword: '', showPassword: false }">
-                <!-- Password Label -->
+            <div class="mb-3" x-data="{ password: formData.password, confirmPassword: formData.password_confirmation, showPassword: false }"
+                x-init="$watch('password', value => formData.password = value); $watch('confirmPassword', value => formData.password_confirmation = value);">
                 <label for="password" class="block font-bold text-[20px] text-[#212121]">
                     {{ __('messages.password') }}
                 </label>
 
-                <!-- Password Input -->
                 <div
-                    class="flex items-center mt-2 border-[1px] border-[#767676] rounded-[12px] overflow-hidden">
+                    class="flex items-center mt-2 border-[1px] rounded-[12px] overflow-hidden"
+                    :class="{'border-[#d33]': errors.password, 'border-[#767676]': !errors.password }">
                     <img class="h-[24px] w-[24px] object-cover text-[#767676] mr-4"
                         src="{{ asset('images/interface-lock--combination-combo-lock-locked-padlock-secure-security-shield-keyhole--Streamline-Core.svg') }}"
                         alt="">
@@ -114,33 +120,31 @@
                     </button>
                 </div>
 
-                <!-- validation messages -->
                 <ul class="text-[14px] space-y-1 text-[#767676] mt-2"
                     x-show="password.length >= 0">
-                    <li x-show="!/[0-9]/.test(password)">
+                    <li :class="{ 'text-[#d33]': !/[0-9]/.test(password) }">
                         • {{ __('messages.passwordNumber') }}
                     </li>
-                    <li x-show="password.length <8">
+                    <li :class="{ 'text-[#d33]': password.length < 8 }">
                         • {{ __('messages.passwordMin') }}
                     </li>
-                    <li x-show="!/[A-Z]/.test(password)">
+                    <li :class="{ 'text-[#d33]': !/[A-Z]/.test(password) }">
                         • {{ __('messages.passwordString') }}
                     </li>
                 </ul>
 
-                @error('password')
-                    <div class="text-[#d33] mt-1">{{ $message }}</div>
-                @enderror
+                <template x-if="errors.password">
+                    <div class="text-[#d33] mt-1 text-xs" x-text="errors.password[0]"></div>
+                </template>
 
-                <!-- Confirm Password Label -->
                 <label for="confirm_password"
                     class="block font-bold text-[20px] mt-2 text-[#212121]">
                     {{ __('messages.confirm_password') }}
                 </label>
 
-                <!-- Confirm Password Input -->
                 <div
-                    class="flex items-center mt-2 border-[1px] border-[#767676] rounded-[12px] overflow-hidden">
+                    class="flex items-center mt-2 border-[1px] rounded-[12px] overflow-hidden"
+                    :class="{'border-[#d33]': errors.password_confirmation, 'border-[#767676]': !errors.password_confirmation }">
                     <img class="h-[24px] w-[24px] object-cover text-[#767676] mr-4"
                         src="{{ asset('images/interface-lock--combination-combo-lock-locked-padlock-secure-security-shield-keyhole--Streamline-Core.svg') }}"
                         alt="">
@@ -167,15 +171,16 @@
                     </button>
                 </div>
 
-                <!-- Password match validation -->
                 <div class="mt-2 text-sm text-[#d33]"
                     x-show="password && confirmPassword && password !== confirmPassword">
                     {{ __('messages.passwordConfirm') }}
                 </div>
-
+                <template x-if="errors.password_confirmation">
+                    <div class="text-[#d33] mt-1 text-xs" x-text="errors.password_confirmation[0]"></div>
+                </template>
             </div>
 
-            <button type="button" @click="bussnissdata = true, accountData = false"
+            <button type="button" @click="bussnissdata = true; accountData = false; formData.account_type = 'supplier';"
                 class="w-full bg-[#185D31] text-white p-[12px] h-[48px] rounded-[12px] hover:bg-green-800">
                 {{ __('messages.complete_data') }}
             </button>
@@ -194,45 +199,47 @@
                     {{ __('messages.national_id') }}
                 </label>
                 <div
-                    class="flex item-center mt-2 border-[1px] border-[#767676] rounded-[12px] overflow-hidden">
-                    <input type="text" name="national_id" required
+                    class="flex item-center mt-2 border-[1px] rounded-[12px] overflow-hidden"
+                    :class="{'border-[#d33]': errors.national_id, 'border-[#767676]': !errors.national_id }">
+                    <input type="text" name="national_id" x-model="formData.national_id" required
                         placeholder="{{ __('messages.national_idMSG') }}"
                         class="block w-full px-3 py-2 border-none h-[56px] focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-[16px]">
                 </div>
-                <div x-data="{ fileUpload: null }" class=" mt-2">
+                <template x-if="errors.national_id">
+                    <div class="text-[#d33] mt-1 text-xs" x-text="errors.national_id[0]"></div>
+                </template>
 
-                    <!-- Readonly input showing file name -->
+                <div class=" mt-2">
                     <div
-                        class="flex item-center mt-2 h-[56px] border-[1px] border-[#767676] rounded-[12px] overflow-hidden">
-                        <input type="text" id="fileNameDisplay" readonly
-                            :value="fileUpload ? fileUpload.name : ''"
-                            placeholder="{{ __('messages.national_id') }}"
+                        class="flex item-center mt-2 h-[56px] border-[1px] rounded-[12px] overflow-hidden"
+                        :class="{'border-[#d33]': errors.national_id_attach, 'border-[#767676]': !errors.national_id_attach }">
+                        <input type="text" id="nationalIdAttachDisplay" readonly
+                            :value="formData.national_id_attach ? formData.national_id_attach.name : ''"
+                            placeholder="{{ __('messages.national_id_attach') }}"
                             class="block w-full px-3 py-2 border-none h-[56px] focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-[16px]">
 
                         <div
                             class="file-input-container item-center justify-center w-[90px] h-[32px] mt-[11px] ml-2 bg-[#185D31] rounded-[12px] px-[12px] py-[8px]">
-                            <label for="fileUpload"
+                            <label for="national_id_attach"
                                 class="flex justify-center items-center text-[12px] text-white cursor-pointer w-full h-full">
                                 <img src="{{ asset('images/image-camera-1--photos-picture-camera-photography-photo-pictures--Streamline-Core.svg') }}"
                                     alt="" class="h-[16px] w-[16px] ml-2">
                                 {{ __('messages.attach') }}
                             </label>
-                            <!-- Hidden file input - This is the one that sends the file -->
-                            <input type="file" id="fileUpload" class="hidden"
+                            <input type="file" id="national_id_attach" class="hidden"
                                 name="national_id_attach" accept="image/*,application/pdf"
-                                @change="fileUpload = $event.target.files[0]">
+                                @change="formData.national_id_attach = $event.target.files[0]">
                         </div>
                     </div>
-                    <!-- File not uploaded or invalid format -->
                     <span class="text-[14px] space-y-1 text-[#767676] mt-3"
-                        x-show="!fileUpload || !fileUpload.name.match(/\.(jpg|jpeg|png|pdf)$/i)">
+                        x-show="!formData.national_id_attach || !formData.national_id_attach.name.match(/\.(jpg|jpeg|png|pdf)$/i)">
                         {{ __('messages.file_format') }}
                     </span>
+                    <template x-if="errors.national_id_attach">
+                        <div class="text-[#d33] mt-1 text-xs" x-text="errors.national_id_attach[0]"></div>
+                    </template>
                 </div>
             </div>
-
-
-
 
             <div class="mb-4">
                 <label for="commercial_registration"
@@ -240,44 +247,48 @@
                     {{ __('messages.commercial_registration') }}
                 </label>
                 <div
-                    class="flex item-center mt-2 border-[1px] border-[#767676] rounded-[12px] overflow-hidden">
-                    <input type="text" name="commercial_registration" required
+                    class="flex item-center mt-2 border-[1px] rounded-[12px] overflow-hidden"
+                    :class="{'border-[#d33]': errors.commercial_registration, 'border-[#767676]': !errors.commercial_registration }">
+                    <input type="text" name="commercial_registration" x-model="formData.commercial_registration" required
                         placeholder="{{ __('messages.commercial_registration') }}"
                         class="block w-full px-3 py-2 border-none h-[56px] focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-[16px]">
                 </div>
-                <div x-data="{ fileUploadCom: null }" class=" mt-2">
+                <template x-if="errors.commercial_registration">
+                    <div class="text-[#d33] mt-1 text-xs" x-text="errors.commercial_registration[0]"></div>
+                </template>
 
-                    <!-- Readonly input showing file name -->
+                <div class=" mt-2">
                     <div
-                        class="flex item-center mt-2 h-[56px] border-[1px] border-[#767676] rounded-[12px] overflow-hidden">
-                        <input type="text" id="fileUploadComDisplay" readonly
-                            :value="fileUploadCom ? fileUploadCom.name : ''"
+                        class="flex item-center mt-2 h-[56px] border-[1px] rounded-[12px] overflow-hidden"
+                        :class="{'border-[#d33]': errors.commercial_registration_attach, 'border-[#767676]': !errors.commercial_registration_attach }">
+                        <input type="text" id="commercialRegistrationAttachDisplay" readonly
+                            :value="formData.commercial_registration_attach ? formData.commercial_registration_attach.name : ''"
                             placeholder="{{ __('messages.commercial_reg_or_certificate') }}"
                             class="block w-full px-3 py-2 border-none h-[56px] focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-[16px]">
 
                         <div
                             class="file-input-container item-center justify-center w-[90px] h-[32px] mt-[11px] ml-2 bg-[#185D31] rounded-[12px] px-[12px] py-[8px]">
-                            <label for="fileUploadCom"
+                            <label for="commercial_registration_attach"
                                 class="flex justify-center items-center text-[12px] text-white cursor-pointer w-full h-full">
                                 <img src="{{ asset('images/image-camera-1--photos-picture-camera-photography-photo-pictures--Streamline-Core.svg') }}"
                                     alt="" class="h-[16px] w-[16px] ml-2">
                                 {{ __('messages.attach') }}
                             </label>
-                            <!-- Hidden file input - This is the one that sends the file -->
-                            <input type="file" id="fileUploadCom" class="hidden"
+                            <input type="file" id="commercial_registration_attach" class="hidden"
                                 name="commercial_registration_attach"
                                 accept="image/*,application/pdf"
-                                @change="fileUploadCom = $event.target.files[0]">
+                                @change="formData.commercial_registration_attach = $event.target.files[0]">
                         </div>
                     </div>
-                    <!-- File not uploaded or invalid format -->
                     <span class="text-[14px] space-y-1 text-[#767676] mt-3"
-                        x-show="!fileUploadCom || !fileUploadCom.name.match(/\.(jpg|jpeg|png|pdf)$/i)">
+                        x-show="!formData.commercial_registration_attach || !formData.commercial_registration_attach.name.match(/\.(jpg|jpeg|png|pdf)$/i)">
                         {{ __('messages.file_format') }}
                     </span>
+                    <template x-if="errors.commercial_registration_attach">
+                        <div class="text-[#d33] mt-1 text-xs" x-text="errors.commercial_registration_attach[0]"></div>
+                    </template>
                 </div>
             </div>
-
 
             <div class="mb-4">
                 <label for="national_address"
@@ -285,44 +296,48 @@
                     {{ __('messages.national_address') }}
                 </label>
                 <div
-                    class="flex item-center mt-2 border-[1px] border-[#767676] rounded-[12px] overflow-hidden">
-                    <input type="text" name="national_address" required
+                    class="flex item-center mt-2 border-[1px] rounded-[12px] overflow-hidden"
+                    :class="{'border-[#d33]': errors.national_address, 'border-[#767676]': !errors.national_address }">
+                    <input type="text" name="national_address" x-model="formData.national_address" required
                         placeholder="{{ __('messages.national_addressMSG') }}"
                         class="block w-full px-3 py-2 border-none h-[56px] focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-[16px]">
                 </div>
-                <div x-data="{ fileUploadadd: null }" class=" mt-2">
+                <template x-if="errors.national_address">
+                    <div class="text-[#d33] mt-1 text-xs" x-text="errors.national_address[0]"></div>
+                </template>
 
-                    <!-- Readonly input showing file name -->
+                <div class=" mt-2">
                     <div
-                        class="flex item-center mt-2 h-[56px] border-[1px] border-[#767676] rounded-[12px] overflow-hidden">
-                        <input type="text" id="fileUploadaddDisplay" readonly
-                            :value="fileUploadadd ? fileUploadadd.name : ''"
+                        class="flex item-center mt-2 h-[56px] border-[1px] rounded-[12px] overflow-hidden"
+                        :class="{'border-[#d33]': errors.national_address_attach, 'border-[#767676]': !errors.national_address_attach }">
+                        <input type="text" id="nationalAddressAttachDisplay" readonly
+                            :value="formData.national_address_attach ? formData.national_address_attach.name : ''"
                             placeholder="{{ __('messages.national_address_attach') }}"
                             class="block w-full px-3 py-2 border-none h-[56px] focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-[16px]">
 
                         <div
                             class="file-input-container item-center justify-center w-[90px] h-[32px] mt-[11px] ml-2 bg-[#185D31] rounded-[12px] px-[12px] py-[8px]">
-                            <label for="fileUploadadd"
+                            <label for="national_address_attach"
                                 class="flex justify-center items-center text-[12px] text-white cursor-pointer w-full h-full">
                                 <img src="{{ asset('images/image-camera-1--photos-picture-camera-photography-photo-pictures--Streamline-Core.svg') }}"
                                     alt="" class="h-[16px] w-[16px] ml-2">
                                 {{ __('messages.attach') }}
                             </label>
-                            <!-- Hidden file input - This is the one that sends the file -->
-                            <input type="file" id="fileUploadadd" class="hidden"
+                            <input type="file" id="national_address_attach" class="hidden"
                                 name="national_address_attach"
                                 accept="image/*,application/pdf"
-                                @change="fileUploadadd = $event.target.files[0]">
+                                @change="formData.national_address_attach = $event.target.files[0]">
                         </div>
                     </div>
-                    <!-- File not uploaded or invalid format -->
                     <span class="text-[14px] space-y-1 text-[#767676] mt-3"
-                        x-show="!fileUploadadd || !fileUploadadd.name.match(/\.(jpg|jpeg|png|pdf)$/i)">
+                        x-show="!formData.national_address_attach || !formData.national_address_attach.name.match(/\.(jpg|jpeg|png|pdf)$/i)">
                         {{ __('messages.file_format') }}
                     </span>
+                    <template x-if="errors.national_address_attach">
+                        <div class="text-[#d33] mt-1 text-xs" x-text="errors.national_address_attach[0]"></div>
+                    </template>
                 </div>
             </div>
-
 
             <div class="mb-4">
                 <label for="iban"
@@ -330,40 +345,45 @@
                     {{ __('messages.iban') }}
                 </label>
                 <div
-                    class="flex item-center mt-2 border-[1px] border-[#767676] rounded-[12px] overflow-hidden">
-                    <input type="text" name="iban" required
+                    class="flex item-center mt-2 border-[1px] rounded-[12px] overflow-hidden"
+                    :class="{'border-[#d33]': errors.iban, 'border-[#767676]': !errors.iban }">
+                    <input type="text" name="iban" x-model="formData.iban" required
                         placeholder="{{ __('messages.ibanMSG') }}"
                         class="block w-full px-3 py-2 border-none h-[56px] focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-[16px]">
                 </div>
-                <div x-data="{ fileUploadIBAN: null }" class=" mt-2">
+                <template x-if="errors.iban">
+                    <div class="text-[#d33] mt-1 text-xs" x-text="errors.iban[0]"></div>
+                </template>
 
-                    <!-- Readonly input showing file name -->
+                <div class=" mt-2">
                     <div
-                        class="flex item-center mt-2 h-[56px] border-[1px] border-[#767676] rounded-[12px] overflow-hidden">
-                        <input type="text" id="fileUploadIBANDisplay" readonly
-                            :value="fileUploadIBAN ? fileUploadIBAN.name : ''"
+                        class="flex item-center mt-2 h-[56px] border-[1px] rounded-[12px] overflow-hidden"
+                        :class="{'border-[#d33]': errors.iban_attach, 'border-[#767676]': !errors.iban_attach }">
+                        <input type="text" id="ibanAttachDisplay" readonly
+                            :value="formData.iban_attach ? formData.iban_attach.name : ''"
                             placeholder="{{ __('messages.iban_attach') }}"
                             class="block w-full px-3 py-2 border-none h-[56px] focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-[16px]">
 
                         <div
                             class="file-input-container item-center justify-center w-[90px] h-[32px] mt-[11px] ml-2 bg-[#185D31] rounded-[12px] px-[12px] py-[8px]">
-                            <label for="fileUploadIBAN"
+                            <label for="iban_attach"
                                 class="flex justify-center items-center text-[12px] text-white cursor-pointer w-full h-full">
                                 <img src="{{ asset('images/image-camera-1--photos-picture-camera-photography-photo-pictures--Streamline-Core.svg') }}"
                                     alt="" class="h-[16px] w-[16px] ml-2">
                                 {{ __('messages.attach') }}
                             </label>
-                            <!-- Hidden file input - This is the one that sends the file -->
-                            <input type="file" id="fileUploadIBAN" class="hidden"
+                            <input type="file" id="iban_attach" class="hidden"
                                 name="iban_attach" accept="image/*,application/pdf"
-                                @change="fileUploadIBAN = $event.target.files[0]">
+                                @change="formData.iban_attach = $event.target.files[0]">
                         </div>
                     </div>
-                    <!-- File not uploaded or invalid format -->
                     <span class="text-[14px] space-y-1 text-[#767676] mt-3"
-                        x-show="!fileUploadIBAN || !fileUploadIBAN.name.match(/\.(jpg|jpeg|png|pdf)$/i)">
+                        x-show="!formData.iban_attach || !formData.iban_attach.name.match(/\.(jpg|jpeg|png|pdf)$/i)">
                         {{ __('messages.file_format') }}
                     </span>
+                    <template x-if="errors.iban_attach">
+                        <div class="text-[#d33] mt-1 text-xs" x-text="errors.iban_attach[0]"></div>
+                    </template>
                 </div>
             </div>
 
@@ -374,65 +394,79 @@
                     {{ __('messages.tax_certificate') }}
                 </label>
                 <div
-                    class="flex item-center mt-2 border-[1px] border-[#767676] rounded-[12px] overflow-hidden">
-                    <input type="text" name="tax_certificate" required
+                    class="flex item-center mt-2 border-[1px] rounded-[12px] overflow-hidden"
+                    :class="{'border-[#d33]': errors.tax_certificate, 'border-[#767676]': !errors.tax_certificate }">
+                    <input type="text" name="tax_certificate" x-model="formData.tax_certificate" required
                         placeholder="{{ __('messages.tax_certificateMSG') }}"
                         class="block w-full px-3 py-2 border-none h-[56px] focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-[16px]">
                 </div>
-                <div x-data="{ fileUploadTax: null }" class=" mt-2">
+                <template x-if="errors.tax_certificate">
+                    <div class="text-[#d33] mt-1 text-xs" x-text="errors.tax_certificate[0]"></div>
+                </template>
 
-                    <!-- Readonly input showing file name -->
+                <div class=" mt-2">
                     <div
-                        class="flex item-center mt-2 h-[56px] border-[1px] border-[#767676] rounded-[12px] overflow-hidden">
-                        <input type="text" id="fileUploadTaxDisplay" readonly
-                            :value="fileUploadTax ? fileUploadTax.name : ''"
+                        class="flex item-center mt-2 h-[56px] border-[1px] rounded-[12px] overflow-hidden"
+                        :class="{'border-[#d33]': errors.tax_certificate_attach, 'border-[#767676]': !errors.tax_certificate_attach }">
+                        <input type="text" id="taxCertificateAttachDisplay" readonly
+                            :value="formData.tax_certificate_attach ? formData.tax_certificate_attach.name : ''"
                             placeholder="{{ __('messages.tax_certificate_attach') }}"
                             class="block w-full px-3 py-2 border-none h-[56px] focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-[16px]">
 
                         <div
                             class="file-input-container item-center justify-center w-[90px] h-[32px] mt-[11px] ml-2 bg-[#185D31] rounded-[12px] px-[12px] py-[8px]">
-                            <label for="fileUploadTax"
+                            <label for="tax_certificate_attach"
                                 class="flex justify-center items-center text-[12px] text-white cursor-pointer w-full h-full">
                                 <img src="{{ asset('images/image-camera-1--photos-picture-camera-photography-photo-pictures--Streamline-Core.svg') }}"
                                     alt="" class="h-[16px] w-[16px] ml-2">
                                 {{ __('messages.attach') }}
                             </label>
-                            <!-- Hidden file input - This is the one that sends the file -->
-                            <input type="file" id="fileUploadTax" class="hidden"
+                            <input type="file" id="tax_certificate_attach" class="hidden"
                                 name="tax_certificate_attach" accept="image/*,application/pdf"
-                                @change="fileUploadTax = $event.target.files[0]">
+                                @change="formData.tax_certificate_attach = $event.target.files[0]">
                         </div>
                     </div>
-                    <!-- File not uploaded or invalid format -->
                     <span class="text-[14px] space-y-1 text-[#767676] mt-3"
-                        x-show="!fileUploadTax || !fileUploadTax.name.match(/\.(jpg|jpeg|png|pdf)$/i)">
+                        x-show="!formData.tax_certificate_attach || !formData.tax_certificate_attach.name.match(/\.(jpg|jpeg|png|pdf)$/i)">
                         {{ __('messages.file_format') }}
                     </span>
+                    <template x-if="errors.tax_certificate_attach">
+                        <div class="text-[#d33] mt-1 text-xs" x-text="errors.tax_certificate_attach[0]"></div>
+                    </template>
                 </div>
             </div>
 
-                   <div class="mb-3">
-                        <input type="checkbox" id="terms" name="terms" x-model="formData.terms" required
-                            class="ml-1 h-[15px] w-[15px] text-[#185D31] bg-[#185D31] focus:ring-[#185D31] border-[#185D31] rounded">
-                        <label for="terms" class="ml-2 text-[16px] text-[#212121]">
-                            {{ __('messages.accept_terms') }}
-                            <a href="{{ route('terms') }}" class="text-[#185D31] underline">
-                                {{ __('messages.terms_and_conditions') }}
-                            </a>
-                            {{ __('messages.and') }}
-                            <a href="{{ route('privacy') }}" class="text-[#185D31] underline">
-                                {{ __('messages.privacy_policy') }}
-                            </a>
-                        </label>
-                        <template x-if="errors.terms">
-                            <div class="text-[#d33] mt-1 text-xs" x-text="errors.terms[0]"></div>
-                        </template>
-                    </div>
+            <div class="mb-3">
+                <input type="checkbox" id="terms" name="terms" x-model="formData.terms" required
+                    class="ml-1 h-[15px] w-[15px] text-[#185D31] bg-[#185D31] focus:ring-[#185D31] border-[#185D31] rounded"
+                    :class="{'border-[#d33]': errors.terms, 'border-[#185D31]': !errors.terms }">
+                <label for="terms" class="ml-2 text-[16px] text-[#212121]">
+                    {{ __('messages.accept_terms') }}
+                    <a href="{{ route('terms') }}" class="text-[#185D31] underline">
+                        {{ __('messages.terms_and_conditions') }}
+                    </a>
+                    {{ __('messages.and') }}
+                    <a href="{{ route('privacy') }}" class="text-[#185D31] underline">
+                        {{ __('messages.privacy_policy') }}
+                    </a>
+                </label>
+                <template x-if="errors.terms">
+                    <div class="text-[#d33] mt-1 text-xs" x-text="errors.terms[0]"></div>
+                </template>
+            </div>
+
             <button type="submit"
-                class="w-full bg-[#185D31] text-white p-[12px] h-[48px] rounded-[12px] hover:bg-green-800">
-                {{ __('messages.register') }}
+                class="w-full bg-[#185D31] text-white p-[12px] h-[48px] rounded-[12px] hover:bg-green-800"
+                :disabled="loading">
+                <span x-show="!loading">{{ __('messages.register') }}</span>
+                <span x-show="loading">
+                    <svg class="animate-spin h-5 w-5 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </span>
             </button>
-            <button type="button" @click="bussnissdata = false, accountData = true"
+            <button type="button" @click="bussnissdata = false; accountData = true"
                 class="w-full bg-[#185D31] text-white p-[12px] h-[48px] rounded-[12px] hover:bg-green-800 mt-2">
                 {{ __('messages.previous') }}
             </button>

@@ -13,61 +13,92 @@
             </button>
 
             {{-- THIS IS THE KEY CHANGE: Move x-data to this div --}}
-            <div class="relative bg-white w-[588px] h-[832px] p-[60px] rounded-[12px] shadow-xl overflow-y-auto"
-                 x-data="{ // This x-data is fine for form-specific data and methods
-                    formData: {
-                        full_name: '',
-                        email: '',
-                        phone_number: '',
-                        password: '',
-                        password_confirmation: '',
-                        terms: false,
-                        account_type: 'customer' // Default to customer
-                    },
-                    errors: {},
-                    loading: false,
-                    showPassword: false, // For password visibility toggle
-                    submitForm() {
-                        this.loading = true;
-                        this.errors = {}; // Clear previous errors
-                        console.log('Submitting form with data:', this.formData); // Debugging
-                        axios.post(this.$el.action, this.formData)
-                            .then(response => {
-                                this.loading = false;
-                                if (response.data.success) {
-                                    console.log('Registration successful! Setting showRegister to false and showOTP to true.'); // Debugging
-                                    // CORRECTED: Access the parent component's state directly via $dispatch
-                                    this.$dispatch('set-show-otp', true); // Dispatch a custom event
-                                    this.$dispatch('set-show-register', false); // Dispatch a custom event
+           <div class="relative bg-white w-[588px] h-[832px] p-[60px] rounded-[12px] shadow-xl overflow-y-auto"
+    x-data="{
+        formData: {
+            full_name: '',
+            email: '',
+            phone_number: '',
+            password: '',
+            password_confirmation: '',
+            account_type: 'customer', // Default to customer
+            // --- New Supplier Specific Inputs ---
+            company_name: '',
+            national_id: '',
+            national_id_attach: null, // For file inputs, usually store the File object or its name
+            commercial_registration: '',
+            commercial_registration_attach: null,
+            national_address: '',
+            national_address_attach: null,
+            iban: '',
+            iban_attach: null,
+            tax_certificate: '',
+            tax_certificate_attach: null,
+            terms: false,
+        },
+        errors: {},
+        loading: false,
+        showPassword: false, // For password visibility toggle
+        submitForm() {
+            this.loading = true;
+            this.errors = {}; // Clear previous errors
 
-                                    // Clear form data
-                                    this.formData = {
-                                        full_name: '', email: '', phone_number: '',
-                                        password: '', password_confirmation: '', terms: false,
-                                        account_type: 'customer'
-                                    };
-                                } else {
-                                    console.log('Registration not successful, but no 422 error:', response.data); // Debugging
-                                }
-                            })
-                            .catch(error => {
-                                this.loading = false;
-                                if (error.response) {
-                                    if (error.response.status === 422) {
-                                        this.errors = error.response.data.errors;
-                                        console.error('Validation errors:', this.errors); // Debugging
-                                    } else {
-                                        console.error('Server error:', error.response.data); // Debugging
-                                    }
-                                } else {
-                                    console.error('Network or other error:', error); // Debugging
-                                }
-                            });
+            // IMPORTANT: For file uploads with Axios, you need to use FormData
+            const submitData = new FormData();
+            for (const key in this.formData) {
+                if (this.formData[key] !== null) { // Only append if not null (especially for file inputs not yet selected)
+                    submitData.append(key, this.formData[key]);
+                }
+            }
+
+            console.log('Submitting form with data (FormData object, cannot be directly logged):', submitData); // Debugging
+
+            axios.post(this.$el.action, submitData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data' // Ensure correct header for file uploads
+                }
+            })
+            .then(response => {
+                this.loading = false;
+                if (response.data.success) {
+                    console.log('Registration successful! Setting showRegister to false and showOTP to true.'); // Debugging
+                    this.$dispatch('set-show-otp', true);
+                    this.$dispatch('set-show-register', false);
+
+                    // Clear form data
+                    this.formData = {
+                        full_name: '', email: '', phone_number: '',
+                        password: '', password_confirmation: '',
+                        company_name: '', national_id: '', national_id_attach: null,
+                        commercial_registration: '', commercial_registration_attach: null,
+                        national_address: '', national_address_attach: null,
+                        iban: '', iban_attach: null,
+                        tax_certificate: '', tax_certificate_attach: null,
+                        terms: false,
+                        account_type: 'customer'
+                    };
+                } else {
+                    console.log('Registration not successful, but no 422 error:', response.data); // Debugging
+                }
+            })
+            .catch(error => {
+                this.loading = false;
+                if (error.response) {
+                    if (error.response.status === 422) {
+                        this.errors = error.response.data.errors;
+                        console.error('Validation errors:', this.errors); // Debugging
+                    } else {
+                        console.error('Server error:', error.response.data); // Debugging
                     }
-                }"
-                @set-show-otp.window="showOTP = $event.detail" {{-- Listen for custom event --}}
-                @set-show-register.window="showRegister = $event.detail" {{-- Listen for custom event --}}
-            >
+                } else {
+                    console.error('Network or other error:', error); // Debugging
+                }
+            });
+        }
+    }"
+    @set-show-otp.window="showOTP = $event.detail"
+    @set-show-register.window="showRegister = $event.detail"
+>
 
                 <p class="text-[32px] text-[#212121] font-bold">{{ __('messages.register') }}</p>
                 <p class="text-[20px] text-[#767676] mb-4">{{ __('messages.registerMSG') }}</p>

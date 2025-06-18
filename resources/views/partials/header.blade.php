@@ -958,7 +958,7 @@
         @auth
             <div class="p-[15px]">
                 <div class="dropdown" x-data="{ profile: false }">
-                    <a class="btn p-0 border-0 bg-transparent" @click="profile = !profile" aria-expanded="false"
+                    <a class="btn p-0 border-0 bg-transparent"  @click="profile = !profile" aria-expanded="false"
                         id="dropdownButton">
                         <img src="{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : asset('images/Unknown_person.jpg') }}"
                             class="w-10 h-10 rounded-full object-cover" id="profileImage" style="cursor: pointer;">
@@ -976,7 +976,7 @@
                         </li>
                         <li class="pt-2"><a
                                 class="dropdown-item pb-4 block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
-                                href="#">{{ __('messages.MyAccount') }}</a></li>
+                                href="{{ route('profile.show') }}">{{ __('messages.MyAccount') }}</a></li>
                         <li><a class="dropdown-item pb-4 block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
                                 href="#">{{ __('messages.MyOrders') }}</a></li>
                         <li><a class="dropdown-item pb-4 block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
