@@ -11,6 +11,7 @@ use App\Http\Controllers\OtpController;
 use App\Http\Controllers\Auth\SocialLoginController;
 use App\Http\Controllers\ProductSuggestionController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProductController;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -66,6 +67,8 @@ Route::middleware('web')->group(function () {
     Route::get('/products/category/{slug}', [CategoryController::class, 'filterByCategory'])->name('products.filterByCategory');
 
     Route::get('/products/suggestions', [ProductSuggestionController::class, 'getSuggestions']);
+    // Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
+
 
     Route::get('language/{locale}', function ($locale) {
         if (in_array($locale, ['en', 'ar'])) {

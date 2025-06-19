@@ -25,4 +25,11 @@ class CategoryController extends Controller
         // Return the view with the category
         return view('categories.index', compact('categories', 'selectedCategory'));
     }
+
+    public function showCategoriesAndProducts()
+{
+    $categories = Category::with('products')->get(); 
+
+    return view('categories.index', compact('categories'));
+}
 }

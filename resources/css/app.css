@@ -21,3 +21,7 @@ header {
   height: 80px;
   
 }
+[x-cloak] {
+  display: none !important;
+  
+}
