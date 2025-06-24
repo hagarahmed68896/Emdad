@@ -14,16 +14,26 @@
 
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
+    <style>
+        .swiper-pagination-bullet-active { background-color: #10B981 !important; /* Tailwind green-500 */ }
+        .swiper-button-next, .swiper-button-prev { color: #10B981 !important; /* Tailwind green-500 */ }
+        .swiper-button-next, .swiper-button-prev {
+            top: 50%; transform: translateY(-50%); margin-top: 0; width: 44px; height: 44px;
+        }
+        @media (max-width: 639px) { /* Below sm breakpoint */
+            .swiper-button-next, .swiper-button-prev { display: none; }
+        }
+    </style>
 </head>
 
-<body style="  font-family: 'Cairo', sans-serif; ">
+<body style="  font-family: 'Cairo', sans-serif;">
     <div id="app">
         @include('partials.header')
         @if (Request::is('/'))
             @include('partials.heroSection')
         @endif
         @yield('content')
+
         @include('partials.footer')
     </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>

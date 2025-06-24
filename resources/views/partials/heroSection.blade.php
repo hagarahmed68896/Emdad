@@ -27,7 +27,7 @@
                        right-0 sm:right-[10%] md:-right-[7%] {{-- Use right to position from the right edge --}}
                        -translate-y-1/2         {{-- Vertically center it relative to its top percentage --}}
                        w-[140px] xs:w-[160px] sm:w-[200px] md:w-[232px]
-                       p-2 xs:p-3 sm:p-4         {{-- Responsive padding --}}
+                       p-3 xs:p-3 sm:p-4         {{-- Responsive padding --}}
                        flex flex-col bg-white shadow-md rounded-[16px] text-center">
 
                 <div class="flex -space-x-3 xs:-space-x-4 justify-center mb-2 xs:mb-3 sm:mb-4 rtl:space-x-reverse">
@@ -67,7 +67,7 @@
                        left-1/2                     {{-- Start from center horizontally --}}
                        -translate-x-1/2            {{-- Pull back by half its width to truly center --}}
                        w-[160px] xs:w-[170px] sm:w-[200px] md:w-[239px]
-                       h-auto p-2 sm:p-4          {{-- Responsive padding --}}
+                       h-auto p-2 sm:p-4 p-4         {{-- Responsive padding --}}
                        items-center justify-center bg-white
                        shadow-md rounded-[16px] text-center">
 
@@ -82,3 +82,7 @@
         </div>
     </div>
 </section>
+
+
+@include('partials/categories_choosed')
+@include( 'partials/best_offers')

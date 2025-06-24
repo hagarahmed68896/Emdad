@@ -67,5 +67,20 @@ public function getLastNameAttribute()
     return implode(' ', array_slice($names, 1));
 }
 
+  public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
+    /**
+     * Check if a product is favorited by the user.
+     *
+     * @param int $productId
+     * @return bool
+     */
+    public function hasFavorited($productId)
+    {
+        return $this->favorites()->where('product_id', $productId)->exists();
+    }
 
 }

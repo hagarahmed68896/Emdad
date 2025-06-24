@@ -24,23 +24,23 @@
         .faq-item.open .faq-answer {
             max-height: 500px;
         }
-    </style>1
+    </style>
 
-    <div class="container flex bg-white ">
+    <div class="container flex bg-white p-4">
         <div class="row mb-2 mt-4">
-            <div class="col-lg-6 p-2 h-[722px] mt-4">
+            <div class="col-lg-6 p-2 ">
                 <div class="flex-grow-2 mt-1">
                     <h1 class="text-[#212121] text-[32px] mb-3 text-right font-bold">الأسئلة الشائعة</h1>
                     <p class="text-[#767676] text-lg  text-right">هل لديك سؤال؟</p>
                     <p class="text-[#767676] text-base  text-right">اعثر على إجابات للاستفسارات الشائعة حول منتجاتنا
                         وخدماتنا</p>
                 </div>
-                <div class=" flex justify-center items-center relative overflow-hidden hidden lg:block mt-4">
+                <div class=" flex justify-center items-center relative overflow-hidden mt-4">
                     <img src="{{ asset('images/image.png') }}" alt="Man looking confused holding a phone"
                         class="max-w-[80%] h-auto block rounded-md object-contain">
                     <img class=" absolute rounded-full w-[80px] h-[64px]  flex justify-center items-center top-1/5 left-[72%]"
                         src="{{ asset('images/Group (7).svg') }}" alt="">
-                    <img class=" absolute rounded-full w-[80px] h-[64px] flex justify-center items-center top-1/4 right-[48%]"
+                    <img class=" absolute rounded-full w-[80px] h-[64px] flex justify-center items-center top-1/4 right-[55%]"
                         src="{{ asset('images/Group (6).svg') }}" alt="">
                 </div>
                 <div x-data="{ showContactUs: false }" class="mt-4">
@@ -212,7 +212,7 @@
 
 
             </div>
-            <div class="col-lg-6 p-2 gap-[24px] mt-4">
+            <div class="col-lg-6 p-2 ">
                 <div class="faq-item border-b border-gray-200 rounded-[20px] bg-[#F8F9FA] p-[24px] mb-3 mt-1">
                     <div class="faq-question flex items-center font-semibold text-gray-800 cursor-pointer text-lg">
                         <span class="flex-grow text-right text-[18px] leading-[150%] font-bold">

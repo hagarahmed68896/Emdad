@@ -6,6 +6,8 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\View;
+use Illuminate\Pagination\Paginator; // <--- This line is critical!
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,6 +26,8 @@ class AppServiceProvider extends ServiceProvider
     {
         // App::setLocale(Session::get('locale', config('app.locale')));
         View::share('currentLang', app()->getLocale());
+        Paginator::useTailwind(); // <--- This line is critical!
+
 
 
     }

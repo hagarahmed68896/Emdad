@@ -175,5 +175,37 @@ return [
     'loading'             => 'Loading...',
     'messages'            => 'Messages',
     'save'                => 'Save',
+    'addLocationAuth'=> 'Add Location',
+    'discover_categories' => 'Discover the main categories',
+    'show_more'=>'Show more',
+    'discover_categories_description'=>'Browse varity collection of products which suitable for you',
+    'choosen_categories'=>'Choosen Categories',
+
+    'current_password_required' => 'Current password is required.',
+    'new_password_required' => 'New password is required.',
+    'incorrect_current_password' => 'Incorrect current password.',
+    'password_updated_successfully' => 'Password updated successfully!',
+
+ 
+    'first_name_required' => 'The first name is required.',
+    'last_name_required' => 'The last name is required.',
+    'email_required' => 'The email is required.',
+    'email_invalid' => 'The email format is invalid.',
+    'email_unique' => 'This email is already taken.',
+    'phone_number_digits' => 'The phone number must be 9 digits.',
+    'phone_number_unique' => 'This phone number is already taken.',
+    'change_password'=> 'Change Password',
+    'login_important'=> 'Login is required',
+    'login_important_for_fav'=> 'Please login to add products to favorites.',
+        'limited_offers' => 'Limited Offers',
+    'best_offers' => 'Best Offers',
+    'best_offers_description' => 'Take advantage of the strongest offers on a selection of products for a limited time.',
+    'no_offers_available_title' => 'No offers available currently.',
+    'no_offers_available_description' => 'Please check back later or browse our other products.',
+    'view_details' => 'View Details',
+    'discount_percentage' => 'Discount :percent %',
+    'minimum_order_quantity' => 'Minimum Order: :quantity piece',
+
+
 
 ];

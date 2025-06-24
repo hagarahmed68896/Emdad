@@ -550,31 +550,59 @@
                     {{ __('messages.deliverySiteMSG') }}</p>
             </div>
             <div>
-                <a href="#" @click="showLogin = true"
-                    class="w-full h-[40px] bg-[#185D31] px-4 py-2 rounded-[12px] cursor-pointer text-[14px] text-white flex items-center justify-center">
-                    {{ __('messages.addLocation') }}
-                </a>
+                @guest {{-- This block will only render if the user is NOT logged in --}}
+                    <a href="{{ route('login') }}"
+                        class="w-full h-[40px] bg-[#185D31] px-4 py-2 rounded-[12px] cursor-pointer text-[14px] text-white flex items-center justify-center">
+                        {{ __('messages.addLocation') }} {{-- E.g., "Login to Add Location" --}}
+                    </a>
+                @endguest
+
+                @auth {{-- This block will only render if the user IS logged in --}}
+                    <a onclick="openMapModal()"
+                        class="w-full h-[40px] bg-[#185D31] px-4 py-2 rounded-[12px] cursor-pointer text-[14px] text-white flex items-center justify-center">
+                        {{ __('messages.addLocationAuth') }} {{-- E.g., "Add Your Location" --}}
+                    </a>
+                @endauth
             </div>
             <div class="flex items-center justify-center my-4 text-gray-300">
                 <hr class="flex-grow border-t border-gray-300">
                 <span class="text-sm text-gray-500 font-medium mx-4">{{ __('messages.or') }}</span>
                 <hr class="flex-grow border-t border-gray-300">
             </div>
-            <div
-                class="dropdown w-full h-[40px] bg-white px-4 py-2 rounded-[12px] flex items-center justify-between border border-gray-400 text-gray-600 font-normal text-[16px] cursor-pointer">
-                <a href="javascript:void(0)" onclick="openMapModal()"
-                    class="flex-1 text-gray-600">{{ __('messages.chooseCity') }}</a>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="w-5 h-5 ml-2 shrink-0">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                </svg>
+            <div x-data="{ open: false, selectedCity: '{{ __('messages.chooseCity') }}' }" class="relative">
+                <div @click="open = !open"
+                    class="dropdown w-full h-[40px] bg-white px-4 py-2 rounded-[12px] flex items-center justify-between border border-gray-400 text-gray-600 font-normal text-[16px] cursor-pointer">
+                    <a href="javascript:void(0)" x-text="selectedCity" class="flex-1 text-gray-600"></a>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="w-5 h-5 ml-2 shrink-0" :class="{ 'rotate-180': open }">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                    </svg>
+                </div>
+
+                <div x-show="open" @click.away="open = false" x-cloak
+                    class="absolute z-10 w-full mt-1 bg-white rounded-[12px] shadow-lg border border-gray-300 overflow-hidden">
+                    <ul class="py-1">
+                        <li>
+                            <a href="#" @click.prevent="selectedCity = 'مدينة 1'; open = false"
+                                class="block px-4 py-2 text-gray-800 hover:bg-gray-100">مدينة 1</a>
+                        </li>
+                        <li>
+                            <a href="#" @click.prevent="selectedCity = 'مدينة 2'; open = false"
+                                class="block px-4 py-2 text-gray-800 hover:bg-gray-100">مدينة 2</a>
+                        </li>
+                        <li>
+                            <a href="#" @click.prevent="selectedCity = 'مدينة 3'; open = false"
+                                class="block px-4 py-2 text-gray-800 hover:bg-gray-100">مدينة 3</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
 
     {{-- ********************************************drop menu for small screen******************************* --}}
     <button id="dropdownMenuIconButton" data-dropdown-toggle="dropdownDots"
-        class="hidden order-3  items-center p-2 text-sm font-medium text-center text-gray-900 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+        class="hidden order-3  items-center p-2 text-sm font-medium text-center text-gray-900 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
         type="button">
         <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
             viewBox="0 0 4 15">
@@ -591,7 +619,7 @@
             <li class="mb-4">
                 <div x-data="{ open: false }"
                     class=" relative inline-block text-[12px] tracking-[0%] w-auto max-w-[150px] lg:mx-4
-         sm:mx-1 md:w-[120px] md:h-[36px] shrink-0  ">
+                            sm:mx-1 md:w-[120px] md:h-[36px] shrink-0  ">
                     <div @click="open = !open"
                         class="flex items-center cursor-pointer p-1 hover:border font-normal rounded-[4px] space-x-1 h-full w-full justify-center">
                         <img src="https://s.alicdn.com/@icon/flag/assets/sa.png" alt="SA"
@@ -604,7 +632,7 @@
                     </div>
 
                     <div x-show="open" @click.away="open = false" x-transition
-                        class="absolute z-10 mt-2 w-[calc(100vw-32px)] left-0 sm:right-0  bg-white border border-gray-200 rounded-lg shadow-lg p-4
+                        class="absolute z-10 mt-2 w-[calc(100vw-32px)] -left-15 sm:right-0  bg-white border border-gray-200 rounded-lg shadow-lg p-4
                    md:w-[350px] md:left-auto md:right-0 md:translate-x-0">
                         <div class="flex flex-col mb-4">
                             <p
@@ -615,24 +643,54 @@
                                 {{ __('messages.deliverySiteMSG') }}</p>
                         </div>
                         <div>
-                            <a href="#" @click="showLogin = true"
-                                class="w-full h-[40px] bg-[#185D31] px-4 py-2 rounded-[12px] cursor-pointer text-[14px] text-white flex items-center justify-center">
-                                {{ __('messages.addLocation') }}
-                            </a>
+                            @guest {{-- This block will only render if the user is NOT logged in --}}
+                                <a href="{{ route('login') }}"
+                                    class="w-full h-[40px] bg-[#185D31] px-4 py-2 rounded-[12px] cursor-pointer text-[14px] text-white flex items-center justify-center">
+                                    {{ __('messages.addLocation') }} {{-- E.g., "Login to Add Location" --}}
+                                </a>
+                            @endguest
+
+                            @auth {{-- This block will only render if the user IS logged in --}}
+                                <a onclick="openMapModal()"
+                                    class="w-full h-[40px] bg-[#185D31] px-4 py-2 rounded-[12px] cursor-pointer text-[14px] text-white flex items-center justify-center">
+                                    {{ __('messages.addLocationAuth') }} {{-- E.g., "Add Your Location" --}}
+                                </a>
+                            @endauth
                         </div>
                         <div class="flex items-center justify-center my-4 text-gray-300">
                             <hr class="flex-grow border-t border-gray-300">
                             <span class="text-sm text-gray-500 font-medium mx-4">{{ __('messages.or') }}</span>
                             <hr class="flex-grow border-t border-gray-300">
                         </div>
-                        <div
-                            class="dropdown w-full h-[40px] bg-white px-4 py-2 rounded-[12px] flex items-center justify-between border border-gray-400 text-gray-600 font-normal text-[16px] cursor-pointer">
-                            <a href="javascript:void(0)" onclick="openMapModal()"
-                                class="flex-1 text-gray-600">{{ __('messages.chooseCity') }}</a>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke-width="1.5" stroke="currentColor" class="w-5 h-5 ml-2 shrink-0">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                            </svg>
+                        <div x-data="{ open: false, selectedCity: '{{ __('messages.chooseCity') }}' }" class="relative">
+                            <div @click="open = !open"
+                                class="dropdown w-full h-[40px] bg-white px-4 py-2 rounded-[12px] flex items-center justify-between border border-gray-400 text-gray-600 font-normal text-[16px] cursor-pointer">
+                                <a href="javascript:void(0)" x-text="selectedCity" class="flex-1 text-gray-600"></a>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="w-5 h-5 ml-2 shrink-0"
+                                    :class="{ 'rotate-180': open }">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                                </svg>
+                            </div>
+
+                            <div x-show="open" @click.away="open = false" x-cloak
+                                class="absolute z-10 w-full mt-1 bg-white rounded-[12px] shadow-lg border border-gray-300 overflow-hidden">
+                                <ul class="py-1">
+                                    <li>
+                                        <a href="#" @click.prevent="selectedCity = 'مدينة 1'; open = false"
+                                            class="block px-4 py-2 text-gray-800 hover:bg-gray-100">مدينة 1</a>
+                                    </li>
+                                    <li>
+                                        <a href="#" @click.prevent="selectedCity = 'مدينة 2'; open = false"
+                                            class="block px-4 py-2 text-gray-800 hover:bg-gray-100">مدينة 2</a>
+                                    </li>
+                                    <li>
+                                        <a href="#" @click.prevent="selectedCity = 'مدينة 3'; open = false"
+                                            class="block px-4 py-2 text-gray-800 hover:bg-gray-100">مدينة 3</a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -677,14 +735,14 @@
             </li>
 
             <li class="mb-4 flex">
-                <a href="#" class="relative w-[18px] h-[18px] mx-2">
+                <a href="#" class="relative w-[18px] h-[18px]  rtl:ml-5 rtl:mr-3 ltr:mr-5 ltr:ml-3">
                     <img src="{{ asset('images/Vector.svg') }}" alt="Favorites Icon">
                 </a>
                 {{ __('messages.favorites') }}
             </li>
 
             <li class="mb-4 flex">
-                <a href="#" class="relative w-[18px] h-[18px] mx-2">
+                <a href="#" class="relative w-[18px] h-[18px] rtl:ml-5 rtl:mr-3 ltr:mr-5 ltr:ml-3">
                     <img src="{{ asset('images/Group.svg') }}" alt="Cart Icon">
                 </a>
                 {{ __('messages.cart') }}
@@ -886,7 +944,7 @@
                         x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
                         x-transition:leave="transition ease-in duration-75"
                         x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-                        class="absolute bg-white border rounded shadow w-[350px] mt-1 z-20 max-h-64 overflow-auto -left-28 md:w-[660px] ">
+                        class="absolute bg-white border rounded shadow w-[310px] mt-1 z-20 max-h-64 overflow-auto -left-28 md:w-[660px] ">
 
                         <div x-show="loadingSuggestions" x-clock
                             class="px-3 py-2 text-gray-500 text-sm flex items-center">
@@ -992,7 +1050,7 @@
                     {{-- This is now the ONLY main container for the modal --}}
                     <div x-show="showUploadModal" x-cloak @click.away="showUploadModal = false"
                         class="absolute top-full -left-20   mt-2 bg-white shadow-lg rounded-lg py-2 z-30
-               sm:w-[660px] sm:h-[320px]">
+               sm:w-[660px] sm:h-[320px] w-[310px]">
                         {{-- The content div inside, responsible for its own padding --}}
                         <div class="p-6 relative w-full h-full">
                             <button @click="showUploadModal = false"
@@ -1098,53 +1156,58 @@
             </a>
         @endauth
     </div>
-
-    <div class="user-profile-section  shrink-0 order-7">
-        @auth
-            <div class="p-[15px]">
-                <div class="dropdown" x-data="{ profile: false }">
-                    <a class="btn p-0 border-0 bg-transparent" @click="profile = !profile" aria-expanded="false"
-                        id="dropdownButton">
+<div class="user-profile-section shrink-0 order-7">
+    @auth
+        <div class="p-[15px]">
+            {{-- Make the 'dropdown relative' div span full width on mobile, then auto-width on larger screens --}}
+            <div class="dropdown relative w-full sm:w-auto" x-data="{ profile: false }">
+                <a class="btn p-0 border-0 bg-transparent" @click="profile = !profile" aria-expanded="false"
+                    id="dropdownButton">
+                    <img src="{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : asset('images/Unknown_person.jpg') }}"
+                        class="w-10 h-10 rounded-full object-cover" id="profileImage" style="cursor: pointer;">
+                </a>
+                <ul x-show="profile" @click.away="profile = false" x-cloak
+                    class="profile-menu shadow h-auto rounded-lg p-3 absolute
+                                      {{-- Center horizontally on the page width --}}
+                           w-[calc(100vw-30px)] max-w-[296px] 
+                           -left-30   {{-- Responsive width for mobile, with padding and max cap --}}
+                           sm:left-0 sm:inset-x-auto sm:mx-0 sm:w-[296px] {{-- Revert to left-aligned fixed width for larger screens --}}
+                           mt-2 bg-white z-50"
+                    style="min-width: 200px;">
+                    <li class="flex items-center mb-2 border-b pb-3">
                         <img src="{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : asset('images/Unknown_person.jpg') }}"
-                            class="w-10 h-10 rounded-full object-cover" id="profileImage" style="cursor: pointer;">
-                    </a>
-                    <ul x-show="profile" @click.away="profile = false"
-                        class="profile-menu shadow w-[296px] h-auto rounded-lg p-3 absolute left-0 mt-2 bg-white z-50"
-                        style="min-width: 250px;">
-                        <li class="flex items-center mb-2 border-b pb-3">
-                            <img src="{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : asset('images/Unknown_person.jpg') }}"
-                                class="w-10 h-10 me-2 rounded-full object-cover">
-                            <div>
-                                <span class="text-base text-[#121212]">{{ Auth::user()->full_name }}</span><br>
-                                <small class="text-sm text-gray-500">{{ Auth::user()->email }}</small>
-                            </div>
-                        </li>
-                        <li class="pt-2"><a
-                                class="dropdown-item pb-4 block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
-                                href="{{ route('profile.show') }}">{{ __('messages.MyAccount') }}</a></li>
-                        <li><a class="dropdown-item pb-4 block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
-                                href="#">{{ __('messages.MyOrders') }}</a></li>
-                        <li><a class="dropdown-item pb-4 block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
-                                href="#">{{ __('messages.Fav') }}</a></li>
-                        <li><a class="dropdown-item pb-4 block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
-                                href="#">{{ __('messages.settings_notifications') }}</a>
-                        </li>
-                        <li>
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit"
-                                    class="dropdown-item pb-4 w-full  text-gray-700 hover:bg-gray-100 px-3 py-2 rounded">
-                                    {{ __('messages.logout') }}
-                                </button>
-                            </form>
-                        </li>
-                    </ul>
-                </div>
+                            class="w-10 h-10 me-2 rounded-full object-cover">
+                        <div>
+                            <span class="text-base text-[#121212]">{{ Auth::user()->full_name }}</span><br>
+                            <small class="text-sm text-gray-500">{{ Auth::user()->email }}</small>
+                        </div>
+                    </li>
+                    <li class="pt-2"><a
+                            class="dropdown-item pb-4 block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
+                            href="{{ route('profile.show') }}">{{ __('messages.MyAccount') }}</a></li>
+                    <li><a class="dropdown-item pb-4 block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
+                            href="#">{{ __('messages.MyOrders') }}</a></li>
+                    <li><a class="dropdown-item pb-4 block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
+                            href="#">{{ __('messages.Fav') }}</a></li>
+                    <li><a class="dropdown-item pb-4 block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
+                            href="#">{{ __('messages.settings_notifications') }}</a>
+                    </li>
+                    <li>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit"
+                                class="dropdown-item pb-4 w-full text-gray-700 hover:bg-gray-100 px-3 py-2 rounded">
+                                {{ __('messages.logout') }}
+                            </button>
+                        </form>
+                    </li>
+                </ul>
             </div>
-        @else
-            @include('partials.login')
-        @endauth
-    </div>
+        </div>
+    @else
+        @include('partials.login')
+    @endauth
+</div>
 </header>
 
 
@@ -1152,7 +1215,7 @@
 {{-- category-bar --}}
 <nav
     class="categories bg-white w-full sm:flex sm:items-center sm:justify-between sm:px-[64px] pt-4 pb-3 space-y-3 sm:space-y-0 flex-col sm:flex-row relative">
-    <div class="relative inline-block ml-1 cu w-full md:w-auto" x-data="{ mainDropdownOpen: false }"
+    <div class="relative inline-block ml-1  w-full md:w-auto" x-data="{ mainDropdownOpen: false }"
         @click.outside="mainDropdownOpen = false">
         <a id="mainDropdownButton" @click="mainDropdownOpen = !mainDropdownOpen"
             class="justify-between flex items-center rtl:ml-4 ltr:mr-4 cursor-pointer">
@@ -1200,8 +1263,7 @@
               responsive-dropdown          {{ app()->getLocale() === 'ar' ? 'align-right ml-1' : 'align-left mr-1' }}
                         bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 w-[314px] z-[1002] overflow-hidden">
                                 {{-- New Header for the Side Dropdown, styled like the image --}}
-                                <div
-                                    class=" text-black p-4 flex items-center space-x-3 rtl:space-x-reverse">
+                                <div class=" text-black p-4 flex items-center space-x-3 rtl:space-x-reverse">
                                     <span class="text-[18px] font-semibold">{{ $category->name }}</span>
                                 </div>
 
