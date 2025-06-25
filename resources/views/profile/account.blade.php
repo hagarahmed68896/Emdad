@@ -50,10 +50,64 @@
                 transform: translateY(0);
             }
         }
+
+        /* Added for notification toggles */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #185D31; /* Your green color */
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px #185D31;
+        }
+
+        input:checked + .slider:before {
+            -webkit-transform: translateX(22px);
+            -ms-transform: translateX(22px);
+            transform: translateX(22px);
+        }
     </style>
 
     <div class="min-h-screen flex flex-col items-center py-8">
-        <div class="w-full  bg-white rounded-xl shadow-lg flex flex-col md:flex-row overflow-hidden">
+        <div class="w-full bg-white rounded-xl shadow-lg flex flex-col md:flex-row overflow-hidden">
             <aside class="w-full md:w-1/4 bg-gray-50 p-6 border-b md:border-b-0 md:border-l border-gray-200">
                 <div class="flex flex-col items-center pb-6 border-b border-gray-200 mb-6">
                     <div class="relative w-28 h-28 mb-4">
@@ -165,27 +219,172 @@
                     <p class="text-sm text-gray-500" id="breadcrumbs">{{ __('messages.home') }} <span class="mx-1">&gt;</span> {{ __('messages.MyAccount') }}</p>
                 </div>
 
-<section id="myAccountContentSection" class="bg-white p-6 rounded-lg shadow-sm mb-8 border border-gray-200">
-    <h2 class="text-2xl font-semibold text-gray-800 mb-6">{{ __('messages.account_details') }}</h2>
+                {{-- My Account and Password Section --}}
+                <section id="myAccountContentSection" class="bg-white p-6 rounded-lg shadow-sm mb-8 border border-gray-200">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-6">{{ __('messages.account_details') }}</h2>
 
-    {{-- START: Account Details Form (Now powered by Alpine.js AJAX) --}}
-    {{-- Pass the initial user data to the Alpine component --}}
-    <div x-data="accountDetailsForm({{ json_encode($user) }})"> 
-        
-        {{-- Success Message for account details form--}}
-        <div x-show="success" 
-             x-cloak
-             x-transition:enter="transition ease-out duration-300"
-             x-transition:enter-start="opacity-0 transform -translate-y-2"
-             x-transition:enter-end="opacity-100 transform translate-y-0"
-             x-transition:leave="transition ease-in duration-300"
-             x-transition:leave-start="opacity-100 transform translate-y-0"
-             x-transition:leave-end="opacity-0 transform -translate-y-2"
-             class="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded mb-4" 
-             x-text="success"
-             x-init="setTimeout(() => success = '', 5000)"></div>
+                    {{-- START: Account Details Form (Now powered by Alpine.js AJAX) --}}
+                    {{-- Pass the initial user data to the Alpine component --}}
+                    <div x-data="accountDetailsForm({{ json_encode($user) }})"> 
+                        
+                        {{-- Success Message for account details form--}}
+                        <div x-show="success" 
+                            x-cloak
+                            x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 transform -translate-y-2"
+                            x-transition:enter-end="opacity-100 transform translate-y-0"
+                            x-transition:leave="transition ease-in duration-300"
+                            x-transition:leave-start="opacity-100 transform translate-y-0"
+                            x-transition:leave-end="opacity-0 transform -translate-y-2"
+                            class="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded mb-4" 
+                            x-text="success"
+                            x-init="setTimeout(() => success = '', 5000)"></div>
 
-        {{-- Error List for account details form--}}
+                        {{-- Error List for account details form--}}
+                        <template x-if="Object.keys(errors).length">
+                            <ul class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4 text-sm list-disc list-inside"
+                                x-transition:enter="transition ease-out duration-300"
+                                x-transition:enter-start="opacity-0 transform -translate-y-2"
+                                x-transition:enter-end="opacity-100 transform translate-y-0"
+                                x-transition:leave="transition ease-in duration-300"
+                                x-transition:leave-start="opacity-100 transform translate-y-0"
+                                x-transition:leave-end="opacity-0 transform -translate-y-2">
+                                <template x-for="[key, messages] of Object.entries(errors)" :key="key">
+                                    <li x-text="messages[0]"></li>
+                                </template>
+                            </ul>
+                        </template>
+
+                        <form @submit.prevent="submitDetailsForm" action="{{ route('profile.updateDetails') }}" method="POST">
+                            @csrf
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div>
+                                    <label for="first_name" class="block text-gray-700 text-sm font-medium mb-2">{{ __('messages.first_name') }}</label>
+                                    <input type="text" id="first_name" name="first_name"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition-all duration-200 outline-none"
+                                        placeholder="أدخل اسمك الأول" x-model="formData.first_name">
+                                </div>
+                                <div>
+                                    <label for="last_name" class="block text-gray-700 text-sm font-medium mb-2">
+                                        {{ __('messages.last_name') }}</label>
+                                    <input type="text" id="last_name" name="last_name"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition-all duration-200 outline-none"
+                                        placeholder="{{ __('messages.enter_family_name') }}" x-model="formData.last_name">
+                                </div>
+                                <div>
+                                    <label for="email" class="block text-gray-700 text-sm font-medium mb-2">
+                                        {{ __('messages.email') }}</label>
+                                    <input type="email" id="email" name="email"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition-all duration-200 outline-none"
+                                        placeholder="{{ __('messages.emailMSG') }}"
+                                        x-model="formData.email">
+                                </div>
+                                <div>
+                                    <label for="phone_number" class="block text-gray-700 text-sm font-medium mb-2">
+                                        {{ __('messages.phone_number') }}</label>
+                                    <input type="text" id="phone_number" name="phone_number" maxlength="9"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition-all duration-200 outline-none"
+                                        placeholder=" {{ __('messages.phoneMSG') }}" x-model="formData.phone_number">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label for="address" class="block text-gray-700 text-sm font-medium mb-2">{{ __('messages.address') }}</label>
+                                    <input type="text" id="address" name="address"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition-all duration-200 outline-none"
+                                        placeholder="{{ __('messages.addressMSG') }}" x-model="formData.address">
+                                </div>
+                            </div>
+                            <div class="flex justify-start gap-4 mb-8">
+                                <button type="submit"
+                                    class="px-6 py-2 text-white rounded-lg bg-[#185D31] transition-colors duration-200 shadow-md">{{ __('messages.save') }}</button>
+                            </div>
+                        </form>
+                    </div>
+                    {{-- END: Account Details Form --}}
+
+                    {{-- Password Form (Your existing Alpine.js form) --}}
+                    <div x-data="passwordForm()" class=" bg-white mx-auto">
+                        <h2 class="text-2xl font-semibold text-gray-800 mb-6">{{__('messages.change_password')}}</h2>
+                        {{-- Success Message for password form--}}
+                        <div x-show="success" x-cloak
+                            x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 transform -translate-y-2"
+                            x-transition:enter-end="opacity-100 transform translate-y-0"
+                            x-transition:leave="transition ease-in duration-300"
+                            x-transition:leave-start="opacity-100 transform translate-y-0"
+                            x-transition:leave-end="opacity-0 transform -translate-y-2"
+                            class="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded mb-4" 
+                            x-text="success"
+                            x-init="setTimeout(() => success = '', 5000)"></div>
+
+                        {{-- Error List for password form--}}
+                        <template x-if="Object.keys(errors).length">
+                            <ul class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4 text-sm list-disc list-inside"
+                                x-transition:enter="transition ease-out duration-300"
+                                x-transition:enter-start="opacity-0 transform -translate-y-2"
+                                x-transition:enter-end="opacity-100 transform translate-y-0"
+                                x-transition:leave="transition ease-in duration-300"
+                                x-transition:leave-start="opacity-100 transform translate-y-0"
+                                x-transition:leave-end="opacity-0 transform -translate-y-2">
+                                <template x-for="[key, messages] of Object.entries(errors)" :key="key">
+                                    <li x-text="messages[0]"></li>
+                                </template>
+                            </ul>
+                        </template>
+
+                        <form @submit.prevent="submitPasswordForm" action="{{ route('profile.updatePassword') }}" method="POST">
+                            @csrf
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div class="md:col-span-2">
+                                    <label for="current_password" class="block text-gray-700 text-sm font-medium mb-2">{{__('messages.last_password')}}</label>
+                                    <input type="password" id="current_password" name="current_password" x-model="formData.current_password"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition-all duration-200 outline-none"
+                                        placeholder="{{__('messages.last_password_msg')}}">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label for="password" class="block text-gray-700 text-sm font-medium mb-2"> 
+                                        {{__('messages.new_password')}}</label>
+                                    <input type="password" id="password" name="password" x-model="formData.password"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition-all duration-200 outline-none"
+                                        placeholder="{{__('messages.new_password_msg')}}">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label for="password_confirmation"
+                                        class="block text-gray-700 text-sm font-medium mb-2">{{__('messages.confirm_passwordMSG')}}</label>
+                                    <input type="password" id="password_confirmation" name="password_confirmation" x-model="formData.password_confirmation"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition-all duration-200 outline-none"
+                                        placeholder="{{__('messages.confirm_passwordMSG')}}">
+                                </div>
+                            </div>
+                            <div class="flex justify-start gap-4">
+                                <button type="submit"
+                                    class="px-6 py-2 text-white rounded-lg bg-[#185D31] transition-colors duration-200 shadow-md">{{__('messages.save')}}</button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                {{-- Favorites Section --}}
+                <section id="favoritesSection" class="bg-white p-6 rounded-lg shadow-sm mb-8 border border-gray-200 hidden">
+                    @include('partials.favorites_list', ['favorites' => $favorites])
+                </section>
+
+                {{-- Notifications Section (New!) --}}
+ <section id="notificationsSection" class="bg-white p-6 rounded-lg shadow-sm mb-8 border border-gray-200 hidden">
+
+    {{-- Pass notificationSettings to Alpine.js --}}
+    <div x-data="notificationsForm({{ json_encode($notificationSettings) }})"> 
+        {{-- Success/Error Messages for notifications --}}
+        <div x-show="success" x-cloak
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 transform -translate-y-2"
+            x-transition:enter-end="opacity-100 transform translate-y-0"
+            x-transition:leave="transition ease-in duration-300"
+            x-transition:leave-start="opacity-100 transform translate-y-0"
+            x-transition:leave-end="opacity-0 transform -translate-y-2"
+            class="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded mb-4" 
+            x-text="success"
+            x-init="setTimeout(() => success = '', 5000)"></div>
+
         <template x-if="Object.keys(errors).length">
             <ul class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4 text-sm list-disc list-inside"
                 x-transition:enter="transition ease-out duration-300"
@@ -200,124 +399,60 @@
             </ul>
         </template>
 
-        <form @submit.prevent="submitDetailsForm" action="{{ route('profile.updateDetails') }}" method="POST">
+        <form @submit.prevent="submitNotificationsForm" action="{{ route('profile.updateNotifications') }}" method="POST">
             @csrf
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                    <label for="first_name" class="block text-gray-700 text-sm font-medium mb-2">{{ __('messages.first_name') }}</label>
-                    <input type="text" id="first_name" name="first_name"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition-all duration-200 outline-none"
-                        placeholder="أدخل اسمك الأول" x-model="formData.first_name">
-                    {{-- @error directives are no longer needed here --}}
+
+            <div class="space-y-4">
+                <div class="flex items-center justify-between py-2 border-b border-gray-200">
+                    <label for="receive_in_app" class="text-gray-700">{{ __('messages.receive_in_app') }}</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="receive_in_app" name="receive_in_app" x-model="formData.receive_in_app">
+                        <span class="slider"></span>
+                    </label>
                 </div>
-                <div>
-                    <label for="last_name" class="block text-gray-700 text-sm font-medium mb-2">
-                        {{ __('messages.last_name') }}</label>
-                    <input type="text" id="last_name" name="last_name"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition-all duration-200 outline-none"
-                        placeholder="{{ __('messages.enter_family_name') }}" x-model="formData.last_name">
-                    {{-- @error directives are no longer needed here --}}
+
+                <div class="flex items-center justify-between py-2 border-b border-gray-200">
+                    <label for="receive_chat" class="text-gray-700">{{ __('messages.receive_chat') }}</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="receive_chat" name="receive_chat" x-model="formData.receive_chat">
+                        <span class="slider"></span>
+                    </label>
                 </div>
-                <div>
-                    <label for="email" class="block text-gray-700 text-sm font-medium mb-2">
-                        {{ __('messages.email') }}</label>
-                    <input type="email" id="email" name="email"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition-all duration-200 outline-none"
-                        placeholder="{{ __('messages.emailMSG') }}"
-                        x-model="formData.email">
-                    {{-- @error directives are no longer needed here --}}
+
+                <div class="flex items-center justify-between py-2 border-b border-gray-200">
+                    <label for="order_status_updates" class="text-gray-700">{{ __('messages.order_status_updates') }}</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="order_status_updates" name="order_status_updates" x-model="formData.order_status_updates">
+                        <span class="slider"></span>
+                    </label>
                 </div>
-                <div>
-                    <label for="phone_number" class="block text-gray-700 text-sm font-medium mb-2">
-                        {{ __('messages.phone_number') }}</label>
-                    <input type="text" id="phone_number" name="phone_number" maxlength="9"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition-all duration-200 outline-none"
-                        placeholder=" {{ __('messages.phoneMSG') }}" x-model="formData.phone_number">
-                    {{-- @error directives are no longer needed here --}}
+
+                <div class="flex items-center justify-between py-2 border-b border-gray-200">
+                    <label for="offers_discounts" class="text-gray-700">{{ __('messages.offers_discounts') }}</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="offers_discounts" name="offers_discounts" x-model="formData.offers_discounts">
+                        <span class="slider"></span>
+                    </label>
                 </div>
-                <div class="md:col-span-2">
-                    <label for="address" class="block text-gray-700 text-sm font-medium mb-2">{{ __('messages.address') }}</label>
-                    <input type="text" id="address" name="address"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition-all duration-200 outline-none"
-                        placeholder="{{ __('messages.addressMSG') }}" x-model="formData.address">
-                    {{-- @error directives are no longer needed here --}}
+
+                <div class="flex items-center justify-between py-2">
+                    <label for="viewed_products_offers" class="text-gray-700">{{ __('messages.viewed_products_offers') }}</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="viewed_products_offers" name="viewed_products_offers" x-model="formData.viewed_products_offers">
+                        <span class="slider"></span>
+                    </label>
                 </div>
             </div>
-            <div class="flex justify-start gap-4 mb-8">
+            
+            <div class="flex justify-start gap-4 mt-8">
                 <button type="submit"
                     class="px-6 py-2 text-white rounded-lg bg-[#185D31] transition-colors duration-200 shadow-md">{{ __('messages.save') }}</button>
             </div>
         </form>
     </div>
-    {{-- END: Account Details Form --}}
-
- 
-
-    {{-- Password Form (Your existing Alpine.js form) --}}
-    <div x-data="passwordForm()" class=" bg-white mx-auto">
-        <h2 class="text-2xl font-semibold text-gray-800 mb-6">{{__('messages.change_password')}}</h2>
-        {{-- Success Message for password form--}}
-        <div x-show="success" x-cloak
-             x-transition:enter="transition ease-out duration-300"
-             x-transition:enter-start="opacity-0 transform -translate-y-2"
-             x-transition:enter-end="opacity-100 transform translate-y-0"
-             x-transition:leave="transition ease-in duration-300"
-             x-transition:leave-start="opacity-100 transform translate-y-0"
-             x-transition:leave-end="opacity-0 transform -translate-y-2"
-             class="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded mb-4" 
-             x-text="success"
-             x-init="setTimeout(() => success = '', 5000)"></div>
-
-        {{-- Error List for password form--}}
-        <template x-if="Object.keys(errors).length">
-            <ul class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4 text-sm list-disc list-inside"
-                x-transition:enter="transition ease-out duration-300"
-                x-transition:enter-start="opacity-0 transform -translate-y-2"
-                x-transition:enter-end="opacity-100 transform translate-y-0"
-                x-transition:leave="transition ease-in duration-300"
-                x-transition:leave-start="opacity-100 transform translate-y-0"
-                x-transition:leave-end="opacity-0 transform -translate-y-2">
-                <template x-for="[key, messages] of Object.entries(errors)" :key="key">
-                    <li x-text="messages[0]"></li>
-                </template>
-            </ul>
-        </template>
-
-        <form @submit.prevent="submitPasswordForm" action="{{ route('profile.updatePassword') }}" method="POST">
-            @csrf
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div class="md:col-span-2">
-                    <label for="current_password" class="block text-gray-700 text-sm font-medium mb-2">{{__('messages.last_password')}}</label>
-                    <input type="password" id="current_password" name="current_password" x-model="formData.current_password"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition-all duration-200 outline-none"
-                        placeholder="{{__('messages.last_password_msg')}}">
-                </div>
-                <div class="md:col-span-2">
-                    <label for="password" class="block text-gray-700 text-sm font-medium mb-2"> 
-                        {{__('messages.new_password')}}</label>
-                    <input type="password" id="password" name="password" x-model="formData.password"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition-all duration-200 outline-none"
-                        placeholder="{{__('messages.new_password_msg')}}">
-                </div>
-                <div class="md:col-span-2">
-                    <label for="password_confirmation"
-                        class="block text-gray-700 text-sm font-medium mb-2">{{__('messages.confirm_passwordMSG')}}</label>
-                    <input type="password" id="password_confirmation" name="password_confirmation" x-model="formData.password_confirmation"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition-all duration-200 outline-none"
-                        placeholder="{{__('messages.confirm_passwordMSG')}}">
-                </div>
-            </div>
-            <div class="flex justify-start gap-4">
-                <button type="submit"
-                    class="px-6 py-2 text-white rounded-lg bg-[#185D31] transition-colors duration-200 shadow-md">{{__('messages.save')}}</button>
-            </div>
-        </form>
-    </div>
 </section>
+                {{-- End Notifications Section --}}
 
-                <section id="favoritesSection" class="bg-white p-6 rounded-lg shadow-sm mb-8 border border-gray-200 hidden">
-                  @include('partials/favorites')
-                    </section>
 
                 @if (session('success'))
                     <div class="mt-4 p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg" role="alert">
@@ -374,8 +509,7 @@
             <div id="modalMessage" class="mt-4 text-sm text-center"></div>
         </div>
     </div>
-
-    <script>
+ <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Get references to main page elements
             const profileImage = document.getElementById('profilePageImage');
@@ -396,11 +530,14 @@
             let selectedFile = null;
 
             // Get references to content sections and navigation links
-            // Updated to reference the single merged section
             const myAccountContentSection = document.getElementById('myAccountContentSection');
             const favoritesSection = document.getElementById('favoritesSection');
+            const notificationsSection = document.getElementById('notificationsSection'); // NEW!
+
             const myAccountLink = document.getElementById('myAccountLink');
             const favLink = document.getElementById('favLink');
+            const notificationsLink = document.getElementById('notificationsLink'); // NEW!
+
             const mainContentTitle = document.getElementById('mainContentTitle');
             const breadcrumbs = document.getElementById('breadcrumbs');
 
@@ -408,7 +545,8 @@
             const translations = {
                 MyAccount: "{{ __('messages.MyAccount') }}",
                 home: "{{ __('messages.home') }}",
-                Fav: "{{ __('messages.Fav') }}"
+                Fav: "{{ __('messages.Fav') }}",
+                settings_notifications: "{{ __('messages.settings_notifications') }}" // NEW!
                 // Add any other translations you might need dynamically here
             };
 
@@ -424,13 +562,16 @@
             }
 
             // Function to show/hide content sections and update title/breadcrumbs
-            // Simplified to only switch between myAccountContentSection and favoritesSection
             function showContent(sectionId, titleKey, breadcrumbKey) {
+                // Hide all main content sections
                 myAccountContentSection.classList.add('hidden');
                 favoritesSection.classList.add('hidden');
+                notificationsSection.classList.add('hidden'); // NEW!
 
+                // Show the requested section
                 document.getElementById(sectionId).classList.remove('hidden');
 
+                // Update title and breadcrumbs
                 mainContentTitle.textContent = translations[titleKey];
                 breadcrumbs.innerHTML = translations['home'] + ' <span class="mx-1">&gt;</span> ' + translations[breadcrumbKey];
             }
@@ -452,6 +593,13 @@
                 e.preventDefault();
                 setActiveLink(favLink);
                 showContent('favoritesSection', 'Fav', 'Fav');
+            });
+
+            // Event listener for "Notifications" link (NEW!)
+            notificationsLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                setActiveLink(notificationsLink);
+                showContent('notificationsSection', 'settings_notifications', 'settings_notifications');
             });
 
             // --- Modal Open/Close Logic ---
@@ -550,26 +698,23 @@
                         saveProfilePhotoBtn.classList.remove('hidden');
                     }
                 } catch (error) {
-                    console.error('Network or other error during upload:', error);
+                    console.error('Error uploading profile picture:', error);
                     uploadLoading.classList.add('hidden');
                     uploadMessage.className = 'mt-2 text-sm text-red-500 text-center';
-                    uploadMessage.textContent = 'خطأ في الاتصال بالخادم. الرجاء المحاولة مرة أخرى.';
+                    uploadMessage.textContent = 'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.';
                     saveProfilePhotoBtn.classList.remove('hidden');
                 }
             });
 
             // --- Handle Remove Photo Button Click (AJAX removal) ---
-            if (removePhotoBtn) {
+            @if (Auth::user()->profile_picture)
                 removePhotoBtn.addEventListener('click', async function() {
-                    if (!confirm('هل أنت متأكد أنك تريد إزالة صورة ملفك الشخصي؟')) {
+                    if (!confirm('{{ __('messages.confirm_delete_image') }}')) {
                         return;
                     }
 
                     modalMessage.textContent = '';
-                    removePhotoBtn.disabled = true;
-                    changePhotoBtn.disabled = true;
-                    modalMessage.className = 'mt-4 text-sm text-gray-600 text-center';
-                    modalMessage.textContent = 'جارٍ الإزالة...';
+                    uploadLoading.classList.remove('hidden'); // Use the same loading indicator or add a new one
 
                     try {
                         const response = await fetch('{{ route('profile.removeProfilePicture') }}', {
@@ -581,37 +726,33 @@
                         });
 
                         const data = await response.json();
-
-                        removePhotoBtn.disabled = false;
-                        changePhotoBtn.disabled = false;
+                        uploadLoading.classList.add('hidden');
 
                         if (response.ok) {
-                            profileImage.src = '{{ asset('images/Unknown_person.jpg') }}';
-                            modalProfileImage.src = '{{ asset('images/Unknown_person.jpg') }}';
-                            removePhotoBtn.classList.add('hidden');
-                            saveProfilePhotoBtn.classList.add('hidden');
+                            const defaultImageUrl = '{{ asset('images/Unknown_person.jpg') }}';
+                            profileImage.src = defaultImageUrl;
+                            modalProfileImage.src = defaultImageUrl;
                             modalMessage.className = 'mt-4 text-sm text-green-500 text-center';
-                            modalMessage.textContent = data.message || 'تمت إزالة الصورة بنجاح.';
-                            uploadMessage.textContent = '';
+                            modalMessage.textContent = data.message || 'تم حذف الصورة الشخصية بنجاح.';
+                            removePhotoBtn.classList.add('hidden'); // Hide remove button
+                            saveProfilePhotoBtn.classList.add('hidden'); // Hide save button as no file selected
+                            profilePictureInput.value = ''; // Clear file input
+                            selectedFile = null; // Clear selected file
                         } else {
-                            let errorMessage = 'حدث خطأ أثناء إزالة الصورة.';
-                            if (data.message) {
-                                errorMessage = data.message;
-                            }
                             modalMessage.className = 'mt-4 text-sm text-red-500 text-center';
-                            modalMessage.textContent = errorMessage;
+                            modalMessage.textContent = data.message || 'حدث خطأ أثناء حذف الصورة.';
                         }
                     } catch (error) {
-                        console.error('Network or other error during removal:', error);
-                        removePhotoBtn.disabled = false;
-                        changePhotoBtn.disabled = false;
+                        console.error('Error removing profile picture:', error);
+                        uploadLoading.classList.add('hidden');
                         modalMessage.className = 'mt-4 text-sm text-red-500 text-center';
-                        modalMessage.textContent = 'خطأ في الاتصال بالخادم. الرجاء المحاولة مرة أخرى.';
+                        modalMessage.textContent = 'حدث خطأ غير متوقع أثناء الحذف.';
                     }
                 });
-            }
+            @endif
         });
-        // This typically goes into your app.js or a script tag before </body>
+
+                // This typically goes into your app.js or a script tag before </body>
 function passwordForm() {
     return {
         success: '',
@@ -730,5 +871,59 @@ function accountDetailsForm(initialUser) { // Pass initial user data
 }
 // Make the function available globally
 window.accountDetailsForm = accountDetailsForm;
+
+
+        // Alpine.js component for notifications form (NEW!)
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('notificationsForm', (initialSettings) => ({
+                formData: {
+                    receive_in_app: initialSettings.receive_in_app || false,
+                    receive_chat: initialSettings.receive_chat || false,
+                    order_status_updates: initialSettings.order_status_updates || false,
+                    offers_discounts: initialSettings.offers_discounts || false,
+                    viewed_products_offers: initialSettings.viewed_products_offers || false,
+                },
+                success: '',
+                errors: {},
+
+                async submitNotificationsForm() {
+                    this.errors = {}; // Clear previous errors
+                    this.success = ''; // Clear previous success message
+
+                    try {
+                        const response = await fetch(this.$el.action, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                            },
+                            body: JSON.stringify(this.formData)
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            this.success = data.message || 'تم تحديث إعدادات الإشعارات بنجاح!';
+                            // Optionally, update the formData if the backend sends back canonical values
+                            // this.formData = { ...data.settings };
+                        } else {
+                            if (response.status === 422) { // Validation errors
+                                this.errors = data.errors;
+                            } else {
+                                this.errors = {
+                                    general: [data.message || 'حدث خطأ أثناء تحديث إعدادات الإشعارات.']
+                                };
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error submitting notification form:', error);
+                        this.errors = {
+                            general: ['حدث خطأ في الشبكة. يرجى المحاولة مرة أخرى.']
+                        };
+                    }
+                }
+            }));
+        });
     </script>
 @endsection

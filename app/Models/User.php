@@ -29,6 +29,8 @@ class User extends Authenticatable
         'provider',   
         'provider_id', 
         'profile_picture',
+        'notification_settings', 
+
 
     ];
 
@@ -52,6 +54,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'notification_settings' => 'array', 
+
         ];
     }
 

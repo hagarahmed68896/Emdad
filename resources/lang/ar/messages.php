@@ -183,7 +183,28 @@ return [
     'view_details' => 'عرض التفاصيل',
     'discount_percentage' => 'خصم :percent %', // :percent will be replaced by the value
     'minimum_order_quantity' => 'الحد الأدنى للطلب: :quantity قطعة', // :quantity will be replaced
+        // ... existing translations ...
+    'receive_in_app' => 'استلام إشعارات داخل الموقع',
+    'receive_chat' => 'استلام تنبيهات داخل الموقع', // Or 'استلام رسائل الدردشة'
+    'order_status_updates' => 'استلام إشعارات عند تغير حالة الطلب (تم الشحن/التوصيل)',
+    'offers_discounts' => 'استلام العروض والخصومات على المنتجات المفضلة',
+    'viewed_products_offers' => 'استلام إشعارات العروض الخاصة بالمنتجات المشاهدة سابقًا',
+    'notifications_updated_success' => 'تم تحديث إعدادات الإشعارات بنجاح!',
+    'notifications_updated_error' => 'حدث خطأ أثناء تحديث إعدادات الإشعارات. يرجى المحاولة مرة أخرى.',
+    'account_details_updated_successfully'=> 'تم تحديث تفاصيل الحساب بنجاح!',
+    'account_details_update_error' => 'حدث خطأ أثناء تحديث تفاصيل الحساب. يرجى المحاولة مرة أخرى.',
 
+
+    'best_seller' => 'الأكثر طلبًا',
+    'new_in_imdad' => 'جديد في إمداد',
+    'dont_miss_offer' => 'لا تفوت العرض على المنتج المفضل',
+    'limited_offer_description' => 'عرض لفترة محدودة على أكثر المنتجات مبيعا',
+    'discover_offer' => 'اكتشف العرض',
+    'latest_electronics' => 'أحدث المنتجات في قطاع الإلكترونيات',
+    'explore_tech_description' => 'استكشف تقنيات متطورة تلبي احتياجاتك.',
+    'shop_now' => 'تسوق الآن',
+    'handbag_alt' => 'حقيبة يد خضراء',
+    'electronics_alt' => 'نظارة واقع افتراضي وسماعات رأس',
 
 ];
 

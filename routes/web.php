@@ -61,6 +61,9 @@ Route::middleware('web')->group(function () {
         // Route to display the favorites page
         Route::get('/favorites', [FavoriteController::class, 'index'])
              ->name('favorites.index');
+        Route::post('/profile/update-notifications', [ProfileController::class, 'updateNotifications'])->name('profile.updateNotifications');
+
+
     });
 
     // Public routes that also benefit from session (e.g., for language changes)

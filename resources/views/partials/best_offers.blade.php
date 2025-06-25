@@ -48,9 +48,9 @@
     }
 </style>
 
-<div class="bg-[#F8F9FA] w-full pt-5">
+<div class="bg-[#F8F9FA] w-full pt-5 px-[64px] py-3">
     {{-- Best Offers Section --}}
-    <div class="container mx-auto">
+    {{-- <div class="container mx-auto"> --}}
         {{-- Header Section: Countdown and Title --}}
         <div class="flex justify-between mb-6 rounded-xl bg-[#F8F9FA]">
             <div class="flex justify-between w-full mb-6 md:mb-0">
@@ -200,7 +200,7 @@
             </div>
             <div class="swiper-pagination mt-10"></div>
         </div>
-    </div>
+    {{-- </div> --}}
 </div>
 
 {{-- Login Popup HTML (already uses __() ) --}}

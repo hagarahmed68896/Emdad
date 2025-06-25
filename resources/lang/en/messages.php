@@ -205,6 +205,26 @@ return [
     'view_details' => 'View Details',
     'discount_percentage' => 'Discount :percent %',
     'minimum_order_quantity' => 'Minimum Order: :quantity piece',
+    'receive_in_app' => 'Receive in-app notifications',
+    'receive_chat' => 'Receive in-app alerts', // Or 'Receive chat messages'
+    'order_status_updates' => 'Receive notifications when order status changes (e.g., shipping/delivery)',
+    'offers_discounts' => 'Receive offers and discounts on favorite products',
+    'viewed_products_offers' => 'Receive special offers notifications for previously viewed products',
+    'notifications_updated_success' => 'Notification settings updated successfully!',
+    'notifications_updated_error' => 'An error occurred while updating notification settings. Please try again.',
+    'account_details_updated_successfully'=> 'Account details updated successfully.',
+
+    'best_seller' => 'Best Seller',
+    'new_in_imdad' => 'New in Imdad',
+    'dont_miss_offer' => 'Don\'t miss the offer on your favorite product',
+    'limited_offer_description' => 'Limited-time offer on best-selling products',
+    'discover_offer' => 'Discover the Offer',
+    'latest_electronics' => 'Latest Products in Electronics',
+    'explore_tech_description' => 'Explore advanced technologies that meet your needs.',
+    'shop_now' => 'Shop Now',
+    'handbag_alt' => 'Green handbag',
+    'electronics_alt' => 'VR headset and headphones',
+
 
 
 
