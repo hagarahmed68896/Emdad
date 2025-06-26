@@ -29,6 +29,7 @@ $product = Product::create([
             'supplier_confirmed' => true,
             'min_order_quantity' => 3,
             'rating' => 4.5,
+            'is_featured' =>1,
         ]);
 
         Product::create([
@@ -45,6 +46,7 @@ $product = Product::create([
             'supplier_confirmed'=> true,
             'min_order_quantity'=> 1,
             'rating' => 4.8,
+            'is_featured'=> 1,
         ]);
         Product::create([
             'name' => 'كرسي  مريح',
@@ -58,6 +60,7 @@ $product = Product::create([
             'supplier_confirmed'=> true,
             'min_order_quantity'=> 2,
             'rating' => 4.2,
+            'is_featured' =>0,
         ]);
         Product::create([
             'name' => 'طابعة ليزر',
@@ -73,6 +76,7 @@ $product = Product::create([
             'supplier_confirmed'=> true,
             'min_order_quantity'=> 1,
             'rating' => 4.6,
+            'is_featured' =>1,
         ]);
         Product::create([
             'name' => 'ساعة ذكية',
@@ -87,6 +91,7 @@ $product = Product::create([
             'supplier_confirmed'=> true,
             'min_order_quantity'=> 1,
             'rating' => 4.7,
+            'is_featured' => 1,
         ]);
         Product::create([
             'name' => 'حقيبة ظهر',
@@ -106,7 +111,8 @@ $product = Product::create([
                 'storage/products/1.webp',
                 'storage/products/1(1).webp',
                 'storage/products/2.webp',
-            ]),
+                        ]),
+            'is_featured' => 1,
         ]);
         Product::create([
             'name' => 'قلم حبر جاف',
@@ -120,6 +126,53 @@ $product = Product::create([
             'supplier_confirmed'=> true,
             'min_order_quantity'=> 10,
             'rating' => 4.0,
+            'is_featured' => 0,
+        ]);
+        Product::create([
+            'name'=> 'أثاث',
+            'slug'=> 'أثاث',
+            'description'=> 'Modern furniture for home and office.',
+            'price'=> 999.99,
+            'image'=> 'storage/products/872c7362e417b45a9e5e1e13c169fb360de8fc74.png',
+            'category_id'=> Category::where('slug', 'furniture')->first()->id,
+            'is_offer' => false,
+            'supplier_name'=> 'Furniture World',
+            'supplier_confirmed'=> true,
+            'min_order_quantity'=> 1,
+            'rating' => 4.9,
+            'is_featured' => 1,
+        ]);
+        Product::create([
+            'name'=> 'iPhone 15 pro max',
+            'slug'=> 'iphone-15-pro-max',
+            'description'=> 'Latest iPhone with advanced features.',
+            'price'=> 1099.99,
+            'image'=> 'storage/products/28442cd2d8b4be75c0b3aa5caada440028925cd0.png',
+            'category_id'=> Category::where('slug', 'electronics')->first()->id,
+            'is_offer' => true,
+            'discount_percent' => 5, // 5% discount
+            'offer_expires_at' => now()->addDays(14), // Offer expires in 14 days
+            'supplier_name'=> 'Apple Inc.',
+            'supplier_confirmed'=> true,
+            'min_order_quantity'=> 1,
+            'rating' => 4.8,
+            'is_featured' => 1,
+        ]);
+        Product::create([
+            'name' => 'تيشيرت رجالي',
+            'slug' => '2-تيشيرت-رجالي',
+            'description' => 'Latest model with advanced features.',
+            'price' => 299.99,
+            'image' => 'storage/products/c7cc5df6a3a3ad5b9e08d091347e0b2f8b61e1e4.png',
+            'category_id' => Category::where('slug', 'clothing')->first()->id, // Ensure the category exists
+            'is_offer' => true,
+            'discount_percent' => 15, // 15% discount
+            'offer_expires_at' => now()->addDays(7), // Offer expires in 7 days
+            'supplier_name' => 'Fashion Supplier',
+            'supplier_confirmed' => true,   
+            'min_order_quantity' => 3,
+            'rating' => 4.5,
+            'is_featured' => 1,
         ]);
     }
 }

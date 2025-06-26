@@ -80,7 +80,7 @@
         <div class=" swiper offerSwiper mb-4 bg-[#F8F9FA] px-[64px] py-8 ">
             <div class="swiper-wrapper mb-8 ">
                 {{-- Loop through products to display each card --}}
-                @forelse ($products as $product)
+                @forelse ($onOfferProducts as $product)
                     <div class="swiper-slide mb-8">
                         <div class="product-card bg-white rounded-xl overflow-hidden shadow-md flex flex-col">
                             {{-- Product Image Carousel (Inner Swiper) --}}

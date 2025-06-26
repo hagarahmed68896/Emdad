@@ -224,6 +224,9 @@ return [
     'shop_now' => 'Shop Now',
     'handbag_alt' => 'Green handbag',
     'electronics_alt' => 'VR headset and headphones',
+    'chosen_for_you'=> 'Chosen for You',
+    'discover_our_products' => 'Discover Our Products',
+    'discover_our_products_description' => 'A selected range of the most distinguished products, to facilitate the wholesale shopping experience.',
 
 
 

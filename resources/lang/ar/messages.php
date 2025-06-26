@@ -193,7 +193,7 @@ return [
     'notifications_updated_error' => 'حدث خطأ أثناء تحديث إعدادات الإشعارات. يرجى المحاولة مرة أخرى.',
     'account_details_updated_successfully'=> 'تم تحديث تفاصيل الحساب بنجاح!',
     'account_details_update_error' => 'حدث خطأ أثناء تحديث تفاصيل الحساب. يرجى المحاولة مرة أخرى.',
-
+    'complete_data' => ' أكمل البيانات',
 
     'best_seller' => 'الأكثر طلبًا',
     'new_in_imdad' => 'جديد في إمداد',
@@ -205,6 +205,10 @@ return [
     'shop_now' => 'تسوق الآن',
     'handbag_alt' => 'حقيبة يد خضراء',
     'electronics_alt' => 'نظارة واقع افتراضي وسماعات رأس',
+    'chosen_for_you'=> 'مختارة لك',
+    'discover_our_products'=> 'اكتشف منتجاتنا المميزة',
+    'discover_our_products_description' => 'مجموعة منتقاة من المنتجات الأكثر تميزًا، لتسهيل تجربة الشراء بالجملة.',
+
 
 ];
 

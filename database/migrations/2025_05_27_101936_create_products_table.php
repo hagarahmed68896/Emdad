@@ -34,6 +34,7 @@ return new class extends Migration
             // but for simplicity and direct addition to the 'products' table as requested,
             // a JSON column can store an array of image paths.
             $table->json('images')->nullable(); // Stores an array of additional image paths
+            $table->boolean('is_featured')->default(false); // without "after"
 
             $table->timestamps();
         });

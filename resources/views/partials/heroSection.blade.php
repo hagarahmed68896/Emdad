@@ -87,3 +87,4 @@
 @include('partials/categories_choosed')
 @include( 'partials/best_offers')
 @include('partials/Promotional_Offer')
+@include('partials/Featured_products')

@@ -55,4 +55,15 @@ class ProductController extends Controller
         // This assumes you will have a view file at resources/views/product/show.blade.php
         return view('product.show', compact('product'));
     }
+
+    public function showFeaturedProducts()
+    {
+        $products = Product::where('is_featured', true)
+                           ->orderBy('created_at', 'desc') 
+                           ->limit(8)               // Limit to 8 products for the grid layout
+                           ->get();
+
+        // Pass the fetched products collection to the Blade view
+        return view('products.featured', compact('products'));
+    }
 }

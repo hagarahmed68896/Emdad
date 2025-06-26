@@ -167,8 +167,7 @@
             @submit.prevent="submitForm"> {{-- Prevent default form submission for AJAX --}}
 
             {{-- The main content wrapper for the modal --}}
-            <div class="relative bg-white w-full max-w-[588px] mx-auto p-4 sm:p-6 md:p-[24px] rounded-[12px] shadow-xl"> {{-- Changed fixed width to max-w and added responsive padding --}}
-
+<div class="relative bg-white w-full max-w-[588px] mx-auto p-4 sm:p-6 md:p-[24px] rounded-[12px] shadow-xl max-h-[90vh] overflow-y-auto">
                 @csrf {{-- CSRF token is still required for AJAX POST requests --}}
                 <p class="text-[24px] sm:text-[28px] md:text-[32px] text-[#212121] font-bold">{{ __('messages.login') }}</p> {{-- Responsive font size --}}
                 <p class="text-[16px] sm:text-[18px] md:text-[20px] text-[#767676] mb-4">{{ __('messages.loginMSG') }}</p> {{-- Responsive font size --}}

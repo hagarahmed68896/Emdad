@@ -119,19 +119,17 @@
                         </span>
                     </button>
                 </div>
-
-                <ul class="text-[14px] space-y-1 text-[#767676] mt-2"
-                    x-show="password.length >= 0">
-                    <li :class="{ 'text-[#d33]': !/[0-9]/.test(password) }">
-                        • {{ __('messages.passwordNumber') }}
-                    </li>
-                    <li :class="{ 'text-[#d33]': password.length < 8 }">
-                        • {{ __('messages.passwordMin') }}
-                    </li>
-                    <li :class="{ 'text-[#d33]': !/[A-Z]/.test(password) }">
-                        • {{ __('messages.passwordString') }}
-                    </li>
-                </ul>
+       <ul class="text-sm space-y-1 text-[#767676] mt-2" x-show="formData.password.length >= 0">
+                            <li x-show="!/[0-9]/.test(formData.password)">
+                                • {{ __('messages.passwordNumber') }}
+                            </li>
+                            <li x-show="formData.password.length <8">
+                                • {{ __('messages.passwordMin') }}
+                            </li>
+                            <li x-show="!/[A-Z]/.test(formData.password)">
+                                • {{ __('messages.passwordString') }}
+                            </li>
+                        </ul>
 
                 <template x-if="errors.password">
                     <div class="text-[#d33] mt-1 text-xs" x-text="errors.password[0]"></div>
