@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product; // Import your Product model
 use App\Models\Category; // Make sure you also have a Category model if you want to eager load categories
+use App\Models\User; // Import the User model
+use App\Notifications\NewProductFromSupplier; // Import the notification class
 
 class ProductController extends Controller
 {
@@ -65,5 +67,29 @@ class ProductController extends Controller
 
         // Pass the fetched products collection to the Blade view
         return view('products.featured', compact('products'));
+    }
+
+     public function store(Request $request)
+    {
+        // ... (Logic to save the new product) ...
+        $product = Product::create($request->all());
+
+        // Assuming you have a supplier relationship on Product or you pass it
+        $supplierName = $product->supplier_name ?? 'Unknown Supplier'; // Get supplier name
+        $supplierImage = $product->supplier_image_url ?? asset('images/default_supplier.png'); // Get supplier image
+
+        // Find the user(s) to notify
+        // Example 1: Notify a specific user (e.g., the admin)
+        $adminUser = User::find(1); // Assuming admin user has ID 1
+        if ($adminUser) {
+            $adminUser->notify(new NewProductFromSupplier($product, $supplierName, $supplierImage));
+        }
+
+        // Example 2: Notify all users subscribed to product updates
+        // User::where('receives_product_notifications', true)->each(function ($user) use ($product, $supplierName, $supplierImage) {
+        //     $user->notify(new NewProductFromSupplier($product, $supplierName, $supplierImage));
+        // });
+
+        return redirect()->back()->with('success', 'Product added and notification sent!');
     }
 }

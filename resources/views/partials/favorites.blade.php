@@ -111,8 +111,8 @@
         document.querySelectorAll('.favorite-button').forEach(button => {
             button.addEventListener('click', function() {
                 const productId = this.dataset.productId;
-                const button = this;
-                const card = button.closest('.product-card');
+                const button = this; // Reference to the clicked button
+                const card = button.closest('.product-card'); // Reference to the parent product card
 
                 fetch(`/products/${productId}/toggle-favorite`, {
                         method: 'POST',
@@ -138,44 +138,48 @@
                     .then(data => {
                         console.log(data.message);
                         if (data.is_favorited) {
-                            // This part is for when a product is added. On the favorites page,
-                            // if you add something, it won't appear until a refresh/new fetch.
-                            // The primary action on this page is removal.
-                            // If you want live updates for adding, you'd need more complex JS
-                            // to fetch and append the new product card.
+                            // Product was added to favorites.
+                            // On the favorites page, this scenario implies the user is re-favoriting
+                            // something that might have been unfavorited previously or came from elsewhere.
+                            // Visually, the heart should be filled.
                             button.innerHTML = `
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6 text-red-500">
-                                    <path d="m11.645 20.917-7.393-7.393A4.5 4.5 0 0 1 3 10.5V9.75a3 3 0 0 1 6-6h.75a3 3 0 0 1 3 3v.75a3 3 0 0 1 3 3v.75c0 1.05.42 2.059 1.172 2.811l-7.393 7.393Z" />
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="size-6 text-red-500">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
                                 </svg>
                             `;
                         } else {
                             // Product was removed from favorites
-                            if (window.location.pathname.includes('/favorites') || window.location.pathname.includes('/profile/account')) { // Be more robust with path checking
+                            if (window.location.pathname.includes('/favorites') || window.location.pathname.includes('/profile/account')) {
                                 if (card) {
                                     card.remove(); // Remove the individual product card from the DOM
 
-                                    // After removing, check the total count of product cards
+                                    // Check if there are any remaining product cards on the page
                                     const remainingCardsOnPage = document.querySelectorAll('.product-card').length;
 
                                     if (remainingCardsOnPage === 0) {
-                                        // If no more cards on the current page, check if there are other pages
-                                        // A simple check is to reload the page or redirect to handle potential previous pages
-                                        // or trigger a new AJAX fetch of the favorites list if on the last page.
-                                        // For simplicity and to ensure pagination links update correctly,
-                                        // a full page reload is often the easiest for a favorites page.
+                                        // If no more cards, reload the page to show the empty state or
+                                        // handle pagination if there were previous pages.
                                         window.location.reload();
-
-                                        // Alternatively, if you want a pure JS solution without reload:
-                                        // You'd need to make an AJAX call to the server to get the next page's content
-                                        // or to check if the total favorites count is now zero.
-                                        // For now, reload is simpler for full pagination coherence.
                                     }
                                 }
+                            } else {
+                                // If this is NOT the favorites page (e.g., a product listing page),
+                                // you should change the icon to an empty heart.
+                                button.innerHTML = `
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" class="size-6 text-gray-500">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                                    </svg>
+                                `;
                             }
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
+                        // Optionally, revert the UI state if the API call fails
                     });
             });
         });

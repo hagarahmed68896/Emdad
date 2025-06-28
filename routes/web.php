@@ -13,6 +13,8 @@ use App\Http\Controllers\ProductSuggestionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductController; // Ensure this is used if you uncomment product.show later
 use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\NotificationController;
 use App\Models\Product; // Ensure this is used if you uncomment product.show later
 use Illuminate\Http\Request;
 
@@ -53,7 +55,8 @@ Route::middleware('web')->group(function () {
         Route::post('/profile/update-password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
 
         Route::post('/profile/update-profile-picture', [ProfileController::class, 'updateProfilePicture'])->name('profile.updateProfilePicture');
-        Route::post('/profile/remove-profile-picture', [ProfileController::class, 'removeProfilePicture'])->name('profile.removeProfilePicture');
+        Route::post('/profile/remove-profile-p
+        icture', [ProfileController::class, 'removeProfilePicture'])->name('profile.removeProfilePicture');
 
         Route::post('/products/{product}/toggle-favorite', [FavoriteController::class, 'toggle'])
             ->name('favorites.toggle');
@@ -63,6 +66,17 @@ Route::middleware('web')->group(function () {
              ->name('favorites.index');
         Route::post('/profile/update-notifications', [ProfileController::class, 'updateNotifications'])->name('profile.updateNotifications');
 
+        Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+
+    // Route to display all notifications (e.g., on a dedicated notifications page)
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+
+    // Route to mark all notifications as read (for the button in your popup)
+    // Using a POST request is generally better for actions that change data.
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
+
+    // Route to mark a specific notification as read
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
 
     });
 

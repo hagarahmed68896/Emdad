@@ -364,9 +364,11 @@
                 </section>
 
                 {{-- Favorites Section --}}
-                <section id="favoritesSection" class="bg-white p-6 rounded-lg shadow-sm mb-8 border border-gray-200 hidden">
-                    @include('partials.favorites_list', ['favorites' => $favorites])
-                </section>
+        <section id="favoritesSection"
+         class="bg-white p-6 rounded-lg shadow-sm mb-8 border border-gray-200 {{ $section === 'favoritesSection' ? '' : 'hidden' }}">
+    @include('partials.favorites', ['favorites' => $favorites])
+</section>
+
 
                 {{-- Notifications Section (New!) --}}
  <section id="notificationsSection" class="bg-white p-6 rounded-lg shadow-sm mb-8 border border-gray-200 hidden">

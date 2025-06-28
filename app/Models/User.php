@@ -70,8 +70,13 @@ public function getLastNameAttribute()
     $names = preg_split('/\s+/', trim($this->full_name), -1, PREG_SPLIT_NO_EMPTY);
     return implode(' ', array_slice($names, 1));
 }
+    public function cart()
+    {
+        return $this->hasOne(Cart::class)->where('status', 'active');
+      
+    }
 
-  public function favorites()
+    public function favorites()
     {
         return $this->hasMany(Favorite::class);
     }

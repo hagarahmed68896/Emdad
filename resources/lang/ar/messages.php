@@ -208,6 +208,8 @@ return [
     'chosen_for_you'=> 'مختارة لك',
     'discover_our_products'=> 'اكتشف منتجاتنا المميزة',
     'discover_our_products_description' => 'مجموعة منتقاة من المنتجات الأكثر تميزًا، لتسهيل تجربة الشراء بالجملة.',
+    'show_details'=> ' عرض التفاصيل',
+    'go_to_fav'=> ' اذهب إلى المفضلة',
 
 
 ];

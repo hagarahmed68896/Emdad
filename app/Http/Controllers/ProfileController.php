@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Pagination\Paginator; // Ensure this is imported for pagination styling
+use Illuminate\Pagination\Paginator;
 
 class ProfileController extends Controller
 {
@@ -19,17 +19,14 @@ class ProfileController extends Controller
      */
     public function show(Request $request)
     {
-        // Ensure Paginator is configured for Tailwind in AppServiceProvider's boot method
-        Paginator::useTailwind(); // Redundant here if in AppServiceProvider, but harmless.
+        Paginator::useTailwind(); 
 
         $user = Auth::user();
 
-        // Split full_name into first_name and last_name for the form
         $names = preg_split('/\s+/', trim($user->full_name), -1, PREG_SPLIT_NO_EMPTY);
         $user->first_name = $names[0] ?? '';
         $user->last_name = implode(' ', array_slice($names, 1)); // All remaining parts
 
-        // --- Fetch Favorites (if needed for the initial load) ---
         $favorites = collect();
         if ($user) {
             // Only paginate if the request is not AJAX or if it's explicitly for favorites via AJAX
@@ -39,26 +36,18 @@ class ProfileController extends Controller
             }
         }
 
-        // --- Pass notification settings to the view ---
-        // $user->notification_settings will be an array because of the cast in the User model.
-        // Provide default values if the user hasn't saved any settings yet.
+
         $notificationSettings = $user->notification_settings ?? $this->getDefaultNotificationSettings();
 
-
-        // Handle AJAX requests for partial content
         if ($request->ajax()) {
-            // You need to distinguish which partial is requested for AJAX
-            // This assumes your AJAX requests hit this 'show' method directly for favorites
-            // If you have separate routes for notifications AJAX, this might differ
-            if ($request->path() === 'profile/favorites') { // Adjust this path to your actual route for favorites AJAX
-                return view('partials.favorites_list', compact('favorites'))->render();
+                        if ($request->path() === 'profile/favorites') { 
+                return view('partials.favorites_list', compact('favorites'));
             }
-            // Add conditions for other AJAX partials if they are handled by this same 'show' method
-            // For notification settings, the Alpine.js component directly fetches/posts.
         }
 
-        // Return the main view with all necessary data
-        return view('profile.account', compact('user', 'favorites', 'notificationSettings'));
+     $section = $request->query('section');
+     return view('profile.account', compact('user', 'favorites', 'notificationSettings', 'section'));
+
     }
 
     /**
@@ -86,7 +75,6 @@ class ProfileController extends Controller
             'email.unique' => __('messages.email_unique'),
             'phone_number.digits' => __('messages.phone_number_digits'),
             'phone_number.unique' => __('messages.phone_number_unique'),
-            // Add other custom messages as needed
         ]);
 
         if ($validator->fails()) {
@@ -103,7 +91,7 @@ class ProfileController extends Controller
         // *** THIS IS THE CRITICAL CHANGE ***
         return response()->json([
             'success' => true,
-            'message' => __('messages.account_details_updated_successfully') // Use translation key
+            'message' => __('messages.account_details_updated_successfully') 
         ]);
     }
 
@@ -227,13 +215,11 @@ class ProfileController extends Controller
                 'viewed_products_offers' => 'boolean',
             ]);
 
-            // Merge new settings with existing ones (important for partial updates)
-            // $user->notification_settings is already an array because of the cast.
             $currentSettings = $user->notification_settings ?? $this->getDefaultNotificationSettings();
             $newSettings = array_merge($currentSettings, $validatedData);
 
             $user->notification_settings = $newSettings;
-            $user->save(); // Save the user model, which will serialize notification_settings to JSON
+            $user->save(); 
 
             return response()->json(['message' => __('messages.notifications_updated_success'), 'settings' => $user->notification_settings]);
 
@@ -254,7 +240,7 @@ class ProfileController extends Controller
     protected function getDefaultNotificationSettings(): array
     {
         return [
-            'receive_in_app' => false, // Default to false or true as per your requirement
+            'receive_in_app' => false, 
             'receive_chat' => false,
             'order_status_updates' => false,
             'offers_discounts' => false,

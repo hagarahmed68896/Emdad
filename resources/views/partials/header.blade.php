@@ -481,16 +481,21 @@
             margin-top: 20px;
         }
     } */
-@media(max-width:1450px){
-.search,.deliver,
-.language,.categories{
-    display: none;
-}
-#dropdownMenuIconButton,.search_menu_small{
-    display:flex;
-}
+    @media(max-width:1450px) {
 
-}
+        .search,
+        .deliver,
+        .language,
+        .categories {
+            display: none;
+        }
+
+        #dropdownMenuIconButton,
+        .search_menu_small {
+            display: flex;
+        }
+
+    }
 </style>
 <style>
     .responsive-dropdown {
@@ -943,7 +948,7 @@
                     </div>
                 </div>
 
-                <div class="shrink-0">
+                <div class="shrink-0"> 
                     <button type="submit"
                         class="bg-[#185D31] w-[61px] h-[32px] text-white rounded-[12px] pb-1 mx-1 text-sm">
                         {{ __('messages.Search') }}
@@ -989,85 +994,370 @@
         </div>
     </div>
 
-    <div
-        class="icons flex items-center w-auto justify-end gap-x-4 ml-4 shrink-0 md:w-[100px] md:justify-between md:ml-0 order-6">
-        <a href="#" class="relative w-[18px] h-[18px]">
+<div
+    class="icons flex items-center w-auto justify-end gap-x-4 ml-4 shrink-0 md:w-[100px] md:justify-between md:ml-0 order-6">
+
+    {{-- Favorites Icon and Popup (YOUR EXISTING CODE - UNCHANGED) --}}
+    <div x-data="{ showPopup: false, buttonRect: null }" x-init="$watch('showPopup', value => {
+        if (value) {
+            // When popup is shown, get the button's position
+            buttonRect = $el.querySelector('a').getBoundingClientRect();
+        } else {
+            buttonRect = null; // Clear when hidden
+        }
+    })" class="relative inline-block"> {{-- This 'relative' is for positioning the popup relative to the icon on larger screens --}}
+        <a href="#" @click.prevent="showPopup = !showPopup" class="relative w-[17px] h-[17px] z-10">
             <img src="{{ asset('images/Vector.svg') }}" alt="Favorites Icon">
         </a>
-        <a href="#" class="relative w-[18px] h-[18px]">
-            <img src="{{ asset('images/Group.svg') }}" alt="Cart Icon">
-        </a>
-        {{-- This content will only be rendered if a user IS logged in --}}
-        @auth
-            <a href="#" class="relative w-[18px] h-[18px]">
-                <img
-                    src="{{ asset('images/interface-alert-alarm-bell-2--alert-bell-ring-notification-alarm--Streamline-Core.svg') }}">
-            </a>
-        @endauth
+
+        {{-- Favorites Popup --}}
+        <div x-show="showPopup" x-cloak @click.away="showPopup = false"
+            x-transition:enter="transition ease-out duration-300"
+            class="bg-white shadow-lg rounded-lg p-4
+fixed inset-x-0 top-[5%] w-[calc(100%-4rem)] max-w-[360px] mx-auto z-20 overflow-auto max-h-[90vh]
+sm:absolute sm:top-full sm:mt-2 sm:w-[404px] sm:h-auto sm:max-h-none sm:mx-0
+rtl:sm:left-0 rtl:sm:right-auto {{-- For RTL, position to the left --}}
+ltr:sm:right-0 ltr:sm:left-auto {{-- For LTR, position to the right --}}
+md:absolute md:top-full md:mt-2 md:w-[404px] md:h-auto md:max-h-none md:mx-0
+rtl:md:left-0 rtl:md:right-auto {{-- For RTL, position to the left --}}
+ltr:md:right-0 ltr:md:left-auto {{-- For LTR, position to the right --}}
+lg:absolute lg:top-full lg:mt-2 lg:w-[404px] lg:h-auto lg:max-h-none lg:mx-0
+rtl:lg:left-0 rtl:lg:right-auto {{-- For RTL, position to the left --}}
+ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
+">
+            <h3 class="text-xl font-bold text-right text-gray-900 mb-4">{{ __('المفضلة') }}</h3>
+            <div id="favorites-content-area" class="w-full flex flex-col items-center">
+                @if ($favorites->isEmpty())
+                    <div class="flex flex-col justify-center items-center w-full py-10 text-gray-600">
+                        <img src="{{ asset('images/Illustrations.svg') }}" alt="No favorites illustration"
+                            class="w-[156px] h-[163px] mb-10 ">
+                        <p class="text-[#696969] text-[20px] text-center">لم تقم باضافة أي منتج الي المفضلة بعد</p>
+                        <p class="px-[20px] py-[12px] bg-[#185D31] text-[white] rounded-[12px] mt-3">تصفح المنتجات
+                        </p>
+                    </div>
+                @else
+                    <div class="grid grid-cols-1 gap-4 w-full" id="favorites-grid">
+                        {{-- Limit to the first two favorites --}}
+                        @foreach ($favorites->take(2) as $favorite)
+                            <div class="flex items-center justify-between bg-[#F8F9FA] rounded-lg shadow-md p-3">
+                                {{-- Product Image Container --}}
+                                <div class="w-20 h-20 bg-white rtl:ml-4 ltr:mr-4 rounded-[12px] flex-shrink-0">
+                                    <img src="{{ asset($favorite->product->image ?? 'https://via.placeholder.com/80x80?text=No+Image') }}"
+                                        onerror="this.onerror=null;this.src='https://via.placeholder.com/80x80?text=Image+Error';"
+                                        class="w-full h-full object-contain rounded-md">
+                                </div>
+                                {{-- Product Details (Text Content) --}}
+                                <div class="flex flex-col flex-grow rtl:ml-3 ltr:mr-3">
+                                    {{-- Product Name --}}
+                                    <p class="text-[16x] font-semibold text-[#212121] mb-1">
+                                        {{ $favorite->product->name }}
+                                    </p>
+                                    <div class="flex items-center text-[16px] text-[#212121] mb-1">
+                                        <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]"
+                                            src="{{ asset('images/Success.svg') }}" alt="Confirmed Supplier">
+                                        <span>{{ $favorite->product->supplier_name ?? 'Fuzhou Green' }}</span>
+
+                                    </div>
+                                    <p class=" text-[#212121] flex font-bold">
+                                        <span class="flex text-[16px] font-bold text-gray-800">
+                                            {{ number_format($favorite->product->price * (1 - ($favorite->product->discount_percent ?? 0) / 100), 2) }}
+                                            <img class="mx-1 w-[15px] h-[15px] mt-1"
+                                                src="{{ asset('images/Vector (3).svg') }}"
+                                                class="text-[#212121]">
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    {{-- "Go to Favorites" Button --}}
+                    <div class="mt-6 text-center w-full"> {{-- Added w-full here to contain the button --}}
+                        <a href="{{ route('profile.show', ['section' => 'favoritesSection']) }}#favoritesSection"
+                            class="mt-2 w-full px-[20px] py-[11px] bg-[#185D31] text-white rounded-[12px] text-[16px] ">
+                            {{ __('messages.go_to_fav') }}
+                        </a>
+                    </div>
+                @endif
+            </div>
+        </div>
     </div>
-<div class="user-profile-section shrink-0 order-7">
-    @auth
-        <div class="p-[15px]">
-            <div class="dropdown relative w-full sm:w-auto" x-data="{ profile: false }">
-                <a class="btn p-0 border-0 bg-transparent" @click="profile = !profile" aria-expanded="false"
-                    id="dropdownButton">
-                    <img src="{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : asset('images/Unknown_person.jpg') }}"
-                        class="w-10 h-10 rounded-full object-cover" id="profileImage" style="cursor: pointer;">
-                </a>
-    
-            <ul x-show="profile" @click.away="profile = false" x-cloak
-    class="profile-menu shadow h-auto rounded-lg p-3 absolute
+
+
+    {{-- Cart Icon and Popup (MODIFIED TO MIRROR FAVORITES LOGIC) --}}
+    <div x-data="{ showCartPopup: false, buttonRect: null }" x-init="$watch('showCartPopup', value => {
+        if (value) {
+            buttonRect = $el.querySelector('a').getBoundingClientRect();
+        } else {
+            buttonRect = null;
+        }
+    })" class="relative inline-block">
+        <a href="#" @click.prevent="showCartPopup = !showCartPopup"
+            class="relative w-[18px] h-[18px] z-10">
+            <img src="{{ asset('images/Group.svg') }}" alt="Cart Icon">
+            {{-- Optional: Cart Item Count Badge --}}
+            @if ($cartItems->sum('quantity') > 0)
+                <span class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-xs w-4 h-4 flex items-center justify-center">
+                    {{ $cartItems->sum('quantity') }}
+                </span>
+            @endif
+        </a>
+
+        <div x-show="showCartPopup" x-cloak @click.away="showCartPopup = false"
+            x-transition:enter="transition ease-out duration-300"
+            class="bg-white shadow-lg rounded-lg p-4
+            fixed inset-x-0 top-[5%] w-[calc(100%-4rem)] max-w-[360px] mx-auto z-20 overflow-auto max-h-[85vh]
+            sm:absolute sm:top-full sm:mt-2 sm:w-[404px] sm:h-auto sm:max-h-none sm:mx-0
+            rtl:sm:left-0 rtl:sm:right-auto
+            ltr:sm:right-0 ltr:sm:left-auto
+            md:absolute md:top-full md:mt-2 md:w-[404px] md:h-auto md:max-h-none md:mx-0
+            rtl:md:left-0 rtl:md:right-auto
+            ltr:md:right-0 ltr:md:left-auto
+            lg:absolute lg:top-full lg:mt-2 lg:w-[404px] lg:h-auto lg:max-h-none lg:mx-0
+            rtl:lg:left-0 rtl:lg:right-auto
+            ltr:lg:right-0 ltr:lg:left-auto
+        ">
+            <h3 class="text-xl font-bold text-right text-gray-900 mb-4">{{ __('عربة التسوق') }}</h3>
+            <div id="cart-content-area" class="w-full flex flex-col items-center">
+                @if ($cartItems->isEmpty())
+                    <div class="flex flex-col justify-center items-center w-full py-10 text-gray-600">
+                        <img src="{{ asset('images/Illustrations (2).svg') }}" alt="No cart items illustration"
+                            class="w-[156px] h-[163px] mb-10 ">
+                        <p class="text-[#696969] text-[20px] text-center">لم تقم بإضافة أي منتج الي عربة التسوق بعد.</p>
+                        <a href="{{ route('products.index') }}" class="px-[20px] py-[12px] bg-[#185D31] text-[white] rounded-[12px] mt-3">
+                            {{ __('تصفح المنتجات') }}
+                        </a>
+                    </div>
+                @else
+                    <div class="grid grid-cols-1 gap-4 w-full" id="cart-grid">
+                        {{-- Limit to the first two cart items for popup, or remove take(2) for full list --}}
+                        @foreach ($cartItems->take(2) as $item)
+                            <div class="flex items-center justify-between bg-[#F8F9FA] rounded-lg shadow-md p-3">
+                                {{-- Product Image --}}
+                                <div class="w-20 h-20 bg-white rtl:ml-4 ltr:mr-4 rounded-[12px] flex-shrink-0">
+                                    <img src="{{ asset($item->product->image ?? 'https://via.placeholder.com/80x80?text=No+Image') }}"
+                                        onerror="this.onerror=null;this.src='https://via.placeholder.com/80x80?text=Image+Error';"
+                                        class="w-full h-full object-contain rounded-md">
+                                </div>
+                                {{-- Product Details --}}
+                                <div class="flex flex-col flex-grow rtl:ml-3 ltr:mr-3">
+                                    <p class="text-[16px] font-semibold text-[#212121] mb-1">
+                                        {{ $item->product->name }}
+                                    </p>
+                                    <p class="text-sm text-gray-600">{{ __('الكمية') }}: {{ $item->quantity }}</p>
+                                    @if ($item->options)
+                                        @foreach(json_decode($item->options, true) as $key => $value)
+                                            <p class="text-xs text-gray-500">{{ ucfirst($key) }}: {{ $value }}</p>
+                                        @endforeach
+                                    @endif
+                                </div>
+                                {{-- Price --}}
+                                <p class="text-[16px] font-bold text-gray-800 flex items-center">
+                                    {{ number_format($item->quantity * $item->price_at_addition, 2) }}
+                                    <img class="mx-1 w-[15px] h-[15px] inline-block" src="{{ asset('images/Vector (3).svg') }}" alt="currency">
+                                </p>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    {{-- "Go to Cart" Button --}}
+                    <div class="mt-6 text-center w-full">
+                        <a href="{{ route('cart.index') }}"
+                            class="mt-2 w-full px-[20px] py-[11px] bg-[#185D31] text-white rounded-[12px] text-[16px] ">
+                            {{ __('عرض العربة') }}
+                        </a>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    {{-- Notification Icon and Popup (only if user is logged in) --}}
+@auth
+    <div x-data="{ showNotificationPopup: false, buttonRect: null }" x-init="$watch('showNotificationPopup', value => {
+        if (value) {
+            buttonRect = $el.querySelector('a').getBoundingClientRect();
+        } else {
+            buttonRect = null;
+        }
+    })" class="relative inline-block">
+        <a href="#" @click.prevent="showNotificationPopup = !showNotificationPopup" class="relative w-[18px] h-[18px] z-10">
+            <img src="{{ asset('images/interface-alert-alarm-bell-2--alert-bell-ring-notification-alarm--Streamline-Core.svg') }}"
+                alt="Notification Icon">
+            {{-- Notification Count Badge --}}
+            @if ($unreadNotificationCount > 0)
+                <span class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-xs w-4 h-4 flex items-center justify-center">
+                    {{ $unreadNotificationCount }}
+                </span>
+            @endif
+        </a>
+
+        <div x-show="showNotificationPopup" x-cloak @click.away="showNotificationPopup = false"
+            x-transition:enter="transition ease-out duration-300"
+            class="bg-white shadow-lg rounded-lg p-4
+            fixed inset-x-0 top-[5%] w-[calc(100%-4rem)] max-w-[360px] mx-auto z-20 overflow-auto max-h-[90vh]
+            sm:absolute sm:top-full sm:mt-2 sm:w-[404px] sm:h-auto sm:max-h-none sm:mx-0
+            rtl:sm:left-0 rtl:sm:right-auto
+            ltr:sm:right-0 ltr:sm:left-auto
+            md:absolute md:top-full md:mt-2 md:w-[404px] md:h-auto md:max-h-none md:mx-0
+            rtl:md:left-0 rtl:md:right-auto
+            ltr:md:right-0 ltr:md:left-auto
+            lg:absolute lg:top-full lg:mt-2 lg:w-[404px] lg:h-auto lg:max-h-none lg:mx-0
+            rtl:lg:left-0 rtl:lg:right-auto
+            ltr:lg:right-0 ltr:lg:left-auto
+        ">
+            <h3 class="text-xl font-bold text-right text-gray-900 mb-4">{{ __('الإشعارات') }}</h3>
+            <div id="notifications-content-area" class="w-full flex flex-col items-center">
+                @if ($notifications->isEmpty())
+                    <div class="flex flex-col justify-center items-center w-full py-10 text-gray-600">
+                        <img src="{{ asset('images/Illustrations (3).svg') }}" alt="No notifications illustration"
+                            class="w-[156px] h-[163px] mb-10 ">
+                        <p class="text-[#696969] text-[20px] text-center">{{ __('لا توجد إشعارات حالياً') }}</p>
+                    </div>
+                @else
+               {{--     <div class="flex justify-end mb-4 w-full">
+                        <button type="button" class="text-sm text-[#185D31] hover:underline"
+                            onclick="window.location.href='{{ route('notifications.markAllAsRead') }}'">
+                            {{ __('وضع علامة "قراءة" على الكل') }}
+                        </button>
+                    </div> --}}
+
+                    {{-- Notifications List --}}
+                    <div class="grid grid-cols-1 gap-2 w-full" id="notifications-grid">
+                        @foreach ($notifications as $notification)
+                            {{-- Check if notification is read to apply different styling --}}
+                            <div class="p-3 rounded-lg border-b flex items-center justify-between
+                                {{ $notification->read_at ? 'bg-white text-gray-600' : 'bg-[#F8F9FA] text-[#212121] font-medium' }}">
+                                    {{-- User Image / Icon (from your screenshot) --}}
+                                <div class="flex-shrink-0 w-12 h-12 rounded-full overflow-hidden rtl:ml-3 ltr:mr-3">
+                                    <img src="{{ asset($notification->data['image'] ?? 'images/default_avatar.png') }}"
+                                         alt="User Avatar" class="w-full h-full object-cover">
+                                </div>
+                               
+                                <div class="flex-grow rtl:pr-3 ltr:pl-3">
+                                    <p class="text-[16px] rtl:text-right ltr:text-left">
+                                        {{-- Notification Title (e.g., "إشعار جديد" from your image) --}}
+                                        <span class="font-bold">{{ __('إشعار جديد') }}: </span>
+                                        {{-- Main Notification Message --}}
+                                        {{ $notification->data['message'] ?? 'رسالة إشعار' }}
+                                    </p>
+                                    {{-- Time Ago --}}
+                                    <p class="text-xs text-gray-500 rtl:text-right ltr:text-left mt-1">
+                                        {{ $notification->created_at->diffForHumans() }}
+                                    </p>
+                                    {{-- Optional: Link to details --}}
+                                    @if (isset($notification->data['url']))
+                                        <a href="{{ $notification->data['url'] }}" class="text-sm text-[#185D31] hover:underline block mt-1">
+                                            {{ __('عرض التفاصيل') }}
+                                        </a>
+                                    @endif
+                                </div>
+                           
+                                {{-- Optional: Mark as Read Button (for single notification) --}}
+                                @if (!$notification->read_at)
+                                    <button type="button"
+                                        {{-- This would require an AJAX call to mark as read --}}
+                                        onclick="window.location.href='{{ route('notifications.markAsRead', $notification->id) }}'"
+                                        class="text-xs text-blue-500 hover:underline flex-shrink-0 rtl:mr-2 ltr:ml-2">
+                                        {{ __('قراءة') }}
+                                    </button>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+
+                    {{-- "View All Notifications" Button --}}
+                    <div class="mt-6 text-center w-full">
+                        <a href="{{ route('notifications.index') }}"
+                            class="mt-2 w-full px-[20px] py-[11px] bg-[#185D31] text-white rounded-[12px] text-[16px] ">
+                            {{ __('عرض كل الإشعارات') }}
+                        </a>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+@endauth
+
+</div>
+
+
+
+
+
+
+
+    <div class="user-profile-section shrink-0 order-7">
+        @auth
+            <div class="p-[15px]">
+                <div class="dropdown relative w-full sm:w-auto" x-data="{ profile: false }">
+                    <a class="btn p-0 border-0 bg-transparent" @click="profile = !profile" aria-expanded="false"
+                        id="dropdownButton">
+                        <img src="{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : asset('images/Unknown_person.jpg') }}"
+                            class="w-10 h-10 rounded-full object-cover" id="profileImage" style="cursor: pointer;">
+                    </a>
+
+                    <ul x-show="profile" @click.away="profile = false" x-cloak
+                        class="profile-menu shadow h-auto rounded-lg p-3 absolute
     top-[24px]  left-[50px]
            w-[calc(100vw-30px)] max-w-[296px]     {{-- Full width minus padding, with max cap --}}
            sm:left-0 sm:transform-none sm:w-[296px] {{-- Revert to right-aligned fixed width for larger screens --}}
            mt-2 bg-white z-50"
-    style="min-width: 220px;">
-<style>
-@media (max-width: 640px) { /* Adjust this breakpoint as needed */
-    .profile-menu {
-        position: fixed; /* Change to fixed for mobile */
-        top: 0; /* Position it at the top of the viewport */
-        left: -100px; /* Align to the left */
-        width: 100%; /* Full width */
-        max-width: none; /* Remove max-width for mobile */
-        margin-top: 0; /* Remove top margin */
-    }
-}
-</style>
-    <li class="flex items-center mb-2 border-b pb-3">
-        <img src="{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : asset('images/Unknown_person.jpg') }}"
-            class="w-10 h-10 me-2 rounded-full object-cover">
-        <div>
-            <span class="text-base text-[#121212]">{{ Auth::user()->full_name }}</span><br>
-            <small class="sm:text-sm text-gray-500 text-[10px]">{{ Auth::user()->email }}</small>
-        </div>
-    </li>
-    <li class="pt-2"><a
-            class="dropdown-item pb-4 block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
-            href="{{ route('profile.show') }}">{{ __('messages.MyAccount') }}</a></li>
-    <li><a class="dropdown-item pb-4 block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
-            href="#">{{ __('messages.MyOrders') }}</a></li>
-    <li><a class="dropdown-item pb-4 block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
-            href="#">{{ __('messages.Fav') }}</a></li>
-    <li><a class="dropdown-item pb-4 block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
-            href="#">{{ __('messages.settings_notifications') }}</a>
-    </li>
-    <li>
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button type="submit"
-                class="dropdown-item pb-4 w-full text-gray-700 hover:bg-gray-100 px-3 py-2 rounded">
-                {{ __('messages.logout') }}
-            </button>
-        </form>
-    </li>
-</ul>
+                        style="min-width: 220px;">
+                        <style>
+                            @media (max-width: 640px) {
+
+                                /* Adjust this breakpoint as needed */
+                                .profile-menu {
+                                    position: fixed;
+                                    /* Change to fixed for mobile */
+                                    top: 0;
+                                    /* Position it at the top of the viewport */
+                                    left: -100px;
+                                    /* Align to the left */
+                                    width: 100%;
+                                    /* Full width */
+                                    max-width: none;
+                                    /* Remove max-width for mobile */
+                                    margin-top: 0;
+                                    /* Remove top margin */
+                                }
+                            }
+                        </style>
+                        <li class="flex items-center mb-2 border-b pb-3">
+                            <img src="{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : asset('images/Unknown_person.jpg') }}"
+                                class="w-10 h-10 me-2 rounded-full object-cover">
+                            <div>
+                                <span class="text-base text-[#121212]">{{ Auth::user()->full_name }}</span><br>
+                                <small class="sm:text-sm text-gray-500 text-[10px]">{{ Auth::user()->email }}</small>
+                            </div>
+                        </li>
+                        <li class="pt-2"><a
+                                class="dropdown-item pb-4 block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
+                                href="{{ route('profile.show') }}">{{ __('messages.MyAccount') }}</a></li>
+                        <li><a class="dropdown-item pb-4 block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
+                                href="#">{{ __('messages.MyOrders') }}</a></li>
+                        <li><a class="dropdown-item pb-4 block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
+                                href="#">{{ __('messages.Fav') }}</a></li>
+                        <li><a class="dropdown-item pb-4 block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
+                                href="#">{{ __('messages.settings_notifications') }}</a>
+                        </li>
+                        <li>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit"
+                                    class="dropdown-item pb-4 w-full text-gray-700 hover:bg-gray-100 px-3 py-2 rounded">
+                                    {{ __('messages.logout') }}
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
             </div>
-        </div>
-    @else
-        @include('partials.login')
-    @endauth
-</div>
+        @else
+            @include('partials.login')
+        @endauth
+    </div>
 </header>
 
 
@@ -1171,195 +1461,201 @@
 <div class="search_menu_small hidden flex-row justify-between px-4 sm:px-[64px] py-4">
 
     {{-- ********************************************drop menu for small screen******************************* --}}
-    
+
     <button id="dropdownMenuIconButton" data-dropdown-toggle="mergedDropdownMenu"
         class="hidden order-3  items-center p-2 text-lg rtl:ml-4 ltr:ml-4 font-medium text-center text-gray-900 bg-[#F8F9FA] rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50 "
         type="button">
-     <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
-  <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
-</svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+            class="bi bi-list" viewBox="0 0 16 16">
+            <path fill-rule="evenodd"
+                d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5" />
+        </svg>
     </button>
 
     <!-- Dropdown menu -->
-   <div id="mergedDropdownMenu"
-    class="z-20 hidden p-4 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-[314px] dark:bg-gray-700 dark:divide-gray-600">
-    <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownMenuIconButton">
+    <div id="mergedDropdownMenu"
+        class="z-20 hidden p-4 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-[314px] dark:bg-gray-700 dark:divide-gray-600">
+        <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownMenuIconButton">
 
-        {{-- Delivery Location Section --}}
-        <li class="mb-4">
-            <div x-data="{ open: false }"
-                class="relative inline-block text-[12px] tracking-[0%] w-auto max-w-[150px] lg:mx-4 sm:mx-1 md:w-[120px] md:h-[36px] shrink-0">
-                <div @click="open = !open"
-                    class="flex items-center cursor-pointer p-1 hover:border font-normal rounded-[4px] space-x-1 h-full w-full justify-center">
-                    <img src="https://s.alicdn.com/@icon/flag/assets/sa.png" alt="SA" class="w-[24px] h-[24px] ml-2" />
-                    <span class="truncate">{{ __('messages.deliver') }}</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor" class="w-[12px] h-[12px] shrink-0">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                    </svg>
-                </div>
-
-                <div x-show="open" @click.away="open = false" x-transition
-                    class="fixed z-10 mt-2 w-[calc(100vw-32px)] left-0 bg-white border border-gray-200 rounded-lg shadow-lg p-4">
-                    <div class="flex flex-col mb-4">
-                        <p
-                            class="font-cairo font-bold text-[20px] leading-[150%] tracking-[0%] text-right align-middle mb-3">
-                            {{ __('messages.deliverySite') }}</p>
-                        <p
-                            class="font-cairo text-[14px] leading-[150%] tracking-[0%] text-right align-middle text-gray-500">
-                            {{ __('messages.deliverySiteMSG') }}</p>
-                    </div>
-                    <div>
-                        @guest
-                            <a href="{{ route('login') }}"
-                                class="w-full h-[40px] bg-[#185D31] px-4 py-2 rounded-[12px] cursor-pointer text-[14px] text-white flex items-center justify-center">
-                                {{ __('messages.addLocation') }}
-                            </a>
-                        @endguest
-
-                        @auth
-                            <a onclick="openMapModal()"
-                                class="w-full h-[40px] bg-[#185D31] px-4 py-2 rounded-[12px] cursor-pointer text-[14px] text-white flex items-center justify-center">
-                                {{ __('messages.addLocationAuth') }}
-                            </a>
-                        @endauth
-                    </div>
-                    <div class="flex items-center justify-center my-4 text-gray-300">
-                        <hr class="flex-grow border-t border-gray-300">
-                        <span class="text-sm text-gray-500 font-medium mx-4">{{ __('messages.or') }}</span>
-                        <hr class="flex-grow border-t border-gray-300">
-                    </div>
-                    <div x-data="{ open: false, selectedCity: '{{ __('messages.chooseCity') }}' }" class="relative">
-                        <div @click="open = !open"
-                            class="dropdown w-full h-[40px] bg-white px-4 py-2 rounded-[12px] flex items-center justify-between border border-gray-400 text-gray-600 font-normal text-[16px] cursor-pointer">
-                            <a href="javascript:void(0)" x-text="selectedCity" class="flex-1 text-gray-600"></a>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke-width="1.5" stroke="currentColor" class="w-5 h-5 ml-2 shrink-0"
-                                :class="{ 'rotate-180': open }">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                            </svg>
-                        </div>
-
-                        <div x-show="open" @click.away="open = false" x-cloak
-                            class="absolute z-10 w-full mt-1 bg-white rounded-[12px] shadow-lg border border-gray-300 overflow-hidden">
-                            <ul class="py-1">
-                                <li>
-                                    <a href="#" @click.prevent="selectedCity = 'مدينة 1'; open = false"
-                                        class="block px-4 py-2 text-gray-800 hover:bg-gray-100">مدينة 1</a>
-                                </li>
-                                <li>
-                                    <a href="#" @click.prevent="selectedCity = 'مدينة 2'; open = false"
-                                        class="block px-4 py-2 text-gray-800 hover:bg-gray-100">مدينة 2</a>
-                                </li>
-                                <li>
-                                    <a href="#" @click.prevent="selectedCity = 'مدينة 3'; open = false"
-                                        class="block px-4 py-2 text-gray-800 hover:bg-gray-100">مدينة 3</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </li>
-
-        {{-- Language Selector Section --}}
-        <li class="mb-4">
-            @php
-                $currentLang = app()->getLocale();
-            @endphp
-            <div class="btn-group flex items-center" style="color: #212121; width:90px; height:24px;">
-                <button type="button" class="btn w-[16px] border-none" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="{{ asset('images/Vector (2).svg') }}" alt="">
-                </button>
-                <span class="text-[#212121] text-sm md:text-base">
-                    {{ $currentLang == 'ar' ? 'العربية' : 'English' }}
-                </span>
-                <div class="dropdown-menu w-[180px] h-auto rounded-[12px] bg-[#FFFFFF] py-2 shadow-lg">
-                    <div class="flex items-center cursor-pointer py-3 px-4 text-base text-[#212121]"
-                        onclick="window.location.href='{{ route('change.language', 'ar') }}'">
-                        <input type="radio" name="language" value="arabic"
-                            {{ $currentLang == 'ar' ? 'checked' : '' }}
-                            class="shrink-0 rtl:ml-3 ltr:mr-3 w-6 h-6 border-[#185D31] focus:ring-[#185D31] disabled:pointer-events-none dark:bg-[#185D31] dark:border-neutral-700 dark:checked:border-[#185D31] dark:focus:ring-offset-gray-800 appearance-none rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]"
-                            id="arabic" readonly>
-                        <label for="arabic" class="text-neutral-700">{{ __('messages.arabic') }}</label>
-                    </div>
-                    <div class="flex items-center cursor-pointer py-3 px-4 text-base text-[#212121]"
-                        onclick="window.location.href='{{ route('change.language', 'en') }}'">
-                        <input type="radio" name="language" value="english"
-                            {{ $currentLang == 'en' ? 'checked' : '' }}
-                            class="shrink-0 rtl:ml-3 ltr:mr-3 w-6 h-6 border-[#185D31] focus:ring-[#185D31] disabled:pointer-events-none dark:bg-[#185D31] dark:border-neutral-700 dark:checked:border-[#185D31] dark:focus:ring-offset-gray-800 appearance-none rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]"
-                            id="english" readonly>
-                        <label for="english" class="text-neutral-700">{{ __('messages.english') }}</label>
-                    </div>
-                </div>
-            </div>
-        </li>
-
-        <hr class="my-2 border-gray-100 dark:border-gray-600">
-
-        {{-- Categories and Products Section --}}
-        @if (isset($categories))
-            @foreach ($categories as $index => $category)
-                <li class="relative" x-data="{ openIndex: null }" @mouseenter="openIndex = {{ $index }}"
-                    @mouseleave="openIndex = null">
-                    <div
-                        class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg mx-1 my-0.5 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50"
-                        role="menuitem" aria-haspopup="true" :aria-expanded="(openIndex === {{ $index }}).toString()">
-                        <div class="flex items-center space-x-2 rtl:space-x-reverse">
-                            @php
-                                $icon = $category->iconUrl
-                                    ? asset('storage/' . $category->iconUrl)
-                                    : asset('images/default_avatar.png');
-                            @endphp
-                            <img src="{{ $icon }}" alt="{{ $category->name }}"
-                                class="rounded-[12px] w-[56px] h-[56px] object-cover">
-                            <span class="text-[#1F2B45] text-[16px] font-semibold">{{ $category->name }}</span>
-                        </div>
-                        <svg class="h-5 w-5 text-gray-400 transition-transform duration-200"
-                            :class="{ 'rotate-90': openIndex === {{ $index }} }" xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                            <path fill-rule="evenodd"
-                                d="M7.293 14.707a1 1 0 010-1.414L10.586 10l-3.293-3.293a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                clip-rule="evenodd" />
+            {{-- Delivery Location Section --}}
+            <li class="mb-4">
+                <div x-data="{ open: false }"
+                    class="relative inline-block text-[12px] tracking-[0%] w-auto max-w-[150px] lg:mx-4 sm:mx-1 md:w-[120px] md:h-[36px] shrink-0">
+                    <div @click="open = !open"
+                        class="flex items-center cursor-pointer p-1 hover:border font-normal rounded-[4px] space-x-1 h-full w-full justify-center">
+                        <img src="https://s.alicdn.com/@icon/flag/assets/sa.png" alt="SA"
+                            class="w-[24px] h-[24px] ml-2" />
+                        <span class="truncate">{{ __('messages.deliver') }}</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor" class="w-[12px] h-[12px] shrink-0">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
                         </svg>
                     </div>
 
-                    <div x-show="openIndex === {{ $index }}" x-transition x-cloak
-                        class="SideDropdown absolute top-0
-                        {{ app()->getLocale() === 'ar' ? 'align-right ml-1' : 'align-left mr-1' }}
-                        bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 w-[314px] z-[1002] overflow-hidden">
-                        <div class="text-black p-4 flex items-center space-x-3 rtl:space-x-reverse">
-                            <span class="text-[18px] font-semibold">{{ $category->name }}</span>
+                    <div x-show="open" @click.away="open = false" x-transition
+                        class="fixed z-10 mt-2 w-[calc(100vw-32px)] left-0 bg-white border border-gray-200 rounded-lg shadow-lg p-4">
+                        <div class="flex flex-col mb-4">
+                            <p
+                                class="font-cairo font-bold text-[20px] leading-[150%] tracking-[0%] text-right align-middle mb-3">
+                                {{ __('messages.deliverySite') }}</p>
+                            <p
+                                class="font-cairo text-[14px] leading-[150%] tracking-[0%] text-right align-middle text-gray-500">
+                                {{ __('messages.deliverySiteMSG') }}</p>
                         </div>
+                        <div>
+                            @guest
+                                <a href="{{ route('login') }}"
+                                    class="w-full h-[40px] bg-[#185D31] px-4 py-2 rounded-[12px] cursor-pointer text-[14px] text-white flex items-center justify-center">
+                                    {{ __('messages.addLocation') }}
+                                </a>
+                            @endguest
 
-                        <div class="py-2 px-3 space-y-2 max-h-[300px] overflow-y-auto" role="none">
-                            @if ($category->products && $category->products->isNotEmpty())
-                                @foreach ($category->products as $product)
-                                    <a href=""
-                                        class="flex items-center space-x-2 rtl:space-x-reverse px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded-lg">
-                                        @php
-                                            $productIcon = $product->image
-                                                ? asset('storage/' . $product->image)
-                                                : asset('images/default_product.png');
-                                        @endphp
-                                        <img src="{{ $productIcon }}" alt="{{ $product->name }}"
-                                            class="rounded-[8px] w-[60px] h-[60px] object-cover border border-gray-200">
-                                        <span>{{ $product->name }}</span>
-                                    </a>
-                                @endforeach
-                            @else
-                                <div class="px-2 py-1 text-sm text-gray-500">لا توجد منتجات لهذه الفئة.</div>
-                            @endif
+                            @auth
+                                <a onclick="openMapModal()"
+                                    class="w-full h-[40px] bg-[#185D31] px-4 py-2 rounded-[12px] cursor-pointer text-[14px] text-white flex items-center justify-center">
+                                    {{ __('messages.addLocationAuth') }}
+                                </a>
+                            @endauth
+                        </div>
+                        <div class="flex items-center justify-center my-4 text-gray-300">
+                            <hr class="flex-grow border-t border-gray-300">
+                            <span class="text-sm text-gray-500 font-medium mx-4">{{ __('messages.or') }}</span>
+                            <hr class="flex-grow border-t border-gray-300">
+                        </div>
+                        <div x-data="{ open: false, selectedCity: '{{ __('messages.chooseCity') }}' }" class="relative">
+                            <div @click="open = !open"
+                                class="dropdown w-full h-[40px] bg-white px-4 py-2 rounded-[12px] flex items-center justify-between border border-gray-400 text-gray-600 font-normal text-[16px] cursor-pointer">
+                                <a href="javascript:void(0)" x-text="selectedCity" class="flex-1 text-gray-600"></a>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="w-5 h-5 ml-2 shrink-0"
+                                    :class="{ 'rotate-180': open }">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                                </svg>
+                            </div>
+
+                            <div x-show="open" @click.away="open = false" x-cloak
+                                class="absolute z-10 w-full mt-1 bg-white rounded-[12px] shadow-lg border border-gray-300 overflow-hidden">
+                                <ul class="py-1">
+                                    <li>
+                                        <a href="#" @click.prevent="selectedCity = 'مدينة 1'; open = false"
+                                            class="block px-4 py-2 text-gray-800 hover:bg-gray-100">مدينة 1</a>
+                                    </li>
+                                    <li>
+                                        <a href="#" @click.prevent="selectedCity = 'مدينة 2'; open = false"
+                                            class="block px-4 py-2 text-gray-800 hover:bg-gray-100">مدينة 2</a>
+                                    </li>
+                                    <li>
+                                        <a href="#" @click.prevent="selectedCity = 'مدينة 3'; open = false"
+                                            class="block px-4 py-2 text-gray-800 hover:bg-gray-100">مدينة 3</a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
-                </li>
-            @endforeach
-        @endif
-    </ul>
-</div>
+                </div>
+            </li>
+
+            {{-- Language Selector Section --}}
+            <li class="mb-4">
+                @php
+                    $currentLang = app()->getLocale();
+                @endphp
+                <div class="btn-group flex items-center" style="color: #212121; width:90px; height:24px;">
+                    <button type="button" class="btn w-[16px] border-none" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <img src="{{ asset('images/Vector (2).svg') }}" alt="">
+                    </button>
+                    <span class="text-[#212121] text-sm md:text-base">
+                        {{ $currentLang == 'ar' ? 'العربية' : 'English' }}
+                    </span>
+                    <div class="dropdown-menu w-[180px] h-auto rounded-[12px] bg-[#FFFFFF] py-2 shadow-lg">
+                        <div class="flex items-center cursor-pointer py-3 px-4 text-base text-[#212121]"
+                            onclick="window.location.href='{{ route('change.language', 'ar') }}'">
+                            <input type="radio" name="language" value="arabic"
+                                {{ $currentLang == 'ar' ? 'checked' : '' }}
+                                class="shrink-0 rtl:ml-3 ltr:mr-3 w-6 h-6 border-[#185D31] focus:ring-[#185D31] disabled:pointer-events-none dark:bg-[#185D31] dark:border-neutral-700 dark:checked:border-[#185D31] dark:focus:ring-offset-gray-800 appearance-none rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]"
+                                id="arabic" readonly>
+                            <label for="arabic" class="text-neutral-700">{{ __('messages.arabic') }}</label>
+                        </div>
+                        <div class="flex items-center cursor-pointer py-3 px-4 text-base text-[#212121]"
+                            onclick="window.location.href='{{ route('change.language', 'en') }}'">
+                            <input type="radio" name="language" value="english"
+                                {{ $currentLang == 'en' ? 'checked' : '' }}
+                                class="shrink-0 rtl:ml-3 ltr:mr-3 w-6 h-6 border-[#185D31] focus:ring-[#185D31] disabled:pointer-events-none dark:bg-[#185D31] dark:border-neutral-700 dark:checked:border-[#185D31] dark:focus:ring-offset-gray-800 appearance-none rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]"
+                                id="english" readonly>
+                            <label for="english" class="text-neutral-700">{{ __('messages.english') }}</label>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            <hr class="my-2 border-gray-100 dark:border-gray-600">
+
+            {{-- Categories and Products Section --}}
+            @if (isset($categories))
+                @foreach ($categories as $index => $category)
+                    <li class="relative" x-data="{ openIndex: null }" @mouseenter="openIndex = {{ $index }}"
+                        @mouseleave="openIndex = null">
+                        <div class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg mx-1 my-0.5 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50"
+                            role="menuitem" aria-haspopup="true"
+                            :aria-expanded="(openIndex === {{ $index }}).toString()">
+                            <div class="flex items-center space-x-2 rtl:space-x-reverse">
+                                @php
+                                    $icon = $category->iconUrl
+                                        ? asset('storage/' . $category->iconUrl)
+                                        : asset('images/default_avatar.png');
+                                @endphp
+                                <img src="{{ $icon }}" alt="{{ $category->name }}"
+                                    class="rounded-[12px] w-[56px] h-[56px] object-cover">
+                                <span class="text-[#1F2B45] text-[16px] font-semibold">{{ $category->name }}</span>
+                            </div>
+                            <svg class="h-5 w-5 text-gray-400 transition-transform duration-200"
+                                :class="{ 'rotate-90': openIndex === {{ $index }} }"
+                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                aria-hidden="true">
+                                <path fill-rule="evenodd"
+                                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10l-3.293-3.293a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </div>
+
+                        <div x-show="openIndex === {{ $index }}" x-transition x-cloak
+                            class="SideDropdown absolute top-0
+                        {{ app()->getLocale() === 'ar' ? 'align-right ml-1' : 'align-left mr-1' }}
+                        bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 w-[314px] z-[1002] overflow-hidden">
+                            <div class="text-black p-4 flex items-center space-x-3 rtl:space-x-reverse">
+                                <span class="text-[18px] font-semibold">{{ $category->name }}</span>
+                            </div>
+
+                            <div class="py-2 px-3 space-y-2 max-h-[300px] overflow-y-auto" role="none">
+                                @if ($category->products && $category->products->isNotEmpty())
+                                    @foreach ($category->products as $product)
+                                        <a href=""
+                                            class="flex items-center space-x-2 rtl:space-x-reverse px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded-lg">
+                                            @php
+                                                $productIcon = $product->image
+                                                    ? asset('storage/' . $product->image)
+                                                    : asset('images/default_product.png');
+                                            @endphp
+                                            <img src="{{ $productIcon }}" alt="{{ $product->name }}"
+                                                class="rounded-[8px] w-[60px] h-[60px] object-cover border border-gray-200">
+                                            <span>{{ $product->name }}</span>
+                                        </a>
+                                    @endforeach
+                                @else
+                                    <div class="px-2 py-1 text-sm text-gray-500">لا توجد منتجات لهذه الفئة.</div>
+                                @endif
+                            </div>
+                        </div>
+                    </li>
+                @endforeach
+            @endif
+        </ul>
+    </div>
 
     {{-- ***************************************************************************************************** --}}
-   <div class="  w-full md:flex-grow md:max-w-2xl mx-8 order-4">
+    <div class="  w-full md:flex-grow md:max-w-2xl mx-8 order-4">
         <form action="{{ route('search') }}" method="GET" class="main-search-form">
             <div class="flex border w-[300px] rounded-[12px] bg-[#F8F9FA] items-center py-1 px-2 relative">
                 {{-- Category Dropdown (Unchanged from previous versions) --}}
@@ -1529,8 +1825,7 @@
                         <input type="text" x-model="searchText"
                             @focus="showPopup = true; if (searchText.length === 0) fetchSuggestions(true); else fetchSuggestions();"
                             @input="showPopup = true; fetchSuggestions()" @click.stop
-                            class="block w-full px-3 py-2 border-none focus:outline-none focus:ring-0 sm:text-sm"
-                           >
+                            class="block w-full px-3 py-2 border-none focus:outline-none focus:ring-0 sm:text-sm">
                     </div>
 
                     {{-- Unified Popup for Suggestions and Recent Searches --}}
@@ -1639,7 +1934,8 @@
                 {{-- Image Upload Component (Unchanged) --}}
                 <div x-data="imageUploadComponent()" class="relative flex items-center justify-center mx-2 shrink-0">
                     <label @click="showUploadModal = true" class="cursor-pointer hover:text-black text-[#767676]">
-                        <img src="{{ asset('images/Group (3).svg') }}" alt="Upload Image" class="w-[20px] h-[20px]">
+                        <img src="{{ asset('images/Group (3).svg') }}" alt="Upload Image"
+                            class="w-[20px] h-[20px]">
                     </label>
 
                     {{-- This is now the ONLY main container for the modal --}}
@@ -1678,7 +1974,8 @@
                                     @change="handleImageUpload">
                             </div>
                             <div class="flex flex-col sm:flex-row mt-4 mb-4 items-center justify-between">
-                                <input type="text" x-model="imageUrl" placeholder="{{ __('messages.imageURL') }}"
+                                <input type="text" x-model="imageUrl"
+                                    placeholder="{{ __('messages.imageURL') }}"
                                     class="border border-gray-300 px-3 py-2 rounded w-full sm:w-[400px] text-sm mb-2 sm:mb-0" />
                                 <button type="button" @click="submitImage"
                                     class="bg-green-800 text-white px-6 py-2 rounded text-sm w-full sm:w-auto">

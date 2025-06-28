@@ -76,7 +76,7 @@
                     <div class="mt-auto">
                         <a href="{{ route('products.show', $favorite->product->slug) }}"
                             class="block w-full bg-[#185D31] text-white text-center py-[10px] px-[16px] rounded-[12px] font-medium transition-colors duration-200">
-                            عرض التفاصيل
+                           {{ __('messages.show_details') }}
                         </a>
                     </div>
                 </div>
