@@ -1,6 +1,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
+
 <style>
     /* Custom styles for Swiper navigation and pagination */
 
@@ -54,9 +55,11 @@
         <div class="flex justify-between w-full mb-6 md:mb-0">
             <div class="flex flex-col text-right md:text-right">
                 {{-- Translated: Limited Offers --}}
-                <p class="text-[#1F2B45] text-[16px] px-[16px] py-[8px] bg-white rounded-[40px] mb-4 w-[145px]">{{ __('messages.limited_offers') }}</p>
+                <p class="text-[#1F2B45] text-[16px] px-[16px] py-[8px] bg-white rounded-[40px] mb-4 w-[145px]">
+                    {{ __('messages.limited_offers') }}</p>
                 {{-- Translated: Best Offers --}}
-                <p class="text-3xl sm:text-4xl md:text-[40px] font-bold text-gray-900 mb-2 mt-2">{{ __('messages.best_offers') }}</p>
+                <p class="text-3xl sm:text-4xl md:text-[40px] font-bold text-gray-900 mb-2 mt-2">
+                    {{ __('messages.best_offers') }}</p>
                 {{-- Translated: Description --}}
                 <p class="text-[#696969] text-[20px] sm:text-lg mt-2 ">{{ __('messages.best_offers_description') }}</p>
             </div>
@@ -81,11 +84,17 @@
                 <div class="swiper-slide mb-8">
                     <div class="product-card bg-white rounded-xl overflow-hidden shadow-md flex flex-col">
                         {{-- Product Image Carousel (Inner Swiper) --}}
-                        <div class="relative w-full h-48 sm:h-56 overflow-hidden product-image-swiper swiper ">
+                        <div class="relative w-full h-48 sm:h-56 overflow-hidden product-image-swiper inner-swiper">
                             <div class="swiper-wrapper">
-                                @if (!empty($product->images) && is_array($product->images) && count($product->images) > 0)
-                                    @foreach ($product->images as $image)
-                                        <div class="swiper-slide ">
+                                @php
+                                    $images = is_string($product->images)
+                                        ? json_decode($product->images, true)
+                                        : $product->images ?? [];
+                                @endphp
+
+                                @if (!empty($images) && count($images) > 0)
+                                    @foreach ($images as $image)
+                                        <div class="swiper-slide">
                                             <img src="{{ asset($image) }}"
                                                 onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
                                                 class="w-full h-full object-contain">
@@ -100,9 +109,12 @@
                                 @endif
                             </div>
                             {{-- Inner Swiper Pagination --}}
-                            @if (!empty($product->images) && is_array($product->images) && count($product->images) > 1)
-                            <div class="swiper-pagination image-pagination"></div>
-                            @endif
+                         @php
+    $images = is_string($product->images) ? json_decode($product->images, true) : ($product->images ?? []);
+@endphp
+
+<div class="swiper-pagination image-pagination" style="{{ count($images) <= 1 ? 'display:none;' : '' }}"></div>
+
 
                             {{-- DISCOUNT BADGE - MOVED HERE --}}
                             @if ($product->is_offer && $product->discount_percent)
@@ -164,8 +176,8 @@
                                 @if ($product->is_offer && $product->discount_percent)
                                     <span class="flex text-sm text-gray-400 line-through mr-2 mr-1">
                                         {{ number_format($product->price, 2) }}
-                                        <img class="mx-1 w-[20px] h-[21px]"
-                                            src="{{ asset('images/Vector (3).svg') }}" alt="">
+                                        <img class="mx-1 w-[20px] h-[21px]" src="{{ asset('images/Vector (3).svg') }}"
+                                            alt="">
                                     </span>
                                 @endif
                             </div>
@@ -194,21 +206,24 @@
                 </div>
             @endforelse
         </div>
-        <div class="swiper-pagination mt-10"></div>
+{{-- Always include this regardless of product count --}}
+<div class="swiper-pagination offer-swiper-pagination mt-10"></div>
     </div>
 </div>
 
 {{-- Login Popup HTML --}}
 <div id="login-popup" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
     <div class="bg-white p-8 rounded-lg shadow-lg w-96 max-w-sm mx-4">
-        <h2 class="text-2xl font-bold mb-4 text-gray-900">{{__('messages.login_important')}}</h2>
-        <p class="mb-6 text-gray-700">{{__('messages.login_important_for_fav')}}</p>
+        <h2 class="text-2xl font-bold mb-4 text-gray-900">{{ __('messages.login_important') }}</h2>
+        <p class="mb-6 text-gray-700">{{ __('messages.login_important_for_fav') }}</p>
         <div class="flex justify-end space-x-2 rtl:space-x-reverse">
-            <button id="close-login-popup" class="bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors">
-                {{__('messages.cancel')}}
+            <button id="close-login-popup"
+                class="bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors">
+                {{ __('messages.cancel') }}
             </button>
-            <a href="{{ route('login') }}" class="bg-[#185D31] text-white py-2 px-4 rounded-md hover:bg-[#154a2a] transition-colors">
-                {{__('messages.login')}}
+            <a href="{{ route('login') }}"
+                class="bg-[#185D31] text-white py-2 px-4 rounded-md hover:bg-[#154a2a] transition-colors">
+                {{ __('messages.login') }}
             </a>
         </div>
     </div>
@@ -236,8 +251,10 @@
                 const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
                 document.getElementById("countdown-hours").textContent = String(hours).padStart(2, '0');
-                document.getElementById("countdown-minutes").textContent = String(minutes).padStart(2, '0');
-                document.getElementById("countdown-seconds").textContent = String(seconds).padStart(2, '0');
+                document.getElementById("countdown-minutes").textContent = String(minutes).padStart(2,
+                    '0');
+                document.getElementById("countdown-seconds").textContent = String(seconds).padStart(2,
+                    '0');
 
                 if (distance < 0) {
                     clearInterval(countdownInterval);
@@ -261,7 +278,7 @@
                 disableOnInteraction: false,
             },
             pagination: {
-                el: '.swiper-pagination',
+                el: '.offer-swiper-pagination',
                 clickable: true,
             },
             navigation: {
@@ -295,11 +312,11 @@
         });
 
         function initializeInnerSwipers() {
-            document.querySelectorAll('.product-image-swiper').forEach(swiperElement => {
-                // Check if this swiper instance has already been initialized
+            document.querySelectorAll('.inner-swiper').forEach(swiperElement => {
+                // Prevent duplicate initialization
                 if (!swiperElement.swiper) {
                     const imageSlides = swiperElement.querySelectorAll('.swiper-slide').length;
-                    if (imageSlides > 1) { // Only create swiper if multiple images exist
+                    if (imageSlides > 1) {
                         new Swiper(swiperElement, {
                             loop: true,
                             autoplay: {
@@ -315,6 +332,7 @@
                 }
             });
         }
+
         initializeInnerSwipers(); // Initial call to set up inner swipers on page load
 
 
@@ -322,7 +340,8 @@
 
         // Determine user authentication status from Laravel
         const isUserLoggedIn = {{ Auth::check() ? 'true' : 'false' }};
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token once
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute(
+        'content'); // Get CSRF token once
 
         const favoriteButtons = document.querySelectorAll('.favorite-button');
         const loginPopup = document.getElementById('login-popup');
@@ -331,53 +350,62 @@
         favoriteButtons.forEach(button => {
             button.addEventListener('click', function(event) {
                 if (!isUserLoggedIn) {
-                    event.preventDefault(); // Prevent default action (e.g., potential form submission or link follow)
+                    event
+                .preventDefault(); // Prevent default action (e.g., potential form submission or link follow)
                     loginPopup.classList.remove('hidden'); // Show the popup
                 } else {
                     // User is logged in, proceed with favorite toggling logic
                     const productId = this.dataset.productId;
-                    console.log('User is logged in. Toggling favorite for product ID:', productId);
+                    console.log('User is logged in. Toggling favorite for product ID:',
+                        productId);
 
                     // AJAX CALL to toggle favorite status
                     fetch(`/products/${productId}/toggle-favorite`, { // Adjust this API endpoint to match your Laravel route
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json', // Important for Laravel to return JSON
-                            'X-CSRF-TOKEN': csrfToken // Laravel CSRF token
-                        },
-                        body: JSON.stringify({ product_id: productId })
-                    })
-                    .then(response => {
-                        // Handle unauthenticated case (e.g., session expired)
-                        if (response.status === 401) {
-                            window.location.href = '/login'; // Redirect to login page
-                            return Promise.reject('Unauthenticated'); // Stop promise chain
-                        }
-                        if (!response.ok) {
-                            // If response is not OK (e.g., 500 Internal Server Error, 403 Forbidden)
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json(); // Parse response as JSON
-                    })
-                    .then(data => {
-                        console.log(data.message); // Log success or failure message from backend
-                        // Update the heart icon visually based on the 'is_favorited' status from the response
-                        const svg = this.querySelector('svg');
-                        if (data.is_favorited) { // If the backend says it's now favorited
-                            svg.setAttribute('fill', 'currentColor'); // Fill the heart
-                            svg.classList.add('text-red-500'); // Make it red
-                            svg.classList.remove('text-gray-500'); // Remove gray if present
-                        } else { // If the backend says it's no longer favorited
-                            svg.setAttribute('fill', 'none'); // Unfill the heart
-                            svg.classList.remove('text-red-500'); // Remove red
-                            svg.classList.add('text-gray-500'); // Make it gray (unfilled color)
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error toggling favorite:', error);
-                        // Optionally, revert the UI state or show an error message to the user
-                    });
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json', // Important for Laravel to return JSON
+                                'X-CSRF-TOKEN': csrfToken // Laravel CSRF token
+                            },
+                            body: JSON.stringify({
+                                product_id: productId
+                            })
+                        })
+                        .then(response => {
+                            // Handle unauthenticated case (e.g., session expired)
+                            if (response.status === 401) {
+                                window.location.href = '/login'; // Redirect to login page
+                                return Promise.reject(
+                                'Unauthenticated'); // Stop promise chain
+                            }
+                            if (!response.ok) {
+                                // If response is not OK (e.g., 500 Internal Server Error, 403 Forbidden)
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json(); // Parse response as JSON
+                        })
+                        .then(data => {
+                            console.log(data
+                            .message); // Log success or failure message from backend
+                            // Update the heart icon visually based on the 'is_favorited' status from the response
+                            const svg = this.querySelector('svg');
+                            if (data
+                                .is_favorited) { // If the backend says it's now favorited
+                                svg.setAttribute('fill', 'currentColor'); // Fill the heart
+                                svg.classList.add('text-red-500'); // Make it red
+                                svg.classList.remove(
+                                'text-gray-500'); // Remove gray if present
+                            } else { // If the backend says it's no longer favorited
+                                svg.setAttribute('fill', 'none'); // Unfill the heart
+                                svg.classList.remove('text-red-500'); // Remove red
+                                svg.classList.add(
+                                'text-gray-500'); // Make it gray (unfilled color)
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error toggling favorite:', error);
+                            // Optionally, revert the UI state or show an error message to the user
+                        });
                 }
             });
         });

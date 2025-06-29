@@ -14,11 +14,11 @@ class Product extends Model
         'slug',
         'description',
         'price',
-        // 'image', // You might want to add 'image' here if it's directly fillable
+        'image', 
         // You'll likely need to add other attributes from your seeder here if they're not already in fillable
         // e.g., 'is_offer', 'discount_percent', 'offer_expires_at', 'supplier_name', 'supplier_confirmed', 'min_order_quantity', 'rating'
         'category_id',
-        'images', // <--- This attribute should be in fillable if you mass assign it
+        'images', 
     ];
 
     /**

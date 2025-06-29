@@ -98,7 +98,6 @@ $product = Product::create([
             'slug' => 'حقيبة-ظهر',
             'description' => 'Durable backpack for daily use.',
             'price' => 39.99,
-            'image'=> 'storage/products/1.webp',
             'category_id' => Category::where('slug', 'clothing')->first()->id,
             'is_offer' => true,
             'discount_percent' => 25,
@@ -108,8 +107,7 @@ $product = Product::create([
             'min_order_quantity'=> 1,
             'rating' => 4.3,
             'images' => json_encode([
-                'storage/products/1.webp',
-                'storage/products/1(1).webp',
+                'storage/products/1 (1).webp',
                 'storage/products/2.webp',
                         ]),
             'is_featured' => 1,
