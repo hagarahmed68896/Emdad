@@ -16,14 +16,23 @@ class CategoryController extends Controller
         return view('categories.index', compact('categories'));
     }
 
-    public function filterByCategory($slug)
+public function filterByCategory($slug)
     {
-        // Fetch the category by slug
+        // If slug is 'clothing', delegate to ClothingController
+        if ($slug === 'clothing') {
+            return app(ClothingController::class)->index();
+        }
+
         $selectedCategory = Category::where('slug', $slug)->firstOrFail();
         $categories = Category::all();
-        
-        // Return the view with the category
-        return view('categories.index', compact('categories', 'selectedCategory'));
+
+        $viewPath = 'categories.' . $slug;
+
+        if (!view()->exists($viewPath)) {
+            abort(404, "View for category [$slug] not found.");
+        }
+
+        return view($viewPath, compact('categories', 'selectedCategory'));
     }
 
     public function showCategoriesAndProducts()

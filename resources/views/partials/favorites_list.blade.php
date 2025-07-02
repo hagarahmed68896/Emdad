@@ -42,7 +42,7 @@
                         </div>
                     </div>
                     <span
-                        class="text-[#696969] text-[20px]">{{ $favorite->product->category->name ?? 'غير مصنف' }}</span>
+                        class="text-[#696969] text-[20px]">{{ $favorite->product->subCategory->category->name ?? 'غير مصنف' }}</span>
                     <div class="flex mt-2">
                         @if ($favorite->product->supplier_confirmed)
                             <span class="flex items-center text-[#185D31]">

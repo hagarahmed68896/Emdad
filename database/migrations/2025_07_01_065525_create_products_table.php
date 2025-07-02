@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->decimal('price', 10, 2); // Original price
             $table->string('image')->nullable(); // Main image, if any
-            $table->foreignId('category_id')->constrained()->onDelete('cascade');
+            $table->foreignId('sub_category_id')->constrained('sub_categories')->onDelete('cascade');
 
             // Offer-related columns:
             $table->boolean('is_offer')->default(false); // true if the product is on offer

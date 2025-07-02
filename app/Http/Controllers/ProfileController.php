@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Session;
+use App\Models\Cart;
 
 class ProfileController extends Controller
 {
@@ -45,8 +47,34 @@ class ProfileController extends Controller
             }
         }
 
+
+        // Logic for Cart
+        $cartItems = collect();
+        $cart = null;
+
+        if (Auth::check()) { // Already checked by middleware, but good to be explicit
+            $cart = Auth::user()->cart;
+        } else {
+            $sessionId = Session::getId();
+            $cart = Cart::where('session_id', $sessionId)
+                        ->where('status', 'active')
+                        ->first();
+        }
+
+        if ($cart) {
+            $cartItems = $cart->items()->with('product')->get();
+        }
+           // Logic for Notifications
+        $notifications = collect();
+        $unreadNotificationCount = 0;
+        if (Auth::check()) {
+            $notifications = Auth::user()->notifications()->latest()->take(5)->get();
+            $unreadNotificationCount = Auth::user()->unreadNotifications->count();
+        }
+
      $section = $request->query('section');
-     return view('profile.account', compact('user', 'favorites', 'notificationSettings', 'section'));
+     
+     return view('profile.account', compact('user', 'favorites', 'notificationSettings', 'section','cartItems', 'notifications', 'unreadNotificationCount'));
 
     }
 

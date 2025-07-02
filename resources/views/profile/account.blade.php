@@ -113,7 +113,6 @@
                     <div class="relative w-28 h-28 mb-4">
                         <img id="profilePageImage"
                             src="{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : asset('images/Unknown_person.jpg') }}"
-                            alt="User Profile"
                             class="w-full h-full rounded-full object-cover shadow-md border-2 border-gray-300">
                         <button id="openProfileModalBtn"
                             class="absolute bottom-0 left-0 bg-[#185D31] rounded-full p-2 shadow-md hover:bg-green-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-400">
@@ -220,8 +219,9 @@
                 </div>
 
                 {{-- My Account and Password Section --}}
-                <section id="myAccountContentSection" class="bg-white p-6 rounded-lg shadow-sm mb-8 border border-gray-200">
-                    <h2 class="text-2xl font-semibold text-gray-800 mb-6">{{ __('messages.account_details') }}</h2>
+<section id="myAccountContentSection"
+    class="bg-white p-6 rounded-lg shadow-sm mb-8 border border-gray-200 {{ request('section') === 'favoritesSection' ? 'hidden' : '' }}">
+          <h2 class="text-2xl font-semibold text-gray-800 mb-6">{{ __('messages.account_details') }}</h2>
 
                     {{-- START: Account Details Form (Now powered by Alpine.js AJAX) --}}
                     {{-- Pass the initial user data to the Alpine component --}}
@@ -364,14 +364,14 @@
                 </section>
 
                 {{-- Favorites Section --}}
-        <section id="favoritesSection"
-         class="bg-white p-6 rounded-lg shadow-sm mb-8 border border-gray-200 {{ $section === 'favoritesSection' ? '' : 'hidden' }}">
+<section id="favoritesSection"
+    class="bg-white p-6 rounded-lg shadow-sm mb-8 border border-gray-200 {{ request('section') === 'favoritesSection' ? '' : 'hidden' }}">
     @include('partials.favorites', ['favorites' => $favorites])
 </section>
 
 
                 {{-- Notifications Section (New!) --}}
- <section id="notificationsSection" class="bg-white p-6 rounded-lg shadow-sm mb-8 border border-gray-200 hidden">
+ <section id="notificationsSection" class="bg-white p-6 rounded-lg shadow-sm mb-8 border border-gray-200 {{ request('section') === 'notificationsSection' ? '' : 'hidden' }}">
 
     {{-- Pass notificationSettings to Alpine.js --}}
     <div x-data="notificationsForm({{ json_encode($notificationSettings) }})"> 
@@ -578,9 +578,24 @@
                 breadcrumbs.innerHTML = translations['home'] + ' <span class="mx-1">&gt;</span> ' + translations[breadcrumbKey];
             }
 
-            // Initial state: "My Account" is active
-            setActiveLink(myAccountLink);
-            showContent('myAccountContentSection', 'MyAccount', 'MyAccount');
+            // Determine section from URL query string
+const urlParams = new URLSearchParams(window.location.search);
+const section = urlParams.get('section');
+
+switch (section) {
+    case 'favoritesSection':
+        setActiveLink(favLink);
+        showContent('favoritesSection', 'Fav', 'Fav');
+        break;
+    case 'notificationsSection':
+        setActiveLink(notificationsLink);
+        showContent('notificationsSection', 'settings_notifications', 'settings_notifications');
+        break;
+    default:
+        setActiveLink(myAccountLink);
+        showContent('myAccountContentSection', 'MyAccount', 'MyAccount');
+}
+
 
 
             // Event listener for "My Account" link

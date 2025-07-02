@@ -556,7 +556,7 @@
         </div>
 
         <div x-show="open" @click.away="open = false" x-transition x-cloak
-            class="absolute z-10 mt-2 w-[calc(100vw-32px)] left-0 sm:right-0  bg-white border border-gray-200 rounded-lg shadow-lg p-4
+            class="absolute z-50 mt-2 w-[calc(100vw-32px)] left-0 sm:right-0  bg-white border border-gray-200 rounded-lg shadow-lg p-4
                    md:w-[350px] md:left-auto md:right-0 md:translate-x-0">
             <div class="flex flex-col mb-4">
                 <p class="font-cairo font-bold text-[20px] leading-[150%] tracking-[0%] text-right align-middle mb-3">
@@ -966,6 +966,8 @@
 
     @php
         $currentLang = app()->getLocale();
+        // @dd($currentLang) 
+
     @endphp
     <!-- Language -->
     <div class="language btn-group flex items-center  order-5" style="color: #212121;  width:90px; height:24px; ">
@@ -979,16 +981,16 @@
         <div class="dropdown-menu w-[180px] h-auto rounded-[12px] bg-[#FFFFFF] py-2 shadow-lg">
             <div class="flex items-center cursor-pointer py-3 px-4 text-base text-[#212121]"
                 onclick="window.location.href='{{ route('change.language', 'ar') }}'">
-                <input type="radio" name="language" value="arabic" {{ $currentLang == 'ar' ? 'checked' : '' }}
+                <input type="radio" value="arabic" {{ $currentLang == 'ar' ? 'checked' : '' }}
                     class="shrink-0 rtl:ml-3 ltr:mr-3 w-6 h-6 border-[#185D31] focus:ring-[#185D31] disabled:pointer-events-none dark:bg-[#185D31] dark:border-neutral-700 dark:checked:border-[#185D31] dark:focus:ring-offset-gray-800 appearance-none rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]"
-                    id="arabic" readonly>
+                    id="arabic" >
                 <label for="arabic" class="text-neutral-700">{{ __('messages.arabic') }}</label>
             </div>
             <div class="flex items-center cursor-pointer py-3 px-4 text-base text-[#212121]"
                 onclick="window.location.href='{{ route('change.language', 'en') }}'">
-                <input type="radio" name="language" value="english" {{ $currentLang == 'en' ? 'checked' : '' }}
+                <input type="radio" value="english" {{ $currentLang == 'en' ? 'checked' : '' }}
                     class="shrink-0 rtl:ml-3 ltr:mr-3 w-6 h-6 border-[#185D31] focus:ring-[#185D31] disabled:pointer-events-none dark:bg-[#185D31] dark:border-neutral-700 dark:checked:border-[#185D31] dark:focus:ring-offset-gray-800 appearance-none rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]"
-                    id="english" readonly>
+                    id="english" >
                 <label for="english" class="text-neutral-700">{{ __('messages.english') }}</label>
             </div>
         </div>
@@ -1073,7 +1075,7 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
 
                     {{-- "Go to Favorites" Button --}}
                     <div class="mt-6 text-center w-full"> {{-- Added w-full here to contain the button --}}
-                        <a href="{{ route('profile.show', ['section' => 'favoritesSection']) }}#favoritesSection"
+                        <a    href="{{ route('profile.show', ['section' => 'favoritesSection']) }}#favoritesSection"
                             class="mt-2 w-full px-[20px] py-[11px] bg-[#185D31] text-white rounded-[12px] text-[16px] ">
                             {{ __('messages.go_to_fav') }}
                         </a>
@@ -1332,16 +1334,29 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
                                 <small class="sm:text-sm text-gray-500 text-[10px]">{{ Auth::user()->email }}</small>
                             </div>
                         </li>
-                        <li class="pt-2"><a
-                                class="dropdown-item pb-4 block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
-                                href="{{ route('profile.show') }}">{{ __('messages.MyAccount') }}</a></li>
-                        <li><a class="dropdown-item pb-4 block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
-                                href="#">{{ __('messages.MyOrders') }}</a></li>
-                        <li><a class="dropdown-item pb-4 block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
-                                href="#">{{ __('messages.Fav') }}</a></li>
-                        <li><a class="dropdown-item pb-4 block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
-                                href="#">{{ __('messages.settings_notifications') }}</a>
-                        </li>
+<li>
+    <a class="dropdown-item block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
+       href="{{ route('profile.show', parameters: ['section' => 'myAccountContentSection']) }}#myAccountContentSection">
+       {{ __('messages.MyAccount') }}
+    </a>
+</li>
+<li>
+    <a class="dropdown-item pb-4 block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
+       href="{{ route('profile.show') }}#myOrdersSection">{{ __('messages.MyOrders') }}</a>
+</li>
+<li>
+    <a class="dropdown-item block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
+    
+       href="{{ route('profile.show', ['section' => 'favoritesSection']) }}#favoritesSection">
+       {{ __('messages.Fav') }}
+    </a>
+</li>
+<li>
+    <a class="dropdown-item pb-4 block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
+              href="{{ route('profile.show', ['section' => 'notificationsSection']) }}#notificationsSection">
+
+       {{ __('messages.settings_notifications') }}</a>
+</li>
                         <li>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
@@ -1444,7 +1459,6 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
             </div>
         </div>
 
-
     </div>
 
     <div class="individualCategories flex flex-wrap gap-2 sm:gap-4 w-full justify-between">
@@ -1453,8 +1467,10 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
                 class="category-button {{ isset($selectedCategory) && $selectedCategory->slug === $category->slug ? 'active' : '' }}">
                 {{ $category->name }}
             </a>
+
         @endforeach
     </div>
+
 
 </nav>
 
@@ -1572,7 +1588,7 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
                     <div class="dropdown-menu w-[180px] h-auto rounded-[12px] bg-[#FFFFFF] py-2 shadow-lg">
                         <div class="flex items-center cursor-pointer py-3 px-4 text-base text-[#212121]"
                             onclick="window.location.href='{{ route('change.language', 'ar') }}'">
-                            <input type="radio" name="language" value="arabic"
+                            <input type="radio"  value="arabic"
                                 {{ $currentLang == 'ar' ? 'checked' : '' }}
                                 class="shrink-0 rtl:ml-3 ltr:mr-3 w-6 h-6 border-[#185D31] focus:ring-[#185D31] disabled:pointer-events-none dark:bg-[#185D31] dark:border-neutral-700 dark:checked:border-[#185D31] dark:focus:ring-offset-gray-800 appearance-none rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]"
                                 id="arabic" readonly>
@@ -1580,7 +1596,7 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
                         </div>
                         <div class="flex items-center cursor-pointer py-3 px-4 text-base text-[#212121]"
                             onclick="window.location.href='{{ route('change.language', 'en') }}'">
-                            <input type="radio" name="language" value="english"
+                            <input type="radio" value="english"
                                 {{ $currentLang == 'en' ? 'checked' : '' }}
                                 class="shrink-0 rtl:ml-3 ltr:mr-3 w-6 h-6 border-[#185D31] focus:ring-[#185D31] disabled:pointer-events-none dark:bg-[#185D31] dark:border-neutral-700 dark:checked:border-[#185D31] dark:focus:ring-offset-gray-800 appearance-none rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]"
                                 id="english" readonly>

@@ -105,7 +105,7 @@ return [
     // Hero Section
     'wholesale'         => 'Wholesale Retail',
     'reliableSolution'  => 'A Reliable Solution for Wholesale Trade',
-    'heroDsecription'   => 'Emsad provides you with a reliable shopping experience connecting you with trusted suppliers across various sectors, from electronics to industrial materials.',
+    'heroDsecription'   => 'Emdad provides you with a reliable shopping experience connecting you with trusted suppliers across various sectors, from electronics to industrial materials.',
     'shopNow'           => 'Shop Now',
 
     // Image Upload
@@ -229,6 +229,10 @@ return [
     'discover_our_products_description' => 'A selected range of the most distinguished products, to facilitate the wholesale shopping experience.',
     'show_details'=> 'Show Details',
     'go_to_fav'=> 'Go to Favorites',
+    'cosen_cat_description' => 'Discover our diverse categories that include everything you need for an easier shopping experience.',
+    'offer_descriptions' => 'Take advantage of the strongest offers on a selection of products for a limited time.',
+    'best_deals' => 'Best Deals',
+    'main_categories' => 'Main Categories',
 
 
 

@@ -10,6 +10,42 @@ use Illuminate\Support\Facades\Auth;
 class FavoriteController extends Controller
 {
     /**
+     * Display a listing of the user's favorited products, handling AJAX for pagination.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\View\View|\Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+     */
+    public function index(Request $request)
+    {
+        if (!Auth::check()) {
+            // For AJAX, return a JSON response indicating unauthenticated
+            if ($request->ajax()) {
+                return response()->json(['message' => 'Unauthenticated.'], 401);
+            }
+            // For a regular request, redirect to login
+            return redirect()->route('login')->with('error', 'Please log in to view your favorites.');
+        }
+
+        $user = Auth::user();
+
+        // Eager load product and its category. Adjust '9' for items per page.
+        $favorites = $user->favorites()
+                          ->with(['product.category', 'product']) // Ensure product and its category are loaded
+                          ->paginate(9); // Crucial for pagination
+
+        // Check if the request is an AJAX request
+        if ($request->ajax()) {
+            // If AJAX, return only the partial view content
+            // The 'partials.favorites_content' contains the grid and pagination links
+            return view('partials.favorites_content', compact('favorites'))->render();
+        }
+
+        // For a regular, full-page load
+        // This will be your main favorites page view, which will *include* the partial
+        return view('favorites.index', compact('favorites'));
+    }
+
+    /**
      * Toggle a product in the user's favorites.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -24,21 +60,18 @@ class FavoriteController extends Controller
 
         $user = Auth::user();
 
-        // Check if the product is already favorited by the user
-        $favorite = Favorite::where('user_id', $user->id)
-                            ->where('product_id', $product->id)
-                            ->first();
+        // Using user()->favorites() relation is cleaner and safer
+        $isFavorited = $user->favorites()->where('product_id', $product->id)->exists();
 
-        if ($favorite) {
+        if ($isFavorited) {
             // If exists, remove from favorites
-            $favorite->delete();
+            $user->favorites()->where('product_id', $product->id)->delete();
             $status = 'removed';
             $message = 'Product removed from favorites.';
         } else {
             // If not, add to favorites
-            Favorite::create([
-                'user_id' => $user->id,
-                'product_id' => $product->id,
+            $user->favorites()->create([
+                'product_id' => $product->id, 
             ]);
             $status = 'added';
             $message = 'Product added to favorites.';
@@ -50,27 +83,5 @@ class FavoriteController extends Controller
             'product_id' => $product->id,
             'is_favorited' => ($status === 'added') // Current state after toggle
         ]);
-    }
-
-    /**
-     * Display a listing of the user's favorited products.
-     *
-     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
-     */
-    public function index()
-    {
-        if (!Auth::check()) {
-            // Redirect to login or show an error
-            return redirect()->route('login')->with('error', 'Please log in to view your favorites.');
-        }
-
-        $user = Auth::user();
-        // Eager load products for better performance
-        $favorites = $user->favorites()->with('product')->get();
-
-        // Optionally, you might want to paginate these
-        // $favorites = $user->favorites()->with('product')->paginate(10);
-
-        return view('partials/favorites', compact('favorites'));
     }
 }

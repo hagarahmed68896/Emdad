@@ -14,8 +14,19 @@ class Category extends Model
     {
         return app()->getLocale() === 'ar' ? $this->name_ar : $this->name_en;
     }
-        public function products(): HasMany // Type-hinting is good practice
+   public function products(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
     {
-        return $this->hasMany(Product::class);
+        return $this->hasManyThrough(
+             Product::class,      // The final model we want to reach (products)
+            SubCategory::class,  // The intermediate model (sub_categories)
+            'category_id',       // Foreign key on the intermediate model (sub_categories table)
+                                 // that links to the categories table (this model's ID).
+            'sub_category_id',   // Foreign key on the final model (products table)
+                                 // that links to the sub_categories table.
+            'id',                // Local key on the current model (categories table)
+                                 // that the intermediate model references.
+            'id'                 // Local key on the intermediate model (sub_categories table)
+                                 // that the final model references.
+        );
     }
 }

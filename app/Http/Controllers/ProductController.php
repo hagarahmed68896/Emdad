@@ -22,7 +22,7 @@ class ProductController extends Controller
         // We'll use the 'is_offer' column from your migration.
         // We also check 'offer_expires_at' to ensure the offer hasn't expired.
         // `with('category')` eager loads the related category for each product.
-        $products = Product::with('category')
+        $products = $onOfferProducts = Product::with('subCategory.category')
                             ->where('is_offer', true) // Filter for products that are marked as an offer
                             ->where(function ($query) {
                                 // Ensure the offer has not expired, or offer_expires_at is null (no expiry)

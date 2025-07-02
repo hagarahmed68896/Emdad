@@ -77,7 +77,7 @@
     </div>
 
     {{-- Product Grid Section - Now a Swiper Container --}}
-    <div class=" swiper offerSwiper mb-4 bg-[#F8F9FA] px-[64px] py-8 ">
+    <div class="swiper offerSwiper mb-4 bg-[#F8F9FA] px-[64px] py-8 ">
         <div class="swiper-wrapper mb-8 ">
             {{-- Loop through products to display each card --}}
             @forelse ($onOfferProducts as $product)
@@ -155,7 +155,7 @@
                                 </div>
                             </div>
                             <span
-                                class="text-[#696969] text-[20px]">{{ $product->category->name ?? 'غير مصنف' }}</span>
+                                class="text-[#696969] text-[20px]">{{ $product->subCategory->category->name ?? 'غير مصنف' }}</span>
                             <div class="flex mt-2">
                                 @if ($product->supplier_confirmed)
                                     <span class="flex items-center text-[#185D31]">
@@ -206,7 +206,7 @@
                 </div>
             @endforelse
         </div>
-{{-- Always include this regardless of product count --}}
+   {{-- Always include this regardless of product count --}}
 <div class="swiper-pagination offer-swiper-pagination mt-10"></div>
     </div>
 </div>

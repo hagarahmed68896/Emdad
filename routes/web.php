@@ -15,6 +15,7 @@ use App\Http\Controllers\ProductController; // Ensure this is used if you uncomm
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ClothingController;
 use App\Models\Product; // Ensure this is used if you uncomment product.show later
 use Illuminate\Http\Request;
 
@@ -67,6 +68,9 @@ Route::middleware('web')->group(function () {
         Route::post('/profile/update-notifications', [ProfileController::class, 'updateNotifications'])->name('profile.updateNotifications');
 
         Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+        // Look for a POST route that points to your CartController's store method
+        Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
+
 
     // Route to display all notifications (e.g., on a dedicated notifications page)
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
@@ -117,4 +121,8 @@ Route::middleware('web')->group(function () {
     Route::get('/common_questions', function () {
         return view('common_questions');
     })->name('common_questions');
-}); // End of the 'web' middleware group here is the web
+
+    Route::get('/clothings', [ClothingController::class, 'index'])->name('clothings');
+    
+
+}); 

@@ -2,33 +2,53 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\View;
-use Illuminate\Pagination\Paginator; // <--- This line is critical!
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
+use App\Models\Cart as CustomCart; // if your Cart model is App\Models\Cart
+use Illuminate\Support\Facades\App;
 
-
-class AppServiceProvider extends ServiceProvider
+class AppServiceProvider extends \Illuminate\Support\ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
-    public function register(): void
-    {
-        //
-    }
-
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
-        // App::setLocale(Session::get('locale', config('app.locale')));
-        View::share('currentLang', app()->getLocale());
-        Paginator::useTailwind(); // <--- This line is critical!
+        View::composer('*', function ($view) {
+            // --- cartItems logic ---
+            $cartItems = collect();
+            $cart = null;
 
+            if (Auth::check()) {
+                $cart = Auth::user()->cart;
+            } else {
+                $sessionId = Session::getId();
+                $cart = CustomCart::where('session_id', $sessionId)
+                            ->where('status', 'active')
+                            ->first();
+            }
 
+            if ($cart) {
+                $cartItems = $cart->items()->with('product')->get();
+            }
 
+            $view->with('cartItems', $cartItems);
+
+            // --- Other shared variables ---
+            $view->with('currentLang', App::getLocale());
+
+            $favorites = Auth::check() ? Auth::user()->favorites()->get() : collect();
+            $view->with('favorites', $favorites);
+
+            $notifications = collect();
+            $unreadNotificationCount = 0;
+
+            if (Auth::check()) {
+                $notifications = Auth::user()->notifications()->latest()->take(5)->get();
+                $unreadNotificationCount = Auth::user()->unreadNotifications()->count();
+            }
+
+            $view->with('notifications', $notifications);
+            $view->with('unreadNotificationCount', $unreadNotificationCount);
+        });
     }
 }
+
