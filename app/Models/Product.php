@@ -17,6 +17,15 @@ class Product extends Model
         'image', 
         'sub_category_id',
         'images', 
+        'is_offer',
+        'discount_percent',
+        'offer_expires_at',
+        'supplier_name',
+        'supplier_confirmed', 
+        'color', 
+        'size', 
+        'gender',
+        'material'
     ];
 
     /**
@@ -28,6 +37,8 @@ class Product extends Model
         'images' => 'array', // <--- This is the correct place for the cast!
         'offer_expires_at' => 'datetime', // Assuming you have an 'offer_expires_at' column as well
         // Add other casts if applicable, like 'supplier_confirmed' => 'boolean'
+        'color' => 'array',  // Cast 'color' to array
+        'size' => 'array',   // Cast 'size' to array
     ];
 
     public function subCategory()

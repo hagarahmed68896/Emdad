@@ -436,7 +436,7 @@
 
             <div class="mb-3">
                 <input type="checkbox" id="terms" name="terms" x-model="formData.terms" required
-                    class="ml-1 h-[15px] w-[15px] text-[#185D31] bg-[#185D31] focus:ring-[#185D31] border-[#185D31] rounded"
+                    class="ml-1 h-[15px] w-[15px] text-[#185D31] bg-[#185D31] focus:ring-[#185D31] accent-[#185D31] border-[#185D31] rounded"
                     :class="{'border-[#d33]': errors.terms, 'border-[#185D31]': !errors.terms }">
                 <label for="terms" class="ml-2 text-[16px] text-[#212121]">
                     {{ __('messages.accept_terms') }}

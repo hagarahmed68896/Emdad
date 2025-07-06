@@ -87,8 +87,24 @@ Route::middleware('web')->group(function () {
     // Public routes that also benefit from session (e.g., for language changes)
     Route::get('/', [HomeController::class, 'index'])->name(name: 'home');
     Route::get('/search', [SearchController::class, 'index'])->name('search');
-    Route::get('/products', [CategoryController::class, 'index'])->name('products.index');
+    // Route::get('/products', [CategoryController::class, 'index'])->name('products.index');
     Route::get('/products/category/{slug}', [CategoryController::class, 'filterByCategory'])->name('products.filterByCategory');
+
+     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+
+    // Route for displaying products that are currently on offer
+    // This explicitly uses the `offers` method in ProductController.
+    Route::get('/offers', [ProductController::class, 'offers'])->name('offers.index');
+
+    // Route for displaying featured products
+    Route::get('/products/featured', [ProductController::class, 'showFeaturedProducts'])->name('products.featured');
+
+    // Route for individual product details by slug
+    // This must be placed AFTER more specific product routes like /products/create or /products/featured
+    // to avoid /{slug} matching those specific paths.
+    Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
+
+
 
     // *** THIS IS THE MISSING ROUTE YOU NEED TO ADD/ENSURE IS PRESENT ***
     Route::get('/categories/{slug}', [CategoryController::class, 'filterByCategory'])->name('categories.show');

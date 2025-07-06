@@ -30,14 +30,20 @@ return new class extends Migration
             $table->boolean('supplier_confirmed')->default(false); // If supplier confirmed put the green mark
             $table->unsignedInteger('min_order_quantity')->default(1); // Minimum order for each product
             $table->decimal('rating', 2, 1)->nullable(); // Rating for each product (e.g., 4.5)
-            // For 'more than one image', a separate table for product images is typically better,
-            // but for simplicity and direct addition to the 'products' table as requested,
-            // a JSON column can store an array of image paths.
+   
             $table->json('images')->nullable(); // Stores an array of additional image paths
             $table->boolean('is_featured')->default(false); // without "after"
 
+
+            // New fields for product attributes
+           $table->json('color')->nullable(); // Change from string to json
+           $table->json('size')->nullable();  // Change from string to json
+            $table->string('gender')->nullable(); 
+            $table->string('material')->nullable();
+
             $table->timestamps();
         });
+        
     }
 
     /**

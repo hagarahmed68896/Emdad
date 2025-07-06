@@ -214,6 +214,23 @@ return [
     'offer_descriptions' => 'استفد من أقوى الخصومات على مجموعة مختارة من المنتجات لفترة محدودة.',
     'best_deals' => 'أفضل الخصومات',
     'main_categories' => 'الفئات الرئيسية',
+    'filters' => 'تصفيات',
+    'filter_by_price_low' => 'السعر: من الأقل إلى الأعلى',
+    'filter_by_price_high' => 'السعر: من الأعلى إلى الأقل',
+    'latest_products' => 'الأحدث',
+    'filter_by_rating' => 'الأعلى تقييمًا',
+    'sort_by' => 'ترتيب حسب',
+    'search_products' => 'ابحث عن المنتجات...',
+    'colors' => 'الألوان',
+    'size' => 'المقاس',
+    'gender' => ' النوع',
+    'material' => 'الخامة',
+    'rating' => 'التقييمات',
+    'delivery' => 'التوصيل',
+    'price' => 'السعر',
+    'min_order_quantity' => 'الحد الأدنى للطلب',
+    'apply_filters' => 'تطبيق ',
+    'reset_filters' => 'إعادة تعيين ',
 
 
 ];

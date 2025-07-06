@@ -33,41 +33,44 @@
         }
     </style>
     <div class="min-h-screen flex flex-col w-full items-center">
-        <section class="w-full h-[547px] relative px-[64px]">
-            
-            <div class="swiper mySwiper w-full h-full relative rounded-[12px]">
-                <div class="swiper-wrapper ">
-                    <div class="swiper-slide">
-                        <img src="{{ asset('storage/products/5c4bef432cc19a3f32f14c6e46e1b12f63981477.png') }}"
-                            class="w-full h-full object-cover" alt="Slide 1">
-                    </div>
-                    <div class="swiper-slide">
-                        <img src="{{ asset('storage/products/5c4bef432cc19a3f32f14c6e46e1b12f63981477.png') }}"
-                            class="w-full h-full object-cover" alt="Slide 2">
-                    </div>
-                    <div class="swiper-slide">
-                        <img src="{{ asset('storage/products/5c4bef432cc19a3f32f14c6e46e1b12f63981477.png') }}"
-                            class="w-full h-full object-cover" alt="Slide 3">
-                    </div>
-                </div>
-                <div
-                    class="custom-swiper-button-prev absolute top-1/2 left-2 -translate-y-1/2 z-10 w-10 h-10 bg-white text-gray-800 rounded-full flex items-center justify-center shadow hover:bg-gray-200 cursor-pointer">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7" />
-                    </svg>
-                </div>
-                <div
-                    class="custom-swiper-button-next absolute top-1/2 right-2 -translate-y-1/2 z-10 w-10 h-10 bg-white text-gray-800 rounded-full flex items-center justify-center shadow hover:bg-gray-200 cursor-pointer">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7" />
-                    </svg>
-                </div>
+<section class="w-full relative px-4 md:px-[64px] py-4 mb-4">
+    <div class="swiper mySwiper w-full relative rounded-lg overflow-hidden">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide">
+                <img src="{{ asset('storage/products/5c4bef432cc19a3f32f14c6e46e1b12f63981477.png') }}"
+                    class="w-full h-auto object-cover max-h-[500px] md:max-h-[547px] aspect-video md:aspect-auto"
+                    alt="Slide 1">
             </div>
-        </section>
-                 <div id="banner-swiper-pagination" class="absolute bottom-4 left-0 right-0 flex justify-center space-x-2 z-30"></div>
-
+            <div class="swiper-slide">
+                <img src="{{ asset('storage/products/5c4bef432cc19a3f32f14c6e46e1b12f63981477.png') }}"
+                    class="w-full h-auto object-cover max-h-[500px] md:max-h-[547px] aspect-video md:aspect-auto"
+                    alt="Slide 2">
+            </div>
+            <div class="swiper-slide">
+                <img src="{{ asset('storage/products/5c4bef432cc19a3f32f14c6e46e1b12f63981477.png') }}"
+                    class="w-full h-auto object-cover max-h-[500px] md:max-h-[547px] aspect-video md:aspect-auto"
+                    alt="Slide 3">
+            </div>
+        </div>
+        <div
+            class="custom-swiper-button-prev absolute top-1/2 left-2 -translate-y-1/2 z-10 w-10 h-10 bg-white text-gray-800 rounded-full flex items-center justify-center shadow hover:bg-gray-200 cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7" />
+            </svg>
+        </div>
+        <div
+            class="custom-swiper-button-next absolute top-1/2 right-2 -translate-y-1/2 z-10 w-10 h-10 bg-white text-gray-800 rounded-full flex items-center justify-center shadow hover:bg-gray-200 cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7" />
+            </svg>
+        </div>
+    </div>
+    <div id="banner-swiper-pagination"
+        class="absolute bottom-[-2.5rem] md:bottom-[-3.5rem] left-0 right-0 flex justify-center space-x-2 z-30">
+    </div>
+</section>
 
         <main class="w-full py-8 md:py-12">
             <section class="mb-12 bg-[#F8F9FA] w-full px-[64px] py-8">
@@ -85,10 +88,10 @@
                         <div class="flex flex-col items-center text-center w-full">
                             <div
                                 class="bg-[#EDEDED] rounded-lg shadow-md overflow-hidden transform transition duration-300 hover:scale-105 h-[312px] w-[310px] flex items-center justify-center">
-                                <a href="{{ route('categories.show', $subCategory->slug) }}" class="block h-full w-full">
-                                    <img src="{{ asset('storage/products/' . $subCategory->iconUrl) }}"
-                                        alt="{{ $subCategory->name }}" class="w-full h-full object-cover" />
-                                </a>
+                            <a href="{{ route('products.index', ['sub_category_id' => $subCategory->id]) }}" class="block h-full w-full">
+    <img src="{{ asset('storage/products/' . $subCategory->iconUrl) }}" 
+        alt="{{ $subCategory->name }}" class="w-full h-full object-cover" />
+</a>
                             </div>
                             <div class="p-4 text-center flex-grow flex items-center justify-center">
                                 <h3 class="text-[24px] font-bold text-gray-700">{{ $subCategory->name_ar }}</h3>
@@ -101,10 +104,10 @@
             <section class=" py-8 font-inter px-[64px]">
                 <div class="flex sm:flex-row flex-col  justify-between mt-1">
                     <div class="flex flex-col justify-between mb-5  mt-3">
-                        <h2 class="text-3xl font-bold text-gray-800 mb-6 relative">
+                        <h2 class="text-[40px] font-bold text-[#212121] mb-6 relative">
                             {{ __('messages.best_deals') }}
                         </h2>
-                        <p class="text-gray-600 mb-8">{{ __('messages.offer_descriptions') }}</p>
+                        <p class="text-gray-600 text-[20px] mb-8">{{ __('messages.offer_descriptions') }}</p>
                     </div>
                 </div>
                 <div class="swiper offerSwiper mb-4 px-[64px] py-8 ">
@@ -229,7 +232,7 @@
                 </div>
             </section>
 
-            <section class=" px-[64px] py-8 font-inter">
+            <section class=" px-[64px] py-4 font-inter">
     <div class="flex sm:flex-row flex-col  justify-between mt-1">
         <div class="flex flex-col justify-between mb-5  mt-3">
             <p class="bg-[#F3F4F5] rounded-[40px] px-[16px] py-[8px] w-[97px] text-[16px] mb-4 text-[#1F2B45]">
@@ -249,66 +252,7 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="favorites-grid">
         @foreach ($onFeaturedProducts as $featuredProduct)
-            {{-- Added product-card class for easier JS selection --}}
-            {{-- <div class="bg-white rounded-xl overflow-hidden shadow-md flex flex-col product-card">
-                <div class="relative w-full h-48 sm:h-56 bg-[#F8F9FA] overflow-hidden">
-                    <img src="{{ asset($featuredProduct->image ?? 'https://placehold.co/300x200/F0F0F0/ADADAD?text=No+Image') }}"
-                        alt="{{ $featuredProduct->name }}"
-                        onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
-                        class="w-full h-full object-contain">
 
-
-                </div>
-
-                <div class="p-4 flex flex-col flex-grow">
-                    <div class="flex w-full items-center text-sm mb-2 justify-between">
-                        <h3 class="text-[24px] font-bold text-[#212121] mb-1">{{ $featuredProduct->name }}</h3>
-                        <div class="flex items-center ">
-                            <img class="mx-1" src="{{ asset('images/Vector (4).svg') }}" alt="">
-                            <span class="text-[18px]">{{ $featuredProduct->rating ?? '4.5' }}</span>
-                        </div>
-                    </div>
-                    <span class="text-[#696969] text-[20px]">{{ $featuredProduct->category->name ?? 'غير مصنف' }}</span>
-                    <div class="flex mt-2">
-                        @if ($featuredProduct->supplier_confirmed)
-                            <span class="flex items-center text-[#185D31]">
-                                <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]" src="{{ asset('images/Success.svg') }}"
-                                    alt="Confirmed Supplier">
-                                <p class="text-[20px] text-[#212121] ">{{ $featuredProduct->supplier_name }}</p>
-                            </span>
-                        @else
-                            <p class="text-[20px] text-[#212121] mb-3">{{ $featuredProduct->supplier_name }}</p>
-                        @endif
-                    </div>
-                    <div class="flex items-center mb-3">
-                        <span class=" flex text-lg font-bold text-gray-800">
-                            {{ number_format($featuredProduct->price * (1 - ($featuredProduct->discount_percent ?? 0) / 100), 2) }}
-                            <img class="mx-1 w-[20px] h-[21px]" src="{{ asset('images/Vector (3).svg') }}"
-                                alt="">
-                        </span>
-                        @if ($featuredProduct->is_offer && $featuredProduct->discount_percent)
-                            <span class="flex text-sm text-gray-400 line-through mr-2 mr-1">
-                                {{ number_format($featuredProduct->price, 2) }}
-                                <img class="mx-1 w-[20px] h-[21px]" src="{{ asset('images/Vector (3).svg') }}"
-                                    alt="">
-                            </span>
-                        @endif
-                    </div>
-
-                    <p class="text-sm text-gray-600 mb-4">
-                        الحد الأدنى للطلب: {{ $featuredProduct->min_order_quantity ?? '1' }} قطعة
-                    </p>
-
-                    <div class="mt-auto">
-                        <a href="{{ route('products.show', $featuredProduct->slug) }}"
-                            class="block w-full bg-[#185D31] text-white text-center py-[10px] px-[16px] rounded-[12px] font-medium transition-colors duration-200">
-                            عرض التفاصيل
-                        </a>
-                    </div>
-                </div>
-            </div> --}}
-
-            
                     <div class="product-card bg-white rounded-xl overflow-hidden shadow-md flex flex-col">
                         {{-- Product Image Carousel (Inner Swiper) --}}
                         <div class="relative w-full h-48 sm:h-56 overflow-hidden product-image-swiper inner-swiper">
@@ -425,7 +369,7 @@
                     </div>
         @endforeach
     </div>
-</section>
+            </section>
 
         </main>
     </div>

@@ -232,7 +232,7 @@
                     <div class="flex items-center">
                         {{-- Use x-model for remember checkbox --}}
                         <input type="checkbox" id="remember" name="remember" x-model="formData.remember"
-                            class="h-4 w-4 ml-2 rtl:mr-2 rtl:ml-0 text-[#185D31] focus:ring-[#185D31] border-[#185D31] rounded"> {{-- RTL support for checkbox margin --}}
+                            class="h-4 w-4 ml-2 rtl:mr-2 rtl:ml-0 text-[#185D31] focus:ring-[#185D31] accent-[#185D31] border-[#185D31] rounded"> {{-- RTL support for checkbox margin --}}
                         <label for="remember" class="ml-2 rtl:mr-2 rtl:ml-0 text-[14px] sm:text-[16px] text-[#212121]"> {{-- Responsive font size and RTL support --}}
                             {{ __('messages.remember_me') }}
                         </label>

@@ -233,6 +233,23 @@ return [
     'offer_descriptions' => 'Take advantage of the strongest offers on a selection of products for a limited time.',
     'best_deals' => 'Best Deals',
     'main_categories' => 'Main Categories',
+    'filters' => 'Filters',
+    'filter_by_price_low' => 'Price: Low to High',
+    'filter_by_price_high' => 'Price: High to Low',
+    'latest_products' => 'Latest',
+    'filter_by_rating' => 'Top Rated',
+    'sort_by' => 'Sort By',
+    'search_products' => 'Search for products...',
+    'colors' => 'Colors',
+    'size' => 'Size',
+    'gender' => 'Gender',
+    'material' => 'Material',
+    'rating' => 'Ratings',
+    'delivery' => 'Delivery',
+    'price' => 'Price',
+    'min_order_quantity' => 'Min Order Quantity',
+    'apply_filters' => 'Apply Filters',
+    'reset_filters' => 'Reset Filters',
 
 
 

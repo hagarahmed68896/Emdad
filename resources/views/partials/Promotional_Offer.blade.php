@@ -17,7 +17,7 @@
                 <p class="text-sm sm:text-[20px] text-gray-600 mb-6">
                     {{ __('messages.explore_tech_description') }}
                 </p>
-                <a href="{{ route('products.filterByCategory', ['slug' => 'electronics']) }}" class="text-center inline-block bg-[#3C445C] text-white px-[20px] py-[12px] w-[128px] rounded-[12px] font-[16px] hover:bg-gray-700 transition-colors duration-200 shadow-md">
+                <a href="{{ route('products.index', ['slug' => 'electronics']) }}" class="text-center inline-block bg-[#3C445C] text-white px-[20px] py-[12px] w-[128px] rounded-[12px] font-[16px] hover:bg-gray-700 transition-colors duration-200 shadow-md">
                     {{ __('messages.shop_now') }}
                 </a>
             </div>

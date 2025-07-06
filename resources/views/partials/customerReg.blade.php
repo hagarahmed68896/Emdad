@@ -277,7 +277,7 @@
 
                     <div class="mb-3">
                         <input type="checkbox" id="terms" name="terms" x-model="formData.terms" required
-                            class="ml-1 h-4 w-4 text-[#185D31] bg-[#185D31] focus:ring-[#185D31] border-[#185D31] rounded">
+                            class="ml-1 h-4 w-4 text-[#185D31] bg-[#185D31] focus:ring-[#185D31] accent-[#185D31] border-[#185D31] rounded">
                         <label for="terms" class="ml-2 text-sm sm:text-base text-[#212121]">
                             {{ __('messages.accept_terms') }}
                             <a href="{{ route('terms') }}" class="text-[#185D31] underline">

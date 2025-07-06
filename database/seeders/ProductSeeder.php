@@ -24,7 +24,7 @@ class ProductSeeder extends Seeder
 $product = Product::create([
             'name' => 'تيشيرت رجالي',
             'slug' => 'تيشيرت-رجالي',
-            'description' => 'Latest model with advanced features.',
+            'description' => 'تيشرت بطبعة',
             'price' => 299.99,
             'image' => 'storage/products/c5ee969a39847f84173601fad7592a9d2665472f.png',
             'sub_category_id' => SubCategory::where('slug', 't-shirt')->first()->id, // Ensure the category exists
@@ -36,6 +36,12 @@ $product = Product::create([
             'min_order_quantity' => 3,
             'rating' => 4.5,
             'is_featured' =>1,
+            'color' => ['Orange'],
+            'size' => ['L'],
+            'material' => 'قطن',
+            'gender' => 'رجالي',
+            
+            
         ]);
 
 
@@ -120,7 +126,7 @@ $product = Product::create([
         Product::create([
             'name' => 'تيشيرت رجالي',
             'slug' => '2-تيشيرت-رجالي',
-            'description' => 'Latest model with advanced features.',
+            'description' => 'تيشرت بولو',
             'price' => 299.99,
             'image' => 'storage/products/c7cc5df6a3a3ad5b9e08d091347e0b2f8b61e1e4.png',
             'sub_category_id' => SubCategory::where('slug', 't-shirt')->first()->id, 
@@ -132,6 +138,10 @@ $product = Product::create([
             'min_order_quantity' => 3,
             'rating' => 4.5,
             'is_featured' => 1,
+            'color' => ['Black', 'White', 'Gray'], // Changed to an array of colors
+            'size' => ['XL', 'L', 'M'], 
+            'material' => 'بوليستر',
+            'gender' => 'رجالي',
         ]);
         Product::create([
             'name' => 'نظارة شمس',
