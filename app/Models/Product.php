@@ -25,7 +25,7 @@ class Product extends Model
         'color', 
         'size', 
         'gender',
-        'material'
+        'material',
     ];
 
     /**
@@ -34,11 +34,12 @@ class Product extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'images' => 'array', // <--- This is the correct place for the cast!
-        'offer_expires_at' => 'datetime', // Assuming you have an 'offer_expires_at' column as well
-        // Add other casts if applicable, like 'supplier_confirmed' => 'boolean'
-        'color' => 'array',  // Cast 'color' to array
-        'size' => 'array',   // Cast 'size' to array
+        'images' => 'array', 
+        'offer_expires_at' => 'datetime', 
+        'color' => 'array',  
+        'size' => 'array',   
+        'estimated_delivery_date' => 'date', 
+
     ];
 
     public function subCategory()

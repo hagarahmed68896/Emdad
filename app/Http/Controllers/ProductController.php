@@ -4,12 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
-use App\Models\Category;
 use App\Models\SubCategory;
 use App\Models\User;
 use App\Notifications\NewProductFromSupplier;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\App; // Import App facade for locale checks
+use Carbon\Carbon;
 
 class ProductController extends Controller
 {
@@ -20,102 +19,160 @@ class ProductController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\View\View
      */
-  public function index(Request $request)
+    public function index(Request $request)
     {
-        // 1. Start with the base query for the products to be displayed.
-        // Eager load subCategory and its parent category to prevent N+1 queries.
         $productsQuery = Product::with('subCategory.category');
 
-        // 2. Apply Filters Conditionally to $productsQuery
+        // Initialize $filterOptionsQuery at the beginning to prevent "undefined variable" error.
+        // This query will be used to fetch the available filter options based on the currently applied filters.
+        $filterOptionsQuery = Product::query();
 
-        // Filter by Search (Product Name/Description) - This should apply to both main product list AND filter options
+        // Apply Search Filter
         if ($request->filled('search')) {
             $search = $request->input('search');
             $productsQuery->where(function($q) use ($search) {
-                // Search in product name or description
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('description', 'like', '%' . $search . '%');
+            });
+            // Apply search filter to the options query as well
+            $filterOptionsQuery->where(function($q) use ($search) {
                 $q->where('name', 'like', '%' . $search . '%')
                   ->orWhere('description', 'like', '%' . $search . '%');
             });
         }
 
-        // Filter by Sub Category (e.g., if linking from a subcategory page or a filter)
-        // THIS IS CRUCIAL FOR PRESERVING THE SUBCATEGORY CONTEXT - Applies to both main list AND filter options
+        // Apply Sub Category Filter
         if ($request->filled('sub_category_id')) {
             $productsQuery->where('sub_category_id', $request->input('sub_category_id'));
+            // Apply sub_category_id filter to the options query as well
+            $filterOptionsQuery->where('sub_category_id', $request->input('sub_category_id'));
         }
 
-        // Filter by Color (Multi-select checkbox: name="color[]")
+        // Filter by Color (Multi-select checkbox: name="color[]" -> JSON array in DB)
         if ($request->has('color') && is_array($request->input('color'))) {
-            $selectedColors = array_filter($request->input('color')); // Filter out empty strings if any
+            $selectedColors = array_filter($request->input('color'));
             if (!empty($selectedColors)) {
                 $productsQuery->where(function($q) use ($selectedColors) {
                     foreach ($selectedColors as $color) {
-                        $q->orWhereJsonContains('color', $color); // Use orWhereJsonContains for multiple colors
+                        $q->orWhereJsonContains('color', $color);
+                    }
+                });
+                // Apply to options query
+                $filterOptionsQuery->where(function($q) use ($selectedColors) {
+                    foreach ($selectedColors as $color) {
+                        $q->orWhereJsonContains('color', $color);
                     }
                 });
             }
         }
 
-        // Filter by Size (Multi-select checkbox: name="size[]")
+        // Filter by Size (Multi-select checkbox: name="size[]" -> JSON array in DB)
         if ($request->has('size') && is_array($request->input('size'))) {
             $selectedSizes = array_filter($request->input('size'));
             if (!empty($selectedSizes)) {
                 $productsQuery->where(function($q) use ($selectedSizes) {
                     foreach ($selectedSizes as $size) {
-                        $q->orWhereJsonContains('size', $size); // Use orWhereJsonContains for multiple sizes
+                        $q->orWhereJsonContains('size', $size);
+                    }
+                });
+                // Apply to options query
+                $filterOptionsQuery->where(function($q) use ($selectedSizes) {
+                    foreach ($selectedSizes as $size) {
+                        $q->orWhereJsonContains('size', $size);
                     }
                 });
             }
         }
 
-        // Filter by Gender (Single select radio: name="gender")
-        if ($request->filled('gender')) {
-            $productsQuery->where('gender', $request->input('gender'));
+        // Filter by Gender (Multi-select checkbox: name="gender[]")
+        if ($request->has('gender') && is_array($request->input('gender'))) {
+            $selectedGenders = array_filter($request->input('gender'));
+            if (!empty($selectedGenders)) {
+                $productsQuery->whereIn('gender', $selectedGenders);
+                // Apply to options query
+                $filterOptionsQuery->whereIn('gender', $selectedGenders);
+            }
         }
 
-        // Filter by Material (Single select radio: name="material")
-        if ($request->filled('material')) {
-            $productsQuery->where('material', $request->input('material'));
+        // Filter by Material (Multi-select checkbox: name="material[]")
+        if ($request->has('material') && is_array($request->input('material'))) {
+            $selectedMaterials = array_filter($request->input('material'));
+            if (!empty($selectedMaterials)) {
+                $productsQuery->whereIn('material', $selectedMaterials);
+                // Apply to options query
+                $filterOptionsQuery->whereIn('material', $selectedMaterials);
+            }
         }
 
         // Filter by Description (Multi-select checkbox: name="description[]")
-        // This filter affects the products displayed, just like others.
         if ($request->has('description') && is_array($request->input('description'))) {
             $selectedDescriptions = array_filter($request->input('description'));
             if (!empty($selectedDescriptions)) {
                 $productsQuery->whereIn('description', $selectedDescriptions);
+                // Apply to options query
+                $filterOptionsQuery->whereIn('description', $selectedDescriptions);
             }
         }
 
-        // Filter by Rating (e.g., '4.5')
+        // Filter by Rating
         if ($request->filled('rating')) {
             $productsQuery->where('rating', '>=', (float) $request->input('rating'));
+            // Apply to options query
+            $filterOptionsQuery->where('rating', '>=', (float) $request->input('rating'));
         }
 
         // Filter by Price Range
         if ($request->filled('min_price')) {
             $productsQuery->where('price', '>=', (float) $request->input('min_price'));
+            // Apply to options query
+            $filterOptionsQuery->where('price', '>=', (float) $request->input('min_price'));
         }
         if ($request->filled('max_price')) {
             $productsQuery->where('price', '<=', (float) $request->input('max_price'));
+            // Apply to options query
+            $filterOptionsQuery->where('price', '<=', (float) $request->input('max_price'));
         }
 
         // Filter by Minimum Order Quantity
         if ($request->filled('min_order_quantity')) {
             $productsQuery->where('min_order_quantity', '>=', (int) $request->input('min_order_quantity'));
+            // Apply to options query
+            $filterOptionsQuery->where('min_order_quantity', '>=', (int) $request->input('min_order_quantity'));
         }
 
-        // NEW: Filter by Delivery Option (e.g., free_shipping)
+        // Filter by Delivery Option (e.g., free_shipping)
         if ($request->has('delivery_option') && is_array($request->input('delivery_option'))) {
             $selectedDeliveryOptions = array_filter($request->input('delivery_option'));
             if (!empty($selectedDeliveryOptions)) {
                 if (in_array('free_shipping', $selectedDeliveryOptions)) {
                     $productsQuery->where('free_shipping', true);
+                    // Apply to options query
+                    $filterOptionsQuery->where('free_shipping', true);
                 }
             }
         }
 
-        // 3. Apply Sorting
+        // Filter: Trusted Factory (supplier_confirmed)
+        if ($request->has('supplier_confirmed') && $request->input('supplier_confirmed') == '1') {
+            $productsQuery->where('supplier_confirmed', true);
+            // Apply to options query
+            $filterOptionsQuery->where('supplier_confirmed', true);
+        }
+
+        // Filter: Delivery Date (estimated_delivery_date)
+        if ($request->filled('delivery_date')) {
+            try {
+                $deliveryDate = Carbon::parse($request->input('delivery_date'));
+                $productsQuery->where('estimated_delivery_date', '<=', $deliveryDate->toDateString());
+                // Apply to options query
+                $filterOptionsQuery->where('estimated_delivery_date', '<=', $deliveryDate->toDateString());
+            } catch (\Exception $e) {
+                Log::warning("Invalid delivery_date format: " . $request->input('delivery_date') . " - " . $e->getMessage());
+                // For filter options, we can silently ignore if the date is malformed
+            }
+        }
+
+        // Apply Sorting
         if ($request->filled('sort_by')) {
             switch ($request->input('sort_by')) {
                 case 'price_asc':
@@ -138,55 +195,88 @@ class ProductController extends Controller
             $productsQuery->latest();
         }
 
-        // 4. Get the paginated product results
+        // Get the paginated product results
         $products = $productsQuery->paginate(12)->withQueryString();
 
-        // 5. Prepare data for dynamic filter options in the sidebar
-        // IMPORTANT: These filters should now be based on the *context* of the current page,
-        // specifically the sub_category_id if one is selected, and potentially the search term.
+        // --- Start of Dynamic Delivery Options Generation ---
+        $deliveryOptions = [];
 
-        // Start with a new query for filter options, but apply the core filters first.
-        $filterOptionsQuery = Product::query();
+        // Option 1: Delivery in a few days (e.g., 3-7 days)
+        $date1 = Carbon::today()->addDays(rand(3, 7));
+        $deliveryOptions[$date1->toDateString()] = [
+            'label_key' => 'delivery_by_date',
+            'date_param' => $date1->isoFormat('MMMM D'), // e.g., "July 9"
+        ];
 
-        // Apply global search filter to options as well
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $filterOptionsQuery->where(function($q) use ($search) {
-                $q->where('name', 'like', '%' . $search . '%')
-                  ->orWhere('description', 'like', '%' . $search . '%');
-            });
-        }
+        // Option 2: Delivery within approximately 2 weeks (e.g., 8-14 days)
+        $date2 = Carbon::today()->addDays(rand(8, 14));
+        $deliveryOptions[$date2->toDateString()] = [
+            'label_key' => 'delivery_by_date',
+            'date_param' => $date2->isoFormat('MMMM D'), // e.g., "July 15"
+        ];
 
-        // Apply sub_category_id filter to options as well
-        if ($request->filled('sub_category_id')) {
-            $filterOptionsQuery->where('sub_category_id', $request->input('sub_category_id'));
-        }
+        // Option 3: Delivery within approximately 3 weeks (e.g., 15-21 days)
+        $date3 = Carbon::today()->addDays(rand(15, 21));
+        $deliveryOptions[$date3->toDateString()] = [
+            'label_key' => 'delivery_by_date',
+            'date_param' => $date3->isoFormat('MMMM D'), // e.g., "July 22"
+        ];
+        // --- End of Dynamic Delivery Options Generation ---
 
-        // Now, derive available filter options from this context-aware query
+        // --- Start of Centralized Color Hex Map Definition ---
+        // Define a comprehensive color-to-hex map.
+        // You will need to manually update this array whenever you introduce a new color.
+        $colorHexMap = [
+            'Red'       => '#FF0000',
+            'Blue'      => '#0000FF',
+            'Green'     => '#008000',
+            'Yellow'    => '#FFFF00',
+            'Orange'    => '#FFA500',
+            'Purple'    => '#800080',
+            'Black'     => '#000000',
+            'White'     => '#FFFFFF',
+            'Gray'      => '#808080',
+            'Brown'     => '#A52A2A',
+            'Pink'      => '#FFC0CB',
+            'Turquoise' => '#40E0D0',
+            'Navy'      => '#000080',
+            'Maroon'    => '#800000',
+            'Silver'    => '#C0C0C0',
+            'Gold'      => '#FFD700',
+            'Cyan'      => '#00FFFF',
+            'Magenta'   => '#FF00FF',
+            'Lime'      => '#00FF00',
+            'Teal'      => '#008080',
+            'Olive'     => '#808000',
+            'Nike Red'  => '#BB0000',
+            'Adidas Blue' => '#0050A0',
+            // You can add many more. If a color is not found here, it will default to '#ccc' in the Blade view.
+        ];
+        // --- End of Centralized Color Hex Map Definition ---
+
+
+        // Now, derive available filter options from the context-aware $filterOptionsQuery
         $availableColors = $filterOptionsQuery->clone()->pluck('color')
-                               ->filter(function ($value) { return !empty($value); })
-                               ->flatten()->unique()->sort()->values();
-
+                                             ->filter(function ($value) { return !empty($value); })
+                                             ->flatten()->unique()->sort()->values();
         $availableSizes = $filterOptionsQuery->clone()->pluck('size')
-                               ->filter(function ($value) { return !empty($value); })
-                               ->flatten()->unique()->sort()->values();
+                                             ->filter(function ($value) { return !empty($value); })
+                                             ->flatten()->unique()->sort()->values();
 
         $availableGenders = $filterOptionsQuery->clone()->distinct()->pluck('gender')
-                                ->filter()->sort()->values();
+                                               ->filter()->sort()->values();
 
         $availableMaterials = $filterOptionsQuery->clone()->distinct()->pluck('material')
-                                  ->filter()->sort()->values();
+                                                           ->filter()->sort()->values();
 
-        // THIS IS THE CRUCIAL CHANGE: availableDescriptions now uses $filterOptionsQuery
+        // Note: For 'description', if it's a long text field, collecting distinct values might lead to many options.
+        // Consider if this filter is truly meant for pre-defined "tags" or just for a general text search.
         $availableDescriptions = $filterOptionsQuery->clone()->distinct()->whereNotNull('description')
-                                       ->pluck('description')->sort()->values();
+                                                           ->pluck('description')->sort()->values();
 
-        // Subcategories are usually always all listed, or filtered by a main category in a different context.
-        // This is generally okay as you might want to show all subcategories for navigation,
-        // even if only one is currently selected.
-        $availableSubCategories = SubCategory::all();
+        $availableSubCategories = SubCategory::all(); // This should likely be fetched without filtering by current product query, unless you only want subcategories that have products matching current filters. For a general list of subcategories, `SubCategory::all()` is fine.
 
-        // 6. Prepare data for breadcrumbs (to indicate the current category/subcategory)
+        // Prepare data for breadcrumbs
         $currentCategory = null;
         $currentSubCategory = null;
         if ($request->filled('sub_category_id')) {
@@ -196,7 +286,7 @@ class ProductController extends Controller
             }
         }
 
-        // 7. Pass all necessary data to the view
+        // Pass all necessary data to the view
         return view('categories.product', compact(
             'products',
             'availableColors',
@@ -206,7 +296,9 @@ class ProductController extends Controller
             'availableSubCategories',
             'availableDescriptions',
             'currentCategory',
-            'currentSubCategory'
+            'currentSubCategory',
+            'deliveryOptions',
+            'colorHexMap' // <-- Make sure to pass this to your view
         ));
     }
 
@@ -277,7 +369,7 @@ class ProductController extends Controller
         $subCategories = SubCategory::all();
 
         // Define common attributes for dropdowns/radio buttons
-        $colors = ['Red', 'Blue', 'Green', 'Yellow', 'Black', 'White', 'Gray', 'Brown', 'Purple', 'Orange'];
+        $colors = ['Red', 'Blue', 'Green', 'Yellow', 'Black', 'White', 'Gray', 'Brown', 'Purple', 'Orange', 'Pink', 'Turquoise', 'Navy', 'Maroon', 'Silver', 'Gold', 'Cyan', 'Magenta', 'Lime', 'Teal', 'Olive', 'Nike Red', 'Adidas Blue'];
         $sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'One Size','Over Size'];
         $genders = ['Male', 'Female', 'Unisex', 'Kids'];
         $materials = ['Cotton', 'Polyester', 'Wool', 'Leather', 'Denim', 'Silk', 'Nylon'];
@@ -314,8 +406,9 @@ class ProductController extends Controller
             'color.*' => 'string|max:255', // Validate each item in the color array
             'size' => 'nullable|array',   // Allow 'size' to be an array of strings
             'size.*' => 'string|max:255', // Validate each item in the size array
-            'gender' => 'nullable|string|max:255',
+            'gender' => 'nullable|string|max:255', // Updated to string, as per Blade's multiple checkboxes (can be handled by whereIn on backend if array of values is sent)
             'material' => 'nullable|string|max:255',
+            'estimated_delivery_date' => 'nullable|date|after_or_equal:today', // Added validation for the new field
         ]);
 
         // Handle main image upload
@@ -353,6 +446,7 @@ class ProductController extends Controller
             'size' => $validatedData['size'] ?? null,   // Save as JSON array in database
             'gender' => $validatedData['gender'] ?? null,
             'material' => $validatedData['material'] ?? null,
+            'estimated_delivery_date' => $validatedData['estimated_delivery_date'] ?? null, // Save the new field
         ]);
 
         // Notify admin(s) about the new product

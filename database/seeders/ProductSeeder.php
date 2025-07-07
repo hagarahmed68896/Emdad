@@ -34,7 +34,7 @@ $product = Product::create([
             'supplier_name' => 'Fashion Supplier',
             'supplier_confirmed' => true,
             'min_order_quantity' => 3,
-            'rating' => 4.5,
+            'rating' => 4.0,
             'is_featured' =>1,
             'color' => ['Orange'],
             'size' => ['L'],
@@ -124,8 +124,8 @@ $product = Product::create([
             'is_featured' => 1,
         ]);
         Product::create([
-            'name' => 'تيشيرت رجالي',
-            'slug' => '2-تيشيرت-رجالي',
+            'name' => 'تيشيرت ',
+            'slug' => 'تيشيرت',
             'description' => 'تيشرت بولو',
             'price' => 299.99,
             'image' => 'storage/products/c7cc5df6a3a3ad5b9e08d091347e0b2f8b61e1e4.png',
@@ -138,7 +138,7 @@ $product = Product::create([
             'min_order_quantity' => 3,
             'rating' => 4.5,
             'is_featured' => 1,
-            'color' => ['Black', 'White', 'Gray'], // Changed to an array of colors
+            'color' => ['Black', 'White', 'Gray'], 
             'size' => ['XL', 'L', 'M'], 
             'material' => 'بوليستر',
             'gender' => 'رجالي',
@@ -156,6 +156,54 @@ $product = Product::create([
             'min_order_quantity'=> 2,
             'rating' => 4.8,
             'is_featured' =>1,
+        ]);
+        Product::create([
+            'name' => 'تيشيرت رياضي',
+            'slug' => 'تيشيرت-رياضي',
+            'description' => 'تيشرت رياضي',
+            'price' => 155.0,
+            'sub_category_id' => SubCategory::where('slug', 't-shirt')->first()->id, // Ensure the category exists
+            'is_offer' => true,
+            'discount_percent' => 10, 
+            'offer_expires_at' => now()->addDays(7),
+            'supplier_name' => 'Fashion Supplier',
+            'supplier_confirmed' => true,
+            'min_order_quantity' => 3,
+            'rating' => 4.0,
+            'is_featured' =>1,
+             'images' => json_encode([
+                'storage/products/a83454ae419fb750af84f07c1f35acb42e3d3ff5.png',
+                'storage/products/c9e653c80313c6ada3c24262f4d7cd4f205b36fb.png',
+                        ]),
+            'color' => ['Blue','Gray','Caffe'],
+            'size' => ['M'],
+            'material' => 'قطن',
+            'gender' => 'نسائي',
+            'estimated_delivery_date' => '2023-10-15' 
+        ]);
+            Product::create([
+            'name' => 'تيشيرت سادة',
+            'slug' => 'تيشيرت-سادة',
+            'description' => 'تيشرت سادة',
+            'price' => 252.0,
+            'sub_category_id' => SubCategory::where('slug', 't-shirt')->first()->id, // Ensure the category exists
+            'is_offer' => true,
+            'discount_percent' => 5, 
+            'offer_expires_at' => now()->addDays(7),
+            'supplier_name' => 'Fashion Supplier',
+            'supplier_confirmed' => false,
+            'min_order_quantity' => 3,
+            'rating' => 4.0,
+            'is_featured' =>1,
+            'images' => json_encode([
+                'storage/products/c7cc5df6a3a3ad5b9e08d091347e0b2f8b61e1e4.png',
+                'storage/products/340bb1d4c43f0944e9e74745b6d6eb54c7252b78.png',
+                        ]),
+            'color' => ['Black','White','Nike Red'],
+            'size' => ['XL'],
+            'material' => 'قطن',
+            'gender' => 'رجالي',
+            'estimated_delivery_date' => '2023-10-15' 
         ]);
     }
     

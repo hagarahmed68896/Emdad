@@ -1,5 +1,8 @@
 /** @type {
   import('tailwindcss').Config
+
+
+
 }
 */
 module.exports = {
@@ -13,14 +16,28 @@ module.exports = {
   fontFamily: {
   cairo: ['Cairo', 'sans-serif'],
       
+
+
+
 }
 ,
     
+
+
+
 }
 ,
   
+
+
+
 }
 ,
-  plugins: [],
+  plugins: [
+        require('@tailwindcss/forms'),
+  ],
+
+
+
 
 }

@@ -231,6 +231,16 @@ return [
     'min_order_quantity' => 'الحد الأدنى للطلب',
     'apply_filters' => 'تطبيق ',
     'reset_filters' => 'إعادة تعيين ',
+    '5.0&Up' => '5.0 وأكثر',
+    '4.0&Up' => '4.0 وأكثر',
+    '4.5&Up' => '4.5 وأكثر',
+    'supplier_confirmed' => 'مصنع موثوق',
+    'suppliers_featured' => 'ميزات المورد',
+    'unit_price_depends_on_delivery_date'=> 'سعر الوحدة يعتمد على تاريخ التسليم المتوقع',
+    'delivery_by_date'=> 'التسليم بحلول :date',
+    'from' => 'من',
+    'to' => ' الي',
+
 
 
 ];

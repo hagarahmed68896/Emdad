@@ -2,7 +2,7 @@
 
 <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
 
-<section class=" px-[64px] py-8 font-inter">
+<section class="px-[64px] py-8 font-inter">
     <div class="flex sm:flex-row flex-col  justify-between mt-1">
         <div class="flex flex-col justify-between mb-5  mt-3">
             <p class="bg-[#F3F4F5] rounded-[40px] px-[16px] py-[8px] w-[97px] text-[16px] mb-4 text-[#1F2B45]">

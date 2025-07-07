@@ -30,16 +30,18 @@ return new class extends Migration
             $table->boolean('supplier_confirmed')->default(false); // If supplier confirmed put the green mark
             $table->unsignedInteger('min_order_quantity')->default(1); // Minimum order for each product
             $table->decimal('rating', 2, 1)->nullable(); // Rating for each product (e.g., 4.5)
-   
+            
             $table->json('images')->nullable(); // Stores an array of additional image paths
             $table->boolean('is_featured')->default(false); // without "after"
 
-
             // New fields for product attributes
-           $table->json('color')->nullable(); // Change from string to json
-           $table->json('size')->nullable();  // Change from string to json
-            $table->string('gender')->nullable(); 
+            $table->json('color')->nullable(); // Change from string to json
+            $table->json('size')->nullable();  // Change from string to json
+            $table->string('gender')->nullable();
             $table->string('material')->nullable();
+
+            // NEW COLUMN: Estimated Delivery Date
+            $table->date('estimated_delivery_date')->nullable(); // Add this line for the delivery filter
 
             $table->timestamps();
         });

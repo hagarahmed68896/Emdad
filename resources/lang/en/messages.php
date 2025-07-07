@@ -250,6 +250,16 @@ return [
     'min_order_quantity' => 'Min Order Quantity',
     'apply_filters' => 'Apply Filters',
     'reset_filters' => 'Reset Filters',
+    '5.0&Up' => '5.0 & Up',
+    '4.0&Up' => '4.0 & Up',
+    '4.5&Up' => '4.5 & Up',
+    'supplier_confirmed' => 'Trusted Supplier',
+    'suppliers_featured' => 'Suppliers Features',
+    'unit_price_depends_on_delivery_date' => 'Unit price depends on delivery date',
+    'delivery_by_date' => 'Delivery by:date',
+    'from' => 'From',
+    'to' => 'To',
+
 
 
 
