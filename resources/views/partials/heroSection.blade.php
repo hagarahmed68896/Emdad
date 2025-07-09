@@ -44,7 +44,7 @@
                     <img class="w-6 h-6 xs:w-7 xs:h-7 sm:w-10 sm:h-10 rounded-full border-2 border-white z-50"
                         src="{{ asset('images/d9295352fc08a04c070e415a77ae8cfe609bab92.jpg') }}" alt="Customer Avatar">
                     <div
-                        class="w-6 h-6 xs:w-7 xs:h-7 sm:w-10 sm:h-10 rounded-full bg-gray-200 text-center text-[8px] xs:text-[10px] sm:text-sm flex items-center justify-center border-2 border-white z-60">
+                        class="w-6 h-6 xs:w-7 xs:h-7 sm:w-10 sm:h-10 rounded-full bg-gray-200 text-center text-[8px] xs:text-[10px] sm:text-sm flex items-center justify-center border-2 border-white z-50">
                         +10K
                     </div>
                 </div>

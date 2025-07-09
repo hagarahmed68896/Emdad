@@ -22,6 +22,7 @@ class CategorySeeder extends Seeder
         Category::create(['name_en' => 'Tools & Equipment', 'name_ar' => 'العدد والأدوات', 'slug' => 'tools-equipment','iconUrl' => '']);
         Category::create(['name_en' => 'Medical Devices', 'name_ar' => 'الأجهزة الطبية', 'slug' => 'medical-devices','iconUrl' => '']);
         Category::create(['name_en' => 'Metal Materials', 'name_ar' => 'المواد المعدنية', 'slug' => 'metal-materials','iconUrl' => '']);
+        Category::create(['name_en' => 'Food Materials', 'name_ar' => 'المواد الغذائية', 'slug' => 'food_materials', 'iconUrl' => '' ]);
 
 }
 }

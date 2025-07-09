@@ -259,6 +259,28 @@ return [
     'delivery_by_date' => 'Delivery by:date',
     'from' => 'From',
     'to' => 'To',
+    'contact_supplier' => 'Contact supplier',
+    'place_order' => 'Place order',
+    'reviews' => 'Reviews',
+    'stars' => 'Stars',
+    'pieces' => 'Pieces',
+    'selectable' => 'Selectable',
+    'shipping' => 'Shipping',
+    'shipping_details' => 'Shipping details',
+    'selectChanges' => 'Select Changes',
+    'shipping_cost_for_quantity' => 'Shipping cost: :cost SAR for :quantity pieces',
+    'shipping_cost_not_available' => 'Shipping cost not available', // Ensure this fallback is also present
+    'estimated_delivery_date' => 'Estimated delivery: :days days',
+    'product_protection' => 'Product Protection',
+    'secure_payments' => 'Secure Payments',
+    'secure_payments_description' => 'Every payment process is securely encrypted with strict protocols for data protection.',
+    'easy_returns_refunds' => 'Easy Returns & Refunds',
+    'easy_returns_refunds_description' => 'Request refunds if your order is missing or arrived with product issues, plus free local returns for eligible purchases.',
+    'interest_free_payments_info' => '4 Interest-Free Payments',
+    'interest_free_payments_description' => 'Split your purchase into 4 interest-free payments.',
+   
+
+    
 
 
 

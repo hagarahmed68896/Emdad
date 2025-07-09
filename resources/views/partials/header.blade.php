@@ -11,7 +11,7 @@
         display: inline;
         padding: 8px 10px;
         background-color: #EDEDED;
-        color: #767676;
+        color: #212121;
         border-radius: 12px;
         text-decoration: none;
         font-size: 14px;
@@ -402,9 +402,9 @@
 
     .category-button,
     #mainDropdownButton {
-        padding: 8px 20px;
+        padding: 8px 21.5px;
         background-color: #EDEDED;
-        color: #767676;
+        color: #212121;
         border-radius: 12px;
         text-decoration: none;
         font-size: 14px;
@@ -547,7 +547,7 @@
          sm:mx-1 md:w-[120px] md:h-[36px] shrink-0 order-2">
         <div @click="open = !open"
             class="flex items-center cursor-pointer p-1 hover:border font-normal rounded-[4px] space-x-1 h-full w-full justify-center">
-            <img src="https://s.alicdn.com/@icon/flag/assets/sa.png" alt="SA" class="w-[24px] h-[24px] ml-2" />
+            <img src="{{ asset('images/Flag Pack.svg') }}" alt="" class="w-[24px] h-[24px] ml-2">
             <span class="truncate">{{ __('messages.deliver') }}</span>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                 stroke="currentColor" class="w-[12px] h-[12px] shrink-0">
@@ -948,7 +948,7 @@
                     </div>
                 </div>
 
-                <div class="shrink-0"> 
+                <div class="shrink-0">
                     <button type="submit"
                         class="bg-[#185D31] w-[61px] h-[32px] text-white rounded-[12px] pb-1 mx-1 text-sm">
                         {{ __('messages.Search') }}
@@ -966,56 +966,59 @@
 
     @php
         $currentLang = app()->getLocale();
-        // @dd($currentLang) 
-
+        // @dd($currentLang)
     @endphp
     <!-- Language -->
     <div class="language btn-group flex items-center  order-5" style="color: #212121;  width:90px; height:24px; ">
 
-        <button type="button" class="btn  w-[16px]  border-none" data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="{{ asset('images/Vector (2).svg') }}" alt="">
-        </button>
-        <span class="text-[#212121] text-sm md:text-base ml-1">
-            {{ $currentLang == 'ar' ? 'العربية' : 'English' }}
-        </span>
+        <div class="dropdown flex items-center cursor-pointer" data-bs-toggle="dropdown" aria-expanded="false">
+            {{-- The image is now inside the clickable area --}}
+            <img src="{{ asset('images/Vector (2).svg') }}" alt="Language Icon"
+                class="w-[16px] h-[16px] rtl:ml-2 ltr:mr-2">
+            {{-- The span text is also inside the clickable area --}}
+            <span class="text-[#212121] text-sm md:text-base">
+                {{ $currentLang == 'ar' ? 'العربية' : 'English' }}
+            </span>
+            {{-- The actual dropdown menu would follow this div --}}
+        </div>
         <div class="dropdown-menu w-[180px] h-auto rounded-[12px] bg-[#FFFFFF] py-2 shadow-lg">
             <div class="flex items-center cursor-pointer py-3 px-4 text-base text-[#212121]"
                 onclick="window.location.href='{{ route('change.language', 'ar') }}'">
                 <input type="radio" value="arabic" {{ $currentLang == 'ar' ? 'checked' : '' }}
                     class="shrink-0 rtl:ml-3 ltr:mr-3 w-6 h-6 border-[#185D31] focus:ring-[#185D31] disabled:pointer-events-none dark:bg-[#185D31] dark:border-neutral-700 dark:checked:border-[#185D31] dark:focus:ring-offset-gray-800 appearance-none rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]"
-                    id="arabic" >
+                    id="arabic">
                 <label for="arabic" class="text-neutral-700">{{ __('messages.arabic') }}</label>
             </div>
             <div class="flex items-center cursor-pointer py-3 px-4 text-base text-[#212121]"
                 onclick="window.location.href='{{ route('change.language', 'en') }}'">
                 <input type="radio" value="english" {{ $currentLang == 'en' ? 'checked' : '' }}
                     class="shrink-0 rtl:ml-3 ltr:mr-3 w-6 h-6 border-[#185D31] focus:ring-[#185D31] disabled:pointer-events-none dark:bg-[#185D31] dark:border-neutral-700 dark:checked:border-[#185D31] dark:focus:ring-offset-gray-800 appearance-none rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]"
-                    id="english" >
+                    id="english">
                 <label for="english" class="text-neutral-700">{{ __('messages.english') }}</label>
             </div>
         </div>
     </div>
 
-<div
-    class="icons flex items-center w-auto justify-end gap-x-4 ml-4 shrink-0 md:w-[100px] md:justify-between md:ml-0 order-6">
+    <div
+        class="icons flex items-center w-auto justify-end gap-x-4 ml-4 shrink-0 md:w-[100px] md:justify-between md:ml-0 order-6">
 
-    {{-- Favorites Icon and Popup (YOUR EXISTING CODE - UNCHANGED) --}}
-    <div x-data="{ showPopup: false, buttonRect: null }" x-init="$watch('showPopup', value => {
-        if (value) {
-            // When popup is shown, get the button's position
-            buttonRect = $el.querySelector('a').getBoundingClientRect();
-        } else {
-            buttonRect = null; // Clear when hidden
-        }
-    })" class="relative inline-block"> {{-- This 'relative' is for positioning the popup relative to the icon on larger screens --}}
-        <a href="#" @click.prevent="showPopup = !showPopup" class="relative w-[17px] h-[17px] z-10">
-            <img src="{{ asset('images/Vector.svg') }}" alt="Favorites Icon">
-        </a>
+        {{-- Favorites Icon and Popup (YOUR EXISTING CODE - UNCHANGED) --}}
+        <div x-data="{ showPopup: false, buttonRect: null }" x-init="$watch('showPopup', value => {
+            if (value) {
+                // When popup is shown, get the button's position
+                buttonRect = $el.querySelector('a').getBoundingClientRect();
+            } else {
+                buttonRect = null; // Clear when hidden
+            }
+        })" class="relative inline-block"> {{-- This 'relative' is for positioning the popup relative to the icon on larger screens --}}
+            <a href="#" @click.prevent="showPopup = !showPopup" class="relative w-[17px] h-[17px] z-10">
+                <img src="{{ asset('images/Vector.svg') }}" alt="Favorites Icon">
+            </a>
 
-        {{-- Favorites Popup --}}
-        <div x-show="showPopup" x-cloak @click.away="showPopup = false"
-            x-transition:enter="transition ease-out duration-300"
-            class="bg-white shadow-lg rounded-lg p-4
+            {{-- Favorites Popup --}}
+            <div x-show="showPopup" x-cloak @click.away="showPopup = false"
+                x-transition:enter="transition ease-out duration-300"
+                class="bg-white shadow-lg rounded-lg p-4
 fixed inset-x-0 top-[5%] w-[calc(100%-4rem)] max-w-[360px] mx-auto z-20 overflow-auto max-h-[90vh]
 sm:absolute sm:top-full sm:mt-2 sm:w-[404px] sm:h-auto sm:max-h-none sm:mx-0
 rtl:sm:left-0 rtl:sm:right-auto {{-- For RTL, position to the left --}}
@@ -1027,87 +1030,88 @@ lg:absolute lg:top-full lg:mt-2 lg:w-[404px] lg:h-auto lg:max-h-none lg:mx-0
 rtl:lg:left-0 rtl:lg:right-auto {{-- For RTL, position to the left --}}
 ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
 ">
-            <h3 class="text-xl font-bold text-right text-gray-900 mb-4">{{ __('المفضلة') }}</h3>
-            <div id="favorites-content-area" class="w-full flex flex-col items-center">
-                @if ($favorites->isEmpty())
-                    <div class="flex flex-col justify-center items-center w-full py-10 text-gray-600">
-                        <img src="{{ asset('images/Illustrations.svg') }}" alt="No favorites illustration"
-                            class="w-[156px] h-[163px] mb-10 ">
-                        <p class="text-[#696969] text-[20px] text-center">لم تقم باضافة أي منتج الي المفضلة بعد</p>
-                        <p class="px-[20px] py-[12px] bg-[#185D31] text-[white] rounded-[12px] mt-3">تصفح المنتجات
-                        </p>
-                    </div>
-                @else
-                    <div class="grid grid-cols-1 gap-4 w-full" id="favorites-grid">
-                        {{-- Limit to the first two favorites --}}
-                        @foreach ($favorites->take(2) as $favorite)
-                            <div class="flex items-center justify-between bg-[#F8F9FA] rounded-lg shadow-md p-3">
-                                {{-- Product Image Container --}}
-                                <div class="w-20 h-20 bg-white rtl:ml-4 ltr:mr-4 rounded-[12px] flex-shrink-0">
-                                    <img src="{{ asset($favorite->product->image ?? 'https://via.placeholder.com/80x80?text=No+Image') }}"
-                                        onerror="this.onerror=null;this.src='https://via.placeholder.com/80x80?text=Image+Error';"
-                                        class="w-full h-full object-contain rounded-md">
-                                </div>
-                                {{-- Product Details (Text Content) --}}
-                                <div class="flex flex-col flex-grow rtl:ml-3 ltr:mr-3">
-                                    {{-- Product Name --}}
-                                    <p class="text-[16x] font-semibold text-[#212121] mb-1">
-                                        {{ $favorite->product->name }}
-                                    </p>
-                                    <div class="flex items-center text-[16px] text-[#212121] mb-1">
-                                        <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]"
-                                            src="{{ asset('images/Success.svg') }}" alt="Confirmed Supplier">
-                                        <span>{{ $favorite->product->supplier_name ?? 'Fuzhou Green' }}</span>
-
+                <h3 class="text-xl font-bold text-right text-gray-900 mb-4">{{ __('المفضلة') }}</h3>
+                <div id="favorites-content-area" class="w-full flex flex-col items-center">
+                    @if ($favorites->isEmpty())
+                        <div class="flex flex-col justify-center items-center w-full py-10 text-gray-600">
+                            <img src="{{ asset('images/Illustrations.svg') }}" alt="No favorites illustration"
+                                class="w-[156px] h-[163px] mb-10 ">
+                            <p class="text-[#696969] text-[20px] text-center">لم تقم باضافة أي منتج الي المفضلة بعد</p>
+                            <p class="px-[20px] py-[12px] bg-[#185D31] text-[white] rounded-[12px] mt-3">تصفح المنتجات
+                            </p>
+                        </div>
+                    @else
+                        <div class="grid grid-cols-1 gap-4 w-full" id="favorites-grid">
+                            {{-- Limit to the first two favorites --}}
+                            @foreach ($favorites->take(2) as $favorite)
+                                <div class="flex items-center justify-between bg-[#F8F9FA] rounded-lg shadow-md p-3">
+                                    {{-- Product Image Container --}}
+                                    <div class="w-20 h-20 bg-white rtl:ml-4 ltr:mr-4 rounded-[12px] flex-shrink-0">
+                                        <img src="{{ asset($favorite->product->image ?? 'https://via.placeholder.com/80x80?text=No+Image') }}"
+                                            onerror="this.onerror=null;this.src='https://via.placeholder.com/80x80?text=Image+Error';"
+                                            class="w-full h-full object-contain rounded-md">
                                     </div>
-                                    <p class=" text-[#212121] flex font-bold">
-                                        <span class="flex text-[16px] font-bold text-gray-800">
-                                            {{ number_format($favorite->product->price * (1 - ($favorite->product->discount_percent ?? 0) / 100), 2) }}
-                                            <img class="mx-1 w-[15px] h-[15px] mt-1"
-                                                src="{{ asset('images/Vector (3).svg') }}"
-                                                class="text-[#212121]">
-                                        </span>
-                                    </p>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
+                                    {{-- Product Details (Text Content) --}}
+                                    <div class="flex flex-col flex-grow rtl:ml-3 ltr:mr-3">
+                                        {{-- Product Name --}}
+                                        <p class="text-[16x] font-semibold text-[#212121] mb-1">
+                                            {{ $favorite->product->name }}
+                                        </p>
+                                        <div class="flex items-center text-[16px] text-[#212121] mb-1">
+                                            <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]"
+                                                src="{{ asset('images/Success.svg') }}" alt="Confirmed Supplier">
+                                            <span>{{ $favorite->product->supplier_name ?? 'Fuzhou Green' }}</span>
 
-                    {{-- "Go to Favorites" Button --}}
-                    <div class="mt-6 text-center w-full"> {{-- Added w-full here to contain the button --}}
-                        <a    href="{{ route('profile.show', ['section' => 'favoritesSection']) }}#favoritesSection"
-                            class="mt-2 w-full px-[20px] py-[11px] bg-[#185D31] text-white rounded-[12px] text-[16px] ">
-                            {{ __('messages.go_to_fav') }}
-                        </a>
-                    </div>
-                @endif
+                                        </div>
+                                        <p class=" text-[#212121] flex font-bold">
+                                            <span class="flex text-[16px] font-bold text-gray-800">
+                                                {{ number_format($favorite->product->price * (1 - ($favorite->product->discount_percent ?? 0) / 100), 2) }}
+                                                <img class="mx-1 w-[15px] h-[15px] mt-1"
+                                                    src="{{ asset('images/Vector (3).svg') }}"
+                                                    class="text-[#212121]">
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        {{-- "Go to Favorites" Button --}}
+                        <div class="mt-6 text-center w-full"> {{-- Added w-full here to contain the button --}}
+                            <a href="{{ route('profile.show', ['section' => 'favoritesSection']) }}#favoritesSection"
+                                class="mt-2 w-full px-[20px] py-[11px] bg-[#185D31] text-white rounded-[12px] text-[16px] ">
+                                {{ __('messages.go_to_fav') }}
+                            </a>
+                        </div>
+                    @endif
+                </div>
             </div>
         </div>
-    </div>
 
 
-    {{-- Cart Icon and Popup (MODIFIED TO MIRROR FAVORITES LOGIC) --}}
-    <div x-data="{ showCartPopup: false, buttonRect: null }" x-init="$watch('showCartPopup', value => {
-        if (value) {
-            buttonRect = $el.querySelector('a').getBoundingClientRect();
-        } else {
-            buttonRect = null;
-        }
-    })" class="relative inline-block">
-        <a href="#" @click.prevent="showCartPopup = !showCartPopup"
-            class="relative w-[18px] h-[18px] z-10">
-            <img src="{{ asset('images/Group.svg') }}" alt="Cart Icon">
-            {{-- Optional: Cart Item Count Badge --}}
-            @if ($cartItems->sum('quantity') > 0)
-                <span class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-xs w-4 h-4 flex items-center justify-center">
-                    {{ $cartItems->sum('quantity') }}
-                </span>
-            @endif
-        </a>
+        {{-- Cart Icon and Popup (MODIFIED TO MIRROR FAVORITES LOGIC) --}}
+        <div x-data="{ showCartPopup: false, buttonRect: null }" x-init="$watch('showCartPopup', value => {
+            if (value) {
+                buttonRect = $el.querySelector('a').getBoundingClientRect();
+            } else {
+                buttonRect = null;
+            }
+        })" class="relative inline-block">
+            <a href="#" @click.prevent="showCartPopup = !showCartPopup"
+                class="relative w-[18px] h-[18px] z-10">
+                <img src="{{ asset('images/Group.svg') }}" alt="Cart Icon">
+                {{-- Optional: Cart Item Count Badge --}}
+                @if ($cartItems->sum('quantity') > 0)
+                    <span
+                        class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-xs w-4 h-4 flex items-center justify-center">
+                        {{ $cartItems->sum('quantity') }}
+                    </span>
+                @endif
+            </a>
 
-        <div x-show="showCartPopup" x-cloak @click.away="showCartPopup = false"
-            x-transition:enter="transition ease-out duration-300"
-            class="bg-white shadow-lg rounded-lg p-4
+            <div x-show="showCartPopup" x-cloak @click.away="showCartPopup = false"
+                x-transition:enter="transition ease-out duration-300"
+                class="bg-white shadow-lg rounded-lg p-4
             fixed inset-x-0 top-[5%] w-[calc(100%-4rem)] max-w-[360px] mx-auto z-20 overflow-auto max-h-[85vh]
             sm:absolute sm:top-full sm:mt-2 sm:w-[404px] sm:h-auto sm:max-h-none sm:mx-0
             rtl:sm:left-0 rtl:sm:right-auto
@@ -1119,84 +1123,91 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
             rtl:lg:left-0 rtl:lg:right-auto
             ltr:lg:right-0 ltr:lg:left-auto
         ">
-            <h3 class="text-xl font-bold text-right text-gray-900 mb-4">{{ __('عربة التسوق') }}</h3>
-            <div id="cart-content-area" class="w-full flex flex-col items-center">
-                @if ($cartItems->isEmpty())
-                    <div class="flex flex-col justify-center items-center w-full py-10 text-gray-600">
-                        <img src="{{ asset('images/Illustrations (2).svg') }}" alt="No cart items illustration"
-                            class="w-[156px] h-[163px] mb-10 ">
-                        <p class="text-[#696969] text-[20px] text-center">لم تقم بإضافة أي منتج الي عربة التسوق بعد.</p>
-                        <a href="{{ route('products.index') }}" class="px-[20px] py-[12px] bg-[#185D31] text-[white] rounded-[12px] mt-3">
-                            {{ __('تصفح المنتجات') }}
-                        </a>
-                    </div>
-                @else
-                    <div class="grid grid-cols-1 gap-4 w-full" id="cart-grid">
-                        {{-- Limit to the first two cart items for popup, or remove take(2) for full list --}}
-                        @foreach ($cartItems->take(2) as $item)
-                            <div class="flex items-center justify-between bg-[#F8F9FA] rounded-lg shadow-md p-3">
-                                {{-- Product Image --}}
-                                <div class="w-20 h-20 bg-white rtl:ml-4 ltr:mr-4 rounded-[12px] flex-shrink-0">
-                                    <img src="{{ asset($item->product->image ?? 'https://via.placeholder.com/80x80?text=No+Image') }}"
-                                        onerror="this.onerror=null;this.src='https://via.placeholder.com/80x80?text=Image+Error';"
-                                        class="w-full h-full object-contain rounded-md">
-                                </div>
-                                {{-- Product Details --}}
-                                <div class="flex flex-col flex-grow rtl:ml-3 ltr:mr-3">
-                                    <p class="text-[16px] font-semibold text-[#212121] mb-1">
-                                        {{ $item->product->name }}
+                <h3 class="text-xl font-bold text-right text-gray-900 mb-4">{{ __('عربة التسوق') }}</h3>
+                <div id="cart-content-area" class="w-full flex flex-col items-center">
+                    @if ($cartItems->isEmpty())
+                        <div class="flex flex-col justify-center items-center w-full py-10 text-gray-600">
+                            <img src="{{ asset('images/Illustrations (2).svg') }}" alt="No cart items illustration"
+                                class="w-[156px] h-[163px] mb-10 ">
+                            <p class="text-[#696969] text-[20px] text-center">لم تقم بإضافة أي منتج الي عربة التسوق
+                                بعد.</p>
+                            <a href="{{ route('products.index') }}"
+                                class="px-[20px] py-[12px] bg-[#185D31] text-[white] rounded-[12px] mt-3">
+                                {{ __('تصفح المنتجات') }}
+                            </a>
+                        </div>
+                    @else
+                        <div class="grid grid-cols-1 gap-4 w-full" id="cart-grid">
+                            {{-- Limit to the first two cart items for popup, or remove take(2) for full list --}}
+                            @foreach ($cartItems->take(2) as $item)
+                                <div class="flex items-center justify-between bg-[#F8F9FA] rounded-lg shadow-md p-3">
+                                    {{-- Product Image --}}
+                                    <div class="w-20 h-20 bg-white rtl:ml-4 ltr:mr-4 rounded-[12px] flex-shrink-0">
+                                        <img src="{{ asset($item->product->image ?? 'https://via.placeholder.com/80x80?text=No+Image') }}"
+                                            onerror="this.onerror=null;this.src='https://via.placeholder.com/80x80?text=Image+Error';"
+                                            class="w-full h-full object-contain rounded-md">
+                                    </div>
+                                    {{-- Product Details --}}
+                                    <div class="flex flex-col flex-grow rtl:ml-3 ltr:mr-3">
+                                        <p class="text-[16px] font-semibold text-[#212121] mb-1">
+                                            {{ $item->product->name }}
+                                        </p>
+                                        <p class="text-sm text-gray-600">{{ __('الكمية') }}: {{ $item->quantity }}
+                                        </p>
+                                        @if ($item->options)
+                                            @foreach (json_decode($item->options, true) as $key => $value)
+                                                <p class="text-xs text-gray-500">{{ ucfirst($key) }}:
+                                                    {{ $value }}</p>
+                                            @endforeach
+                                        @endif
+                                    </div>
+                                    {{-- Price --}}
+                                    <p class="text-[16px] font-bold text-gray-800 flex items-center">
+                                        {{ number_format($item->quantity * $item->price_at_addition, 2) }}
+                                        <img class="mx-1 w-[15px] h-[15px] inline-block"
+                                            src="{{ asset('images/Vector (3).svg') }}" alt="currency">
                                     </p>
-                                    <p class="text-sm text-gray-600">{{ __('الكمية') }}: {{ $item->quantity }}</p>
-                                    @if ($item->options)
-                                        @foreach(json_decode($item->options, true) as $key => $value)
-                                            <p class="text-xs text-gray-500">{{ ucfirst($key) }}: {{ $value }}</p>
-                                        @endforeach
-                                    @endif
                                 </div>
-                                {{-- Price --}}
-                                <p class="text-[16px] font-bold text-gray-800 flex items-center">
-                                    {{ number_format($item->quantity * $item->price_at_addition, 2) }}
-                                    <img class="mx-1 w-[15px] h-[15px] inline-block" src="{{ asset('images/Vector (3).svg') }}" alt="currency">
-                                </p>
-                            </div>
-                        @endforeach
-                    </div>
+                            @endforeach
+                        </div>
 
-                    {{-- "Go to Cart" Button --}}
-                    <div class="mt-6 text-center w-full">
-                        <a href="{{ route('cart.index') }}"
-                            class="mt-2 w-full px-[20px] py-[11px] bg-[#185D31] text-white rounded-[12px] text-[16px] ">
-                            {{ __('عرض العربة') }}
-                        </a>
-                    </div>
-                @endif
+                        {{-- "Go to Cart" Button --}}
+                        <div class="mt-6 text-center w-full">
+                            <a href="{{ route('cart.index') }}"
+                                class="mt-2 w-full px-[20px] py-[11px] bg-[#185D31] text-white rounded-[12px] text-[16px] ">
+                                {{ __('عرض العربة') }}
+                            </a>
+                        </div>
+                    @endif
+                </div>
             </div>
         </div>
-    </div>
 
-    {{-- Notification Icon and Popup (only if user is logged in) --}}
-@auth
-    <div x-data="{ showNotificationPopup: false, buttonRect: null }" x-init="$watch('showNotificationPopup', value => {
-        if (value) {
-            buttonRect = $el.querySelector('a').getBoundingClientRect();
-        } else {
-            buttonRect = null;
-        }
-    })" class="relative inline-block">
-        <a href="#" @click.prevent="showNotificationPopup = !showNotificationPopup" class="relative w-[18px] h-[18px] z-10">
-            <img src="{{ asset('images/interface-alert-alarm-bell-2--alert-bell-ring-notification-alarm--Streamline-Core.svg') }}"
-                alt="Notification Icon">
-            {{-- Notification Count Badge --}}
-            @if ($unreadNotificationCount > 0)
-                <span class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-xs w-4 h-4 flex items-center justify-center">
-                    {{ $unreadNotificationCount }}
-                </span>
-            @endif
-        </a>
+        {{-- Notification Icon and Popup (only if user is logged in) --}}
+        @auth
+            <div x-data="{ showNotificationPopup: false, buttonRect: null }" x-init="$watch('showNotificationPopup', value => {
+                if (value) {
+                    buttonRect = $el.querySelector('a').getBoundingClientRect();
+                } else {
+                    buttonRect = null;
+                }
+            })" class="relative inline-block">
+                <a href="#" @click.prevent="showNotificationPopup = !showNotificationPopup"
+                    class="relative w-[18px] h-[18px] z-10">
+                    <img src="{{ asset('images/interface-alert-alarm-bell-2--alert-bell-ring-notification-alarm--Streamline-Core.svg') }}"
+                        alt="Notification Icon">
+                    {{-- Notification Count Badge --}}
+                    @if ($unreadNotificationCount > 0)
+                        <span
+                            class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-xs w-4 h-4 flex items-center justify-center">
+                            {{ $unreadNotificationCount }}
+                        </span>
+                    @endif
+                </a>
 
-        <div x-show="showNotificationPopup" x-cloak @click.away="showNotificationPopup = false"
-            x-transition:enter="transition ease-out duration-300"
-            class="bg-white shadow-lg rounded-lg p-4
+                <div x-show="showNotificationPopup" x-cloak @click.away="showNotificationPopup = false"
+                    x-transition:enter="transition ease-out duration-300"
+                    class="bg-white shadow-lg rounded-lg p-4
             fixed inset-x-0 top-[5%] w-[calc(100%-4rem)] max-w-[360px] mx-auto z-20 overflow-auto max-h-[90vh]
             sm:absolute sm:top-full sm:mt-2 sm:w-[404px] sm:h-auto sm:max-h-none sm:mx-0
             rtl:sm:left-0 rtl:sm:right-auto
@@ -1208,80 +1219,82 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
             rtl:lg:left-0 rtl:lg:right-auto
             ltr:lg:right-0 ltr:lg:left-auto
         ">
-            <h3 class="text-xl font-bold text-right text-gray-900 mb-4">{{ __('الإشعارات') }}</h3>
-            <div id="notifications-content-area" class="w-full flex flex-col items-center">
-                @if ($notifications->isEmpty())
-                    <div class="flex flex-col justify-center items-center w-full py-10 text-gray-600">
-                        <img src="{{ asset('images/Illustrations (3).svg') }}" alt="No notifications illustration"
-                            class="w-[156px] h-[163px] mb-10 ">
-                        <p class="text-[#696969] text-[20px] text-center">{{ __('لا توجد إشعارات حالياً') }}</p>
-                    </div>
-                @else
-               {{--     <div class="flex justify-end mb-4 w-full">
+                    <h3 class="text-xl font-bold text-right text-gray-900 mb-4">{{ __('الإشعارات') }}</h3>
+                    <div id="notifications-content-area" class="w-full flex flex-col items-center">
+                        @if ($notifications->isEmpty())
+                            <div class="flex flex-col justify-center items-center w-full py-10 text-gray-600">
+                                <img src="{{ asset('images/Illustrations (3).svg') }}"
+                                    alt="No notifications illustration" class="w-[156px] h-[163px] mb-10 ">
+                                <p class="text-[#696969] text-[20px] text-center">{{ __('لا توجد إشعارات حالياً') }}</p>
+                            </div>
+                        @else
+                            {{--     <div class="flex justify-end mb-4 w-full">
                         <button type="button" class="text-sm text-[#185D31] hover:underline"
                             onclick="window.location.href='{{ route('notifications.markAllAsRead') }}'">
                             {{ __('وضع علامة "قراءة" على الكل') }}
                         </button>
                     </div> --}}
 
-                    {{-- Notifications List --}}
-                    <div class="grid grid-cols-1 gap-2 w-full" id="notifications-grid">
-                        @foreach ($notifications as $notification)
-                            {{-- Check if notification is read to apply different styling --}}
-                            <div class="p-3 rounded-lg border-b flex items-center justify-between
+                            {{-- Notifications List --}}
+                            <div class="grid grid-cols-1 gap-2 w-full" id="notifications-grid">
+                                @foreach ($notifications as $notification)
+                                    {{-- Check if notification is read to apply different styling --}}
+                                    <div
+                                        class="p-3 rounded-lg border-b flex items-center justify-between
                                 {{ $notification->read_at ? 'bg-white text-gray-600' : 'bg-[#F8F9FA] text-[#212121] font-medium' }}">
-                                    {{-- User Image / Icon (from your screenshot) --}}
-                                <div class="flex-shrink-0 w-12 h-12 rounded-full overflow-hidden rtl:ml-3 ltr:mr-3">
-                                    <img src="{{ asset($notification->data['image'] ?? 'images/default_avatar.png') }}"
-                                         alt="User Avatar" class="w-full h-full object-cover">
-                                </div>
-                               
-                                <div class="flex-grow rtl:pr-3 ltr:pl-3">
-                                    <p class="text-[16px] rtl:text-right ltr:text-left">
-                                        {{-- Notification Title (e.g., "إشعار جديد" from your image) --}}
-                                        <span class="font-bold">{{ __('إشعار جديد') }}: </span>
-                                        {{-- Main Notification Message --}}
-                                        {{ $notification->data['message'] ?? 'رسالة إشعار' }}
-                                    </p>
-                                    {{-- Time Ago --}}
-                                    <p class="text-xs text-gray-500 rtl:text-right ltr:text-left mt-1">
-                                        {{ $notification->created_at->diffForHumans() }}
-                                    </p>
-                                    {{-- Optional: Link to details --}}
-                                    @if (isset($notification->data['url']))
-                                        <a href="{{ $notification->data['url'] }}" class="text-sm text-[#185D31] hover:underline block mt-1">
-                                            {{ __('عرض التفاصيل') }}
-                                        </a>
-                                    @endif
-                                </div>
-                           
-                                {{-- Optional: Mark as Read Button (for single notification) --}}
-                                @if (!$notification->read_at)
-                                    <button type="button"
-                                        {{-- This would require an AJAX call to mark as read --}}
-                                        onclick="window.location.href='{{ route('notifications.markAsRead', $notification->id) }}'"
-                                        class="text-xs text-blue-500 hover:underline flex-shrink-0 rtl:mr-2 ltr:ml-2">
-                                        {{ __('قراءة') }}
-                                    </button>
-                                @endif
+                                        {{-- User Image / Icon (from your screenshot) --}}
+                                        <div
+                                            class="flex-shrink-0 w-12 h-12 rounded-full overflow-hidden rtl:ml-3 ltr:mr-3">
+                                            <img src="{{ asset($notification->data['image'] ?? 'images/default_avatar.png') }}"
+                                                alt="User Avatar" class="w-full h-full object-cover">
+                                        </div>
+
+                                        <div class="flex-grow rtl:pr-3 ltr:pl-3">
+                                            <p class="text-[16px] rtl:text-right ltr:text-left">
+                                                {{-- Notification Title (e.g., "إشعار جديد" from your image) --}}
+                                                <span class="font-bold">{{ __('إشعار جديد') }}: </span>
+                                                {{-- Main Notification Message --}}
+                                                {{ $notification->data['message'] ?? 'رسالة إشعار' }}
+                                            </p>
+                                            {{-- Time Ago --}}
+                                            <p class="text-xs text-gray-500 rtl:text-right ltr:text-left mt-1">
+                                                {{ $notification->created_at->diffForHumans() }}
+                                            </p>
+                                            {{-- Optional: Link to details --}}
+                                            @if (isset($notification->data['url']))
+                                                <a href="{{ $notification->data['url'] }}"
+                                                    class="text-sm text-[#185D31] hover:underline block mt-1">
+                                                    {{ __('عرض التفاصيل') }}
+                                                </a>
+                                            @endif
+                                        </div>
+
+                                        {{-- Optional: Mark as Read Button (for single notification) --}}
+                                        @if (!$notification->read_at)
+                                            <button type="button" {{-- This would require an AJAX call to mark as read --}}
+                                                onclick="window.location.href='{{ route('notifications.markAsRead', $notification->id) }}'"
+                                                class="text-xs text-blue-500 hover:underline flex-shrink-0 rtl:mr-2 ltr:ml-2">
+                                                {{ __('قراءة') }}
+                                            </button>
+                                        @endif
+                                    </div>
+                                @endforeach
                             </div>
-                        @endforeach
-                    </div>
 
-                    {{-- "View All Notifications" Button --}}
-                    <div class="mt-6 text-center w-full">
-                        <a href="{{ route('notifications.index') }}"
-                            class="mt-2 w-full px-[20px] py-[11px] bg-[#185D31] text-white rounded-[12px] text-[16px] ">
-                            {{ __('عرض كل الإشعارات') }}
-                        </a>
+                            {{-- "View All Notifications" Button --}}
+                            <div class="mt-6 text-center w-full">
+                                <a href="{{ route('notifications.index') }}"
+                                    class="mt-2 w-full px-[20px] py-[11px] bg-[#185D31] text-white rounded-[12px] text-[16px] ">
+                                    {{ __('عرض كل الإشعارات') }}
+                                </a>
+                            </div>
+                        @endif
                     </div>
-                @endif
+                </div>
             </div>
-        </div>
-    </div>
-@endauth
+        @endauth
 
-</div>
+    </div>
 
 
 
@@ -1334,29 +1347,28 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
                                 <small class="sm:text-sm text-gray-500 text-[10px]">{{ Auth::user()->email }}</small>
                             </div>
                         </li>
-<li>
-    <a class="dropdown-item block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
-       href="{{ route('profile.show', parameters: ['section' => 'myAccountContentSection']) }}#myAccountContentSection">
-       {{ __('messages.MyAccount') }}
-    </a>
-</li>
-<li>
-    <a class="dropdown-item pb-4 block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
-       href="{{ route('profile.show') }}#myOrdersSection">{{ __('messages.MyOrders') }}</a>
-</li>
-<li>
-    <a class="dropdown-item block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
-    
-       href="{{ route('profile.show', ['section' => 'favoritesSection']) }}#favoritesSection">
-       {{ __('messages.Fav') }}
-    </a>
-</li>
-<li>
-    <a class="dropdown-item pb-4 block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
-              href="{{ route('profile.show', ['section' => 'notificationsSection']) }}#notificationsSection">
+                        <li>
+                            <a class="dropdown-item block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
+                                href="{{ route('profile.show', parameters: ['section' => 'myAccountContentSection']) }}#myAccountContentSection">
+                                {{ __('messages.MyAccount') }}
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item pb-4 block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
+                                href="{{ route('profile.show') }}#myOrdersSection">{{ __('messages.MyOrders') }}</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
+                                href="{{ route('profile.show', ['section' => 'favoritesSection']) }}#favoritesSection">
+                                {{ __('messages.Fav') }}
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item pb-4 block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
+                                href="{{ route('profile.show', ['section' => 'notificationsSection']) }}#notificationsSection">
 
-       {{ __('messages.settings_notifications') }}</a>
-</li>
+                                {{ __('messages.settings_notifications') }}</a>
+                        </li>
                         <li>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
@@ -1380,10 +1392,10 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
 {{-- category-bar --}}
 <nav
     class="categories bg-white w-full sm:flex sm:items-center sm:justify-between sm:px-[64px] pt-4 pb-3 space-y-3 sm:space-y-0 flex-col sm:flex-row relative">
-    <div class="relative inline-block ml-1  w-full md:w-auto" x-data="{ mainDropdownOpen: false }"
+    <div class="relative inline-block ml-1 gap-1 w-full md:w-auto" x-data="{ mainDropdownOpen: false }"
         @click.outside="mainDropdownOpen = false">
         <a id="mainDropdownButton" @click="mainDropdownOpen = !mainDropdownOpen"
-            class="justify-between flex items-center rtl:ml-4 ltr:mr-4 cursor-pointer">
+            class="justify-between flex items-center rtl:ml-1 ltr:mr-1 cursor-pointer">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
@@ -1461,15 +1473,15 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
 
     </div>
 
-    <div class="individualCategories flex flex-wrap gap-2 sm:gap-4 w-full justify-between">
-        @foreach ($categories as $category)
-            <a href="{{ route('products.filterByCategory', $category->slug) }}"
-                class="category-button {{ isset($selectedCategory) && $selectedCategory->slug === $category->slug ? 'active' : '' }}">
-                {{ $category->name }}
-            </a>
+<div class="individualCategories flex flex-wrap gap-2 sm:gap-3 w-full justify-start">
+    @foreach ($categories as $category)
+        <a href="{{ route('products.filterByCategory', $category->slug) }}"
+            class="category-button {{ isset($selectedCategory) && $selectedCategory->slug === $category->slug ? 'active' : '' }}">
+            {{ $category->name }}
+        </a>
+    @endforeach
+</div>
 
-        @endforeach
-    </div>
 
 
 </nav>
@@ -1499,8 +1511,8 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
                     class="relative inline-block text-[12px] tracking-[0%] w-auto max-w-[150px] lg:mx-4 sm:mx-1 md:w-[120px] md:h-[36px] shrink-0">
                     <div @click="open = !open"
                         class="flex items-center cursor-pointer p-1 hover:border font-normal rounded-[4px] space-x-1 h-full w-full justify-center">
-                        <img src="https://s.alicdn.com/@icon/flag/assets/sa.png" alt="SA"
-                            class="w-[24px] h-[24px] ml-2" />
+                        <img src="{{ asset('images/Flag Pack.svg') }}" alt=""
+                            class="w-[24px] h-[24px] ml-2">
                         <span class="truncate">{{ __('messages.deliver') }}</span>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                             stroke-width="1.5" stroke="currentColor" class="w-[12px] h-[12px] shrink-0">
@@ -1578,26 +1590,28 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
                     $currentLang = app()->getLocale();
                 @endphp
                 <div class="btn-group flex items-center" style="color: #212121; width:90px; height:24px;">
-                    <button type="button" class="btn w-[16px] border-none" data-bs-toggle="dropdown"
+                    <div class="dropdown flex items-center cursor-pointer" data-bs-toggle="dropdown"
                         aria-expanded="false">
-                        <img src="{{ asset('images/Vector (2).svg') }}" alt="">
-                    </button>
-                    <span class="text-[#212121] text-sm md:text-base">
-                        {{ $currentLang == 'ar' ? 'العربية' : 'English' }}
-                    </span>
+                        {{-- The image is now inside the clickable area --}}
+                        <img src="{{ asset('images/Vector (2).svg') }}" alt="Language Icon"
+                            class="w-[16px] h-[16px] rtl:ml-2 ltr:mr-2">
+                        {{-- The span text is also inside the clickable area --}}
+                        <span class="text-[#212121] text-sm md:text-base">
+                            {{ $currentLang == 'ar' ? 'العربية' : 'English' }}
+                        </span>
+                        {{-- The actual dropdown menu would follow this div --}}
+                    </div>
                     <div class="dropdown-menu w-[180px] h-auto rounded-[12px] bg-[#FFFFFF] py-2 shadow-lg">
                         <div class="flex items-center cursor-pointer py-3 px-4 text-base text-[#212121]"
                             onclick="window.location.href='{{ route('change.language', 'ar') }}'">
-                            <input type="radio"  value="arabic"
-                                {{ $currentLang == 'ar' ? 'checked' : '' }}
+                            <input type="radio" value="arabic" {{ $currentLang == 'ar' ? 'checked' : '' }}
                                 class="shrink-0 rtl:ml-3 ltr:mr-3 w-6 h-6 border-[#185D31] focus:ring-[#185D31] disabled:pointer-events-none dark:bg-[#185D31] dark:border-neutral-700 dark:checked:border-[#185D31] dark:focus:ring-offset-gray-800 appearance-none rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]"
                                 id="arabic" readonly>
                             <label for="arabic" class="text-neutral-700">{{ __('messages.arabic') }}</label>
                         </div>
                         <div class="flex items-center cursor-pointer py-3 px-4 text-base text-[#212121]"
                             onclick="window.location.href='{{ route('change.language', 'en') }}'">
-                            <input type="radio" value="english"
-                                {{ $currentLang == 'en' ? 'checked' : '' }}
+                            <input type="radio" value="english" {{ $currentLang == 'en' ? 'checked' : '' }}
                                 class="shrink-0 rtl:ml-3 ltr:mr-3 w-6 h-6 border-[#185D31] focus:ring-[#185D31] disabled:pointer-events-none dark:bg-[#185D31] dark:border-neutral-700 dark:checked:border-[#185D31] dark:focus:ring-offset-gray-800 appearance-none rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]"
                                 id="english" readonly>
                             <label for="english" class="text-neutral-700">{{ __('messages.english') }}</label>
@@ -2044,4 +2058,5 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
                 class="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800">{{ __('messages.confirmLocation') }}</button>
         </div>
     </div>
+</div>
 </div>

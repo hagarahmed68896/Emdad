@@ -14,18 +14,25 @@ class Product extends Model
         'slug',
         'description',
         'price',
-        'image', 
+        'image',
+        'images',
         'sub_category_id',
-        'images', 
         'is_offer',
         'discount_percent',
         'offer_expires_at',
         'supplier_name',
-        'supplier_confirmed', 
-        'color', 
-        'size', 
-        'gender',
-        'material',
+        'supplier_confirmed',
+        'min_order_quantity',
+        'rating',
+        'reviews_count',
+        'price_tiers',
+        'shipping_cost',
+        'estimated_delivery_days',
+        'is_main_featured',
+        'model_number',
+        'quality',
+        'specifications',
+        'is_featured',
     ];
 
     /**
@@ -34,17 +41,14 @@ class Product extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'images' => 'array', 
-        'offer_expires_at' => 'datetime', 
-        'color' => 'array',  
-        'size' => 'array',   
-        'estimated_delivery_date' => 'date', 
-
+        'images' => 'array',
+        'price_tiers' => 'array',
+        'specifications' => 'array',
+        'offer_expires_at' => 'datetime',
     ];
 
     public function subCategory()
     {
-        return $this->belongsTo(SubCategory::class,'sub_category_id');
+        return $this->belongsTo(SubCategory::class, 'sub_category_id');
     }
-
 }

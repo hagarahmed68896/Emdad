@@ -240,6 +240,29 @@ return [
     'delivery_by_date'=> 'التسليم بحلول :date',
     'from' => 'من',
     'to' => ' الي',
+    'contact_supplier' =>'تواصل مع المورد',
+    'place_order' => 'ابدأ الطلب',
+    'reviews' => 'تقييمًا',
+    'stars' => 'نجوم',
+    'pieces' => 'قطعة',
+    'selectable' => 'قابل للتخصيص',
+    'changes' => 'التغييرات',
+    'shipping' => 'الشحن',
+    'shipping_details' => 'تفاصيل',
+    'selectChanges' => 'حدد التغييرات',
+    'shipping_cost_for_quantity' => 'رسوم الشحن: :cost ر.س لـ :quantity قطع',
+    'shipping_cost_not_available' => 'تكلفة الشحن غير متوفرة', // Ensure this fallback is also present
+    'estimated_delivery_date' => 'التوصيل المتوقع: :days أيام',
+    'product_protection' => 'حماية المنتج',
+    'secure_payments' => 'المدفوعات الآمنة',
+    'secure_payments_description' => 'كل عملية دفع تقوم بها مؤمنة بتشفير صارم وبروتوكولات حماية البيانات.',
+    'easy_returns_refunds' => 'إرجاع واسترداد سهل',
+    'easy_returns_refunds_description' => 'اطلب استرداد الأموال إذا كان طلبك مفقودًا أو وصل مع مشاكل في المنتج، بالإضافة إلى إرجاعات محلية مجانية للعيوب في المشتريات المؤهلة.',
+    'interest_free_payments_info' => '4 دفعات بدون فوائد',
+    'interest_free_payments_description' => 'قسم مشترياتك إلى 4 دفعات بدون فوائد',
+    
+
+   
 
 
 

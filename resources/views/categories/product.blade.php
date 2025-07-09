@@ -106,10 +106,29 @@
                 <div class="grid grid-cols-6 gap-2">
                     @php
                         $colorHexMap = [
-                            'Red' => '#FF0000', 'Blue' => '#0000FF', 'Green' => '#008000',
-                            'Yellow' => '#FFFF00', 'Orange' => '#FFA500', 'Purple' => '#800080',
-                            'Black' => '#000000', 'White' => '#FFFFFF', 'Gray' => '#808080',
-                            'Brown' => '#A52A2A',
+                            'Red'       => '#FF0000',
+            'Blue'      => '#0000FF',
+            'Green'     => '#008000',
+            'Yellow'    => '#FFFF00',
+            'Orange'    => '#FFA500',
+            'Purple'    => '#800080',
+            'Black'     => '#000000',
+            'White'     => '#FFFFFF',
+            'Gray'      => '#808080',
+            'Brown'     => '#A52A2A',
+            'Pink'      => '#FFC0CB',
+            'Turquoise' => '#40E0D0',
+            'Navy'      => '#000080',
+            'Maroon'    => '#800000',
+            'Silver'    => '#C0C0C0',
+            'Gold'      => '#FFD700',
+            'Cyan'      => '#00FFFF',
+            'Magenta'   => '#FF00FF',
+            'Lime'      => '#00FF00',
+            'Teal'      => '#008080',
+            'Olive'     => '#808000',
+            'Nike Red'  => '#BB0000',
+            'Adidas Blue' => '#0050A0',
                         ];
                         $selectedColors = (array) request('color');
                     @endphp
@@ -220,17 +239,18 @@
         $selectedDeliveryDate = request('delivery_date'); 
     @endphp
 
-    @foreach ($deliveryOptions as $dateValue => $optionData)
-        <label class="flex items-center mb-2 text-gray-700">
-            <input type="radio" name="delivery_date" value="{{ $dateValue }}"
-                class="form-radio h-[20px] w-[20px] rounded-full border-2 border-black focus:ring-[#185D31] accent-[#185D31]"
-                {{ $selectedDeliveryDate == $dateValue ? 'checked' : '' }}
-                onchange="document.getElementById('filterForm').submit()">
-            <span class="rtl:mr-3 ltr:ml-3">
-                {{ __('messages.' . $optionData['label_key'], ['date' => $optionData['date_param']]) }}
-            </span>
-        </label>
-    @endforeach
+  @foreach ($deliveryOptions as $dateValue => $optionData)
+    <label class="flex items-center mb-2 text-gray-700">
+        <input type="radio" name="delivery_date" value="{{ $dateValue }}"
+            class="form-radio h-[20px] w-[20px] rounded-full border-2 border-black focus:ring-[#185D31] accent-[#185D31]"
+            {{ $selectedDeliveryDate == $dateValue ? 'checked' : '' }}
+            onchange="document.getElementById('filterForm').submit()">
+        <span class="rtl:mr-3 ltr:ml-3">
+            {{-- Corrected line: Changed $option to $optionData --}}
+            {{ __('messages.' . $optionData['label_key'], ['days' => $optionData['days_param']]) }}
+        </span>
+    </label>
+@endforeach
 </div>
 
         <!-- Range slider container -->
@@ -277,12 +297,11 @@
                   <img class="mx-1 w-[15px] h-[16px]" src="{{ asset('images/Vector (3).svg') }}"
                                         alt="">
             </span>
-            <span id="maxPriceLabel" class="flex">{{__('messages.to')}}: {{ request('max_price', 1000) }}
+            <span id="maxPriceLabel" class="flex">{{__('messages.to')}}: {{ request('max_price', 100000) }}
                   <img class="mx-1 w-[15px] h-[16px]" src="{{ asset('images/Vector (3).svg') }}"
                                         alt="">
             </span>
         </div>
-
         <div class="relative flex items-center gap-2">
             <input type="range" min="0" max="1000" step="10" 
                 id="minRange" name="min_price"
@@ -312,7 +331,7 @@
 
     function clearPriceFilter() {
         document.getElementById('minRange').value = 0;
-        document.getElementById('maxRange').value = 1000;
+        document.getElementById('maxRange').value = 100000;
         updateRangeLabels();
         document.getElementById('filterForm').submit();
     }
@@ -478,52 +497,22 @@
 </script>
         <main class="w-full lg:w-3/4">
             <div class="flex justify-between items-center mb-6">
-                <p class="text-sm text-gray-500" id="breadcrumbs">
+                <p class="inline-flex flex-row text-[14px] px-[16px] pt-[10px] rounded-[12px] text-white bg-[#185D31] h-[40px]" id="breadcrumbs">
                     <a href="{{ route('home') }}" class="hover:underline">{{ __('messages.home') }}</a>
-                    <span class="mx-1">&gt;</span>
+                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4 mx-1 mt-1">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+</svg>
                     @if ($currentCategory)
                         <a href="#" class="hover:underline">{{ $currentCategory->name_ar }}</a>
-                        <span class="mx-1">&gt;</span>
-                    @endif
+                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4 mx-1 mt-1">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+</svg>                    @endif
 
                     @if ($currentSubCategory)
                         <a href="{{ route('products.index', ['sub_category_id' => $currentSubCategory->id]) }}"
                             class="hover:underline">{{ $currentSubCategory->name_ar }}</a>
                     @endif
-
-                    {{-- **IMPORTANT FIX FOR HTMLSPECIALCHARS ERROR:** --}}
-                    {{-- If you had any dynamic text displaying selected filters like: --}}
-                    {{-- <span class="mx-1">&gt;</span>
-                @if (request()->has('material') && !empty(request('material')))
-                    <span class="mx-1">Materials: {{ request('material') }}</span> // THIS IS THE PROBLEM LINE
-                @endif --}}
-                    {{-- The above line `{{ request('material') }}` would cause the error if material is an array. --}}
-                    {{-- To display selected materials (or any array filter), you need to implode them: --}}
-                    @if (!empty((array) request('material')))
-                        <span class="mx-1">&gt;</span>
-                        <span>{{ implode(', ', (array) request('material')) }}</span>
-                    @endif
-                    {{-- Apply the same logic for other array filters if you want them in breadcrumbs/summary --}}
-                    @if (!empty((array) request('description')))
-                        <span class="mx-1">&gt;</span>
-                        <span>{{ implode(', ', (array) request('description')) }}</span>
-                    @endif
-                    @if (!empty((array) request('color')))
-                        <span class="mx-1">&gt;</span>
-                        <span>{{ implode(', ', (array) request('color')) }}</span>
-                    @endif
-                    @if (!empty((array) request('size')))
-                        <span class="mx-1">&gt;</span>
-                        <span>{{ implode(', ', (array) request('size')) }}</span>
-                    @endif
-                    @if (!empty((array) request('gender')))
-                        <span class="mx-1">&gt;</span>
-                        <span>{{ implode(', ', (array) request('gender')) }}</span>
-                    @endif
-                    @if (!empty((array) request('delivery_option')))
-                        <span class="mx-1">&gt;</span>
-                        <span>{{ implode(', ', (array) request('delivery_option')) }}</span>
-                    @endif
+        
                 </p>
                 <div class="relative ">
                     <select name="sort_by" id="sort_by" form="filterForm"
@@ -627,7 +616,7 @@
                                             </p>
                                         </span>
                                     @else
-                                        <p class="text-[20px] text-[#212121] mb-3">{{ $product->supplier_name }}
+                                        <p class="text-[20px] text-[#212121] ">{{ $product->supplier_name }}
                                         </p>
                                     @endif
                                 </div>
@@ -640,8 +629,8 @@
                                     @if ($product->is_offer && $product->discount_percent)
                                         <span class="flex text-sm text-gray-400 line-through mr-2 mr-1">
                                             {{ number_format($product->price, 2) }}
-                                            <img class="mx-1 w-[20px] h-[21px]"
-                                                src="{{ asset('images/Vector (3).svg') }}" alt="">
+                                              <img class="mx-1 w-[14px] h-[14px] mt-1 inline-block"
+                                            src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}" alt="currency">
                                         </span>
                                     @endif
                                 </div>
@@ -671,7 +660,23 @@
             @endif
         </main>
     </div>
-
+{{-- Login Popup HTML --}}
+<div id="login-popup" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-96 max-w-sm mx-4">
+        <h2 class="text-2xl font-bold mb-4 text-gray-900">{{ __('messages.login_important') }}</h2>
+        <p class="mb-6 text-gray-700">{{ __('messages.login_important_for_fav') }}</p>
+        <div class="flex justify-end space-x-2 rtl:space-x-reverse">
+            <button id="close-login-popup"
+                class="bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors">
+                {{ __('messages.cancel') }}
+            </button>
+            <a href="{{ route('login') }}"
+                class="bg-[#185D31] text-white py-2 px-4 rounded-md hover:bg-[#154a2a] transition-colors">
+                {{ __('messages.login') }}
+            </a>
+        </div>
+    </div>
+</div>
     <script>
         // Function to clear a specific filter
         function clearFilter(filterName) {
@@ -855,5 +860,155 @@
         });
     });
 </script>
+  <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const offerSwiper = new Swiper('.offerSwiper', {
+                slidesPerView: 1,
+                spaceBetween: 24,
+                loop: true,
+                rtl: true,
+                autoplay: {
+                    delay: 3500,
+                    disableOnInteraction: false,
+                },
+                pagination: {
+                    el: '.offer-swiper-pagination',
+                    clickable: true,
+                },
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+                breakpoints: {
+                    640: {
+                        slidesPerView: 2,
+                        spaceBetween: 20,
+                    },
+                    768: {
+                        slidesPerView: 3,
+                        spaceBetween: 24,
+                    },
+                    1024: {
+                        slidesPerView: 4,
+                        spaceBetween: 24,
+                    }
+                },
+            });
 
+            function initializeInnerSwipers() {
+                document.querySelectorAll('.inner-swiper').forEach(swiperElement => {
+                    if (!swiperElement.swiper) {
+                        const imageSlides = swiperElement.querySelectorAll('.swiper-slide').length;
+                        if (imageSlides > 1) {
+                            new Swiper(swiperElement, {
+                                loop: true,
+                                autoplay: {
+                                    delay: 2500,
+                                    disableOnInteraction: false,
+                                },
+                                pagination: {
+                                    el: swiperElement.querySelector('.image-pagination'),
+                                    clickable: true,
+                                },
+                            });
+                        }
+                    }
+                });
+            }
+            initializeInnerSwipers();
+
+                 // --- Logic for Favorite Button and Login Popup ---
+
+        // Determine user authentication status from Laravel
+        const isUserLoggedIn = {{ Auth::check() ? 'true' : 'false' }};
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute(
+        'content'); // Get CSRF token once
+
+        const favoriteButtons = document.querySelectorAll('.favorite-button');
+        const loginPopup = document.getElementById('login-popup');
+        const closeLoginPopupBtn = document.getElementById('close-login-popup');
+
+        favoriteButtons.forEach(button => {
+            button.addEventListener('click', function(event) {
+                if (!isUserLoggedIn) {
+                    event
+                .preventDefault(); // Prevent default action (e.g., potential form submission or link follow)
+                    loginPopup.classList.remove('hidden'); // Show the popup
+                } else {
+                    // User is logged in, proceed with favorite toggling logic
+                    const productId = this.dataset.productId;
+                    console.log('User is logged in. Toggling favorite for product ID:',
+                        productId);
+
+                    // AJAX CALL to toggle favorite status
+                    fetch(`/products/${productId}/toggle-favorite`, { // Adjust this API endpoint to match your Laravel route
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json', // Important for Laravel to return JSON
+                                'X-CSRF-TOKEN': csrfToken // Laravel CSRF token
+                            },
+                            body: JSON.stringify({
+                                product_id: productId
+                            })
+                        })
+                        .then(response => {
+                            // Handle unauthenticated case (e.g., session expired)
+                            if (response.status === 401) {
+                                window.location.href = '/login'; // Redirect to login page
+                                return Promise.reject(
+                                'Unauthenticated'); // Stop promise chain
+                            }
+                            if (!response.ok) {
+                                // If response is not OK (e.g., 500 Internal Server Error, 403 Forbidden)
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json(); // Parse response as JSON
+                        })
+                        .then(data => {
+                            console.log(data
+                            .message); // Log success or failure message from backend
+                            // Update the heart icon visually based on the 'is_favorited' status from the response
+                            const svg = this.querySelector('svg');
+                            if (data
+                                .is_favorited) { // If the backend says it's now favorited
+                                svg.setAttribute('fill', 'currentColor'); // Fill the heart
+                                svg.classList.add('text-red-500'); // Make it red
+                                svg.classList.remove(
+                                'text-gray-500'); // Remove gray if present
+                            } else { // If the backend says it's no longer favorited
+                                svg.setAttribute('fill', 'none'); // Unfill the heart
+                                svg.classList.remove('text-red-500'); // Remove red
+                                svg.classList.add(
+                                'text-gray-500'); // Make it gray (unfilled color)
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error toggling favorite:', error);
+                            // Optionally, revert the UI state or show an error message to the user
+                        });
+                }
+            });
+        });
+
+        // Close popup when clicking the close button
+        if (closeLoginPopupBtn) {
+            closeLoginPopupBtn.addEventListener('click', function() {
+                loginPopup.classList.add('hidden');
+            });
+        }
+
+        // Close popup when clicking outside of it
+        if (loginPopup) {
+            loginPopup.addEventListener('click', function(event) {
+                if (event.target === loginPopup) { // Check if the click was directly on the overlay
+                    loginPopup.classList.add('hidden');
+                }
+            });
+        }
+    
+        });
+
+        
+    </script>
 @endsection
