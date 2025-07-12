@@ -16,6 +16,7 @@ use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ClothingController;
+use App\Http\Controllers\ReviewController;
 use App\Models\Product; // Ensure this is used if you uncomment product.show later
 use Illuminate\Http\Request;
 
@@ -140,5 +141,13 @@ Route::middleware('web')->group(function () {
 
     Route::get('/clothings', [ClothingController::class, 'index'])->name('clothings');
     
+   Route::post('/reviews/{review}/like', [ReviewController::class, 'toggleLike'])->name('reviews.like')->middleware('auth');
+
+   Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store')->middleware('auth');
+
+   Route::resource('reviews', ReviewController::class)->only(['edit','destroy']);
+
+   Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
+
 
 }); 

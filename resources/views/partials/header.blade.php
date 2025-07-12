@@ -6,10 +6,10 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/alpinejs" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-<style>
+{{-- <style>
     .category-button {
         display: inline;
-        padding: 8px 10px;
+        padding: 8px 21px;
         background-color: #EDEDED;
         color: #212121;
         border-radius: 12px;
@@ -27,7 +27,7 @@
         background-color: #185D31;
         color: white;
     }
-</style>
+</style> --}}
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 <script src="//unpkg.com/alpinejs" defer></script>
 <script>
@@ -402,7 +402,7 @@
 
     .category-button,
     #mainDropdownButton {
-        padding: 8px 21.5px;
+        /* padding: 8px 21.5px; */
         background-color: #EDEDED;
         color: #212121;
         border-radius: 12px;
@@ -1395,13 +1395,13 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
     <div class="relative inline-block ml-1 gap-1 w-full md:w-auto" x-data="{ mainDropdownOpen: false }"
         @click.outside="mainDropdownOpen = false">
         <a id="mainDropdownButton" @click="mainDropdownOpen = !mainDropdownOpen"
-            class="justify-between flex items-center rtl:ml-1 ltr:mr-1 cursor-pointer">
+            class="justify-between px-[21.5px] py-[8px] flex items-center rtl:ml-1 ltr:mr-1 cursor-pointer">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
                 </path>
             </svg>
-            <span class="dropdown-text">{{ __('messages.All') }}</span>
+            <span class="dropdown-text ">{{ __('messages.All') }}</span>
         </a>
 
         <div id="mainDropdownMenu" x-show="mainDropdownOpen" x-transition.origin.top-left x-cloak
@@ -1473,10 +1473,10 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
 
     </div>
 
-<div class="individualCategories flex flex-wrap gap-2 sm:gap-3 w-full justify-start">
+<div class="individualCategories flex flex-wrap gap-2  w-full justify-start">
     @foreach ($categories as $category)
         <a href="{{ route('products.filterByCategory', $category->slug) }}"
-            class="category-button {{ isset($selectedCategory) && $selectedCategory->slug === $category->slug ? 'active' : '' }}">
+            class="category-button rtl:px-[21.5px] py-[8px] ltr:px-[17px]  {{ isset($selectedCategory) && $selectedCategory->slug === $category->slug ? 'active' : '' }}">
             {{ $category->name }}
         </a>
     @endforeach

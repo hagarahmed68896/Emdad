@@ -238,10 +238,10 @@ class ProductSeeder extends Seeder
             'model_number' => 'IPHONE15PMAX',
             'quality' => 'Premium',
             'specifications' => [
-                    'colors' => [ // This is an array of objects
+            'colors' => [ 
                                 ['name' => 'Blue Titanium', 'swatch_image' => 'storage/products/28442cd2d8b4be75c0b3aa5caada440028925cd0.png'],
-        ['name' => 'Brown Titanium', 'swatch_image' => 'storage/products/Apple-iPhone-15-Pro-Max-256GB-Natural-Titanium-1.webp'],
-        ['name' => 'Gold Titanium', 'swatch_image' => 'storage/products/Iphone 15 Pro Natural Titanium 256Gb (2)-600x600.jpg'],
+                                ['name' => 'Brown Titanium', 'swatch_image' => 'storage/products/Apple-iPhone-15-Pro-Max-256GB-Natural-Titanium-1.webp'],
+                                ['name' => 'Gold Titanium', 'swatch_image' => 'storage/products/Iphone 15 Pro Natural Titanium 256Gb (2)-600x600.jpg'],
     ],
                 'storage_gb' => [128, 256, 512, 1024],
                 'processor' => 'A17 Bionic',
@@ -279,7 +279,7 @@ class ProductSeeder extends Seeder
             'estimated_delivery_days' => 5,
             'is_main_featured' => false,
             'model_number' => 'TSHIRT-POLO-002',
-            'quality' => 'High',
+            'quality' => 'جودة عالية',
             'specifications' => [
                 'colors' => ['Black', 'White', 'Gray'],
                 'size' => ['M', 'L', 'XL'],

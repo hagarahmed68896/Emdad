@@ -80,6 +80,17 @@ public function getLastNameAttribute()
     {
         return $this->hasMany(Favorite::class);
     }
+    public function reviews()
+{
+    return $this->hasMany(Review::class);
+}
+
+public function likedReviews()
+{
+    return $this->belongsToMany(Review::class, 'review_likes')->withTimestamps();
+}
+
+
 
     /**
      * Check if a product is favorited by the user.
