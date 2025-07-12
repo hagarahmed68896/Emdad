@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class ReviewController extends Controller
 {
-    public function toggleLike(Review $review)
+public function toggleLike(Review $review)
 {
     $user = \Illuminate\Support\Facades\Auth::user();
 
@@ -20,12 +20,21 @@ class ReviewController extends Controller
 
     if ($like->exists()) {
         $like->delete();
-        return response()->json(['liked' => false]);
+        $liked = false;
     } else {
         $review->likes()->create(['user_id' => $user->id]);
-        return response()->json(['liked' => true]);
+        $liked = true;
     }
+
+    // ✅ Always include updated count:
+    $count = $review->likes()->count();
+
+    return response()->json([
+        'liked' => $liked,
+        'count' => $count
+    ]);
 }
+
 
 public function store(Request $request)
 {

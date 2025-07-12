@@ -786,7 +786,7 @@ if (
             params.delete('sortBy');
         }
         window.location.search = params.toString();
-    }
+    },  visible: 3,
 }">
     @php
         $filteredReviews = $product->reviews()
@@ -884,8 +884,21 @@ if (
                 count: {{ $review->likes->count() }} 
             }"> 
                 @auth 
-                    <form method="POST" action="{{ route('reviews.like', $review) }}" 
-                        @submit.prevent=""> 
+                 <form x-data @submit.prevent="
+    fetch('{{ route('reviews.like', $review) }}', {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    }).then(response => response.json())
+    .then(data => {
+        liked = data.liked;
+        count = data.count;
+    });
+">
+
                         <button type="submit" 
                             class="flex items-center text-sm rounded-[12px] border px-[16px] py-[10px] border-[#185D31] text-[#185D31] transition"> 
                             <template x-if="liked"> 
@@ -930,13 +943,14 @@ if (
             <p class="text-[#696969] text-[24px] font-semibold">{{ __('messages.no_review') }}</p> 
         </div> 
     @endforelse 
-    @if ($filteredReviews->count() > 3) 
-        <button 
-            class="mt-4 text-[#185D31] font-semibold hover:underline" 
-            @click="visible = {{ $filteredReviews->count() }}"> 
-            تحميل المزيد 
-        </button> 
-    @endif 
+@if ($filteredReviews->count() > 3)
+    <button 
+        class="mt-4 text-[#185D31] font-semibold hover:underline"
+        @click="visible = visible + 3">
+        تحميل المزيد
+    </button>
+@endif
+
             </div>
 
         </div>
@@ -945,8 +959,6 @@ if (
 
     </div>
 @endsection
-
-
 
 
 
