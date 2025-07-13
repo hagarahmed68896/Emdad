@@ -44,8 +44,6 @@ class ProductSeeder extends Seeder
             'supplier_name' => 'Fashion Supplier',
             'supplier_confirmed' => true,
             'min_order_quantity' => 3,
-            'rating' => 4.0,
-            'reviews_count' => 50,
             'price_tiers' => [ // Pass as array, Laravel accessor handles
                 ['min_qty' => 3, 'max_qty' => 10, 'price' => 280.00],
                 ['min_qty' => 11, 'price' => 260.00],
@@ -451,6 +449,173 @@ class ProductSeeder extends Seeder
             ],
             'is_featured' => true,
         ]);
+
+          // --- Hand pack ---
+            Product::firstOrCreate(['slug' => 'حقيبة-يد'], [
+            'name' => 'حقيبة يد',
+            'slug' => 'حقيبة-يد',
+            'description' => 'لوريم إيبسوم دولور سيت آميت، كونسيكتيتور أديبيسينغ إيليت. فيفيرا كونديمنتوم إيجيت بوروس إن. كونسيكتيتور إيجيت إيد موربي آميت آميت، إن. إبسوم فيفيرا بريتيوم تيلوس نيكوي. أولامكوربر سوسبنديسي آنيان ليو فاريترا إن سيت سمبر إت. آميت كوام بليسيرات سيم.',
+            'price' => 100.00,
+            'image' => 'storage/products/91a8a258e3d7b69ebf5633a0a8b97654e0c6a4e2 (5).png',
+            'images' => [
+                'storage/products/91a8a258e3d7b69ebf5633a0a8b97654e0c6a4e2 (7).png',
+                'storage/products/91a8a258e3d7b69ebf5633a0a8b97654e0c6a4e2.png',
+                'storage/products/91a8a258e3d7b69ebf5633a0a8b97654e0c6a4e2 (8).png',
+
+            ],
+            'sub_category_id' => $bagsSubCategory->id,
+            'is_offer' => true,
+            'discount_percent' => 15,
+            'offer_expires_at' => now()->addDays(10),
+            'supplier_name' => 'Bag World',
+            'supplier_confirmed' => false,
+            'min_order_quantity' => 1,
+            'price_tiers' => [
+                ['min_qty' => 1, 'max_qty' => 5, 'price' => 100.00],
+                ['min_qty' => 6, 'price' => 90.00],
+            ],
+            'shipping_cost' => 8.00,
+            'estimated_delivery_days' => 5,
+            'is_main_featured' => false,
+            'model_number' => 'HP-BW-001',
+            'quality' => 'جودة عالية',
+            'specifications' => [
+                              'colors' => [ 
+                                ['name' => 'اسود', 'swatch_image' => 'storage/products/91a8a258e3d7b69ebf5633a0a8b97654e0c6a4e2 (8).png'],
+                                ['name' => 'اخضر', 'swatch_image' => 'storage/products/91a8a258e3d7b69ebf5633a0a8b97654e0c6a4e2 (5).png'],
+                                ['name' => 'رمادي', 'swatch_image' => 'storage/products/91a8a258e3d7b69ebf5633a0a8b97654e0c6a4e2 (7).png'],
+    ],
+        
+                'material' => 'جلد',
+                'features' => ['الجلد المتين سهل التنظيف لذا يمكنك الحفاظ على مظهرك منتعشًا.','فتحة رئيسية بسحاب ملتف للإغلاق']
+            ],
+            'is_featured' => 1,
+        ]);
+
+            Product::firstOrCreate(['slug' => 'حقيبة-يد'], [
+            'name' => 'حقيبة يد',
+            'slug' => 'مشجر-حقيبة-يد',
+            'description' => 'لوريم إيبسوم دولور سيت آميت، كونسيكتيتور أديبيسينغ إيليت. فيفيرا كونديمنتوم إيجيت بوروس إن. كونسيكتيتور إيجيت إيد موربي آميت آميت، إن. إبسوم فيفيرا بريتيوم تيلوس نيكوي. أولامكوربر سوسبنديسي آنيان ليو فاريترا إن سيت سمبر إت. آميت كوام بليسيرات سيم.',
+            'price' => 100.00,
+            'image' => 'storage/products/a26c52e3af30a75b8b830f853450090771a7e166.png',
+    
+            'sub_category_id' => $bagsSubCategory->id,
+         
+            'offer_expires_at' => now()->addDays(10),
+            'supplier_name' => 'Bag World',
+            'supplier_confirmed' => false,
+            'min_order_quantity' => 1,
+            'price_tiers' => [
+                ['min_qty' => 1, 'max_qty' => 5, 'price' => 100.00],
+                ['min_qty' => 6, 'price' => 90.00],
+            ],
+            'shipping_cost' => 8.00,
+            'estimated_delivery_days' => 5,
+            'is_main_featured' => false,
+            'model_number' => 'HP-BW-002',
+            'quality' => 'جودة عالية',
+            'specifications' => [
+                'colors' => [
+                ['name' => 'مشجر', 'swatch_image' => 'storage/products/a26c52e3af30a75b8b830f853450090771a7e166.png'],
+                ],
+                'material' => 'جلد',
+                'features' => ['الجلد المتين سهل التنظيف لذا يمكنك الحفاظ على مظهرك منتعشًا.','فتحة رئيسية بسحاب ملتف للإغلاق']
+            ],
+            'is_featured' => 1,
+        ]);
+
+             Product::firstOrCreate(['slug' => 'حقيبة-يد'], [
+            'name' => 'حقيبة يد',
+            'slug' => 'ابيض-حقيبة-يد',
+            'description' => 'لوريم إيبسوم دولور سيت آميت، كونسيكتيتور أديبيسينغ إيليت. فيفيرا كونديمنتوم إيجيت بوروس إن. كونسيكتيتور إيجيت إيد موربي آميت آميت، إن. إبسوم فيفيرا بريتيوم تيلوس نيكوي. أولامكوربر سوسبنديسي آنيان ليو فاريترا إن سيت سمبر إت. آميت كوام بليسيرات سيم.',
+            'price' => 100.00,
+            'image' => 'storage/products/1534653e79403121848ed67b371d836fd86a3ec4.png',
+    
+            'sub_category_id' => $bagsSubCategory->id,
+         
+            'offer_expires_at' => now()->addDays(10),
+            'supplier_name' => 'Bag World',
+            'supplier_confirmed' => false,
+            'min_order_quantity' => 1,
+            'price_tiers' => [
+                ['min_qty' => 1, 'max_qty' => 5, 'price' => 100.00],
+                ['min_qty' => 6, 'price' => 90.00],
+            ],
+            'shipping_cost' => 8.00,
+            'estimated_delivery_days' => 5,
+            'is_main_featured' => false,
+            'model_number' => 'HP-BW-002',
+            'quality' => 'جودة عالية',
+            'specifications' => [
+           'colors' => [
+                ['name' => 'ابيض', 'swatch_image' => 'storage/products/a26c52e3af30a75b8b830f853450090771a7e166.png'],
+                ],
+                'material' => 'جلد',
+                'features' => ['الجلد المتين سهل التنظيف لذا يمكنك الحفاظ على مظهرك منتعشًا.','فتحة رئيسية بسحاب ملتف للإغلاق']
+            ],
+            'is_featured' => 1,
+        ]);  
+        
+            Product::firstOrCreate(['slug' => 'حقيبة-يد'], [
+            'name' => 'حقيبة يد',
+            'slug' => 'كبيره-حقيبة-يد',
+            'description' => 'لوريم إيبسوم دولور سيت آميت، كونسيكتيتور أديبيسينغ إيليت. فيفيرا كونديمنتوم إيجيت بوروس إن. كونسيكتيتور إيجيت إيد موربي آميت آميت، إن. إبسوم فيفيرا بريتيوم تيلوس نيكوي. أولامكوربر سوسبنديسي آنيان ليو فاريترا إن سيت سمبر إت. آميت كوام بليسيرات سيم.',
+            'price' => 90.00,
+            'image' => 'storage/products/1534653e79403121848ed67b371d836fd86a3ec4.png',
+    
+            'sub_category_id' => $bagsSubCategory->id,
+         
+            'offer_expires_at' => now()->addDays(10),
+            'supplier_name' => 'Bag World',
+            'supplier_confirmed' => false,
+            'min_order_quantity' => 1,
+            'price_tiers' => [
+                ['min_qty' => 1, 'max_qty' => 5, 'price' => 90.00],
+                ['min_qty' => 6, 'price' => 85.00],
+            ],
+            'shipping_cost' => 8.00,
+            'estimated_delivery_days' => 5,
+            'is_main_featured' => false,
+            'model_number' => 'HP-BW-002',
+            'quality' => 'جودة عالية',
+            'specifications' => [
+        
+                'material' => 'جلد',
+                'features' => ['الجلد المتين سهل التنظيف لذا يمكنك الحفاظ على مظهرك منتعشًا.','فتحة رئيسية بسحاب ملتف للإغلاق']
+            ],
+            'is_featured' => 1,
+        ]);   
+                  Product::firstOrCreate(['slug' => 'حقيبة-يد'], [
+            'name' => 'حقيبة يد',
+            'slug' => 'ابيض-حقيبة-يد',
+            'description' => 'لوريم إيبسوم دولور سيت آميت، كونسيكتيتور أديبيسينغ إيليت. فيفيرا كونديمنتوم إيجيت بوروس إن. كونسيكتيتور إيجيت إيد موربي آميت آميت، إن. إبسوم فيفيرا بريتيوم تيلوس نيكوي. أولامكوربر سوسبنديسي آنيان ليو فاريترا إن سيت سمبر إت. آميت كوام بليسيرات سيم.',
+            'price' => 120.00,
+            'image' => 'storage/products/1534653e79403121848ed67b371d836fd86a3ec4.png',
+    
+            'sub_category_id' => $bagsSubCategory->id,
+         
+            'offer_expires_at' => now()->addDays(10),
+            'supplier_name' => 'Bag World',
+            'supplier_confirmed' => false,
+            'min_order_quantity' => 1,
+            'price_tiers' => [
+                ['min_qty' => 1, 'max_qty' => 5, 'price' => 120.00],
+                ['min_qty' => 6, 'price' => 115.00],
+            ],
+            'shipping_cost' => 8.00,
+            'estimated_delivery_days' => 5,
+            'is_main_featured' => false,
+            'model_number' => 'HP-BW-002',
+            'quality' => 'جودة عالية',
+            'specifications' => [
+           'colors' => [
+                ['name' => 'زيتي', 'swatch_image' => 'storage/products/9479a8a57abb9695fb325426f565c74c20e9bf43.png'],
+                ],
+                'material' => 'جلد',
+                'features' => ['الجلد المتين سهل التنظيف لذا يمكنك الحفاظ على مظهرك منتعشًا.','فتحة رئيسية بسحاب ملتف للإغلاق']
+            ],
+            'is_featured' => 1,
+        ]);   
 
         $this->command->info('Products seeded successfully!');
     }
