@@ -58,8 +58,6 @@ class ProductSeeder extends Seeder
                 'size' => ['L'],       // Moved from top-level
                 'gender' => 'رجالي',   // Moved from top-level
                 'material' => 'قطن',   // Moved from top-level
-                'neck_type' => 'Crew Neck',
-                'sleeve_length' => 'Short',
             ],
             'is_featured' => 1,
         ]);
@@ -283,7 +281,6 @@ class ProductSeeder extends Seeder
                 'size' => ['M', 'L', 'XL'],
                 'gender' => 'رجالي',
                 'material' => 'بوليستر',
-                'neck_type' => 'Polo Collar',
             ],
             'is_featured' => 1,
         ]);
@@ -358,7 +355,6 @@ class ProductSeeder extends Seeder
                 'size' => ['S', 'M', 'L'],
                 'gender' => 'نسائي',
                 'material' => 'قطن',
-                'fabric_type' => 'Breathable',
             ],
             'is_featured' => 1,
         ]);
@@ -397,7 +393,6 @@ class ProductSeeder extends Seeder
                 'size' => ['S', 'M', 'L', 'XL'],
                 'material' => 'قطن',
                 'gender' => 'رجالي',
-                'fit_type' => 'Regular',
             ],
             'is_featured' => 1,
         ]);
@@ -481,18 +476,17 @@ class ProductSeeder extends Seeder
             'quality' => 'جودة عالية',
             'specifications' => [
                               'colors' => [ 
-                                ['name' => 'اسود', 'swatch_image' => 'storage/products/91a8a258e3d7b69ebf5633a0a8b97654e0c6a4e2 (8).png'],
-                                ['name' => 'اخضر', 'swatch_image' => 'storage/products/91a8a258e3d7b69ebf5633a0a8b97654e0c6a4e2 (5).png'],
-                                ['name' => 'رمادي', 'swatch_image' => 'storage/products/91a8a258e3d7b69ebf5633a0a8b97654e0c6a4e2 (7).png'],
-    ],
-        
+                                ['name' => 'اسود', 'swatch_image' => 'storage/products/91a8a258e3d7b69ebf5633a0a8b97654e0c6a4e2 (8).png', 'price' => 100.00],
+                                ['name' => 'اخضر', 'swatch_image' => 'storage/products/91a8a258e3d7b69ebf5633a0a8b97654e0c6a4e2 (5).png', 'price' => 100.00],
+                                ['name' => 'رمادي', 'swatch_image' => 'storage/products/91a8a258e3d7b69ebf5633a0a8b97654e0c6a4e2 (7).png', 'price' => 100.00],
+                                ],
                 'material' => 'جلد',
                 'features' => ['الجلد المتين سهل التنظيف لذا يمكنك الحفاظ على مظهرك منتعشًا.','فتحة رئيسية بسحاب ملتف للإغلاق']
             ],
             'is_featured' => 1,
         ]);
 
-            Product::firstOrCreate(['slug' => 'حقيبة-يد'], [
+            Product::firstOrCreate(['slug' => 'مشجر-حقيبة-يد'], [
             'name' => 'حقيبة يد',
             'slug' => 'مشجر-حقيبة-يد',
             'description' => 'لوريم إيبسوم دولور سيت آميت، كونسيكتيتور أديبيسينغ إيليت. فيفيرا كونديمنتوم إيجيت بوروس إن. كونسيكتيتور إيجيت إيد موربي آميت آميت، إن. إبسوم فيفيرا بريتيوم تيلوس نيكوي. أولامكوربر سوسبنديسي آنيان ليو فاريترا إن سيت سمبر إت. آميت كوام بليسيرات سيم.',
@@ -524,7 +518,7 @@ class ProductSeeder extends Seeder
             'is_featured' => 1,
         ]);
 
-             Product::firstOrCreate(['slug' => 'حقيبة-يد'], [
+             Product::firstOrCreate(['slug' => 'ابيض-حقيبة-يد'], [
             'name' => 'حقيبة يد',
             'slug' => 'ابيض-حقيبة-يد',
             'description' => 'لوريم إيبسوم دولور سيت آميت، كونسيكتيتور أديبيسينغ إيليت. فيفيرا كونديمنتوم إيجيت بوروس إن. كونسيكتيتور إيجيت إيد موربي آميت آميت، إن. إبسوم فيفيرا بريتيوم تيلوس نيكوي. أولامكوربر سوسبنديسي آنيان ليو فاريترا إن سيت سمبر إت. آميت كوام بليسيرات سيم.',
@@ -556,12 +550,12 @@ class ProductSeeder extends Seeder
             'is_featured' => 1,
         ]);  
         
-            Product::firstOrCreate(['slug' => 'حقيبة-يد'], [
+            Product::firstOrCreate(['slug' => 'كبيره-حقيبة-يد'], [
             'name' => 'حقيبة يد',
             'slug' => 'كبيره-حقيبة-يد',
             'description' => 'لوريم إيبسوم دولور سيت آميت، كونسيكتيتور أديبيسينغ إيليت. فيفيرا كونديمنتوم إيجيت بوروس إن. كونسيكتيتور إيجيت إيد موربي آميت آميت، إن. إبسوم فيفيرا بريتيوم تيلوس نيكوي. أولامكوربر سوسبنديسي آنيان ليو فاريترا إن سيت سمبر إت. آميت كوام بليسيرات سيم.',
             'price' => 90.00,
-            'image' => 'storage/products/1534653e79403121848ed67b371d836fd86a3ec4.png',
+            'image' => 'storage/products/9479a8a57abb9695fb325426f565c74c20e9bf43.png',
     
             'sub_category_id' => $bagsSubCategory->id,
          
@@ -585,37 +579,7 @@ class ProductSeeder extends Seeder
             ],
             'is_featured' => 1,
         ]);   
-                  Product::firstOrCreate(['slug' => 'حقيبة-يد'], [
-            'name' => 'حقيبة يد',
-            'slug' => 'ابيض-حقيبة-يد',
-            'description' => 'لوريم إيبسوم دولور سيت آميت، كونسيكتيتور أديبيسينغ إيليت. فيفيرا كونديمنتوم إيجيت بوروس إن. كونسيكتيتور إيجيت إيد موربي آميت آميت، إن. إبسوم فيفيرا بريتيوم تيلوس نيكوي. أولامكوربر سوسبنديسي آنيان ليو فاريترا إن سيت سمبر إت. آميت كوام بليسيرات سيم.',
-            'price' => 120.00,
-            'image' => 'storage/products/1534653e79403121848ed67b371d836fd86a3ec4.png',
-    
-            'sub_category_id' => $bagsSubCategory->id,
-         
-            'offer_expires_at' => now()->addDays(10),
-            'supplier_name' => 'Bag World',
-            'supplier_confirmed' => false,
-            'min_order_quantity' => 1,
-            'price_tiers' => [
-                ['min_qty' => 1, 'max_qty' => 5, 'price' => 120.00],
-                ['min_qty' => 6, 'price' => 115.00],
-            ],
-            'shipping_cost' => 8.00,
-            'estimated_delivery_days' => 5,
-            'is_main_featured' => false,
-            'model_number' => 'HP-BW-002',
-            'quality' => 'جودة عالية',
-            'specifications' => [
-           'colors' => [
-                ['name' => 'زيتي', 'swatch_image' => 'storage/products/9479a8a57abb9695fb325426f565c74c20e9bf43.png'],
-                ],
-                'material' => 'جلد',
-                'features' => ['الجلد المتين سهل التنظيف لذا يمكنك الحفاظ على مظهرك منتعشًا.','فتحة رئيسية بسحاب ملتف للإغلاق']
-            ],
-            'is_featured' => 1,
-        ]);   
+       
 
         $this->command->info('Products seeded successfully!');
     }

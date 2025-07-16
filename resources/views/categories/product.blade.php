@@ -1,9 +1,6 @@
 @extends('layouts.app')
-<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
-
-<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <style>
     /* Custom styles for color swatches */
     .color-swatch {
@@ -63,15 +60,15 @@
 </style>
 
 @section('content')
-    <div class="py-8 px-[64px] w-full lg:p-8 flex flex-col lg:flex-row gap-6">
+    <div class="py-8 mx-[64px]  flex flex-col lg:flex-row gap-6">
 
-    <aside
+<aside
     class="w-full lg:w-1/4 bg-white p-6 rounded-xl shadow-lg h-fit lg:sticky lg:top-8 sidebar-scroll overflow-y-auto max-h-[calc(100vh-64px)]">
     <div class="flex justify-between w-full mb-6 border-b pb-3">
         <h2 class="text-[24px] font-bold text-[#212121]">{{ __('messages.filters') }}</h2>
         <img src="{{ asset('images/interface-setting-slider-horizontal--adjustment-adjust-controls-fader-horizontal-settings-slider--Streamline-Core.svg') }}"
             alt="Filters Icon">
-    </div>
+    </div> 
 
     <form id="filterForm" method="GET" action="{{ route('products.index') }}">
         @if (request()->has('sub_category_id'))
@@ -84,6 +81,7 @@
                 class="w-full p-3 border border-gray-300 rounded-lg transition duration-200">
         </div>
 
+        {{-- Description filter (assuming it's still a separate top-level column) --}}
         <div class="mb-6 border-b pb-3">
             <div class="flex flex-col space-y-2">
                 @php $selectedDescriptions = (array) request('description'); @endphp
@@ -101,101 +99,80 @@
             </div>
         </div>
 
- <div class="mb-6 border-b pb-3">
-                <h3 class="text-lg font-semibold text-gray-800 mb-3">{{__('messages.colors')}}</h3>
-                <div class="grid grid-cols-6 gap-2">
-                    @php
-                        $colorHexMap = [
-                            'Red'       => '#FF0000',
-            'Blue'      => '#0000FF',
-            'Green'     => '#008000',
-            'Yellow'    => '#FFFF00',
-            'Orange'    => '#FFA500',
-            'Purple'    => '#800080',
-            'Black'     => '#000000',
-            'White'     => '#FFFFFF',
-            'Gray'      => '#808080',
-            'Brown'     => '#A52A2A',
-            'Pink'      => '#FFC0CB',
-            'Turquoise' => '#40E0D0',
-            'Navy'      => '#000080',
-            'Maroon'    => '#800000',
-            'Silver'    => '#C0C0C0',
-            'Gold'      => '#FFD700',
-            'Cyan'      => '#00FFFF',
-            'Magenta'   => '#FF00FF',
-            'Lime'      => '#00FF00',
-            'Teal'      => '#008080',
-            'Olive'     => '#808000',
-            'Nike Red'  => '#BB0000',
-            'Adidas Blue' => '#0050A0',
-                        ];
-                        $selectedColors = (array) request('color');
-                    @endphp
-                    @forelse($availableColors as $colorName)
-                        <label class="flex items-center justify-center">
-                            <input type="checkbox" name="color[]" value="{{ $colorName }}" class="hidden"
-                                {{ in_array($colorName, $selectedColors) ? 'checked' : '' }}>
-                            <div class="color-swatch {{ in_array($colorName, $selectedColors) ? 'selected' : '' }}  h-[37px] w-[37px]"
-                                style="background-color: {{ $colorHexMap[$colorName] ?? '#ccc' }}"
-                                title="{{ $colorName }}"></div>
-                        </label>
-                    @empty
-                        <p class="text-gray-500 text-sm col-span-6">No colors available.</p>
-                    @endforelse
+        {{-- Dynamic Specification Filters --}}
+        @php
+            // Make sure the colorHexMap is defined or passed from the controller if needed here.
+            // It's better to pass it from the controller to keep the Blade clean.
+            // For now, I'll assume it's available or define a minimal one if not.
+            $colorHexMap = $colorHexMap ?? [
+                'أحمر' => '#FF0000', 'أزرق' => '#0000FF', 'أخضر' => '#008000', 'أصفر' => '#FFFF00',
+                'أسود' => '#000000', 'أبيض' => '#FFFFFF', 'رمادي' => '#808080',
+                // Add all your colors here
+            ];
+            $filterableSpecsConfig = config('products.filterable_specifications', []);
+        @endphp
+
+        @foreach($filterableSpecsConfig as $specKey => $specConfig)
+            @php
+                $options = $availableSpecifications[$specKey] ?? [];
+                $selectedOptions = (array) request($specKey);
+            @endphp
+
+            @if (!empty($options))
+                <div class="mb-6 border-b pb-3">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">{{ __('messages.' . $specKey) }}</h3>
+
+                    @if ($specKey === 'colors')
+                        <div class="grid grid-cols-6 gap-2">
+                            @foreach($options as $colorOption)
+                                @php
+                                    // Use 'name' property for color and look up hex from map
+                                    $colorName = $colorOption['name'];
+                                    $swatchImage = $colorOption['swatch_image'] ?? null;
+                                    $backgroundColor = $colorHexMap[$colorName] ?? '#ccc';
+                                    $isSelected = in_array($colorName, $selectedOptions);
+                                @endphp
+                                <label class="flex items-center justify-center">
+                                    <input type="checkbox" name="{{ $specKey }}[]" value="{{ $colorName }}" class="hidden"
+                                        {{ $isSelected ? 'checked' : '' }}
+                                        onchange="document.getElementById('filterForm').submit()">
+                                    <div class="color-swatch {{ $isSelected ? 'selected' : '' }} h-[37px] w-[37px]"
+                                        style="background-color: {{ $backgroundColor }}; {{ $swatchImage ? 'background-image: url(' . asset($swatchImage) . '); background-size: cover; background-position: center;' : '' }}"
+                                        title="{{ $colorName }}">
+                                        {{-- You can display text for colors here if swatch image/color isn't enough --}}
+                                    </div>
+                                </label>
+                            @endforeach
+                        </div>
+                    @elseif ($specConfig['type'] === 'array_of_strings' || $specConfig['type'] === 'string')
+                        {{-- For size, gender, material, processor, ram, storage, graphics_card, screen_size, operating_system --}}
+                        <div class="{{ $specKey === 'size' ? 'grid grid-cols-4 gap-2' : 'flex flex-col space-y-2' }}">
+                            @foreach($options as $option)
+                                @php $isSelected = in_array($option, $selectedOptions); @endphp
+                                <label class="{{ $specKey === 'size' ? 'flex items-center justify-center' : 'inline-flex items-center' }}">
+                                    <input type="checkbox" name="{{ $specKey }}[]" value="{{ $option }}"
+                                        class="{{ $specKey === 'size' ? 'hidden' : 'form-checkbox h-[20px] w-[20px] rounded-[6px]  border-2 border-black focus:ring-[#185D31] accent-[#185D31]' }}"
+                                        {{ $isSelected ? 'checked' : '' }}
+                                        onchange="document.getElementById('filterForm').submit()">
+                                    @if ($specKey === 'size')
+                                        <div class="size-button w-[71px] bg-[#EDEDED] py-1 justify-center items-center text-center px-2 {{ $isSelected ? 'selected' : '' }}">
+                                            {{ $option }}
+                                        </div>
+                                    @else
+                                        <span class="rtl:mr-3 ltr:ml-3 text-[#212121] text-base">{{ $option }}</span>
+                                    @endif
+                                </label>
+                            @endforeach
+                        </div>
+                    @else
+                        {{-- Fallback for unexpected types --}}
+                        <p class="text-gray-500 text-sm">No options available for {{ $specKey }}.</p>
+                    @endif
                 </div>
+            @endif
+        @endforeach
 
-            </div>
-
-            <div class="mb-6 border-b pb-3">
-                <h3 class="text-lg font-bold text-gray-800 mb-3">{{__('messages.size')}}</h3>
-                <div class="grid grid-cols-4 gap-2">
-                    @php $selectedSizes = (array) request('size'); @endphp
-                    @forelse($availableSizes as $size)
-                        <label class="flex items-center justify-center">
-                            <input type="checkbox" name="size[]" value="{{ $size }}" class="hidden"
-                                {{ in_array($size, $selectedSizes) ? 'checked' : '' }}>
-                            <div class="size-button text-center w-[71px] h-[32px] bg-[#EDEDED] {{ in_array($size, $selectedSizes) ? 'selected' : '' }}">
-                                {{ $size }}
-                            </div>
-                        </label>
-                    @empty
-                        <p class="text-gray-500 text-sm col-span-4">No sizes available.</p>
-                    @endforelse
-                </div>
-            </div>
-        <div class="mb-6 border-b pb-3">
-            <h3 class="text-lg font-bold text-gray-800 mb-3">{{ __('messages.gender') }}</h3>
-            @php $selectedGenders = (array) request('gender'); @endphp
-            @forelse($availableGenders as $gender)
-                <label class="flex items-center mb-2 text-gray-700">
-                    <input type="checkbox" name="gender[]" value="{{ $gender }}"
-                        class="form-checkbox h-[20px] w-[20px] rounded-[6px] border-2 border-black focus:ring-[#185D31] accent-[#185D31]"
-                        {{ in_array($gender, $selectedGenders) ? 'checked' : '' }}
-                        onchange="document.getElementById('filterForm').submit()">
-                    <span class="rtl:mr-3 ltr:ml-3 text-[#212121] text-base">{{ $gender }}</span>
-                </label>
-            @empty
-                <p class="text-gray-500 text-sm">No genders available.</p>
-            @endforelse
-        </div>
-
-        <div class="mb-6 border-b pb-3">
-            <h3 class="text-lg font-bold text-gray-800 mb-3">{{ __('messages.material') }}</h3>
-            @php $selectedMaterials = (array) request('material'); @endphp
-            @forelse($availableMaterials as $material)
-                <label class="flex items-center mb-2 text-gray-700">
-                    <input type="checkbox" name="material[]" value="{{ $material }}"
-                        class="form-checkbox h-[20px] w-[20px] rounded-[6px] border-2 border-black focus:ring-[#185D31] accent-[#185D31]"
-                        {{ in_array($material, $selectedMaterials) ? 'checked' : '' }}
-                        onchange="document.getElementById('filterForm').submit()">
-                    <span class="rtl:mr-3 ltr:ml-3 text-[#212121] text-base">{{ $material }}</span>
-                </label>
-            @empty
-                <p class="text-gray-500 text-sm">No materials available.</p>
-            @endforelse
-        </div>
-
+        {{-- Rating --}}
         <div class="mb-6 border-b pb-3">
             <h3 class="text-lg font-bold text-[20px] text-black mb-3">{{ __('messages.rating') }}</h3>
             @php
@@ -217,7 +194,7 @@
             @endforeach
         </div>
 
-        {{-- NEW FILTER: Trusted Factory --}}
+        {{-- Trusted Factory --}}
         <div class="mb-6 border-b pb-3">
             <h3 class="text-lg font-bold text-gray-800 mb-3"> {{__('messages.suppliers_featured')}} </h3>
             <label class="flex items-center mb-2 text-gray-700">
@@ -225,129 +202,123 @@
                     class="form-checkbox h-[20px] w-[20px] rounded-[6px] border-2 border-black focus:ring-[#185D31] accent-[#185D31]"
                     {{ request('supplier_confirmed') == '1' ? 'checked' : '' }}
                     onchange="document.getElementById('filterForm').submit()">
-                     <img class="ltr:ml-3 rtl:mr-3 w-[20px] h-[20px]"
-                                                src="{{ asset('images/Success.svg') }}" alt="Confirmed Supplier">
+                   <img class="ltr:ml-3 rtl:mr-3 w-[20px] h-[20px]"
+                                src="{{ asset('images/Success.svg') }}" alt="Confirmed Supplier">
                 <span class="rtl:mr-1 ltr:ml-1">{{ __('messages.supplier_confirmed') }}</span>
             </label>
         </div>
 
-<div class="mb-6 border-b pb-3">
-    <h3 class="text-lg font-bold text-gray-800 mb-3">{{ __('messages.delivery') }}</h3>
-    <p class="text-sm text-gray-600 mb-3">{{ __('messages.unit_price_depends_on_delivery_date') }}</p>
+        {{-- Delivery Options --}}
+        <div class="mb-6 border-b pb-3">
+            <h3 class="text-lg font-bold text-gray-800 mb-3">{{ __('messages.delivery') }}</h3>
+            <p class="text-sm text-gray-600 mb-3">{{ __('messages.unit_price_depends_on_delivery_date') }}</p>
 
-    @php
-        $selectedDeliveryDate = request('delivery_date'); 
-    @endphp
+            @php $selectedDeliveryDate = request('delivery_date'); @endphp
 
-  @foreach ($deliveryOptions as $dateValue => $optionData)
-    <label class="flex items-center mb-2 text-gray-700">
-        <input type="radio" name="delivery_date" value="{{ $dateValue }}"
-            class="form-radio h-[20px] w-[20px] rounded-full border-2 border-black focus:ring-[#185D31] accent-[#185D31]"
-            {{ $selectedDeliveryDate == $dateValue ? 'checked' : '' }}
-            onchange="document.getElementById('filterForm').submit()">
-        <span class="rtl:mr-3 ltr:ml-3">
-            {{-- Corrected line: Changed $option to $optionData --}}
-            {{ __('messages.' . $optionData['label_key'], ['days' => $optionData['days_param']]) }}
-        </span>
-    </label>
-@endforeach
-</div>
-
-        <!-- Range slider container -->
-<style>
-    input[type="range"]::-webkit-slider-thumb {
-        background-color: #185D31; /* Blue-500 */
-        border: none;
-        border-radius: 50%;
-        width: 16px;
-        height: 16px;
-        cursor: pointer;
-        -webkit-appearance: none;
-        margin-top: -6px;
-    }
-
-    input[type="range"]::-moz-range-thumb {
-        background-color: #185D31; /* Blue-500 */
-        border: none;
-        border-radius: 50%;
-        width: 16px;
-        height: 16px;
-        cursor: pointer;
-    }
-
-    input[type="range"]::-webkit-slider-runnable-track {
-        height: 4px;
-        background: #cbd5e1; /* slate-300 */
-        border-radius: 2px;
-    }
-
-    input[type="range"]::-moz-range-track {
-        height: 4px;
-        background: #cbd5e1;
-        border-radius: 2px;
-    }
-</style>
-
-<div class="mb-6 border-b pb-3">
-    <h3 class="text-lg font-bold text-gray-800 mb-3">{{ __('messages.price') }}</h3>
-
-    <div class="flex flex-col gap-2 mb-2">
-        <div class="flex justify-between text-sm text-gray-600">
-            <span id="minPriceLabel " class="flex">{{__('messages.from')}}: {{ request('min_price', 0) }}
-                  <img class="mx-1 w-[15px] h-[16px]" src="{{ asset('images/Vector (3).svg') }}"
-                                        alt="">
-            </span>
-            <span id="maxPriceLabel" class="flex">{{__('messages.to')}}: {{ request('max_price', 100000) }}
-                  <img class="mx-1 w-[15px] h-[16px]" src="{{ asset('images/Vector (3).svg') }}"
-                                        alt="">
-            </span>
+            @foreach ($deliveryOptions as $dateValue => $optionData)
+                <label class="flex items-center mb-2 text-gray-700">
+                    <input type="radio" name="delivery_date" value="{{ $dateValue }}"
+                        class="form-radio h-[20px] w-[20px] rounded-full border-2 border-black focus:ring-[#185D31] accent-[#185D31]"
+                        {{ $selectedDeliveryDate == $dateValue ? 'checked' : '' }}
+                        onchange="document.getElementById('filterForm').submit()">
+                    <span class="rtl:mr-3 ltr:ml-3">
+                        {{ __('messages.' . $optionData['label_key'], ['days' => $optionData['days_param']]) }}
+                    </span>
+                </label>
+            @endforeach
         </div>
-        <div class="relative flex items-center gap-2">
-            <input type="range" min="0" max="1000" step="10" 
-                id="minRange" name="min_price"
-                value="{{ request('min_price', 0) }}"
-                class="w-full appearance-none bg-transparent focus:outline-none"
-                oninput="updateRangeLabels()" 
-                onchange="document.getElementById('filterForm').submit()">
 
-            <input type="range" min="0" max="1000" step="10" 
-                id="maxRange" name="max_price"
-                value="{{ request('max_price', 1000) }}"
-                class="w-full appearance-none bg-transparent focus:outline-none"
-                oninput="updateRangeLabels()" 
-                onchange="document.getElementById('filterForm').submit()">
-        </div>
-    </div>
-</div>
+        {{-- Price Range Slider --}}
+        <style>
+            input[type="range"]::-webkit-slider-thumb {
+                background-color: #185D31; /* Blue-500 */
+                border: none;
+                border-radius: 50%;
+                width: 16px;
+                height: 16px;
+                cursor: pointer;
+                -webkit-appearance: none;
+                margin-top: -6px;
+            }
 
-<script>
-    function updateRangeLabels() {
-        const min = document.getElementById('minRange').value;
-        const max = document.getElementById('maxRange').value;
+            input[type="range"]::-moz-range-thumb {
+                background-color: #185D31; /* Blue-500 */
+                border: none;
+                border-radius: 50%;
+                width: 16px;
+                height: 16px;
+                cursor: pointer;
+            }
 
-        // document.getElementById('minPriceLabel').textContent = 'Min: ' + min;
-        // document.getElementById('maxPriceLabel').textContent = 'Max: ' + max;
-    }
+            input[type="range"]::-webkit-slider-runnable-track {
+                height: 4px;
+                background: #cbd5e1; /* slate-300 */
+                border-radius: 2px;
+            }
 
-    function clearPriceFilter() {
-        document.getElementById('minRange').value = 0;
-        document.getElementById('maxRange').value = 100000;
-        updateRangeLabels();
-        document.getElementById('filterForm').submit();
-    }
-
-    document.addEventListener('DOMContentLoaded', updateRangeLabels);
-</script>
-
-
+            input[type="range"]::-moz-range-track {
+                height: 4px;
+                background: #cbd5e1;
+                border-radius: 2px;
+            }
+        </style>
 
         <div class="mb-6 border-b pb-3">
+            <h3 class="text-lg font-bold text-gray-800 mb-3">{{ __('messages.price') }}</h3>
+
+            <div class="flex flex-col gap-2 mb-2">
+                <div class="flex justify-between text-sm text-gray-600">
+                    <span id="minPriceLabel" class="flex">{{__('messages.from')}}: {{ request('min_price', 0) }}
+                        <img class="mx-1 w-[15px] h-[16px]" src="{{ asset('images/Vector (3).svg') }}" alt="">
+                    </span>
+                    <span id="maxPriceLabel" class="flex">{{__('messages.to')}}: {{ request('max_price', 100000) }}
+                        <img class="mx-1 w-[15px] h-[16px]" src="{{ asset('images/Vector (3).svg') }}" alt="">
+                    </span>
+                </div>
+                <div class="relative flex items-center gap-2">
+                    <input type="range" min="0" max="1000" step="10"
+                        id="minRange" name="min_price"
+                        value="{{ request('min_price', 0) }}"
+                        class="w-full appearance-none bg-transparent focus:outline-none"
+                        oninput="updateRangeLabels()"
+                        onchange="document.getElementById('filterForm').submit()">
+
+                    <input type="range" min="0" max="1000" step="10"
+                        id="maxRange" name="max_price"
+                        value="{{ request('max_price', 1000) }}"
+                        class="w-full appearance-none bg-transparent focus:outline-none"
+                        oninput="updateRangeLabels()"
+                        onchange="document.getElementById('filterForm').submit()">
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function updateRangeLabels() {
+                const min = document.getElementById('minRange').value;
+                const max = document.getElementById('maxRange').value;
+                // Update your labels based on the selected range values
+                // document.getElementById('minPriceLabel').textContent = '{{__('messages.from')}}: ' + min;
+                // document.getElementById('maxPriceLabel').textContent = '{{__('messages.to')}}: ' + max;
+            }
+
+            function clearPriceFilter() {
+                document.getElementById('minRange').value = 0;
+                document.getElementById('maxRange').value = 100000;
+                updateRangeLabels();
+                document.getElementById('filterForm').submit();
+            }
+
+            document.addEventListener('DOMContentLoaded', updateRangeLabels);
+        </script>
+
+        {{-- Minimum Order Quantity --}}
+        <div class="mb-6 border-b pb-3">
             <h3 class="text-lg font-bold text-gray-800 mb-3">{{ __('messages.min_order_quantity') }}</h3>
-            <input type="number" name="min_order_quantity" placeholder="Min Qty"
+            <input type="number" name="min_order_quantity" 
                 value="{{ request('min_order_quantity') }}"
                 class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
                 onchange="document.getElementById('filterForm').submit()">
-
         </div>
 
         <div class="mb-6">
@@ -363,150 +334,19 @@
     </form>
 </aside>
 
-<style>
-    /* Custom styles for color and size swatches/buttons */
-    .color-swatch {
-        border: 2px solid #ccc;
-        border-radius: 50%; /* Make them circular */
-        cursor: pointer;
-        display: inline-block;
-        box-shadow: 0 0 0 2px transparent; /* Default shadow for selection */
-        transition: all 0.2s ease-in-out;
-    }
 
-    .color-swatch.selected {
-        border-color: #185D31; /* Highlight border for selected */
-        box-shadow: 0 0 0 2px #185D31; /* Stronger shadow for selection */
-    }
-
-    .color-swatch:hover {
-        opacity: 0.8;
-    }
-
-    .size-button {
-        padding: 8px 12px;
-        border: 1px solid #ccc;
-        border-radius: 8px; /* Slightly rounded corners for size buttons */
-        cursor: pointer;
-        transition: all 0.2s ease-in-out;
-        min-width: 40px; /* Ensure a minimum width */
-        min-height: 40px; /* Ensure a minimum height */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .size-button.selected {
-        background-color: #185D31;
-        color: white;
-        border-color: #185D31;
-    }
-
-    .size-button:hover {
-        background-color: #f0f0f0;
-    }
-
-    /* Style for the actual hidden checkboxes so they don't interfere visually */
-    input[type="checkbox"].hidden,
-    input[type="radio"].hidden {
-        position: absolute;
-        opacity: 0;
-        width: 0;
-        height: 0;
-        pointer-events: none;
-    }
-</style>
-
-<script>
-    // Function to clear a specific filter
-    function clearFilter(filterName) {
-        // If it's an array name (e.g., 'size[]', 'gender[]'), uncheck all checkboxes for it
-        if (filterName.endsWith('[]')) {
-            const checkboxes = document.querySelectorAll(`input[name="${filterName}"]`);
-            checkboxes.forEach(cb => cb.checked = false);
-        } else {
-            // For single input fields like min_order_quantity
-            const inputField = document.querySelector(`input[name="${filterName}"]`);
-            if (inputField) {
-                inputField.value = '';
-            }
-        }
-        document.getElementById('filterForm').submit();
-    }
-
-    // Function to clear price filters
-    function clearPriceFilter() {
-        document.querySelector('input[name="min_price"]').value = '';
-        document.querySelector('input[name="max_price"]').value = '';
-        document.getElementById('filterForm').submit();
-    }
-
-    // Function to reset all filters
-    function resetFilters() {
-        // Clear all text/number inputs
-        document.getElementById('search').value = '';
-        document.querySelector('input[name="min_price"]').value = '';
-        document.querySelector('input[name="max_price"]').value = '';
-        document.querySelector('input[name="min_order_quantity"]').value = '';
-
-        // Uncheck all checkboxes
-        document.querySelectorAll('#filterForm input[type="checkbox"]').forEach(checkbox => {
-            checkbox.checked = false;
-        });
-
-        // Uncheck all radio buttons
-        document.querySelectorAll('#filterForm input[type="radio"]').forEach(radio => {
-            radio.checked = false;
-        });
-
-        // Remove hidden sub_category_id if it exists (for full reset)
-        const subCategoryIdHiddenInput = document.querySelector('input[name="sub_category_id"]');
-        if (subCategoryIdHiddenInput) {
-            subCategoryIdHiddenInput.remove();
-        }
-
-        document.getElementById('filterForm').submit();
-    }
-
-    // Event listeners for price range inputs to auto-submit
-    document.addEventListener('DOMContentLoaded', function() {
-        const minPriceInput = document.querySelector('input[name="min_price"]');
-        const maxPriceInput = document.querySelector('input[name="max_price"]');
-
-        if (minPriceInput) {
-            minPriceInput.addEventListener('change', function() {
-                document.getElementById('filterForm').submit();
-            });
-        }
-        if (maxPriceInput) {
-            maxPriceInput.addEventListener('change', function() {
-                document.getElementById('filterForm').submit();
-            });
-        }
-
-        // Add click listeners to color swatches and size buttons to trigger their respective hidden checkboxes
-        document.querySelectorAll('.color-swatch, .size-button').forEach(element => {
-            element.addEventListener('click', function() {
-                // The onchange event on the hidden checkbox will handle the form submission
-                // This ensures the hidden checkbox's state changes, then the form submits
-                this.previousElementSibling.checked = !this.previousElementSibling.checked;
-                this.previousElementSibling.dispatchEvent(new Event('change'));
-            });
-        });
-    });
-</script>
         <main class="w-full lg:w-3/4">
-            <div class="flex justify-between items-center mb-6">
-                <p class="inline-flex flex-row text-[14px] px-[16px] pt-[10px] rounded-[12px] text-white bg-[#185D31] h-[40px]" id="breadcrumbs">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6">
+                <p class="inline-flex flex-row text-[14px] px-[16px] py-[10px] rounded-[12px] text-white bg-[#185D31] mb-2 md:sm-0" id="breadcrumbs">
                     <a href="{{ route('home') }}" class="hover:underline">{{ __('messages.home') }}</a>
                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4 mx-1 mt-1">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-</svg>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                            </svg>
                     @if ($currentCategory)
                         <a href="#" class="hover:underline">{{ $currentCategory->name_ar }}</a>
                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4 mx-1 mt-1">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-</svg>                    @endif
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                            </svg>                    @endif
 
                     @if ($currentSubCategory)
                         <a href="{{ route('products.index', ['sub_category_id' => $currentSubCategory->id]) }}"
@@ -514,21 +354,56 @@
                     @endif
         
                 </p>
-                <div class="relative ">
-                    <select name="sort_by" id="sort_by" form="filterForm"
-                        onchange="document.getElementById('filterForm').submit()"
-                        class="p-2 px-2 border border-[#185D31] rounded-lg  transition duration-200">
-                        <option class="focus:bg-[#185D31] " value="">{{ __('messages.sort_by') }}</option>
-                        <option value="price_asc" {{ request('sort_by') == 'price_asc' ? 'selected' : '' }}>
-                            {{ __('messages.filter_by_price_low') }}</option>
-                        <option value="price_desc" {{ request('sort_by') == 'price_desc' ? 'selected' : '' }}>
-                            {{ __('messages.filter_by_price_high') }}</option>
-                        <option value="latest" {{ request('sort_by') == 'latest' ? 'selected' : '' }}>
-                            {{ __('messages.latest_products') }}</option>
-                        <option value="rating_desc" {{ request('sort_by') == 'rating_desc' ? 'selected' : '' }}>
-                            {{ __('messages.filter_by_rating') }}</option>
-                    </select>
-                </div>
+  <!-- ✅ Alpine.js custom dropdown that submits form on select -->
+<div x-data="{
+    open: false,
+    selected: '{{ request('sort_by') ? __('messages.' . str_replace('_', '', request('sort_by'))) : __('messages.sort_by') }}',
+    value: '{{ request('sort_by') ?? '' }}'
+}"
+     class="relative w-[200px]">
+
+  <!-- Display -->
+  <button type="button"
+          @click="open = !open"
+          class="w-full border border-[#185D31] px-4 py-2 rounded-lg flex justify-between items-center text-sm md:text-base">
+    <span x-text="selected"></span>
+    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M19 9l-7 7-7-7"/>
+    </svg>
+  </button>
+
+  <!-- Options -->
+  <ul x-show="open"
+      @click.away="open = false"
+      class="absolute left-0 w-full bg-white border border-[#185D31] mt-1 rounded-lg shadow z-10">
+
+    <template x-for="option in [
+        {label: '{{ __('messages.filter_by_price_low') }}', value: 'price_asc'},
+        {label: '{{ __('messages.filter_by_price_high') }}', value: 'price_desc'},
+        {label: '{{ __('messages.latest_products') }}', value: 'latest'},
+        {label: '{{ __('messages.filter_by_rating') }}', value: 'rating_desc'}
+      ]">
+      <li @click="
+            selected = option.label;
+            value = option.value;
+            open = false;
+            $nextTick(() => { 
+              document.getElementById('sort_by_hidden').value = value;
+              document.getElementById('filterForm').submit();
+            });
+          "
+          class="px-4 py-2 hover:bg-[#185D31] hover:text-white cursor-pointer">
+        <span x-text="option.label"></span>
+      </li>
+    </template>
+
+  </ul>
+
+  <!-- Hidden input that the form reads -->
+  <input type="hidden" name="sort_by" id="sort_by_hidden" :value="value" form="filterForm">
+</div>
+
             </div>
 
             @if ($products->isEmpty())
@@ -862,60 +737,30 @@
 </script>
   <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const offerSwiper = new Swiper('.offerSwiper', {
-                slidesPerView: 1,
-                spaceBetween: 24,
-                loop: true,
-                rtl: true,
-                autoplay: {
-                    delay: 3500,
-                    disableOnInteraction: false,
-                },
-                pagination: {
-                    el: '.offer-swiper-pagination',
-                    clickable: true,
-                },
-                navigation: {
-                    nextEl: '.swiper-button-next',
-                    prevEl: '.swiper-button-prev',
-                },
-                breakpoints: {
-                    640: {
-                        slidesPerView: 2,
-                        spaceBetween: 20,
-                    },
-                    768: {
-                        slidesPerView: 3,
-                        spaceBetween: 24,
-                    },
-                    1024: {
-                        slidesPerView: 4,
-                        spaceBetween: 24,
+        
+ 
+        function initializeInnerSwipers() {
+            document.querySelectorAll('.inner-swiper').forEach(swiperElement => {
+                // Prevent duplicate initialization
+                if (!swiperElement.swiper) {
+                    const imageSlides = swiperElement.querySelectorAll('.swiper-slide').length;
+                    if (imageSlides > 1) {
+                        new Swiper(swiperElement, {
+                            loop: true,
+                            autoplay: {
+                                delay: 2500,
+                                disableOnInteraction: false,
+                            },
+                            pagination: {
+                                el: swiperElement.querySelector('.image-pagination'),
+                                clickable: true,
+                            },
+                        });
                     }
-                },
+                }
             });
-
-            function initializeInnerSwipers() {
-                document.querySelectorAll('.inner-swiper').forEach(swiperElement => {
-                    if (!swiperElement.swiper) {
-                        const imageSlides = swiperElement.querySelectorAll('.swiper-slide').length;
-                        if (imageSlides > 1) {
-                            new Swiper(swiperElement, {
-                                loop: true,
-                                autoplay: {
-                                    delay: 2500,
-                                    disableOnInteraction: false,
-                                },
-                                pagination: {
-                                    el: swiperElement.querySelector('.image-pagination'),
-                                    clickable: true,
-                                },
-                            });
-                        }
-                    }
-                });
-            }
-            initializeInnerSwipers();
+        }
+        initializeInnerSwipers(); // Initial call to set up inner swipers on page load
 
                  // --- Logic for Favorite Button and Login Popup ---
 

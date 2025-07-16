@@ -1491,7 +1491,7 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
     {{-- ********************************************drop menu for small screen******************************* --}}
 
     <button id="dropdownMenuIconButton" data-dropdown-toggle="mergedDropdownMenu"
-        class="hidden order-3  items-center p-2 text-lg rtl:ml-4 ltr:ml-4 font-medium text-center text-gray-900 bg-[#F8F9FA] rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50 "
+        class="hidden order-3  items-center px-2 py-2 text-lg rtl:ml-2 ltr:ml-2 font-small h-full text-center text-gray-900 bg-[#F8F9FA] rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50 "
         type="button">
         <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
             class="bi bi-list" viewBox="0 0 16 16">
@@ -1503,7 +1503,7 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
     <!-- Dropdown menu -->
     <div id="mergedDropdownMenu"
         class="z-20 hidden p-4 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-[314px] dark:bg-gray-700 dark:divide-gray-600">
-        <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownMenuIconButton">
+        <ul class="py-2 text-sm text-gray-700 " aria-labelledby="dropdownMenuIconButton">
 
             {{-- Delivery Location Section --}}
             <li class="mb-4">
@@ -1849,7 +1849,7 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
                         this.fetchSuggestions(true);
                     }
                 }">
-                    <div class="flex items-center border-[1px] bg-white rounded-[12px] overflow-hidden">
+                    <div class="flex items-center border-[1px] bg-white rounded-[12px] overflow-hidden px-1">
                         <img src="{{ asset('images/interface-search--glass-search-magnifying--Streamline-Core.svg') }}"
                             alt="Search Icon" class="h-[16px] w-[16px] object-cover text-[#767676]">
                         <input type="text" x-model="searchText"

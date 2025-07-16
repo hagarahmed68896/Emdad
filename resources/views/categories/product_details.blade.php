@@ -1,11 +1,9 @@
 @extends('layouts.app')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-{{-- Include Swiper CSS --}}
 <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
 {{-- Include Tailwind CSS (assuming it's already configured or loaded via CDN) --}}
 <script src="https://cdn.tailwindcss.com"></script>
-
 <style>
     .product-thumbnail-swiper .swiper-slide {
         opacity: 0.5;
@@ -136,14 +134,14 @@
     document.addEventListener("DOMContentLoaded", function() {
         // Initialize thumbnail swiper
         const thumbnailSwiper = new Swiper('.product-thumbnail-swiper', {
-            spaceBetween: 10,
-            slidesPerView: 4,
+            spaceBetween: 5,
+            slidesPerView: 'auto',
             watchSlidesProgress: true,
         });
 
         // Initialize main swiper and link it to thumbnails
         const mainSwiper = new Swiper('.product-main-swiper', {
-            spaceBetween: 10,
+            spaceBetween: 5,
             navigation: {
                 nextEl: '.swiper-button-next',
                 prevEl: '.swiper-button-prev',
@@ -154,7 +152,32 @@
         });
     });
 </script>
+<style>
+    /* Basic styling for the modal overlay and content */
+    .modal-overlay {
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+    }
 
+    /* Hide spin buttons for number input */
+    .no-spinners::-webkit-outer-spin-button,
+    .no-spinners::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .no-spinners {
+        -moz-appearance: textfield;
+        /* Firefox */
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+</style>
 
 @section('content')
     <div class="px-[64px]">
@@ -184,7 +207,9 @@
             @endif
             <span class="font-semibold">{{ $product->name }}</span>
         </p>
-        <div class="py-4 flex flex-col lg:flex-row gap-8 items-stretch">
+
+        {{-- product section --}}
+        <div class="py-4  flex flex-col lg:flex-row gap-8 items-stretch">
 
             {{-- Product Image Gallery Section --}}
             <div class="w-full lg:w-1/2  rounded-[12px]  flex flex-col items-center">
@@ -230,24 +255,24 @@
                         @endif
 
                         {{-- Favorite Button (Top Left) --}}
-                      <button
-                                class="favorite-button absolute top-3 rtl:left-3 ltr:right-3 bg-white p-2 rounded-full shadow-md text-gray-500 hover:text-red-500 transition-colors duration-200 z-10"
-                                data-product-id="{{ $product->id }}" aria-label="Add to favorites">
-                                {{-- Conditional SVG for filled/unfilled heart --}}
-                                @if (Auth::check() && Auth::user()->hasFavorited($product->id))
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"
-                                        stroke-width="1.5" stroke="currentColor" class="size-6 text-red-500">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-                                    </svg>
-                                @else
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                        stroke-width="1.5" stroke="currentColor" class="size-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-                                    </svg>
-                                @endif
-                            </button>
+                        <button
+                            class="favorite-button absolute top-3 rtl:left-3 ltr:right-3 bg-white p-2 rounded-full shadow-md text-gray-500 hover:text-red-500 transition-colors duration-200 z-10"
+                            data-product-id="{{ $product->id }}" aria-label="Add to favorites">
+                            {{-- Conditional SVG for filled/unfilled heart --}}
+                            @if (Auth::check() && Auth::user()->hasFavorited($product->id))
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="size-6 text-red-500">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                                </svg>
+                            @else
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                                </svg>
+                            @endif
+                        </button>
                     </div>
                 </div>
 
@@ -256,7 +281,7 @@
                     <div class="swiper-wrapper gap-3">
                         @forelse ($images as $imagePath)
                             <div
-                                class="swiper-slide w-[166px] h-[166px] bg-[#EDEDED] rounded-md overflow-hidden border-2 border-transparent hover:border-[#185D31] transition-all duration-200 cursor-pointer">
+                                class="swiper-slide w-[150px] h-[150px] bg-[#EDEDED] rounded-md overflow-hidden border-2 border-transparent hover:border-[#185D31] transition-all duration-200 cursor-pointer">
                                 <img src="{{ asset($imagePath) }}"
                                     onerror="this.onerror=null;this.src='https://placehold.co/120x120/F0F0F0/ADADAD?text=Thumb';"
                                     alt="Thumbnail" class="w-full h-full object-cover rounded-md">
@@ -265,7 +290,6 @@
                             {{-- No thumbnails if no images --}}
                         @endforelse
                     </div>
-
                 </div>
 
             </div>
@@ -278,11 +302,11 @@
                 <div class=" items-center mb-1">
                     <h1 class="text-[32px] font-bold text-[#212121] mb-3">{{ $product->name }}</h1>
                     <div class="flex items-center">
-        
+
                         @php
-                        $averageRating = round($product->reviews->avg('rating'), 1);
-                        $totalReviews = $product->reviews->count();
-                        $ratingsCount = $product->reviews->groupBy('rating')->map->count();
+                            $averageRating = round($product->reviews->avg('rating'), 1);
+                            $totalReviews = $product->reviews->count();
+                            $ratingsCount = $product->reviews->groupBy('rating')->map->count();
                             $fullStars = floor($averageRating);
                             $halfStar = $averageRating - $fullStars >= 0.5 ? 1 : 0;
                             $emptyStars = 5 - $fullStars - $halfStar;
@@ -305,8 +329,7 @@
 
 
                         {{-- Display the numerical rating --}}
-                        <span
-                            class="text-[16px] text-[#212121] rtl:mr-1 ltr:ml-1">{{ $averageRating }}
+                        <span class="text-[16px] text-[#212121] rtl:mr-1 ltr:ml-1">{{ $averageRating }}
                             {{ __('messages.stars') }}</span>
                         <span class="text-[14px] text-bold mr-2">•</span>
                         <span class="text-[#212121] text-[16px] ltr:ml-2 rtl:mr-2">{{ $totalReviews }}
@@ -325,9 +348,19 @@
 
                 {{-- price tiers --}}
                 <div class="mb-2 w-full bg-[#F8F9FA] p-4 rounded-[12px]">
-                    <p class="bg-white w-[129px] h-[40px] px-[16px] py-[8px] rounded-[40px]">
-                        {{ __('messages.selectable') }}</p>
-                    <div class="grid grid-cols-3 gap-3">
+                    <div class="flex">
+                        <p class="bg-white ml-4 w-[129px] h-[40px] px-[16px] py-[8px]  rounded-[40px]">
+                            {{ __('messages.selectable') }}</p>
+                        {{-- Discount Badge (Top Right) --}}
+                        @if ($product->is_offer && $product->discount_percent)
+                            <span
+                                class="  bg-[#FAE1DF] text-[#C62525] text-xs font-bold px-[25px] pt-[12px]  rounded-full z-10">
+                                {{ __('messages.discount_percentage', ['percent' => $product->discount_percent]) }}
+                            </span>
+                        @endif
+                    </div>
+
+                    <div class="grid grid-cols-4 gap-1">
                         @forelse ($product->price_tiers as $tier)
                             <div class="p-3">
                                 <p class="text-[16px] text-[#696969]">
@@ -337,11 +370,21 @@
                                         {{ $tier['min_qty'] }}+ {{ __('messages.pieces') }}
                                     @endif
                                 </p>
-                                <p class="text-[24px] text-[#212121] font-bold text-[#185D31]">
-                                    {{ number_format($tier['price'], 2) }}
-                                    <img class="inline-block mx-1 w-[24px] h-[27px]"
+                                <p class="price-item text-[32px] text-[#212121] font-bold">
+                                    {{ number_format($tier['price'] * (1 - ($product->discount_percent ?? 0) / 100)) }}
+
+                                    <img class="currency-symbol inline-block mx-1 w-[24px] h-[27px]"
                                         src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}" alt="Currency">
                                 </p>
+
+                                @if ($product->is_offer && $product->discount_percent)
+                                    <p class="flex text-sm text-gray-400 line-through mr-2 mr-1">
+                                        {{ number_format($product->price, 2) }}
+                                        <img class="mx-1 w-[14px] h-[14px] mt-1 inline-block"
+                                            src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}" alt="currency">
+                                    </p>
+                                @endif
+
                             </div>
                         @empty
                             <p class="text-gray-500 text-sm col-span-3">{{ __('messages.no_pricing_tiers_available') }}
@@ -378,11 +421,294 @@ if (
 ) {
     $defaultSelectedColorName = $productColors[0]['name'];
                         }
+                        $baseProductPrice = $product->price ?? 0;
+                        $productDiscountPercent = $product->discount_percent ?? 0;
+                        $shippingCost = $product->shipping_cost ?? 0;
+                        $priceTiers = $product->price_tiers ?? [];
                     @endphp
+
+
+                    {{-- select changes popup --}}
                     <div class="flex w-full justify-between">
                         <p class="text-[24px] font-bold mb-3">{{ __('messages.changes') }}</p>
-                        <a href=""
-                            class="underline text-[#696969] text-[14px] ">{{ __('messages.selectChanges') }}</a>
+
+                        <div x-cloak x-data="{
+                            open_Poduct: false,
+                            selectedQuantities: {},
+                            totalItems: 0,
+                            totalPrice: 0,
+                        
+                        
+                        }">
+                            <button
+                                @click=" 
+                          open_Poduct = true;
+                           selectedQuantities: {};
+                       totalItems: 0;
+                       totalPrice: 0; "
+                                class="underline text-[#696969] text-[14px] ">{{ __('messages.selectChanges') }}</button>
+
+                            </button>
+
+                            <div x-show="open_Poduct" x-cloak @click.away="open_Poduct = false;"
+                                class="fixed inset-0 p-2 bg-black bg-opacity-50 flex  justify-between z-50">
+                                <div
+                                    class="bg-white p-4 rounded-xl shadow-2xl w-full  md:max-w-[700px] min-h-[50px] h overflow-y-auto flex flex-col md:flex-row rtl:md:flex-row-reverse relative">
+                                    {{-- Close Button --}}
+                                    <button x-on:click="open_Poduct = false"
+                                        class="absolute top-3 rtl:left-3 ltr:right-3 p-2 transition-colors z-10"
+                                        aria-label="Close">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke-width="1" stroke="currentColor" class="size-9">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M6 18 18 6M6 6l12 12" />
+                                        </svg>
+
+                                    </button>
+
+                                    {{-- Left Section: Product Details & Options --}}
+                                    <div class="flex-1 p-6 md:p-8 flex flex-col">
+                                        <h2 class="text-2xl md:text-3xl font-bold text-[#212121] mb-2">
+                                            {{ $product->name }}
+                                        </h2>
+                                        <p class="text-gray-600 mb-6 text-sm md:text-base">
+                                            {{ __('messages.select_changes') }}
+                                        </p>
+
+                                        {{-- Price Tiers --}}
+                                        <div class="mb-6 border-b pb-4">
+                                            <h3 class="text-lg font-bold text-gray-800 mb-3">
+                                                {{ __('messages.q_price') }}</h3>
+                                            <div class="grid grid-cols-4 gap-1">
+                                                @forelse ($product->price_tiers as $tier)
+                                                    <div class="p-1">
+                                                        <p class="text-[16px] text-[#696969]">
+                                                            @if (isset($tier['max_qty']))
+                                                                {{ $tier['min_qty'] }}-{{ $tier['max_qty'] }}
+                                                                {{ __('messages.pieces') }}
+                                                            @else
+                                                                {{ $tier['min_qty'] }}+ {{ __('messages.pieces') }}
+                                                            @endif
+                                                        </p>
+                                                        <p class="price-item text-[24px] text-[#212121] font-bold">
+                                                            <span>
+                                                                {{ number_format($tier['price'] * (1 - ($product->discount_percent ?? 0) / 100)) }}
+                                                            </span>
+                                                            <img class="currency-symbol inline-block mx-1 w-[24px] h-[27px]"
+                                                                src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}"
+                                                                alt="Currency">
+                                                        </p>
+
+
+
+                                                    </div>
+                                                @empty
+                                                    <p class="text-gray-500 text-sm col-span-3">
+                                                        {{ __('messages.no_pricing_tiers_available') }}
+                                                    </p>
+                                                @endforelse
+                                            </div>
+                                        </div>
+
+                                        <div x-data="{
+                                            selected: [],
+                                            discount: {{ $product->discount_percent ?? 0 }},
+                                            shipping: 14.94,
+                                        
+                                            get subtotal() {
+                                                return this.selected.reduce((sum, c) => sum + this.getUnitPrice(c) * c.count, 0);
+                                            },
+                                            get total() {
+                                                return this.subtotal + this.shipping;
+                                            },
+                                            getUnitPrice(color) {
+                                                return color.price ? color.price * (1 - this.discount / 100) : 0;
+                                            }
+                                        }" class="space-y-6">
+
+                                            <h3 class="text-lg font-bold text-gray-800 mb-2">
+                                                {{ __('messages.colors') }}
+                                            </h3>
+
+                                            <!-- Colors loop: each pushes to selected -->
+                                            @foreach ($product->specifications['colors'] as $index => $color)
+                                                @php
+                                                    $colorName =
+                                                        is_array($color) && isset($color['name'])
+                                                            ? $color['name']
+                                                            : $color;
+                                                    $swatchImage =
+                                                        is_array($color) && isset($color['swatch_image'])
+                                                            ? asset($color['swatch_image'])
+                                                            : 'https://placehold.co/40x40/F0F0F0/ADADAD?text=N/A';
+                                                    $colorPrice =
+                                                        is_array($color) && isset($color['price'])
+                                                            ? $color['price']
+                                                            : 0;
+                                                @endphp
+
+                                                <div x-init="selected.push({
+                                                    name: '{{ $colorName }}',
+                                                    swatchImage: '{{ $swatchImage }}',
+                                                    price: {{ $colorPrice }},
+                                                    count: 0
+                                                })"
+                                                    class="flex items-center justify-between border-b pb-2">
+                                                    <div class="flex items-center ">
+                                                        <img :src="selected[{{ $index }}].swatchImage"
+                                                            alt="{{ $colorName }}"
+                                                            class="w-[64px] h-[64px] rounded-[12px] ml-3 bg-[#EDEDED]" />
+                                                        <span class="text-gray-800 font-medium"
+                                                            x-text="selected[{{ $index }}].name"></span>
+                                                    </div>
+
+                                                    <div class="flex items-center">
+                                                        <div class="flex text-[20px] ml-2">
+                                                            <p
+                                                                x-text="`${getUnitPrice(selected[{{ $index }}]).toFixed(2)} `">
+                                                            </p>
+                                                            <img class="mx-1 w-[16px] h-[16px] mt-2 inline-block"
+                                                                src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}"
+                                                                alt="">
+                                                        </div>
+
+                                                        <!-- Counter -->
+                                                        <div
+                                                            class="flex rounded-[12px] items-center py-1 w-[113px] bg-[#EDEDED] overflow-hidden ml-2">
+                                                            <button type="button"
+                                                                @click="selected[{{ $index }}].count = Math.max(0, selected[{{ $index }}].count - 1)"
+                                                                class="px-3 py-1 ">
+                                                                     -
+
+                                                            </button>
+                                                            <input type="number" min="0"
+                                                                x-model="selected[{{ $index }}].count"
+                                                                class="flex-grow w-full text-center mr-2 border-0 bg-[#EDEDED]"
+                                                                readonly>
+                                                            <button type="button"
+                                                                @click="selected[{{ $index }}].count++"
+                                                                class="px-3 py-1">
+                                                                    +
+
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+
+                                                 {{-- Shipping Details --}}
+                                        <div>
+                                            <p class="text-[24px] font-bold mb-3">{{ __('messages.shipping') }}</p>
+                                            <div class="mb-2 w-full bg-[#F8F9FA] p-4 rounded-[12px]">
+                                                <h3 class="text-lg font-bold text-gray-800 mb-2">
+                                                    {{ __('messages.shipping_details') }}</h3>
+                                                <div class="flex items-center text-gray-700 mb-1">
+                                                    <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]"
+                                                        src="{{ asset('images/shipping (2).svg') }}"
+                                                        onerror="this.onerror=null;this.src='https://placehold.co/20x20/F0F0F0/ADADAD?text=S';"
+                                                        alt="Shipping Cost">
+                                                    <span>
+                                                        @php
+                                                            // $product->shipping_cost should contain the per-item shipping cost from the DB
+                                                            $shippingCostPerItem = $product->shipping_cost ?? null;
+                                                            $displayQuantity = 2; // Fixed quantity for display as per your example
+                                                            $calculatedShippingCost = null;
+
+                                                            if (is_numeric($shippingCostPerItem)) {
+                                                                $calculatedShippingCost = number_format(
+                                                                    $shippingCostPerItem * $displayQuantity,
+                                                                    2,
+                                                                );
+                                                            }
+                                                        @endphp
+
+                                                        @if ($calculatedShippingCost !== null)
+                                                            {{-- Using a new translation key for clarity --}}
+                                                            {{ __('messages.shipping_cost_for_quantity', ['cost' => $calculatedShippingCost, 'quantity' => $displayQuantity]) }}
+                                                        @else
+                                                            {{ __('messages.shipping_cost_not_available') }}
+                                                            {{-- Fallback message --}}
+                                                        @endif
+                                                    </span>
+                                                </div>
+                                                <div class="flex items-center text-gray-700">
+                                                    <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]"
+                                                        src="{{ asset('images/shipping-box-2--box-package-label-delivery-shipment-shipping-3d--Streamline-Core.svg') }}"
+                                                        onerror="this.onerror=null;this.src='https://placehold.co/20x20/F0F0F0/ADADAD?text=D';"
+                                                        alt="Delivery Date">
+                                                    <span>{{ __('messages.estimated_delivery_date', ['days' => $product->estimated_delivery_days ?? 'N/A']) }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+
+
+                                            <!-- ✅ Single live summary for ALL colors -->
+                                            <div class="tex border-t pt-4 mb-4">
+                                                <p class="text-[24px] font-bold mb-3">{{ __('messages.price') }}</p>
+
+                                                <div class="flex justify-between mb-2">
+                                                    <span class="text-[20px] text-[#212121]"> {{__('messages.total_elements')}}</span>
+                                                    <div class="flex ">
+                                                    <span x-text="`${subtotal.toFixed(2)}`"></span>
+                                                    
+                                                   <img class="mx-1 w-[16px] h-[16px] mt-1 inline-block"
+                                                                src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}"
+                                                                alt="">
+                                                                </div>
+                                                            </div>
+                                                <div class="flex justify-between border-b pb-3 mb-2">
+                                                    <span class="text-[20px] text-[#212121]">{{__('messages.shipping_price')}}</span>
+                                                      <div class="flex ">
+                                                    <span x-text="`${shipping.toFixed(2)}`"></span>
+                                                     <img class="mx-1 w-[16px] h-[16px] mt-1 inline-block"
+                                                                src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}"
+                                                                alt="">
+                                                      </div>
+                                                </div>
+                                                <div class="font-bold  flex text-[20px] justify-between">
+                                                    <span>{{__('messages.total')}}</span>
+                                                    <div class="flex ">
+                                                    <span x-text="`${total.toFixed(2)}`"></span>
+                                                     <img class="mx-1 w-[16px] h-[16px] mt-2 inline-block"
+                                                                src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}"
+                                                                alt="">
+                                                </div>
+                                                </div>
+                                            </div>
+
+                                            
+                                        </div>
+
+
+
+
+
+                                   
+
+                            
+
+                                        {{-- Action Buttons --}}
+                                        <div class="flex flex-col md:flex-row gap-3 mb-3">
+                                      <button x-on:click="handleAddToCart()" x-bind:disabled="totalItems === 0"
+                                        class="flex flex-1 px-6 py-3 bg-[#185D31] text-white rounded-lg font-semibold hover:bg-green-700 transition-colors shadow-md text-center justify-center items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 ml-2"> {{-- Changed ml-1 to mr-2 for spacing --}}
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                                        </svg>
+                                        {{__('messages.add_to_cart')}}
+                                    </button>
+                                            <button x-on:click="handleContactSupplier()"
+                                                class="flex-1 px-6 py-3 bg-[#EDEDED] text-[#696969] rounded-lg font-semibold hover:bg-gray-200 transition-colors shadow-md">
+                                                {{__('messages.connect_to_supplier')}}
+                                            </button>
+                                      
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                     <h3 class="text-lg font-bold text-gray-800 mb-2">
                         {{ __('messages.colors') }} (<span id="colorCount">{{ count($productColors ?? []) }}</span>):
@@ -521,7 +847,7 @@ if (
         </div>
 
 
-        <div x-data="{ tab: 'overview' }" class="w-full bg-white p-6 rounded-xl">
+        <div x-data="{ tab: 'overview' }" class="w-full bg-white py-6 rounded-xl">
 
             {{-- Tabs --}}
             <div class="flex  mb-6">
@@ -706,7 +1032,8 @@ if (
                             class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                             <div @click.away="open = false; errorMessage = ''"
                                 class="bg-white rounded-lg p-6 w-full max-w-md">
-                                <h2 class="text-center mb-4 text-[20px] font-bold">{{ __('messages.how_was_experience') }}
+                                <h2 class="text-center mb-4 text-[20px] font-bold">
+                                    {{ __('messages.how_was_experience') }}
                                 </h2>
 
                                 <div class="flex justify-center mb-4">
@@ -729,7 +1056,7 @@ if (
 
                                 <button
                                     @click="
-                    errorMessage = ''; // Clear previous errors
+                    errorMessage = ''; 
 
                     if (rating === 0) {
                         errorMessage = '{{ __('messages.please_select_a_rating') }}';
@@ -962,31 +1289,29 @@ if (
                         </div>
                     @endforelse
                     @if ($filteredReviews->count() > 3)
-<button 
-    class="mt-4 bg-[#185D31] px-[20px] py-[12px] rounded-[12px] font-semibold text-white flex items-center justify-center gap-2"
-    x-show="visible <= {{ $filteredReviews->count() }}"
-    @click="
+                        <button
+                            class="mt-4 bg-[#185D31] px-[20px] py-[12px] rounded-[12px] font-semibold text-white flex items-center justify-center gap-2"
+                            x-show="visible <= {{ $filteredReviews->count() }}"
+                            @click="
         loading = true;
         setTimeout(() => {
             visible = visible + 3;
             loading = false;
         }, 500);
     "
-    x-data="{ loading: false }"
-    :disabled="loading"
->
+                            x-data="{ loading: false }" :disabled="loading">
 
-    <svg x-show="loading" class="w-5 h-5 animate-spin text-white" fill="none" viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z">
-        </path>
-    </svg>
-    <span>{{ __('messages.show_more') }}</span>
+                            <svg x-show="loading" class="w-5 h-5 animate-spin text-white" fill="none"
+                                viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                    stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z">
+                                </path>
+                            </svg>
+                            <span>{{ __('messages.show_more') }}</span>
 
-</button>
-
-
+                        </button>
                     @endif
 
                 </div>
@@ -995,9 +1320,131 @@ if (
         </div>
 
 
+        @if ($relatedProducts->count())
+            <div class="mt-10">
+                <h2 class="text-[40px] font-bold mb-4">{{ __('messages.may_like') }}</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                    @forelse ($relatedProducts as $product)
+                        <div class="product-card bg-white rounded-xl overflow-hidden shadow-md flex flex-col">
+                            <div class="relative w-full h-48 sm:h-56 overflow-hidden product-image-swiper inner-swiper">
+                                <div class="swiper-wrapper">
+                                    @php
+                                        $images = is_string($product->images)
+                                            ? json_decode($product->images, true)
+                                            : $product->images ?? [];
+                                    @endphp
+                                    @if (!empty($images) && count($images) > 0)
+                                        @foreach ($images as $image)
+                                            <div class="swiper-slide">
+                                                <img src="{{ asset($image) }}"
+                                                    onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
+                                                    class="w-full h-full object-contain">
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <div class="swiper-slide">
+                                            <img src="{{ asset($product->image ?? 'https://placehold.co/300x200/F0F0F0/ADADAD?text=No+Image') }}"
+                                                onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
+                                                class="w-full h-full object-contain">
+                                        </div>
+                                    @endif
+                                </div>
+                                @php
+                                    $images = is_string($product->images)
+                                        ? json_decode($product->images, true)
+                                        : $product->images ?? [];
+                                @endphp
+                                <div class="swiper-pagination image-pagination"
+                                    style="{{ count($images) <= 1 ? 'display:none;' : '' }}"></div>
+                                @if ($product->is_offer && $product->discount_percent)
+                                    <span
+                                        class="absolute top-3 right-3 bg-[#FAE1DF] text-[#C62525] text-xs font-bold px-[16px] py-[8px] rounded-full z-10">
+                                        {{ __('messages.discount_percentage', ['percent' => $product->discount_percent]) }}
+                                    </span>
+                                @endif
+                                <button
+                                    class="favorite-button absolute top-3 rtl:left-3 ltr:right-3 bg-white p-2 rounded-full shadow-md text-gray-500 hover:text-red-500 transition-colors duration-200 z-10"
+                                    data-product-id="{{ $product->id }}" aria-label="Add to favorites">
+                                    @if (Auth::check() && Auth::user()->hasFavorited($product->id))
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"
+                                            stroke-width="1.5" stroke="currentColor" class="size-6 text-red-500">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                                        </svg>
+                                    @else
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke-width="1.5" stroke="currentColor" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                                        </svg>
+                                    @endif
+                                </button>
+                            </div>
+                            <div class="p-4 flex flex-col flex-grow">
+                                <div class="flex w-full items-center text-sm mb-2 justify-between">
+                                    <h3 class="text-[24px] font-bold text-[#212121] mb-1">{{ $product->name }}</h3>
+                                    <div class="flex items-center ">
+                                        <img class="mx-1" src="{{ asset('images/Vector (4).svg') }}" alt="">
+                                        <span class="text-[18px]">{{ $product->rating ?? '4.5' }}</span>
+                                    </div>
+                                </div>
+                                <span
+                                    class="text-[#696969] text-[20px]">{{ $product->subCategory->category->name ?? 'غير مصنف' }}</span>
+                                <div class="flex mt-2">
+                                    @if ($product->supplier_confirmed)
+                                        <span class="flex items-center text-[#185D31]">
+                                            <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]"
+                                                src="{{ asset('images/Success.svg') }}" alt="Confirmed Supplier">
+                                            <p class="text-[20px] text-[#212121] ">{{ $product->supplier_name }}
+                                            </p>
+                                        </span>
+                                    @else
+                                        <p class="text-[20px] text-[#212121] ">{{ $product->supplier_name }}
+                                        </p>
+                                    @endif
+                                </div>
+                                <div class="flex items-center mb-2">
+                                    <span class=" flex text-lg font-bold text-gray-800">
+                                        {{ number_format($product->price * (1 - ($product->discount_percent ?? 0) / 100), 2) }}
+                                        <img class="mx-1 w-[20px] h-[21px]" src="{{ asset('images/Vector (3).svg') }}"
+                                            alt="">
+                                    </span>
+                                    @if ($product->is_offer && $product->discount_percent)
+                                        <span class="flex text-sm text-gray-400 line-through mr-2 mr-1">
+                                            {{ number_format($product->price, 2) }}
+                                            <img class="mx-1 w-[14px] h-[14px] mt-1 inline-block"
+                                                src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}" alt="currency">
+                                        </span>
+                                    @endif
+                                </div>
+                                <p class="text-sm text-gray-600 mb-4">
+                                    {{ __('messages.minimum_order_quantity', ['quantity' => $product->min_order_quantity ?? '1']) }}
+                                </p>
+                                <div class="mt-auto">
+                                    <a href="{{ route('products.show', $product->slug) }}"
+                                        class="block w-full bg-[#185D31] text-white text-center py-[10px] px-[16px] rounded-[12px] font-medium transition-colors duration-200">
+                                        {{ __('messages.view_details') }}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="swiper-slide w-full text-center py-10 text-gray-600">
+                            <p class="text-2xl font-bold mb-4">{{ __('messages.no_offers_available_title') }}</p>
+                            <p>{{ __('messages.no_offers_available_description') }}</p>
+                        </div>
+                    @endforelse
+                </div>
+                <div class="swiper-pagination offer-swiper-pagination mt-8"></div>
+
+                <div class="mt-8">
+                    {{ $relatedProducts->links('pagination::tailwind') }}
+                </div>
+            </div>
+        @endif
 
 
-    
+
 
     </div>
 @endsection
@@ -1005,13 +1452,14 @@ if (
 
 
 {{-- Login Popup HTML --}}
-<div id="login-popup" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
+<div id="login-popup" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50"
+   >
     <div class="bg-white p-8 rounded-lg shadow-lg w-96 max-w-sm mx-4">
         <h2 class="text-2xl font-bold mb-4 text-gray-900">{{ __('messages.login_important') }}</h2>
         <p class="mb-6 text-gray-700">{{ __('messages.login_important_for_fav') }}</p>
         <div class="flex justify-end space-x-2 rtl:space-x-reverse">
             <button id="close-login-popup"
-                class="bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors">
+                class="bg-gray-200 text-gray-800 py-2 px-4 ml-2 rounded-md hover:bg-gray-300 transition-colors">
                 {{ __('messages.cancel') }}
             </button>
             <a href="{{ route('login') }}"
@@ -1022,184 +1470,162 @@ if (
     </div>
 </div>
 
-
-
-{{-- Include Swiper JS --}}
-<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
 <script>
-
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialize main product image Swiper
-        const productMainSwiper = new Swiper('.product-main-swiper', {
-            loop: true, // Enable looping
-            spaceBetween: 10,
-            slidesPerView: 1,
-            navigation: {
-                nextEl: '.swiper-button-next',
-                prevEl: '.swiper-button-prev',
-            },
-            pagination: {
-                el: '.product-main-pagination',
-                clickable: true,
-            },
-        });
+        const priceItems = document.querySelectorAll('.price-item');
+        const selectedImageSrc = "{{ asset('images/Saudi_Riyal_Symbol (2).svg') }}";
+        const defaultImageSrc = "{{ asset('images/Saudi_Riyal_Symbol.svg') }}";
+        const selectedColor = '#185D31'; // Green color for selected price
+        const defaultColor = '#212121'; // Default price color
 
-        // Initialize thumbnail Swiper
-        const productThumbnailSwiper = new Swiper('.product-thumbnail-swiper', {
-            spaceBetween: 10,
-            slidesPerView: 'auto', // Number of visible thumbnails
-            freeMode: true,
-            watchSlidesProgress: true,
-            breakpoints: {
-                640: {
-                    slidesPerView: 5,
-                },
-                768: {
-                    slidesPerView: 6,
-                },
-                1024: {
-                    slidesPerView: 7,
-                },
-            }
-        });
+        priceItems.forEach(item => {
+            item.addEventListener('click', function() {
+                // First, reset all items to their default state
+                priceItems.forEach(p => {
+                    p.style.color = defaultColor;
+                    p.querySelector('.currency-symbol').src = defaultImageSrc;
+                });
 
-        // Link main Swiper to thumbnail Swiper
-        productMainSwiper.controller.control = productThumbnailSwiper;
-        productThumbnailSwiper.controller.control = productMainSwiper;
-
-
-        // Handle color swatch selection
-        const colorSwatches = document.querySelectorAll('.color-swatch');
-        const selectedColorNameSpan = document.getElementById('selectedColorName');
-
-        // Set initial selected color name
-        const initialSelectedSwatch = document.querySelector('.color-swatch.selected');
-        if (initialSelectedSwatch) {
-            selectedColorNameSpan.textContent = initialSelectedSwatch.dataset.colorName;
-        } else {
-            selectedColorNameSpan.textContent = " ";
-        }
-
-
-        colorSwatches.forEach(swatch => {
-            swatch.addEventListener('click', function() {
-                // Remove 'selected' class from all swatches
-                colorSwatches.forEach(s => s.classList.remove('selected'));
-
-                // Add 'selected' class to the clicked swatch
-                this.classList.add('selected');
-
-                // Update the displayed color name
-                selectedColorNameSpan.textContent = this.dataset.colorName;
-
+                // Then, apply the selected state to the clicked item
+                this.style.color = selectedColor;
+                this.querySelector('.currency-symbol').src = selectedImageSrc;
             });
         });
-
-
-       // --- Logic for Favorite Button and Login Popup ---
-
-        // Determine user authentication status from Laravel
-        const isUserLoggedIn = {{ Auth::check() ? 'true' : 'false' }};
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute(
-        'content'); // Get CSRF token once
-
-        const favoriteButtons = document.querySelectorAll('.favorite-button');
-        const loginPopup = document.getElementById('login-popup');
-        const closeLoginPopupBtn = document.getElementById('close-login-popup');
-
-        favoriteButtons.forEach(button => {
-            button.addEventListener('click', function(event) {
-                if (!isUserLoggedIn) {
-                    event
-                .preventDefault(); // Prevent default action (e.g., potential form submission or link follow)
-                    loginPopup.classList.remove('hidden'); // Show the popup
-                } else {
-                    // User is logged in, proceed with favorite toggling logic
-                    const productId = this.dataset.productId;
-                    console.log('User is logged in. Toggling favorite for product ID:',
-                        productId);
-
-                    // AJAX CALL to toggle favorite status
-                    fetch(`/products/${productId}/toggle-favorite`, { // Adjust this API endpoint to match your Laravel route
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json', // Important for Laravel to return JSON
-                                'X-CSRF-TOKEN': csrfToken // Laravel CSRF token
-                            },
-                            body: JSON.stringify({
-                                product_id: productId
-                            })
-                        })
-                        .then(response => {
-                            // Handle unauthenticated case (e.g., session expired)
-                            if (response.status === 401) {
-                                window.location.href = '/login'; // Redirect to login page
-                                return Promise.reject(
-                                'Unauthenticated'); // Stop promise chain
-                            }
-                            if (!response.ok) {
-                                // If response is not OK (e.g., 500 Internal Server Error, 403 Forbidden)
-                                throw new Error(`HTTP error! status: ${response.status}`);
-                            }
-                            return response.json(); // Parse response as JSON
-                        })
-                        .then(data => {
-                            console.log(data
-                            .message); // Log success or failure message from backend
-                            // Update the heart icon visually based on the 'is_favorited' status from the response
-                            const svg = this.querySelector('svg');
-                            if (data
-                                .is_favorited) { // If the backend says it's now favorited
-                                svg.setAttribute('fill', 'currentColor'); // Fill the heart
-                                svg.classList.add('text-red-500'); // Make it red
-                                svg.classList.remove(
-                                'text-gray-500'); // Remove gray if present
-                            } else { // If the backend says it's no longer favorited
-                                svg.setAttribute('fill', 'none'); // Unfill the heart
-                                svg.classList.remove('text-red-500'); // Remove red
-                                svg.classList.add(
-                                'text-gray-500'); // Make it gray (unfilled color)
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error toggling favorite:', error);
-                            // Optionally, revert the UI state or show an error message to the user
-                        });
-                }
-            });
-        });
-
-        // Close popup when clicking the close button
-        if (closeLoginPopupBtn) {
-            closeLoginPopupBtn.addEventListener('click', function() {
-                loginPopup.classList.add('hidden');
-            });
-        }
-
-        // Close popup when clicking outside of it
-        if (loginPopup) {
-            loginPopup.addEventListener('click', function(event) {
-                if (event.target === loginPopup) { // Check if the click was directly on the overlay
-                    loginPopup.classList.add('hidden');
-                }
-            });
-        }
-    });
-    const thumbnailSwiper = new Swiper('.product-thumbnail-swiper', {
-        spaceBetween: 8,
-        slidesPerView: 'auto',
-        watchSlidesProgress: true,
-    });
-
-    const mainSwiper = new Swiper('.product-main-swiper', {
-        spaceBetween: 10,
-        navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
-        },
-        thumbs: {
-            swiper: thumbnailSwiper,
-        },
     });
 </script>
+
+{{-- Include Swiper JS --}}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const productMainSwiper = new Swiper('.product-main-swiper', {
+      loop: true,
+      spaceBetween: 10,
+      slidesPerView: 1,
+      navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+      },
+      pagination: {
+        el: '.product-main-pagination',
+        clickable: true,
+      },
+    });
+
+    const productThumbnailSwiper = new Swiper('.product-thumbnail-swiper', {
+      spaceBetween: 10,
+      slidesPerView: 'auto',
+      freeMode: true,
+      watchSlidesProgress: true,
+      breakpoints: {
+        640: { slidesPerView: 5 },
+        768: { slidesPerView: 6 },
+        1024: { slidesPerView: 7 },
+      },
+    });
+
+    productMainSwiper.controller.control = productThumbnailSwiper;
+    productThumbnailSwiper.controller.control = productMainSwiper;
+
+    const colorSwatches = document.querySelectorAll('.color-swatch');
+    const selectedColorNameSpan = document.getElementById('selectedColorName');
+
+    const initialSelectedSwatch = document.querySelector('.color-swatch.selected');
+    if (initialSelectedSwatch) {
+      selectedColorNameSpan.textContent = initialSelectedSwatch.dataset.colorName;
+    } else {
+      selectedColorNameSpan.textContent = " ";
+    }
+
+    colorSwatches.forEach(swatch => {
+      swatch.addEventListener('click', function() {
+        colorSwatches.forEach(s => s.classList.remove('selected'));
+        this.classList.add('selected');
+        selectedColorNameSpan.textContent = this.dataset.colorName;
+      });
+    });
+
+    function initializeInnerSwipers() {
+      document.querySelectorAll('.inner-swiper').forEach(swiperElement => {
+        if (!swiperElement.swiper) {
+          const imageSlides = swiperElement.querySelectorAll('.swiper-slide').length;
+          if (imageSlides > 1) {
+            new Swiper(swiperElement, {
+              loop: true,
+              autoplay: { delay: 2500, disableOnInteraction: false },
+              pagination: {
+                el: swiperElement.querySelector('.image-pagination'),
+                clickable: true,
+              },
+            });
+          }
+        }
+      });
+    }
+
+    initializeInnerSwipers();
+
+    const isUserLoggedIn = {{ Auth::check() ? 'true' : 'false' }};
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    const favoriteButtons = document.querySelectorAll('.favorite-button');
+    const loginPopup = document.getElementById('login-popup');
+    const closeLoginPopupBtn = document.getElementById('close-login-popup');
+
+    favoriteButtons.forEach(button => {
+      button.addEventListener('click', function(event) {
+        if (!isUserLoggedIn) {
+          event.preventDefault();
+          loginPopup.classList.remove('hidden');
+        } else {
+          const productId = this.dataset.productId;
+          fetch(`/products/${productId}/toggle-favorite`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({ product_id: productId })
+          })
+          .then(response => {
+            if (response.status === 401) {
+              window.location.href = '/login';
+              return Promise.reject('Unauthenticated');
+            }
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then(data => {
+            const svg = this.querySelector('svg');
+            if (data.is_favorited) {
+              svg.setAttribute('fill', 'currentColor');
+              svg.classList.add('text-red-500');
+              svg.classList.remove('text-gray-500');
+            } else {
+              svg.setAttribute('fill', 'none');
+              svg.classList.remove('text-red-500');
+              svg.classList.add('text-gray-500');
+            }
+          })
+          .catch(error => console.error('Error toggling favorite:', error));
+        }
+      });
+    });
+
+    if (closeLoginPopupBtn) {
+      closeLoginPopupBtn.addEventListener('click', function() {
+        loginPopup.classList.add('hidden');
+      });
+    }
+
+    if (loginPopup) {
+      loginPopup.addEventListener('click', function(event) {
+        if (event.target === loginPopup) {
+          loginPopup.classList.add('hidden');
+        }
+      });
+    }
+  });
+</script>
+<script src="//unpkg.com/alpinejs" defer></script>

@@ -4,11 +4,11 @@
         class="text-center sm:text-right text-[16px] text-[#1F2B45] px-[16px] py-[8px] rounded-[40px] bg-[#F3F4F5] w-[112px] mb-3">
         {{ __('messages.choosen_categories') }}</p>
 
-    <div class="flex flex-col sm:flex-row justify-between items-center text-center sm:text-right">
+    <div class="flex flex-col sm:flex-row justify-between ">
         <h2 class="sm:text-[40px] text-[30px] font-bold text-gray-800 mb-4 sm:mb-0">
             {{ __('messages.discover_categories') }} </h2>
         <a href="#"
-            class="text-[#FFFFFF] bg-[#185D31]  text-[16px] px-[20px] py-[12px] rounded-[12px]">{{ __('messages.show_more') }}</a>
+            class="text-[#FFFFFF] bg-[#185D31] h-[48px] text-[16px] px-[20px] py-[12px] rounded-[12px]">{{ __('messages.show_more') }}</a>
     </div>
 
     <p class="text-[#696969] text-[20px] mb-8  sm:text-right">
