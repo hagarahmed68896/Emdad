@@ -215,7 +215,7 @@
             <div class="w-full lg:w-1/2  rounded-[12px]  flex flex-col items-center">
 
                 {{-- Main Product Image Swiper --}}
-                <div class="relative w-full md:h-[960px] bg-[#EDEDED]  overflow-hidden rounded-[12px]">
+                <div class="relative w-full md:h-[1080px] bg-[#EDEDED] py-4 overflow-hidden rounded-[12px]">
                     <div class="relative w-full aspect-[3/4] md:aspect-[3/5] lg:aspect-[2/3] rounded-lg">
 
                         <div class="swiper product-main-swiper w-full h-full rounded-lg flex items-center justify-center">
@@ -246,7 +246,7 @@
                             <div class="swiper-button-prev text-[#212121] bg-white rounded-full p-3 shadow-sm"></div>
                         </div>
 
-                        {{-- Discount Badge (Top Right) --}}
+                        {{-- Discount Badge  --}}
                         @if ($product->is_offer && $product->discount_percent)
                             <span
                                 class="absolute top-3 right-3 bg-[#FAE1DF] text-[#C62525] text-xs font-bold px-4 py-2 rounded-full z-10">
@@ -281,7 +281,7 @@
                     <div class="swiper-wrapper gap-3">
                         @forelse ($images as $imagePath)
                             <div
-                                class="swiper-slide w-[150px] h-[150px] bg-[#EDEDED] rounded-md overflow-hidden border-2 border-transparent hover:border-[#185D31] transition-all duration-200 cursor-pointer">
+                                class="swiper-slide w-[120px] h-[150px] bg-[#EDEDED] rounded-md overflow-hidden border-2 border-transparent hover:border-[#185D31] transition-all duration-200 cursor-pointer">
                                 <img src="{{ asset($imagePath) }}"
                                     onerror="this.onerror=null;this.src='https://placehold.co/120x120/F0F0F0/ADADAD?text=Thumb';"
                                     alt="Thumbnail" class="w-full h-full object-cover rounded-md">
@@ -346,21 +346,23 @@
                     <p class="text-[20px] text-[#212121]">{{ $product->supplier_name }}</p>
                 </div>
 
-                {{-- price tiers --}}
                 <div class="mb-2 w-full bg-[#F8F9FA] p-4 rounded-[12px]">
-                    <div class="flex">
-                        <p class="bg-white ml-4 w-[129px] h-[40px] px-[16px] py-[8px]  rounded-[40px]">
+                    {{-- Top flex row with "selectable" and discount --}}
+                    <div class="flex flex-col md:flex-row">
+                        <p
+                            class="bg-white ml-4  md:mb-0 items-center text-center justify-center mb-2 h-[40px] px-[16px] py-[8px] rounded-[40px]">
                             {{ __('messages.selectable') }}</p>
-                        {{-- Discount Badge (Top Right) --}}
                         @if ($product->is_offer && $product->discount_percent)
                             <span
-                                class="  bg-[#FAE1DF] text-[#C62525] text-xs font-bold px-[25px] pt-[12px]  rounded-full z-10">
+                                class="h-[40px] bg-[#FAE1DF] text-[#C62525] text-xs font-bold px-3 rounded-full z-10
+           flex items-center justify-center">
                                 {{ __('messages.discount_percentage', ['percent' => $product->discount_percent]) }}
                             </span>
                         @endif
                     </div>
 
-                    <div class="grid grid-cols-4 gap-1">
+                    {{-- Grid for price tiers --}}
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-1">
                         @forelse ($product->price_tiers as $tier)
                             <div class="p-3">
                                 <p class="text-[16px] text-[#696969]">
@@ -370,21 +372,19 @@
                                         {{ $tier['min_qty'] }}+ {{ __('messages.pieces') }}
                                     @endif
                                 </p>
-                                <p class="price-item text-[32px] text-[#212121] font-bold">
+                                <p class="price-item text-[20px] md:text-[32px] text-[#212121] font-bold">
                                     {{ number_format($tier['price'] * (1 - ($product->discount_percent ?? 0) / 100)) }}
 
-                                    <img class="currency-symbol inline-block mx-1 w-[24px] h-[27px]"
+                                    <img class="currency-symbol inline-block mx-1 md:w-[24px] md:h-[27px] w-[20px] h-[22px]"
                                         src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}" alt="Currency">
                                 </p>
-
                                 @if ($product->is_offer && $product->discount_percent)
-                                    <p class="flex text-sm text-gray-400 line-through mr-2 mr-1">
+                                    <p class="flex text-sm text-gray-400 line-through ">
                                         {{ number_format($product->price, 2) }}
                                         <img class="mx-1 w-[14px] h-[14px] mt-1 inline-block"
                                             src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}" alt="currency">
                                     </p>
                                 @endif
-
                             </div>
                         @empty
                             <p class="text-gray-500 text-sm col-span-3">{{ __('messages.no_pricing_tiers_available') }}
@@ -453,7 +453,7 @@ if (
                             <div x-show="open_Poduct" x-cloak @click.away="open_Poduct = false;"
                                 class="fixed inset-0 p-2 bg-black bg-opacity-50 flex  justify-between z-50">
                                 <div
-                                    class="bg-white p-4 rounded-xl shadow-2xl w-full  md:max-w-[700px] min-h-[50px] h overflow-y-auto flex flex-col md:flex-row rtl:md:flex-row-reverse relative">
+                                    class="bg-white p-4 rounded-xl shadow-2xl w-full  md:max-w-[700px] min-h-[50px]  overflow-y-auto flex flex-col md:flex-row rtl:md:flex-row-reverse relative">
                                     {{-- Close Button --}}
                                     <button x-on:click="open_Poduct = false"
                                         class="absolute top-3 rtl:left-3 ltr:right-3 p-2 transition-colors z-10"
@@ -514,6 +514,12 @@ if (
                                             selected: [],
                                             discount: {{ $product->discount_percent ?? 0 }},
                                             shipping: 14.94,
+                                            isPriceDetailsOpen: false,
+                                        
+                                            openSwatchModal: false,
+                                            swiperInstance: null,
+                                            activeSwatchIndex: 0,
+                                        
                                         
                                             get subtotal() {
                                                 return this.selected.reduce((sum, c) => sum + this.getUnitPrice(c) * c.count, 0);
@@ -555,9 +561,27 @@ if (
                                                 })"
                                                     class="flex items-center justify-between border-b pb-2">
                                                     <div class="flex items-center ">
-                                                        <img :src="selected[{{ $index }}].swatchImage"
-                                                            alt="{{ $colorName }}"
-                                                            class="w-[64px] h-[64px] rounded-[12px] ml-3 bg-[#EDEDED]" />
+               <img
+  :src="selected[{{ $index }}].swatchImage"
+  alt="{{ $colorName }}"
+  class="w-[64px] h-[64px] rounded-[12px] ml-3 bg-[#EDEDED] cursor-pointer object-cover"
+  @click="
+    openSwatchModal = true;
+    $nextTick(() => {
+      if (swiperInstance) swiperInstance.destroy(true, true);
+      swiperInstance = new Swiper('.swatchSwiper', {
+        initialSlide: {{ $index }},
+        loop: true,
+        navigation: {
+          nextEl: '.swiper-button-next',
+          prevEl: '.swiper-button-prev',
+        },
+      });
+    });
+  "
+/>
+
+
                                                         <span class="text-gray-800 font-medium"
                                                             x-text="selected[{{ $index }}].name"></span>
                                                     </div>
@@ -578,7 +602,7 @@ if (
                                                             <button type="button"
                                                                 @click="selected[{{ $index }}].count = Math.max(0, selected[{{ $index }}].count - 1)"
                                                                 class="px-3 py-1 ">
-                                                                     -
+                                                                -
 
                                                             </button>
                                                             <input type="number" min="0"
@@ -588,7 +612,7 @@ if (
                                                             <button type="button"
                                                                 @click="selected[{{ $index }}].count++"
                                                                 class="px-3 py-1">
-                                                                    +
+                                                                +
 
                                                             </button>
                                                         </div>
@@ -596,113 +620,223 @@ if (
                                                 </div>
                                             @endforeach
 
-                                                 {{-- Shipping Details --}}
-                                        <div>
-                                            <p class="text-[24px] font-bold mb-3">{{ __('messages.shipping') }}</p>
-                                            <div class="mb-2 w-full bg-[#F8F9FA] p-4 rounded-[12px]">
-                                                <h3 class="text-lg font-bold text-gray-800 mb-2">
-                                                    {{ __('messages.shipping_details') }}</h3>
-                                                <div class="flex items-center text-gray-700 mb-1">
-                                                    <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]"
-                                                        src="{{ asset('images/shipping (2).svg') }}"
-                                                        onerror="this.onerror=null;this.src='https://placehold.co/20x20/F0F0F0/ADADAD?text=S';"
-                                                        alt="Shipping Cost">
-                                                    <span>
-                                                        @php
-                                                            // $product->shipping_cost should contain the per-item shipping cost from the DB
-                                                            $shippingCostPerItem = $product->shipping_cost ?? null;
-                                                            $displayQuantity = 2; // Fixed quantity for display as per your example
-                                                            $calculatedShippingCost = null;
+                                            {{-- Shipping Details --}}
+                                            <div>
+                                                <p class="text-[24px] font-bold mb-3">{{ __('messages.shipping') }}</p>
+                                                <div class="mb-2 w-full bg-[#F8F9FA] p-4 rounded-[12px]">
+                                                    <h3 class="text-lg font-bold text-gray-800 mb-2">
+                                                        {{ __('messages.shipping_details') }}</h3>
+                                                    <div class="flex items-center text-gray-700 mb-1">
+                                                        <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]"
+                                                            src="{{ asset('images/shipping (2).svg') }}"
+                                                            onerror="this.onerror=null;this.src='https://placehold.co/20x20/F0F0F0/ADADAD?text=S';"
+                                                            alt="Shipping Cost">
+                                                        <span>
+                                                            @php
+                                                                // $product->shipping_cost should contain the per-item shipping cost from the DB
+                                                                $shippingCostPerItem = $product->shipping_cost ?? null;
+                                                                $displayQuantity = 2; // Fixed quantity for display as per your example
+                                                                $calculatedShippingCost = null;
 
-                                                            if (is_numeric($shippingCostPerItem)) {
-                                                                $calculatedShippingCost = number_format(
-                                                                    $shippingCostPerItem * $displayQuantity,
-                                                                    2,
-                                                                );
-                                                            }
-                                                        @endphp
+                                                                if (is_numeric($shippingCostPerItem)) {
+                                                                    $calculatedShippingCost = number_format(
+                                                                        $shippingCostPerItem * $displayQuantity,
+                                                                        2,
+                                                                    );
+                                                                }
+                                                            @endphp
 
-                                                        @if ($calculatedShippingCost !== null)
-                                                            {{-- Using a new translation key for clarity --}}
-                                                            {{ __('messages.shipping_cost_for_quantity', ['cost' => $calculatedShippingCost, 'quantity' => $displayQuantity]) }}
-                                                        @else
-                                                            {{ __('messages.shipping_cost_not_available') }}
-                                                            {{-- Fallback message --}}
-                                                        @endif
-                                                    </span>
-                                                </div>
-                                                <div class="flex items-center text-gray-700">
-                                                    <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]"
-                                                        src="{{ asset('images/shipping-box-2--box-package-label-delivery-shipment-shipping-3d--Streamline-Core.svg') }}"
-                                                        onerror="this.onerror=null;this.src='https://placehold.co/20x20/F0F0F0/ADADAD?text=D';"
-                                                        alt="Delivery Date">
-                                                    <span>{{ __('messages.estimated_delivery_date', ['days' => $product->estimated_delivery_days ?? 'N/A']) }}</span>
+                                                            @if ($calculatedShippingCost !== null)
+                                                                {{-- Using a new translation key for clarity --}}
+                                                                {{ __('messages.shipping_cost_for_quantity', ['cost' => $calculatedShippingCost, 'quantity' => $displayQuantity]) }}
+                                                            @else
+                                                                {{ __('messages.shipping_cost_not_available') }}
+                                                                {{-- Fallback message --}}
+                                                            @endif
+                                                        </span>
+                                                    </div>
+                                                    <div class="flex items-center text-gray-700">
+                                                        <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]"
+                                                            src="{{ asset('images/shipping-box-2--box-package-label-delivery-shipment-shipping-3d--Streamline-Core.svg') }}"
+                                                            onerror="this.onerror=null;this.src='https://placehold.co/20x20/F0F0F0/ADADAD?text=D';"
+                                                            alt="Delivery Date">
+                                                        <span>{{ __('messages.estimated_delivery_date', ['days' => $product->estimated_delivery_days ?? 'N/A']) }}</span>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
 
 
 
 
-                                            <!-- ✅ Single live summary for ALL colors -->
-                                            <div class="tex border-t pt-4 mb-4">
-                                                <p class="text-[24px] font-bold mb-3">{{ __('messages.price') }}</p>
 
-                                                <div class="flex justify-between mb-2">
-                                                    <span class="text-[20px] text-[#212121]"> {{__('messages.total_elements')}}</span>
-                                                    <div class="flex ">
-                                                    <span x-text="`${subtotal.toFixed(2)}`"></span>
-                                                    
-                                                   <img class="mx-1 w-[16px] h-[16px] mt-1 inline-block"
+                                            <!-- Price Section with Collapse -->
+                                            <div x-data="{ isPriceDetailsOpen: false }" class="tex border-t pt-4 mb-4">
+
+                                                <!-- 1️⃣ Collapsed: total + arrow on the right -->
+                                                <template x-if="!isPriceDetailsOpen">
+                                                    <div class="font-bold flex text-[20px] justify-between cursor-pointer"
+                                                        @click="isPriceDetailsOpen = true">
+                                                        <span>{{ __('messages.total') }}</span>
+                                                        <div class="flex items-center">
+                                                            <span x-text="`${total.toFixed(2)}`"></span>
+                                                            <img class="mx-1 w-[16px] h-[16px] mt-2 inline-block"
                                                                 src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}"
                                                                 alt="">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                                viewBox="0 0 24 24" stroke-width="1.5"
+                                                                stroke="currentColor" class="size-6"
+                                                                :class="{ 'rotate-180': isPriceDetailsOpen }">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                </template>
+
+                                                <!-- 2️⃣ Expanded: details + arrow moved next to Price heading -->
+                                                <div x-show="isPriceDetailsOpen" x-collapse>
+                                                    <div class="flex justify-between items-center mb-3">
+                                                        <p class="text-[24px] font-bold">{{ __('messages.price') }}</p>
+                                                        <!-- Arrow here next to heading -->
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                            class="size-6 cursor-pointer"
+                                                            @click="isPriceDetailsOpen = false"
+                                                            :class="{ 'rotate-180': isPriceDetailsOpen }">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                                                        </svg>
+                                                    </div>
+
+                                                    <!-- Details -->
+                                                    <div class="flex justify-between mb-2">
+                                                        <span
+                                                            class="text-[20px] text-[#212121]">{{ __('messages.total_elements') }}</span>
+                                                        <div class="flex">
+                                                            <span x-text="`${subtotal.toFixed(2)}`"></span>
+                                                            <img class="mx-1 w-[16px] h-[16px] mt-1 inline-block"
+                                                                src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}"
+                                                                alt="">
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="flex justify-between border-b pb-3 mb-2">
+                                                        <span
+                                                            class="text-[20px] text-[#212121]">{{ __('messages.shipping_price') }}</span>
+                                                        <div class="flex">
+                                                            <span x-text="`${shipping.toFixed(2)}`"></span>
+                                                            <img class="mx-1 w-[16px] h-[16px] mt-1 inline-block"
+                                                                src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}"
+                                                                alt="">
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Bottom total: no arrow -->
+                                                    <div class="font-bold flex text-[20px] justify-between cursor-pointer mt-4"
+                                                        @click="isPriceDetailsOpen = false">
+                                                        <span>{{ __('messages.total') }}</span>
+                                                        <div class="flex items-center">
+                                                            <span x-text="`${total.toFixed(2)}`"></span>
+                                                            <img class="mx-1 w-[16px] h-[16px] mt-2 inline-block"
+                                                                src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}"
+                                                                alt="">
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+
+
+
+
+
+                                            <!-- Swatch Modal with Swiper -->
+                                            <div x-show="openSwatchModal" x-transition
+                                                class="fixed inset-0 items-center justify-end pl-[100px] flex z-50">
+                                                <div
+                                                    class="bg-white rounded-lg  max-w-[40%] max-h-[80%] overflow-hidden relative">
+
+                                                    <!-- Close -->
+
+                                                    <button @click="openSwatchModal = false"
+                                                        class="absolute top-3 rtl:left-3 ltr:right-3 p-2 transition-colors z-10"
+                                                        aria-label="Close">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                            viewBox="0 0 24 24" stroke-width="1" stroke="currentColor"
+                                                            class="size-9">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M6 18 18 6M6 6l12 12" />
+                                                        </svg>
+
+                                                    </button>
+
+                                                    <!-- Swiper -->
+                                                    <div class="swiper swatchSwiper">
+                                                        <div class="swiper-wrapper">
+                                                            @foreach ($product->specifications['colors'] as $index => $color)
+                                                                @php
+                                                                    $colorName =
+                                                                        is_array($color) && isset($color['name'])
+                                                                            ? $color['name']
+                                                                            : $color;
+                                                                    $swatchImage =
+                                                                        is_array($color) &&
+                                                                        isset($color['swatch_image'])
+                                                                            ? asset($color['swatch_image'])
+                                                                            : 'https://placehold.co/40x40/F0F0F0/ADADAD?text=N/A';
+                                                                @endphp
+
+                                                                <div class="swiper-slide flex flex-col items-center">
+                                                                    <img src="{{ $swatchImage }}"
+                                                                    
+                                                                        class="max-w-full max-h-[70vh] rounded-lg" />
+                                                                    <h2 class="text-lg font-bold text-center">
+                                                                       {{__('messages.color_name')}}: {{ $colorName }}</h2>
                                                                 </div>
-                                                            </div>
-                                                <div class="flex justify-between border-b pb-3 mb-2">
-                                                    <span class="text-[20px] text-[#212121]">{{__('messages.shipping_price')}}</span>
-                                                      <div class="flex ">
-                                                    <span x-text="`${shipping.toFixed(2)}`"></span>
-                                                     <img class="mx-1 w-[16px] h-[16px] mt-1 inline-block"
-                                                                src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}"
-                                                                alt="">
-                                                      </div>
-                                                </div>
-                                                <div class="font-bold  flex text-[20px] justify-between">
-                                                    <span>{{__('messages.total')}}</span>
-                                                    <div class="flex ">
-                                                    <span x-text="`${total.toFixed(2)}`"></span>
-                                                     <img class="mx-1 w-[16px] h-[16px] mt-2 inline-block"
-                                                                src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}"
-                                                                alt="">
-                                                </div>
+                                                            @endforeach
+                                                        </div>
+
+                                                        <!-- Swiper navigation -->
+                                                        <div class="swiper-button-next"></div>
+                                                        <div class="swiper-button-prev"></div>
+                                                    </div>
+
                                                 </div>
                                             </div>
 
-                                            
+
+
+
+
+
                                         </div>
 
 
 
 
 
-                                   
 
-                            
+
+
 
                                         {{-- Action Buttons --}}
-                                        <div class="flex flex-col md:flex-row gap-3 mb-3">
-                                      <button x-on:click="handleAddToCart()" x-bind:disabled="totalItems === 0"
-                                        class="flex flex-1 px-6 py-3 bg-[#185D31] text-white rounded-lg font-semibold hover:bg-green-700 transition-colors shadow-md text-center justify-center items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 ml-2"> {{-- Changed ml-1 to mr-2 for spacing --}}
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
-                                        </svg>
-                                        {{__('messages.add_to_cart')}}
-                                    </button>
+                                        <div class="flex flex-col md:flex-row gap-3 mb-3 py-4">
+                                            <button x-on:click="handleAddToCart()" x-bind:disabled="totalItems === 0"
+                                                class="flex flex-1 px-6 py-3 bg-[#185D31] text-white rounded-lg font-semibold hover:bg-green-700 transition-colors shadow-md text-center justify-center items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                    class="size-6 ml-2"> {{-- Changed ml-1 to mr-2 for spacing --}}
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                                                </svg>
+                                                {{ __('messages.add_to_cart') }}
+                                            </button>
                                             <button x-on:click="handleContactSupplier()"
                                                 class="flex-1 px-6 py-3 bg-[#EDEDED] text-[#696969] rounded-lg font-semibold hover:bg-gray-200 transition-colors shadow-md">
-                                                {{__('messages.connect_to_supplier')}}
+                                                {{ __('messages.connect_to_supplier') }}
                                             </button>
-                                      
+
                                         </div>
                                     </div>
                                 </div>
@@ -804,7 +938,7 @@ if (
                                 <img src="{{ asset('images/Tabby.svg') }}"
                                     onerror="this.onerror=null;this.src='https://placehold.co/60x20/F0F0F0/ADADAD?text=Tabby';"
                                     alt="Tabby Logo" class="h-5 object-contain">
-                                <img src="{{ asset('images/تمارا.svg') }}"
+                                <img src="{{ asset('images/tamara.svg') }}"
                                     onerror="this.onerror=null;this.src='https://placehold.co/60x20/F0F0F0/ADADAD?text=Tamara';"
                                     alt="Tamara Logo" class="h-5 object-contain">
                             </div>
@@ -1452,8 +1586,7 @@ if (
 
 
 {{-- Login Popup HTML --}}
-<div id="login-popup" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50"
-   >
+<div id="login-popup" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
     <div class="bg-white p-8 rounded-lg shadow-lg w-96 max-w-sm mx-4">
         <h2 class="text-2xl font-bold mb-4 text-gray-900">{{ __('messages.login_important') }}</h2>
         <p class="mb-6 text-gray-700">{{ __('messages.login_important_for_fav') }}</p>
@@ -1496,136 +1629,147 @@ if (
 
 {{-- Include Swiper JS --}}
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const productMainSwiper = new Swiper('.product-main-swiper', {
-      loop: true,
-      spaceBetween: 10,
-      slidesPerView: 1,
-      navigation: {
-        nextEl: '.swiper-button-next',
-        prevEl: '.swiper-button-prev',
-      },
-      pagination: {
-        el: '.product-main-pagination',
-        clickable: true,
-      },
-    });
-
-    const productThumbnailSwiper = new Swiper('.product-thumbnail-swiper', {
-      spaceBetween: 10,
-      slidesPerView: 'auto',
-      freeMode: true,
-      watchSlidesProgress: true,
-      breakpoints: {
-        640: { slidesPerView: 5 },
-        768: { slidesPerView: 6 },
-        1024: { slidesPerView: 7 },
-      },
-    });
-
-    productMainSwiper.controller.control = productThumbnailSwiper;
-    productThumbnailSwiper.controller.control = productMainSwiper;
-
-    const colorSwatches = document.querySelectorAll('.color-swatch');
-    const selectedColorNameSpan = document.getElementById('selectedColorName');
-
-    const initialSelectedSwatch = document.querySelector('.color-swatch.selected');
-    if (initialSelectedSwatch) {
-      selectedColorNameSpan.textContent = initialSelectedSwatch.dataset.colorName;
-    } else {
-      selectedColorNameSpan.textContent = " ";
-    }
-
-    colorSwatches.forEach(swatch => {
-      swatch.addEventListener('click', function() {
-        colorSwatches.forEach(s => s.classList.remove('selected'));
-        this.classList.add('selected');
-        selectedColorNameSpan.textContent = this.dataset.colorName;
-      });
-    });
-
-    function initializeInnerSwipers() {
-      document.querySelectorAll('.inner-swiper').forEach(swiperElement => {
-        if (!swiperElement.swiper) {
-          const imageSlides = swiperElement.querySelectorAll('.swiper-slide').length;
-          if (imageSlides > 1) {
-            new Swiper(swiperElement, {
-              loop: true,
-              autoplay: { delay: 2500, disableOnInteraction: false },
-              pagination: {
-                el: swiperElement.querySelector('.image-pagination'),
-                clickable: true,
-              },
-            });
-          }
-        }
-      });
-    }
-
-    initializeInnerSwipers();
-
-    const isUserLoggedIn = {{ Auth::check() ? 'true' : 'false' }};
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    const favoriteButtons = document.querySelectorAll('.favorite-button');
-    const loginPopup = document.getElementById('login-popup');
-    const closeLoginPopupBtn = document.getElementById('close-login-popup');
-
-    favoriteButtons.forEach(button => {
-      button.addEventListener('click', function(event) {
-        if (!isUserLoggedIn) {
-          event.preventDefault();
-          loginPopup.classList.remove('hidden');
-        } else {
-          const productId = this.dataset.productId;
-          fetch(`/products/${productId}/toggle-favorite`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-              'X-CSRF-TOKEN': csrfToken
+    document.addEventListener('DOMContentLoaded', function() {
+        const productMainSwiper = new Swiper('.product-main-swiper', {
+            loop: true,
+            spaceBetween: 10,
+            slidesPerView: 1,
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
             },
-            body: JSON.stringify({ product_id: productId })
-          })
-          .then(response => {
-            if (response.status === 401) {
-              window.location.href = '/login';
-              return Promise.reject('Unauthenticated');
-            }
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-          })
-          .then(data => {
-            const svg = this.querySelector('svg');
-            if (data.is_favorited) {
-              svg.setAttribute('fill', 'currentColor');
-              svg.classList.add('text-red-500');
-              svg.classList.remove('text-gray-500');
-            } else {
-              svg.setAttribute('fill', 'none');
-              svg.classList.remove('text-red-500');
-              svg.classList.add('text-gray-500');
-            }
-          })
-          .catch(error => console.error('Error toggling favorite:', error));
+            pagination: {
+                el: '.product-main-pagination',
+                clickable: true,
+            },
+        });
+
+        const productThumbnailSwiper = new Swiper('.product-thumbnail-swiper', {
+            spaceBetween: 8,
+            slidesPerView: 'auto',
+            freeMode: true,
+            watchSlidesProgress: true,
+            breakpoints: {
+                640: {
+                    slidesPerView: 5
+                },
+                768: {
+                    slidesPerView: 5
+                },
+                1024: {
+                    slidesPerView: 4
+                },
+            },
+        });
+
+        productMainSwiper.controller.control = productThumbnailSwiper;
+        productThumbnailSwiper.controller.control = productMainSwiper;
+
+        const colorSwatches = document.querySelectorAll('.color-swatch');
+        const selectedColorNameSpan = document.getElementById('selectedColorName');
+
+        const initialSelectedSwatch = document.querySelector('.color-swatch.selected');
+        if (initialSelectedSwatch) {
+            selectedColorNameSpan.textContent = initialSelectedSwatch.dataset.colorName;
+        } else {
+            selectedColorNameSpan.textContent = " ";
         }
-      });
+
+        colorSwatches.forEach(swatch => {
+            swatch.addEventListener('click', function() {
+                colorSwatches.forEach(s => s.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedColorNameSpan.textContent = this.dataset.colorName;
+            });
+        });
+
+        function initializeInnerSwipers() {
+            document.querySelectorAll('.inner-swiper').forEach(swiperElement => {
+                if (!swiperElement.swiper) {
+                    const imageSlides = swiperElement.querySelectorAll('.swiper-slide').length;
+                    if (imageSlides > 1) {
+                        new Swiper(swiperElement, {
+                            loop: true,
+                            autoplay: {
+                                delay: 2500,
+                                disableOnInteraction: false
+                            },
+                            pagination: {
+                                el: swiperElement.querySelector('.image-pagination'),
+                                clickable: true,
+                            },
+                        });
+                    }
+                }
+            });
+        }
+
+        initializeInnerSwipers();
+
+        const isUserLoggedIn = {{ Auth::check() ? 'true' : 'false' }};
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        const favoriteButtons = document.querySelectorAll('.favorite-button');
+        const loginPopup = document.getElementById('login-popup');
+        const closeLoginPopupBtn = document.getElementById('close-login-popup');
+
+        favoriteButtons.forEach(button => {
+            button.addEventListener('click', function(event) {
+                if (!isUserLoggedIn) {
+                    event.preventDefault();
+                    loginPopup.classList.remove('hidden');
+                } else {
+                    const productId = this.dataset.productId;
+                    fetch(`/products/${productId}/toggle-favorite`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken
+                            },
+                            body: JSON.stringify({
+                                product_id: productId
+                            })
+                        })
+                        .then(response => {
+                            if (response.status === 401) {
+                                window.location.href = '/login';
+                                return Promise.reject('Unauthenticated');
+                            }
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            const svg = this.querySelector('svg');
+                            if (data.is_favorited) {
+                                svg.setAttribute('fill', 'currentColor');
+                                svg.classList.add('text-red-500');
+                                svg.classList.remove('text-gray-500');
+                            } else {
+                                svg.setAttribute('fill', 'none');
+                                svg.classList.remove('text-red-500');
+                                svg.classList.add('text-gray-500');
+                            }
+                        })
+                        .catch(error => console.error('Error toggling favorite:', error));
+                }
+            });
+        });
+
+        if (closeLoginPopupBtn) {
+            closeLoginPopupBtn.addEventListener('click', function() {
+                loginPopup.classList.add('hidden');
+            });
+        }
+
+        if (loginPopup) {
+            loginPopup.addEventListener('click', function(event) {
+                if (event.target === loginPopup) {
+                    loginPopup.classList.add('hidden');
+                }
+            });
+        }
     });
-
-    if (closeLoginPopupBtn) {
-      closeLoginPopupBtn.addEventListener('click', function() {
-        loginPopup.classList.add('hidden');
-      });
-    }
-
-    if (loginPopup) {
-      loginPopup.addEventListener('click', function(event) {
-        if (event.target === loginPopup) {
-          loginPopup.classList.add('hidden');
-        }
-      });
-    }
-  });
 </script>
 <script src="//unpkg.com/alpinejs" defer></script>
