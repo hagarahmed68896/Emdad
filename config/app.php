@@ -137,4 +137,80 @@ return [
     //     // 'PDF' => Barryvdh\DomPDF\Facade::class, // Example of another custom alias
     // ])->toArray(), // Don't forget toArray() if using merge
 
+    // ... (Your existing configuration above this point) ...
+
+    /*
+    |--------------------------------------------------------------------------
+    | Autoloaded Service Providers
+    |--------------------------------------------------------------------------
+    |
+    | The service providers listed here will be automatically loaded on the
+    | request to your application. Feel free to add your own services to
+    | this array to grant them access to the Laravel framework.
+    |
+    */
+
+    // 'providers' => [
+    //     /*
+    //      * Laravel Framework Service Providers...
+    //      */
+    //     Illuminate\Auth\AuthServiceProvider::class,
+    //     Illuminate\Broadcasting\BroadcastServiceProvider::class,
+    //     Illuminate\Bus\BusServiceProvider::class,
+    //     Illuminate\Cache\CacheServiceProvider::class,
+    //     Illuminate\Foundation\Providers\ConsoleSupportServiceProvider::class,
+    //     Illuminate\Cookie\CookieServiceProvider::class,
+    //     Illuminate\Database\DatabaseServiceProvider::class,
+    //     Illuminate\Encryption\EncryptionServiceProvider::class,
+    //     Illuminate\Filesystem\FilesystemServiceProvider::class,
+    //     Illuminate\Foundation\Providers\FoundationServiceProvider::class,
+    //     Illuminate\Hashing\HashServiceProvider::class,
+    //     Illuminate\Mail\MailServiceProvider::class,
+    //     Illuminate\Notifications\NotificationServiceProvider::class,
+    //     Illuminate\Pagination\PaginationServiceProvider::class,
+    //     Illuminate\Pipeline\PipelineServiceProvider::class,
+    //     Illuminate\Queue\QueueServiceProvider::class,
+    //     Illuminate\Redis\RedisServiceProvider::class,
+    //     Illuminate\Auth\Passwords\PasswordResetServiceProvider::class,
+    //     Illuminate\Session\SessionServiceProvider::class, // This line was outside, make sure it's inside 'providers'
+    //     Illuminate\Translation\TranslationServiceProvider::class,
+    //     Illuminate\Validation\ValidationServiceProvider::class,
+    //     Illuminate\View\ViewServiceProvider::class,
+
+    //     /*
+    //      * Package Service Providers...
+    //      */
+    //     Laravel\Socialite\SocialiteServiceProvider::class, // Example, if you use Socialite
+    //     Maatwebsite\Excel\ExcelServiceProvider::class, // <-- ADD THIS LINE FOR LARAVEL EXCEL
+
+    //     /*
+    //      * Application Service Providers...
+    //      */
+    //     App\Providers\AppServiceProvider::class,
+    //     App\Providers\AuthServiceProvider::class,
+    //     // App\Providers\BroadcastServiceProvider::class, // Uncomment if you're using broadcasting
+    //     //        App\Providers\EventServiceProvider::class,
+    //     // App\Providers\RouteServiceProvider::class,
+
+    // ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Class Aliases
+    |--------------------------------------------------------------------------
+    |
+    | This array of class aliases will be registered when this application
+    | is started. However, feel free to register as many as you wish as
+    | the aliases are "lazy" loaded so they don't hinder performance.
+    |
+    */
+
+    // 'aliases' => Illuminate\Support\Facades\Facade::defaultAliases()->merge([ // This part is correct if uncommented
+    //     // 'Example' => App\Facades\Example::class, // Your custom application aliases
+    //     'Session' => Illuminate\Support\Facades\Session::class,
+    //     'Socialite' => Laravel\Socialite\Facades\Socialite::class, // Example, if you use Socialite
+    //     'Excel' => Maatwebsite\Excel\Facades\Excel::class, // <-- ADD THIS LINE FOR LARAVEL EXCEL
+    // ])->toArray(), // Don't forget toArray()
+
+
    ];

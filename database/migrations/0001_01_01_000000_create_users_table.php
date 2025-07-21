@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('password');
             $table->string('profile_picture')->nullable();
             $table->string('address')->nullable();
-            //type of account: 'supplier' or 'customer'
+            //type of account: 'supplier' or 'customer' or 'admin'
             $table->string('account_type');            
     
             $table->timestamp('email_verified_at')->nullable();

@@ -334,6 +334,11 @@ return [
     'pricedesc' => 'السعر: من الأعلى إلى الأقل',
     'latest' => 'الأحدث',
     'ratingdesc' => 'الأعلى تقييمًا',
+    'selected_items' => 'العناصر المحددة',
+    'product' => 'المنتج',
+    'quantaty' => 'الكمية',
+    'element' => 'عنصر',
+    'type' => 'صنف',
     
 
     

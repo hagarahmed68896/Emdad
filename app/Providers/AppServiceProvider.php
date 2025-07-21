@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use App\Models\Cart as CustomCart; // if your Cart model is App\Models\Cart
 use Illuminate\Support\Facades\App;
+use App\Console\Commands\ChangeAdminPassword;
 
 class AppServiceProvider extends \Illuminate\Support\ServiceProvider
 {

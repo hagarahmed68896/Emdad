@@ -7,17 +7,20 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Auth\SupplierController;
+use App\Http\Controllers\Auth\AdminLoginController;
+use App\Http\Controllers\AdminDashboardController; 
 use App\Http\Controllers\OtpController;
 use App\Http\Controllers\Auth\SocialLoginController;
 use App\Http\Controllers\ProductSuggestionController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ProductController; // Ensure this is used if you uncomment product.show later
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ClothingController;
 use App\Http\Controllers\ReviewController;
-use App\Models\Product; // Ensure this is used if you uncomment product.show later
+use App\Http\Controllers\Admin\UserController; 
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 // ---
@@ -28,6 +31,10 @@ Route::middleware('web')->group(function () {
     Route::middleware('guest')->group(function () {
         Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
         Route::post('/login', [LoginController::class, 'login'])->name('login');
+
+        // Admin Login Routes (accessible to guests)
+        Route::get('/admin/login', [AdminLoginController::class, 'showLoginForm'])->name('admin.login.show');
+        Route::post('/admin/login', [AdminLoginController::class, 'login'])->name('admin.login.store');
 
         Route::get('/auth/google/redirect', [SocialLoginController::class, 'redirectToGoogle'])->name('login.google');
         Route::get('/auth/google/callback', [SocialLoginController::class, 'handleGoogleCallback']);
@@ -46,78 +53,79 @@ Route::middleware('web')->group(function () {
 
     // Authenticated routes
     Route::middleware('auth')->group(function () {
+
+        // Admin-specific routes
+ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
+
+    // ✅ لوحة التحكم => فقط احصائيات عامة
+    Route::get('/dashboard', [\App\Http\Controllers\AdminDashboardController::class, 'index'])
+         ->name('admin.dashboard');
+
+    // ✅ إدارة المستخدمين بالكامل
+    Route::get('/users', [\App\Http\Controllers\Admin\UserController::class, 'index'])
+         ->name('admin.users.index');
+
+    Route::get('/users/create', [\App\Http\Controllers\Admin\UserController::class, 'create'])
+         ->name('admin.users.create');
+
+    Route::post('/users', [\App\Http\Controllers\Admin\UserController::class, 'store'])
+         ->name('admin.users.store');
+
+    Route::get('/users/{user}/edit', [\App\Http\Controllers\Admin\UserController::class, 'edit'])
+         ->name('admin.users.edit');
+
+    Route::put('/users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'update'])
+         ->name('admin.users.update');
+
+    Route::delete('/users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'destroy'])
+         ->name('admin.users.destroy');
+    Route::post('/admin/logout', [AdminLoginController::class, 'logout'])->name('admin.logout');
+
+    Route::get('/users/export/csv', [App\Http\Controllers\Admin\UserController::class, 'exportCsv'])->name('admin.users.export.csv');
+
+        });
+
+
+
+        
+
+        // General user logout (if you have a separate logout for normal users)
         Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 
         Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
-
-        // Route to handle updating user details
         Route::post('/profile/update-details', [ProfileController::class, 'updateDetails'])->name('profile.updateDetails');
-
-        // Route to handle updating user password
         Route::post('/profile/update-password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
-
         Route::post('/profile/update-profile-picture', [ProfileController::class, 'updateProfilePicture'])->name('profile.updateProfilePicture');
-        Route::post('/profile/remove-profile-p
-        icture', [ProfileController::class, 'removeProfilePicture'])->name('profile.removeProfilePicture');
+        Route::post('/profile/remove-profile-picture', [ProfileController::class, 'removeProfilePicture'])->name('profile.removeProfilePicture');
 
-        Route::post('/products/{product}/toggle-favorite', [FavoriteController::class, 'toggle'])
-            ->name('favorites.toggle');
-
-        // Route to display the favorites page
-        Route::get('/favorites', [FavoriteController::class, 'index'])
-             ->name('favorites.index');
+        Route::post('/products/{product}/toggle-favorite', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
+        Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
         Route::post('/profile/update-notifications', [ProfileController::class, 'updateNotifications'])->name('profile.updateNotifications');
 
         Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-        // Look for a POST route that points to your CartController's store method
         Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
 
+        Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
+        Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
 
-    // Route to display all notifications (e.g., on a dedicated notifications page)
-    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::post('/reviews/{review}/like', [ReviewController::class, 'toggleLike'])->name('reviews.like');
+        Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+        Route::resource('reviews', ReviewController::class)->only(['edit','destroy']);
+        Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
 
-    // Route to mark all notifications as read (for the button in your popup)
-    // Using a POST request is generally better for actions that change data.
-    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
-
-    // Route to mark a specific notification as read
-    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
-
+        Route::get('/', [HomeController::class, 'index'])->name(name: 'home');
     });
 
     // Public routes that also benefit from session (e.g., for language changes)
-    Route::get('/', [HomeController::class, 'index'])->name(name: 'home');
     Route::get('/search', [SearchController::class, 'index'])->name('search');
-    // Route::get('/products', [CategoryController::class, 'index'])->name('products.index');
     Route::get('/products/category/{slug}', [CategoryController::class, 'filterByCategory'])->name('products.filterByCategory');
-
-     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
-
-    // Route for displaying products that are currently on offer
-    // This explicitly uses the `offers` method in ProductController.
+    Route::get('/products', [ProductController::class, 'index'])->name('products.index');
     Route::get('/offers', [ProductController::class, 'offers'])->name('offers.index');
-
-    // Route for displaying featured products
     Route::get('/products/featured', [ProductController::class, 'showFeaturedProducts'])->name('products.featured');
-
-    // Route for individual product details by slug
-    // This must be placed AFTER more specific product routes like /products/create or /products/featured
-    // to avoid /{slug} matching those specific paths.
     Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
-
-
-
-    // *** THIS IS THE MISSING ROUTE YOU NEED TO ADD/ENSURE IS PRESENT ***
     Route::get('/categories/{slug}', [CategoryController::class, 'filterByCategory'])->name('categories.show');
-
     Route::get('/products/suggestions', [ProductSuggestionController::class, 'getSuggestions']);
-    // Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show'); // Uncomment if needed for single product view later
-
-    // Route for the main offers page (using ProductController's index)
-    Route::get('/offers', [ProductController::class, 'index'])->name('offers.index');
-
-    // Route for individual product details (using ProductController's show with slug)
-    Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
 
     Route::get('language/{locale}', function ($locale) {
         if (in_array($locale, ['en', 'ar'])) {
@@ -140,14 +148,4 @@ Route::middleware('web')->group(function () {
     })->name('common_questions');
 
     Route::get('/clothings', [ClothingController::class, 'index'])->name('clothings');
-    
-   Route::post('/reviews/{review}/like', [ReviewController::class, 'toggleLike'])->name('reviews.like')->middleware('auth');
-
-   Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store')->middleware('auth');
-
-   Route::resource('reviews', ReviewController::class)->only(['edit','destroy']);
-
-   Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
-
-
-}); 
+});

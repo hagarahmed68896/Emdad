@@ -351,6 +351,11 @@ return [
     'pricedesc' => 'Price: Deseding',
     'latest' => 'Lastest',
     'ratingdesc' => 'Hiegh rating',
+    'selected_items' => 'Selected items',
+    'product' => 'Product',
+    'quantaty' => 'Quantaty',
+    'element' => 'Element',
+    'type' => 'Type',
 
 
 

@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Order;
 
 class User extends Authenticatable
 {
@@ -30,6 +31,7 @@ class User extends Authenticatable
         'provider_id', 
         'profile_picture',
         'notification_settings', 
+        'status', // active, inactive, banned
 
 
     ];
@@ -101,6 +103,11 @@ public function likedReviews()
     public function hasFavorited($productId)
     {
         return $this->favorites()->where('product_id', $productId)->exists();
+    }
+
+        public function orders()
+    {
+        return $this->hasMany(Order::class);
     }
 
 }
