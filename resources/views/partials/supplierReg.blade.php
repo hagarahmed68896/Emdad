@@ -185,7 +185,7 @@
         </div>
 
 
-        {{-- bussness data --}}
+        {{-- business data --}}
         <div x-show="bussnissdata" class="mt-4">
             <p class="text-[24px] font-bold text-[#212121] mb-4">
                 {{ __('messages.bussniss_data') }}

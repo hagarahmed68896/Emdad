@@ -160,7 +160,7 @@
 
 </head>
 
-<body class="flex h-screen overflow-hidden bg-gray-100" style=" font-family: 'Cairo',">
+<body class="flex h-screen overflow-hidden bg-gray-100" style="font-family: 'Cairo', sans-serif;">
 
     <!-- Sidebar -->
     <aside id="sidebar"  x-data="{ activeItem: null }" class="sidebar bg-white shadow-lg flex flex-col p-4 overflow-y-auto">
@@ -202,7 +202,7 @@
         </li>
 
         <li>
-            <a href="{{ route('admin.users.index', ['account_type' => 'supplier']) }}"
+            <a href="{{ route('admin.suppliers.index', ['account_type' => 'supplier']) }}"
                class="flex items-center p-2 transition-colors duration-200
                {{ request('account_type') === 'supplier' ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
                الموردين
@@ -473,6 +473,7 @@
             }
         }
     </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </body>
 
 </html>

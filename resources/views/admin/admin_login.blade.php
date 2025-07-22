@@ -1,53 +1,34 @@
+<script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS CDN (should ideally be in a layout file's head, but placed here as per request) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap" rel="stylesheet">
-
-<div dir="{{ app()->getLocale() == 'ar' ? 'rtl' : 'ltr' }}"
-     style="font-family: 'Cairo', sans-serif;"
-     class="flex flex-col rtl md:flex-row w-full h-screen bg-white rounded-2xl overflow-hidden">
-        <!-- Left Section: Login Form -->
-      
-
-        <!-- Right Section: Dashboard Preview (Green Background) -->
+        <div dir="{{ app()->getLocale() == 'ar' ? 'rtl' : 'ltr' }}"
+        style="font-family: 'Cairo', sans-serif;"
+        class="flex flex-col rtl md:flex-row w-full h-screen bg-white overflow-hidden">
         <div class="w-full md:w-1/2 bg-[#185D31] p-8 md:p-12 flex flex-col justify-center items-center text-white overflow-auto">
-               <!-- Placeholder for dashboard image -->
-            <div class="w-full max-w-md bg-white rounded-xl p-4 shadow-lg mb-4">
+                <div class="w-full max-w-md bg-white rounded-xl p-4 shadow-lg mb-4">
                 <img src="/images/cd11071e9281b541cdbadadda2e9d1fcb71ad2cb.png" alt="Dashboard Preview" class="w-full h-auto rounded-lg">
             </div>
             <h2 class="text-4xl font-bold text-center mb-6">مرحباً بك في لوحة تحكمك</h2>
-            <p class="text-center text-green-100 mb-8 max-w-md">نظام ذكي يساعدك على إدارة كل شيء.</p>
-         
+            <p class="text-center text-green-100 mb-8 max-w-md">نظام ذكي يساعدك على إدارة كل شيء.</p>         
         </div>
 
-
-          <div class="w-full md:w-1/2 p-8 md:px-[60px]  flex flex-col overflow-auto">
+            <div class="w-full md:w-1/2 p-8 md:px-[60px]  flex flex-col overflow-auto">
     
-            <div class="flex flex-col  mb-8">
-                <!-- Placeholder for logo/profile picture -->
-                <div class="w-[92px] h-[92px] flex  overflow-hidden">
-                   <img src="/images/image-picture-landscape-1--photos-photo-landscape-picture-photography-camera-pictures--Streamline-Core.png" alt="">
+                <div class="flex flex-col  mb-8">
+                    <div class="w-[92px] h-[92px] flex  overflow-hidden">
+                       <img src="/images/image-picture-landscape-1--photos-photo-landscape-picture-photography-camera-pictures--Streamline-Core.png" alt="">
+                    </div>
                 </div>
-            </div>
-<div class="p-[64px]">
+       <div class="p-[64px]">
             <h2 class="text-3xl font-bold text-gray-800 mb-2">تسجيل الدخول</h2>
             <p class=" text-gray-600 mb-8">سجل الدخول للوصول إلى لوحة التحكم الخاصة بك</p>
 
-            <!-- Display validation errors -->
-      {{-- @if ($errors->has('email'))
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl relative mb-4" role="alert">
-        <strong class="font-bold">خطأ!</strong>
-        <span class="block sm:inline">{{ $errors->first('email') }}</span>
-    </div>
-@endif --}}
-    <div class="text-red-600 mt-4" x-html="errorMessages"></div>
+            <div class="text-red-600 mt-4" x-html="errorMessages"></div>
 
 
-            <!-- Login Form -->
-            <form action="{{ route('admin.login.store') }}" method="POST" class="space-y-6">
+            <form action="{{ route('admin.login.store') }}" method="POST" class="space-y-6" x-data="adminLogin()" @submit.prevent="submit($event)">
                 @csrf
 
-                <!-- Email Address -->
                 <div>
                     <label for="email" class="block font-[20px] font-bold text-[#212121] mb-2">البريد الإلكتروني</label>
                     <div class="relative rounded-xl shadow-sm">
@@ -60,7 +41,6 @@
                     </div>
                 </div>
 
-                <!-- Password -->
                 <div>
                     <label for="password" class="block  font-[20px] font-bold text-[#212121] mb-2">كلمة المرور</label>
                     <div class="relative rounded-xl shadow-sm">
@@ -84,7 +64,7 @@
 
                 <div>
                     <button type="submit"
-                            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-lg font-medium text-white bg-[#185D31] hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out">
+                                class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-lg font-medium text-white bg-[#185D31] hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out">
                         تسجيل الدخول
                     </button>
                 </div>
@@ -119,10 +99,17 @@ function adminLogin() {
             if (response.ok) {
                 window.location.href = data.redirect;
             } else {
-                if (data.errors) {
+                // Handle 422 Unprocessable Entity (validation errors)
+                if (response.status === 422 && data.errors) {
                     for (const [field, messages] of Object.entries(data.errors)) {
                         this.errorMessages += `<p>${messages.join(', ')}</p>`;
                     }
+                }
+                // Handle other errors (e.g., 401 Unauthorized for incorrect credentials)
+                else if (data.message) {
+                    this.errorMessages = `<p>${data.message}</p>`;
+                } else {
+                    this.errorMessages = `<p>حدث خطأ غير معروف. يرجى المحاولة مرة أخرى.</p>`;
                 }
             }
         }

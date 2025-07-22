@@ -92,10 +92,10 @@ class UserController extends Controller
         $request->validate([
             'full_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'phone_number' => ['nullable', 'string', 'max:20'],
+            'phone_number' => 'required|digits:9|unique:users,phone_number',
             'address' => ['nullable', 'string', 'max:255'],
             'status' => ['required', Rule::in(['active', 'inactive', 'banned'])],
-            'password' => ['nullable', 'string', 'min:8'],
+            'password' => 'required|string|min:8|confirmed|regex:/[A-Z]/|regex:/[0-9]/',
             'account_type' => ['required', 'string', 'in:supplier,customer,admin'],
         ]);
 
@@ -121,30 +121,34 @@ class UserController extends Controller
     }
 
     // ✅ تحديث بيانات مستخدم
-    public function update(Request $request, User $user)
-    {
-        $request->validate([
-            'full_name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'phone_number' => ['nullable', 'string', 'max:20'],
-            'address' => ['nullable', 'string', 'max:255'],
-            'status' => ['required', Rule::in(['active', 'inactive', 'banned'])],
-            'password' => ['nullable', 'string', 'min:8'],
-            'account_type' => ['required', 'string', 'in:supplier,customer,admin'],
-        ]);
+ public function update(Request $request, User $user)
+{
+    $request->validate([
+        'full_name' => ['required', 'string', 'max:255'],
+        'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'phone_number' => 'required|digits:9|unique:users,phone_number',
+        'address' => ['nullable', 'string', 'max:255'],
+        'status' => ['required', Rule::in(['active', 'inactive', 'banned'])],
+            'password' => 'nullable|string|min:8|confirmed|regex:/[A-Z]/|regex:/[0-9]/',
+    ]);
 
-        $user->update([
-            'full_name' => $request->full_name,
-            'email' => $request->email,
-            'phone_number' => $request->phone_number,
-            'address' => $request->address,
-            'status' => $request->status,
-            'password' => $request->password ? Hash::make($request->password) : $user->password,
-            'account_type' => $request->account_type,
-        ]);
+    $user->update([
+        'full_name' => $request->full_name,
+        'email' => $request->email,
+        'phone_number' => $request->phone_number,
+        'address' => $request->address,
+        'status' => $request->status,
+        'password' => $request->password ? Hash::make($request->password) : $user->password,
+    ]);
 
-        return redirect()->route('admin.users.index')->with('success', 'تم تحديث المستخدم بنجاح!');
+    // ✅ يرجع JSON إذا الطلب Ajax
+    if ($request->wantsJson()) {
+        return response()->json(['success' => 'تم تحديث المستخدم بنجاح!']);
     }
+
+    return redirect()->route('admin.users.index')->with('success', 'تم تحديث المستخدم بنجاح!');
+}
+
 
     // ✅ حذف مستخدم
     public function destroy(User $user)
@@ -244,5 +248,35 @@ class UserController extends Controller
 
         return new StreamedResponse($callback, 200, $headers);
     }
+
+    // Add this method to your UserController
+public function bulkDelete(Request $request)
+{
+    $userIds = $request->input('user_ids');
+
+    if (!empty($userIds)) {
+        User::whereIn('id', $userIds)->delete();
+        return redirect()->back()->with('success', 'Selected users deleted successfully.');
+    }
+
+    return redirect()->back()->with('error', 'No users selected for deletion.');
+}
+
+
+public function toggleBan(User $user)
+{
+    if ($user->status === 'banned') {
+        // Unban user
+        $user->status = 'active'; // أو status سابق إذا عندك تخزين له
+    } else {
+        // Ban user
+        $user->status = 'banned';
+    }
+    $user->save();
+
+    return redirect()->back()->with('success', 'تم تحديث حالة المستخدم.');
+}
+
+
 }
 

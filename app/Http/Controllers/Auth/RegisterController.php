@@ -36,23 +36,6 @@ class RegisterController extends Controller
             'terms.accepted' => __('messages.acceptTermsError'),
         ]);
 
-        // $userCount = User::count();
-
-        // if ($userCount === 0) {
-        //     // If there are no users yet, this is the very first registration.
-        //     $accountType = 'admin'; // Assign 'admin' role.
-        // } else {
-        //     // If users already exist, determine type based on user's selection from the form.
-        //     // If 'account_type_choice' is provided and is 'supplier', use 'supplier'.
-        //     // Otherwise, default to 'customer'.
-        //     $requestedAccountType = $request->input('account_type_choice');
-
-        //     if ($requestedAccountType === 'supplier') {
-        //         $accountType = 'supplier';
-        //     } else {
-        //         $accountType = 'customer'; // Default for non-admin, if no choice or 'customer' is chosen
-        //     }
-        // }
         
         $user = User::create([
             'full_name' => $request->full_name,

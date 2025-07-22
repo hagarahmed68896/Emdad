@@ -1,13 +1,15 @@
 @extends('layouts.admin')
 
-@section('page_title', 'تعديل حساب المستخدم')
+@section('page_title', 'تعديل حساب المورد')
 
 @section('content')
 <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
-    <div x-data="editUserForm()" class="bg-white rounded-xl shadow p-6 mx-auto">
-        <h2 class="text-[24px] font-bold text-[#212121] mb-6">تعديل بيانات العميل</h2>
+    <div 
+        x-data="editSupplierForm()" 
+        class="bg-white rounded-b-xl shadow p-6 mx-auto"
+    >
+        <h2 class="text-[24px] font-bold text-[#212121] mb-6">تعديل حساب المورد</h2>
 
-        {{-- رسائل النجاح --}}
         <div 
             x-show="success" 
             x-transition 
@@ -15,7 +17,6 @@
             x-text="success"
         ></div>
 
-        {{-- رسائل الأخطاء --}}
         <template x-if="Object.keys(errors).length">
             <ul class="bg-red-100 border border-red-400 text-red-700 p-4 rounded mb-4 list-disc list-inside">
                 <template x-for="[key, messages] of Object.entries(errors)" :key="key">
@@ -25,7 +26,9 @@
         </template>
 
         <form @submit.prevent="submitForm" class="space-y-6">
-            {{-- بيانات النموذج --}}
+            @csrf
+
+            {{-- نفس الحقول مع البيانات القديمة --}}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label class="block font-bold text-[20px] text-[#212121]">الاسم</label>
@@ -34,36 +37,37 @@
                 </div>
 
                 <div>
-                    <label class="block font-bold text-[20px] text-[#212121]">البريد الإلكتروني</label>
-                    <input type="email" x-model="form.email"
+                    <label class="block font-bold text-[20px] text-[#212121]">اسم المورد</label>
+                    <input type="text" x-model="form.company_name"
                         class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 rounded-xl">
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
+                    <label class="block font-bold text-[20px] text-[#212121]">البريد الإلكتروني</label>
+                    <input type="email" x-model="form.email"
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 rounded-xl">
+                </div>
+
+                <div>
                     <label class="block font-bold text-[20px] text-[#212121]">رقم الهاتف</label>
                     <input type="text" x-model="form.phone_number"
                         class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 rounded-xl">
                 </div>
+            </div>
 
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label class="block font-bold text-[20px] text-[#212121]">العنوان</label>
                     <input type="text" x-model="form.address"
                         class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 rounded-xl">
                 </div>
-            </div>
 
-            {{-- كلمة المرور --}}
-            <div>
-                <label class="block font-bold text-[20px] text-[#212121]">كلمة المرور</label>
-                <input type="password" x-model="form.password"
-                    placeholder="اتركها فارغة إذا لم ترغب في التغيير"
-                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 rounded-xl">
-            </div>
-
-            {{-- حالة الحساب --}}
-            <div x-data="{ open: false, selected: '{{ old('status', $user->status) }}' }" class="relative w-full">
+            {{-- Status Dropdown --}}
+            <div 
+                x-data="{ open: false, selected: '{{ old('status', $supplier->status) }}' }" 
+                class="relative w-full">
                 <label class="block font-bold text-[20px] text-[#212121]">حالة الحساب</label>
                 <button type="button"
                     @click="open = !open"
@@ -78,31 +82,36 @@
                     class="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-xl shadow-lg py-2">
 
                     <label class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                        <input type="radio" value="active" x-model="selected"
-                            class="shrink-0 rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
+                        <input type="radio" name="status_temp" value="active" x-model="selected"
+                            class="shrink-0 rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] focus:ring-[#185D31] appearance-none rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
                         <span class="ml-2">نشط</span>
                     </label>
 
                     <label class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                        <input type="radio" value="inactive" x-model="selected"
-                            class="shrink-0 rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
+                        <input type="radio" name="status_temp" value="inactive" x-model="selected"
+                            class="shrink-0 rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] focus:ring-[#185D31] appearance-none rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
                         <span class="ml-2">غير نشط</span>
                     </label>
 
                     <label class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                        <input type="radio" value="banned" x-model="selected"
-                            class="shrink-0 rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
+                        <input type="radio" name="status_temp" value="banned" x-model="selected"
+                            class="shrink-0 rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] focus:ring-[#185D31] appearance-none rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
                         <span class="ml-2">محظور</span>
                     </label>
                 </div>
-                <input type="hidden" x-model="form.status">
+
+                <input type="hidden" name="status" :value="selected">
+
+                @error('status')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
+            </div>
             </div>
 
-            {{-- أزرار الإجراء --}}
             <div class="flex space-x-4 mt-6">
                 <button type="submit"
                     class="px-4 py-2 border ml-2 border-transparent rounded-[16px] shadow-sm text-sm font-medium text-white bg-[#185D31] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out">
-                    تحديث المستخدم
+                    تحديث الحساب
                 </button>
 
                 <button type="button" onclick="window.history.back()"
@@ -115,24 +124,23 @@
 </main>
 
 <script>
-    function editUserForm() {
+    function editSupplierForm() {
         return {
             form: {
-                full_name: @json($user->full_name),
-                email: @json($user->email),
-                phone_number: @json($user->phone_number),
-                address: @json($user->address),
-                password: '',
-                status: '{{ old('status', $user->status) }}',
+                full_name: @json($supplier->full_name),
+                company_name: @json(optional($supplier->business)->company_name),
+                email: @json($supplier->email),
+                phone_number: @json($supplier->phone_number),
+                address: @json($supplier->address),
+                status: @json($supplier->status),
             },
             errors: {},
             success: '',
             async submitForm() {
                 this.errors = {};
                 this.success = '';
-
                 try {
-                    let response = await fetch("{{ route('admin.users.update', $user) }}", {
+                    let response = await fetch("{{ route('admin.suppliers.update', $supplier) }}", {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',
@@ -149,7 +157,7 @@
                     } else {
                         this.success = data.success || 'تم التحديث بنجاح';
                         setTimeout(() => {
-                            window.location.href = "{{ route('admin.users.index') }}";
+                            window.location.href = "{{ route('admin.suppliers.index') }}";
                         }, 1500);
                     }
                 } catch (error) {

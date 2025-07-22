@@ -46,13 +46,39 @@
                 submitForm() {
                     this.loading = true;
                     this.errors = {}; // Clear previous errors
+             const submitData = new FormData();
+               // ✅ الحقول النصية
+            submitData.append('full_name', this.formData.full_name);
+            submitData.append('email', this.formData.email);
+            submitData.append('phone_number', this.formData.phone_number);
+            submitData.append('password', this.formData.password);
+            submitData.append('password_confirmation', this.formData.password_confirmation);
+            submitData.append('account_type', this.formData.account_type);
 
-                    const submitData = new FormData();
-                    for (const key in this.formData) {
-                        if (this.formData[key] !== null) {
-                            submitData.append(key, this.formData[key]);
-                        }
-                    }
+            submitData.append('company_name', this.formData.company_name);
+            submitData.append('national_id', this.formData.national_id);
+            submitData.append('commercial_registration', this.formData.commercial_registration);
+            submitData.append('national_address', this.formData.national_address);
+            submitData.append('iban', this.formData.iban);
+            submitData.append('tax_certificate', this.formData.tax_certificate);
+            submitData.append('terms', this.formData.terms ? '1' : '0');
+
+            // ✅ الملفات
+            if (this.formData.national_id_attach instanceof File) {
+                submitData.append('national_id_attach', this.formData.national_id_attach);
+            }
+            if (this.formData.commercial_registration_attach instanceof File) {
+                submitData.append('commercial_registration_attach', this.formData.commercial_registration_attach);
+            }
+            if (this.formData.national_address_attach instanceof File) {
+                submitData.append('national_address_attach', this.formData.national_address_attach);
+            }
+            if (this.formData.iban_attach instanceof File) {
+                submitData.append('iban_attach', this.formData.iban_attach);
+            }
+            if (this.formData.tax_certificate_attach instanceof File) {
+                submitData.append('tax_certificate_attach', this.formData.tax_certificate_attach);
+            }
 
                     console.log('Submitting form with data (FormData object, cannot be directly logged):', submitData);
 

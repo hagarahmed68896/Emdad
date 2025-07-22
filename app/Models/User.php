@@ -110,4 +110,11 @@ public function likedReviews()
         return $this->hasMany(Order::class);
     }
 
+    // داخل User.php
+public function business()
+{
+    return $this->hasOne(BusinessData::class);
+}
+
+
 }

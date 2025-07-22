@@ -20,6 +20,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ClothingController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Admin\UserController; 
+use App\Http\Controllers\Admin\AdminSupplierController;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -58,32 +59,53 @@ Route::middleware('web')->group(function () {
  Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
     // ✅ لوحة التحكم => فقط احصائيات عامة
-    Route::get('/dashboard', [\App\Http\Controllers\AdminDashboardController::class, 'index'])
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])
          ->name('admin.dashboard');
 
     // ✅ إدارة المستخدمين بالكامل
-    Route::get('/users', [\App\Http\Controllers\Admin\UserController::class, 'index'])
+    Route::get('/users', [UserController::class, 'index'])
          ->name('admin.users.index');
 
-    Route::get('/users/create', [\App\Http\Controllers\Admin\UserController::class, 'create'])
+    Route::get('/users/create', [UserController::class, 'create'])
          ->name('admin.users.create');
 
-    Route::post('/users', [\App\Http\Controllers\Admin\UserController::class, 'store'])
+    Route::post('/users', [UserController::class, 'store'])
          ->name('admin.users.store');
 
-    Route::get('/users/{user}/edit', [\App\Http\Controllers\Admin\UserController::class, 'edit'])
+    Route::get('/users/{user}/edit', [UserController::class, 'edit'])
          ->name('admin.users.edit');
 
-    Route::put('/users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'update'])
+    Route::put('/users/{user}', [UserController::class, 'update'])
          ->name('admin.users.update');
 
-    Route::delete('/users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'destroy'])
+    Route::delete('/users/{user}', [UserController::class, 'destroy'])
          ->name('admin.users.destroy');
     Route::post('/admin/logout', [AdminLoginController::class, 'logout'])->name('admin.logout');
 
     Route::get('/users/export/csv', [App\Http\Controllers\Admin\UserController::class, 'exportCsv'])->name('admin.users.export.csv');
 
-        });
+    Route::delete('/users/bulk-delete', [App\Http\Controllers\Admin\UserController::class, 'bulkDelete'])->name('admin.users.bulk_delete');
+
+    Route::patch('/admin/users/{user}/toggle-ban', [UserController::class, 'toggleBan'])->name('admin.users.toggle-ban');
+
+    Route::get('/admin/suppliers', [AdminSupplierController::class, 'index'])->name('admin.suppliers.index');
+
+    Route::get('/admin/suppliers/create', [AdminSupplierController::class, 'create'])
+         ->name('admin.suppliers.create');
+    Route::post('/admin/suppliers/store', [AdminSupplierController::class, 'store'])->name('admin.suppliers.store');
+
+    Route::get('/suppliers/{supplier}/edit', [AdminSupplierController::class, 'edit'])->name('admin.suppliers.edit');
+   
+    Route::put('/suppliers/{supplier}', [AdminSupplierController::class, 'update'])->name('admin.suppliers.update');
+    
+    Route::get('/suppliers/export/csv', [AdminSupplierController::class, 'exportCsv'])->name('admin.suppliers.export.csv');
+
+    Route::delete('/suppliers/bulk-delete', [AdminSupplierController::class, 'bulkDelete'])->name('admin.suppliers.bulk_delete');
+
+    Route::patch('/admin/suppliers/{supplier}/toggle-ban', [AdminSupplierController::class, 'toggleBan'])->name('admin.suppliers.toggle-ban');
+
+
+});
 
 
 

@@ -115,7 +115,7 @@
             <div class="flex space-x-4 mt-6"> 
                 <button type="submit"
                         class="px-4 py-2 border ml-2 border-transparent rounded-[16px] shadow-sm text-sm font-medium text-white bg-[#185D31] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out ">
-                    إضافة المستخدم
+                    إضافة حساب
                 </button>
 
                 <button type="button" onclick="window.history.back()"
