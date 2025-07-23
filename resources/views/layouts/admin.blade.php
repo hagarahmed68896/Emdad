@@ -221,9 +221,9 @@
 
 
                 <li class="mb-2">
-                    <a href="#"
-                        class="sidebar-link flex items-center p-3 text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl transition-colors duration-200">
-                        <i class="fas fa-file-invoice ml-3 text-gray-500"></i>
+                    <a href="{{route('invoices.index')}}"
+     class="sidebar-link flex items-center p-3  transition-colors duration-200
+        {{ Request::is('admin/invoices') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">                        <i class="fas fa-file-invoice ml-3 text-gray-500"></i>
                         <span class="sidebar-text">الفواتير</span>
                     </a>
                 </li>

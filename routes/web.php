@@ -21,6 +21,7 @@ use App\Http\Controllers\ClothingController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Admin\UserController; 
 use App\Http\Controllers\Admin\AdminSupplierController;
+use App\Http\Controllers\Admin\BillsController;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -103,6 +104,22 @@ Route::middleware('web')->group(function () {
     Route::delete('/suppliers/bulk-delete', [AdminSupplierController::class, 'bulkDelete'])->name('admin.suppliers.bulk_delete');
 
     Route::patch('/admin/suppliers/{supplier}/toggle-ban', [AdminSupplierController::class, 'toggleBan'])->name('admin.suppliers.toggle-ban');
+
+    // ✅ إدارة الفواتير بالكامل
+    Route::get('/admin/invoices', [BillsController::class, 'index'])->name('invoices.index');
+
+    Route::delete('/admin/bills/bulk-delete', [\App\Http\Controllers\Admin\BillsController::class, 'bulkDelete'])
+    ->name('admin.bills.bulk_delete');
+
+    Route::get('/bills', [BillsController::class, 'index'])->name('bills.index');
+    Route::delete('/bills/bulk-delete', [BillsController::class, 'bulkDelete'])->name('bills.bulk_delete');
+
+    Route::get('/bills/{id}/show', [BillsController::class, 'showPdf'])->name('admin.bills.show_pdf');
+
+    // web.php
+Route::get('/admin/bills/{bill}/download', [BillsController::class, 'downloadPdf'])
+    ->name('admin.bills.download_pdf');
+
 
 
 });

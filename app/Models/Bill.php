@@ -23,8 +23,9 @@ class Bill extends Model
     }
 
     // ✅ ربط الطلب (لو احتجت ربطه مباشرة)
-    public function order(): BelongsTo
-    {
-        return $this->belongsTo(Order::class, 'order_number', 'order_number');
-    }
+public function order(): BelongsTo
+{
+    return $this->belongsTo(Order::class, 'order_id'); 
+}
+
 }
