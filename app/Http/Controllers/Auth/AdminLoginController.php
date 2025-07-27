@@ -39,70 +39,39 @@ class AdminLoginController extends Controller
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function login(Request $request)
-    {
-        // Validate input
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ]);
+public function login(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'email' => 'required|email',
+        'password' => 'required|string',
+    ]);
 
-        if ($validator->fails()) {
-            return $request->wantsJson()
-                ? response()->json([
-                    'status' => 'error',
-                    'errors' => $validator->errors(),
-                ], 422)
-                : redirect()->back()->withErrors($validator)->withInput();
-        }
-
-        $credentials = $request->only('email', 'password');
-        $remember = $request->filled('remember');
-
-        if (Auth::attempt($credentials, $remember)) {
-            $user = Auth::user();
-
-            if ($user->account_type === 'admin') {
-                $request->session()->regenerate();
-
-                return $request->wantsJson()
-                    ? response()->json([
-                        'status' => 'success',
-                        'message' => 'مرحباً أيها المشرف، تم تسجيل الدخول بنجاح!',
-                        'redirect' => route('admin.dashboard'),
-                    ])
-                    :  redirect()->route('admin.dashboard')->with('success', 'مرحباً أيها المشرف، تم تسجيل الدخول بنجاح!');
-
-            }
-
-            // Not admin: force logout
-            Auth::logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-
-            return $request->wantsJson()
-                ? response()->json([
-                    'status' => 'error',
-                    'errors' => [
-                        'email' => ['ليس لديك صلاحيات المشرف.'],
-                    ],
-                ], 403)
-                : throw ValidationException::withMessages([
-                    'email' => 'ليس لديك صلاحيات المشرف.',
-                ]);
-        }
-
-        return $request->wantsJson()
-            ? response()->json([
-                'status' => 'error',
-                'errors' => [
-                    'email' => [__('auth.failed')],
-                ],
-            ], 401)
-            : throw ValidationException::withMessages([
-                'email' => __('auth.failed'),
-            ]);
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
     }
+
+    $credentials = $request->only('email', 'password');
+    $remember = $request->filled('remember_me');
+
+    if (Auth::attempt($credentials, $remember)) {
+        $user = Auth::user();
+
+        if ($user->account_type === 'admin') {
+            $request->session()->regenerate();
+            return response()->json(['redirect' => route('admin.dashboard')]);
+        }
+
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return response()->json(['message' => 'ليس لديك صلاحيات المشرف.'], 403);
+    }
+
+    return response()->json(['message' => 'البريد الإلكتروني أو كلمة المرور غير صحيحة.'], 401);
+}
+
+
+
 
     /**
      * Log the admin user out of the application.

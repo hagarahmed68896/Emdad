@@ -16,9 +16,18 @@ class Document extends Model
     ];
 
 
-public function businessData(): BelongsTo
+// public function businessData(): BelongsTo
+// {
+//     return $this->belongsTo(BusinessData::class, 'supplier_id', 'company_name');
+// }
+
+// public function supplier()
+// {
+//     return $this->belongsTo(BusinessData::class, 'supplier_id');
+// }
+public function supplier()
 {
-    return $this->belongsTo(BusinessData::class, 'supplier_id', 'company_name');
+    return $this->belongsTo(User::class, 'supplier_id');
 }
 
 }

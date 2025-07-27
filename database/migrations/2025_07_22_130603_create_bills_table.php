@@ -10,7 +10,7 @@ class CreateBillsTable extends Migration
     {
         Schema::create('bills', function (Blueprint $table) {
             $table->id();
-            $table->string('bill_number')->unique();
+            $table->string('bill_number')->unique()->nullable();
             
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             

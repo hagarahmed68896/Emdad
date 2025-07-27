@@ -79,19 +79,19 @@
 
                     <label class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
                         <input type="radio" value="active" x-model="selected"
-                            class="shrink-0 rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
+                            class="shrink-0  appearance-none  rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
                         <span class="ml-2">نشط</span>
                     </label>
 
                     <label class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
                         <input type="radio" value="inactive" x-model="selected"
-                            class="shrink-0 rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
+                            class="shrink-0  appearance-none  rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
                         <span class="ml-2">غير نشط</span>
                     </label>
 
                     <label class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
                         <input type="radio" value="banned" x-model="selected"
-                            class="shrink-0 rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
+                            class="shrink-0  appearance-none  rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
                         <span class="ml-2">محظور</span>
                     </label>
                 </div>

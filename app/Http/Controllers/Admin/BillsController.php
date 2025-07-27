@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Bill;
+use App\Models\Order;
+use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Validator;
 
 class BillsController extends Controller
 {
@@ -69,55 +72,103 @@ class BillsController extends Controller
     ]);
 }
 
+    public function create()
+    {
+        return view('admin.bills.create');
+    }
+
+
+public function store(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'customer_name' => 'required',
+        'order_number'  => 'required',
+        'payment_way'   => 'required',
+        'total_price'   => 'required|numeric',
+        'status'        => 'required',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
+    }
+
+    $user = User::where('full_name', $request->customer_name)
+                ->where('account_type', 'customer')
+                ->first();
+
+    if (!$user) {
+        return response()->json(['errors' => ['customer_name' => ['العميل غير موجود']]], 422);
+    }
+
+    $order = Order::where('order_number', $request->order_number)->first();
+
+    if (!$order) {
+        return response()->json(['errors' => ['order_number' => ['الطلب غير موجود']]], 422);
+    }
+
+    $bill = Bill::create([
+        'user_id'     => $user->id,
+        'order_id'    => $order->id,
+        'payment_way' => $request->payment_way,
+        'total_price' => $request->total_price,
+        'status'      => $request->status,
+    ]);
+
+    $bill->bill_number = $bill->id;
+    $bill->save();
+
+    return response()->json(['message' => '✅ تمت إضافة الفاتورة بنجاح!']);
+}
+
+
+public function edit(Bill $invoice)
+{
+    return view('admin.bills.edit', [
+        'bill' => $invoice
+    ]);
+}
 
 
 
-    // public function index(Request $request)
-    // {
-    //     // إحصائيات الفواتير
-    //     $totalInvoices = Bill::count();
-    //     $paidInvoices = Bill::where('status', 'payment')->count();
-    //     $unpaidInvoices = Bill::where('status', 'not payment')->count();
+public function update(Request $request, Bill $invoice)
+{
+    $validated = $request->validate([
+        'customer_name' => 'required',
+        'order_number'  => 'required',
+        'payment_way'   => 'required',
+        'total_price'   => 'required|numeric',
+        'status'        => 'required',
+    ]);
 
-    //     // فلترة البيانات
-    //     $invoicesQuery = Bill::query()->with('user');
+    $user = User::where('full_name', $validated['customer_name'])
+                ->where('account_type', 'customer')
+                ->first();
 
-    //     // فلترة بالحالة إن وجدت
-    //     if ($request->filled('status') && in_array($request->status, ['payment', 'not payment'])) {
-    //         $invoicesQuery->where('status', $request->status);
-    //     }
+    if (!$user) {
+        return response()->json(['errors' => ['customer_name' => ['لم يتم العثور على هذا العميل.']]], 422);
+    }
 
-    //     // فلترة بطريقة الدفع إن وجدت
-    //     if ($request->filled('payment_way')) {
-    //         $invoicesQuery->where('payment_way', $request->payment_way);
-    //     }
+    $order = Order::where('order_number', $validated['order_number'])->first();
+    if (!$order) {
+        return response()->json(['errors' => ['order_number' => ['لم يتم العثور على هذا الطلب.']]], 422);
+    }
 
-    //     // فلترة بالبحث إن وجد
-    //     if ($request->filled('search')) {
-    //         $search = $request->search;
+    $invoice->update([
+        'user_id'     => $user->id,
+        'order_id'    => $order->id,
+        'payment_way' => $validated['payment_way'],
+        'total_price' => $validated['total_price'],
+        'status'      => $validated['status'],
+    ]);
 
-    //         $invoicesQuery->where(function ($q) use ($search) {
-    //             $q->where('bill_number', 'like', "%{$search}%")
-    //               ->orWhereHas('user', function ($q) use ($search) {
-    //                   $q->where('full_name', 'like', "%{$search}%")
-    //                     ->orWhere('email', 'like', "%{$search}%");
-    //               });
-    //         });
-    //     }
+    return response()->json(['message' => 'تم تحديث الفاتورة بنجاح!']);
+}
 
-    //     // جلب النتائج مع ترقيم الصفحات
-    //     $invoices = $invoicesQuery->latest()->paginate(10);
 
-    //     return view('admin.bills', [
-    //         'totalInvoices' => $totalInvoices,
-    //         'paidInvoices' => $paidInvoices,
-    //         'unpaidInvoices' => $unpaidInvoices,
-    //         'invoices' => $invoices,
-    //         'request' => $request, // مهم لإرجاع قيم الفلتر للواجهة
-    //     ]);
-    // }
 
-    
+
+
+
     
     public function bulkDelete(Request $request)
     {

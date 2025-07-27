@@ -91,7 +91,7 @@
 
                             <div x-show="open" @click.away="open = false" x-transition.opacity x-cloak
                                 class="absolute mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow z-50 p-4 right-0 md:left-0">
-                                <h3 class="font-bold text-gray-700 mb-2 rtl:text-right">الترتيب حسب:</h3>
+                                <h3 class="font-bold text-gray-700 mb-2 rtl:rtl:text-right">الترتيب حسب:</h3>
                                 <ul class="space-y-1 mb-4">
                                     <li>
                                         <label class="flex items-center cursor-pointer">
@@ -132,7 +132,7 @@
                                     </li>
                                 </ul>
 
-                                <h3 class="font-bold text-gray-700 mb-2 rtl:text-right">حالة الحساب:</h3>
+                                <h3 class="font-bold text-gray-700 mb-2 rtl:rtl:text-right">حالة الحساب:</h3>
                                 <ul class="space-y-1 mb-4">
                                     <li>
                                         <label class="flex items-center cursor-pointer">
@@ -226,7 +226,7 @@
 
             {{-- Table --}}
             <div class="overflow-x-auto border border-gray-200">
-                <table class="min-w-full divide-y divide-gray-200 text-right">
+                <table class="min-w-full divide-y divide-gray-200 rtl:text-right">
                     <thead class="bg-gray-50">
                     <tr>
                         <th class="px-4 py-3 text-center">
@@ -272,14 +272,14 @@
                                     {{ $supplier->status === 'active' ? 'نشط' : ($supplier->status === 'inactive' ? 'غير نشط' : ($supplier->status === 'banned' ? 'محظور' : 'غير محدد')) }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">{{ optional($supplier->created_at)->translatedFormat('j F Y') }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 rtl:text-right">{{ optional($supplier->created_at)->translatedFormat('j F Y') }}</td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center justify-center space-x-3 rtl:space-x-reverse">
-                                    <a href="{{ route('admin.suppliers.edit', $supplier->id) }}" class="text-indigo-600 hover:text-indigo-900">
+                                    <a href="{{ route('admin.suppliers.edit', $supplier->id) }}" class="text-[#185D31]">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <div x-data="{ openBan: false }">
-                                        <button @click="openBan = true" class="text-yellow-600 hover:text-yellow-900">
+                                        <button @click="openBan = true" class="text-[#185D31]">
                                             @if($supplier->status === 'banned')
                                                 <i class="fas fa-unlock"></i>
                                             @else

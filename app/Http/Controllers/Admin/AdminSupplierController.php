@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Document;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -57,7 +58,7 @@ public function index(Request $request)
   $totalUsers = User::count();
         $totalCustomers = User::where('account_type', 'customer')->count();
         $totalSuppliers = User::where('account_type', 'supplier')->count(); // Adjust 'supplier' if your type is different
-        $totalDocuments = 200;
+        $totalDocuments = Document::count();
 return view('admin.supplier', [
     'suppliers' => $suppliers,
     'search' => $search,

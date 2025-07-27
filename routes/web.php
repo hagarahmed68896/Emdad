@@ -22,6 +22,8 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Admin\UserController; 
 use App\Http\Controllers\Admin\AdminSupplierController;
 use App\Http\Controllers\Admin\BillsController;
+use App\Http\Controllers\Admin\DocumentsController;
+use App\Http\Controllers\Admin\BannedUserController;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -57,7 +59,7 @@ Route::middleware('web')->group(function () {
     Route::middleware('auth')->group(function () {
 
         // Admin-specific routes
- Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
+    Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
     // ✅ لوحة التحكم => فقط احصائيات عامة
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])
@@ -89,11 +91,11 @@ Route::middleware('web')->group(function () {
 
     Route::patch('/admin/users/{user}/toggle-ban', [UserController::class, 'toggleBan'])->name('admin.users.toggle-ban');
 
-    Route::get('/admin/suppliers', [AdminSupplierController::class, 'index'])->name('admin.suppliers.index');
+    Route::get('/suppliers', [AdminSupplierController::class, 'index'])->name('admin.suppliers.index');
 
-    Route::get('/admin/suppliers/create', [AdminSupplierController::class, 'create'])
+    Route::get('/suppliers/create', [AdminSupplierController::class, 'create'])
          ->name('admin.suppliers.create');
-    Route::post('/admin/suppliers/store', [AdminSupplierController::class, 'store'])->name('admin.suppliers.store');
+    Route::post('/suppliers/store', [AdminSupplierController::class, 'store'])->name('admin.suppliers.store');
 
     Route::get('/suppliers/{supplier}/edit', [AdminSupplierController::class, 'edit'])->name('admin.suppliers.edit');
    
@@ -105,10 +107,21 @@ Route::middleware('web')->group(function () {
 
     Route::patch('/admin/suppliers/{supplier}/toggle-ban', [AdminSupplierController::class, 'toggleBan'])->name('admin.suppliers.toggle-ban');
 
-    // ✅ إدارة الفواتير بالكامل
-    Route::get('/admin/invoices', [BillsController::class, 'index'])->name('invoices.index');
+    Route::get('/banned-users', [BannedUserController::class, 'index'])->name('admin.banned.index');
 
-    Route::delete('/admin/bills/bulk-delete', [\App\Http\Controllers\Admin\BillsController::class, 'bulkDelete'])
+
+    // ✅ إدارة الفواتير بالكامل
+    Route::get('/invoices', [BillsController::class, 'index'])->name('invoices.index');
+
+     Route::get('/invoices/create', [BillsController::class, 'create'])->name('invoices.create');
+
+     Route::post('/invoices/store', [BillsController::class, 'store'])->name('invoices.store');
+
+    Route::get('/invoices/{invoice}/edit', [BillsController::class, 'edit'])->name('invoices.edit');
+    Route::put('/invoices/{invoice}', [BillsController::class, 'update'])->name('invoices.update');
+
+
+    Route::delete('/admin/bills/bulk-delete', [BillsController::class, 'bulkDelete'])
     ->name('admin.bills.bulk_delete');
 
     Route::get('/bills', [BillsController::class, 'index'])->name('bills.index');
@@ -116,11 +129,22 @@ Route::middleware('web')->group(function () {
 
     Route::get('/bills/{id}/show', [BillsController::class, 'showPdf'])->name('admin.bills.show_pdf');
 
-    // web.php
-Route::get('/admin/bills/{bill}/download', [BillsController::class, 'downloadPdf'])
+    Route::get('/admin/bills/{bill}/download', [BillsController::class, 'downloadPdf'])
     ->name('admin.bills.download_pdf');
 
+    Route::get('/documents', [DocumentsController::class, 'index'])->name('admin.documents.index');
 
+    Route::get('documents/{id}/edit', [DocumentsController::class, 'edit'])->name('admin.documents.edit');
+    
+    Route::put('documents/{id}', [DocumentsController::class, 'update'])->name('admin.documents.update');
+
+    Route::delete('/documents/bulk-delete', [DocumentsController::class, 'bulkDelete'])->name('admin.documents.bulk_delete');
+
+    Route::get('/admin/documents/{id}/download', [DocumentsController::class, 'downloadPdf'])
+    ->name('admin.documents.download');
+
+   Route::delete('documents/{id}', [DocumentsController::class, 'destroy'])
+        ->name('admin.documents.destroy');
 
 });
 

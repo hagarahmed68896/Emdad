@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Document;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -62,7 +63,7 @@ class UserController extends Controller
         $totalUsers = User::count();
         $totalCustomers = User::where('account_type', 'customer')->count();
         $totalSuppliers = User::where('account_type', 'supplier')->count(); // Adjust 'supplier' if your type is different
-        $totalDocuments = 200;// Assuming a Document model. If not, replace with relevant logic.
+        $totalDocuments = Document::count();
         // --- End variable definitions ---
 
         return view('admin.customer', [
@@ -87,32 +88,23 @@ class UserController extends Controller
     }
 
     // ✅ تخزين مستخدم جديد
-    public function store(Request $request)
-    {
-        $request->validate([
-            'full_name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'phone_number' => 'required|digits:9|unique:users,phone_number',
-            'address' => ['nullable', 'string', 'max:255'],
-            'status' => ['required', Rule::in(['active', 'inactive', 'banned'])],
-            'password' => 'required|string|min:8|confirmed|regex:/[A-Z]/|regex:/[0-9]/',
-            'account_type' => ['required', 'string', 'in:supplier,customer,admin'],
-        ]);
+  public function store(Request $request)
+{
+    $validated = $request->validate([
+        'full_name' => ['required', 'string', 'max:255'],
+        'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+        'phone_number' => 'required|digits:9|unique:users,phone_number',
+        'address' => ['nullable', 'string', 'max:255'],
+        'status' => ['required', Rule::in(['active', 'inactive', 'banned'])],
+        'account_type' => ['required', 'string', 'in:supplier,customer,admin'],
+    ]);
 
-        $password = $request->password ?? 'Password123';
 
-        User::create([
-            'full_name' => $request->full_name,
-            'email' => $request->email,
-            'phone_number' => $request->phone_number,
-            'address' => $request->address,
-            'status' => $request->status,
-            'password' => Hash::make($password),
-            'account_type' => $request->account_type,
-        ]);
+    User::create($validated);
 
-        return redirect()->route('admin.users.index')->with('success', 'تم إضافة المستخدم بنجاح!');
-    }
+    return response()->json(['success' => 'تم إضافة المستخدم بنجاح!']);
+}
+
 
     // ✅ صفحة تعديل مستخدم
     public function edit(User $user)

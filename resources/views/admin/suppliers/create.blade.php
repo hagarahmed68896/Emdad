@@ -5,7 +5,7 @@
 @section('content')
 <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
     <div 
-        x-data="supplierForm()" 
+        x-data="supplierForm()" x-cloak
         class="bg-white rounded-xl shadow p-6 mx-auto"
     >
         <h2 class="text-[24px] font-bold text-[#212121] mb-6">إضافة حساب للمورد</h2>

@@ -104,7 +104,7 @@
 
                             <div x-show="open" @click.away="open = false" x-transition.opacity x-cloak
                                 class="absolute mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow z-50 p-4 right-0 md:left-0">
-                                <h3 class="font-bold text-gray-700 mb-2 rtl:text-right">الترتيب حسب:</h3>
+                                <h3 class="font-bold text-gray-700 mb-2 rtl:rtl:text-right">الترتيب حسب:</h3>
                                 <ul class="space-y-1 mb-4">
                                     <li>
                                         <label class="flex items-center cursor-pointer">
@@ -145,7 +145,7 @@
                                     </li>
                                 </ul>
 
-                                <h3 class="font-bold text-gray-700 mb-2 rtl:text-right">حالة الحساب:</h3>
+                                <h3 class="font-bold text-gray-700 mb-2 rtl:rtl:text-right">حالة الحساب:</h3>
                                 <ul class="space-y-1 mb-4">
                                     <li>
                                         <label class="flex items-center cursor-pointer">
@@ -247,37 +247,37 @@
                                     <input type="checkbox" x-model="selectAll" @change="toggleSelectAll()"
                                         class="ml-1 h-4 w-4 text-[#185D31] bg-[#185D31] focus:ring-[#185D31] accent-[#185D31] border-[#185D31] rounded">
                                 </th>
-                                {{-- Standardized padding and text-right for content THs --}}
+                                {{-- Standardized padding and rtl:text-right for content THs --}}
                                 <th scope="col"
-                                    class="px-6 py-3 text-right text-[18px] font-bold font-medium text-[#212121] uppercase tracking-wider">
+                                    class="px-6 py-3 rtl:text-right text-[18px] font-bold font-medium text-[#212121] uppercase tracking-wider">
                                     #
                                 </th>
                                 <th scope="col"
-                                    class="px-6 py-3 text-right text-[18px] font-bold font-medium text-[#212121] uppercase tracking-wider">
+                                    class="px-6 py-3 rtl:text-right text-[18px] font-bold font-medium text-[#212121] uppercase tracking-wider">
                                     الاسم
                                 </th>
                                 <th scope="col"
-                                    class="px-6 py-3 text-right text-[18px] font-bold font-medium text-[#212121] uppercase tracking-wider">
+                                    class="px-6 py-3 rtl:text-right text-[18px] font-bold font-medium text-[#212121] uppercase tracking-wider">
                                     البريد الإلكتروني
                                 </th>
                                 <th scope="col"
-                                    class="px-6 py-3 text-right text-[18px] font-bold font-medium text-[#212121] uppercase tracking-wider">
+                                    class="px-6 py-3 rtl:text-right text-[18px] font-bold font-medium text-[#212121] uppercase tracking-wider">
                                     رقم الهاتف
                                 </th>
                                 <th scope="col"
-                                    class="px-6 py-3 text-right text-[18px] font-bold font-medium text-[#212121] uppercase tracking-wider">
+                                    class="px-6 py-3 rtl:text-right text-[18px] font-bold font-medium text-[#212121] uppercase tracking-wider">
                                     العنوان
                                 </th>
                                 <th scope="col"
-                                    class="px-6 py-3 text-right text-[18px] font-bold font-medium text-[#212121] uppercase tracking-wider">
+                                    class="px-6 py-3 rtl:text-right text-[18px] font-bold font-medium text-[#212121] uppercase tracking-wider">
                                     عدد الطلبات
                                 </th>
                                 <th scope="col"
-                                    class="px-6 py-3 text-right text-[18px] font-bold font-medium text-[#212121] uppercase tracking-wider">
+                                    class="px-6 py-3 rtl:text-right text-[18px] font-bold font-medium text-[#212121] uppercase tracking-wider">
                                     الحالة
                                 </th>
                                 <th scope="col"
-                                    class="px-6 py-3 text-right text-[18px] font-bold font-medium text-[#212121] uppercase tracking-wider">
+                                    class="px-6 py-3 rtl:text-right text-[18px] font-bold font-medium text-[#212121] uppercase tracking-wider">
                                     التاريخ
                                 </th>
                                 {{-- Actions TH: Centered --}}
@@ -296,21 +296,21 @@
                                             class="ml-1 h-4 w-4 text-[#185D31] bg-[#185D31] focus:ring-[#185D31] accent-[#185D31] border-[#185D31] rounded">
                                         </th>
                                     </td>
-                                    {{-- Standardized padding and text-right for content TDs --}}
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                                    {{-- Standardized padding and rtl:text-right for content TDs --}}
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 rtl:text-right">
                                         {{ $loop->iteration + $users->firstItem() - 1 }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 rtl:text-right">
                                         {{ $user->full_name }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 rtl:text-right">
                                         {{ $user->email }}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 rtl:text-right">
                                         {{ $user->phone_number ?? 'N/A' }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 rtl:text-right">
                                         {{ $user->address ?? 'N/A' }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 rtl:text-right">
                                         {{ optional($user->orders)->count() ?? 0 }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right">
+                                    <td class="px-6 py-4 whitespace-nowrap rtl:text-right">
                                         @php
                                             $statusClass = '';
                                             $statusText = '';
@@ -335,7 +335,7 @@
                                         <span
                                             class="px-2 py-1 inline-flex w-[100px] text-center items-center justify-center text-[14px] leading-5 rounded-full {{ $statusClass }}">{{ $statusText }}</span>
                                     </td>
-                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">
+                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 rtl:text-right">
                                     {{ optional($user->created_at)->translatedFormat('j F Y') ?? 'N/A' }}
                                 </td>
  
@@ -344,7 +344,7 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex items-center justify-center space-x-4 rtl:space-x-reverse">
                                             <a href="{{ route('admin.users.edit', $user->id) }}"
-                                                class="text-indigo-600 hover:text-indigo-900">
+                                                class="text-[#185D31]">
                                                 <i class="fas fa-edit"></i>
                                             </a>
 
@@ -353,7 +353,7 @@
 <div x-data="{ openBan: false }" class="inline-block">
     <button type="button"
             @click="openBan = true"
-            class="text-yellow-600 hover:text-yellow-900">
+            class="text-[#185D31]">
         @if ($user->status === 'banned')
             <i class="fas fa-unlock"></i>
         @else
@@ -401,7 +401,7 @@
 
                                             <div x-data="{ open: false }" class="inline-block">
                                                 <button type="button" @click="open = true"
-                                                    class="text-red-600 hover:text-red-900">
+                                                    class="text-[#185D31]">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
 
