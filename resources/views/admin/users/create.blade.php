@@ -10,7 +10,7 @@
         {{-- رسالة النجاح --}}
         <div 
             x-show="success" 
-            x-transition 
+            x-transition x-cloak
             class="bg-green-100 border border-green-400 text-green-700 p-4 rounded mb-4"
             x-text="success"
         ></div>
@@ -72,24 +72,24 @@
                     </svg>
                 </button>
 
-                <div x-show="open" @click.away="open = false"
+                <div x-show="open" @click.away="open = false" x-cloak
                     class="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-xl shadow-lg py-2">
 
                     <label class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
                         <input type="radio" value="active" x-model="form.status"
-                                class="shrink-0 w-5 h-5 border-[#185D31] focus:ring-[#185D31] rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
+                                class="shrink-0 w-5 h-5 mx-2 appearance-none border-[#185D31] focus:ring-[#185D31] rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
                         <span class="ml-2">نشط</span>
                     </label>
 
                     <label class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
                         <input type="radio" value="inactive" x-model="form.status"
-                                class="shrink-0 w-5 h-5 border-[#185D31] focus:ring-[#185D31] rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
+                                class="shrink-0 w-5 h-5 mx-2 appearance-none border-[#185D31] focus:ring-[#185D31] rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
                         <span class="ml-2">غير نشط</span>
                     </label>
 
                     <label class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
                         <input type="radio" value="banned" x-model="form.status"
-                                class="shrink-0 w-5 h-5 border-[#185D31] focus:ring-[#185D31] rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
+                                class="shrink-0 w-5 h-5 mx-2 appearance-none border-[#185D31] focus:ring-[#185D31] rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
                         <span class="ml-2">محظور</span>
                     </label>
                 </div>

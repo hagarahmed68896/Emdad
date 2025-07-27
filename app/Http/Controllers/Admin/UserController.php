@@ -5,12 +5,15 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Document;
+use App\Models\Order;
+use App\Models\Bill;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\UsersExport;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 
 class UserController extends Controller
@@ -94,13 +97,23 @@ class UserController extends Controller
         'full_name' => ['required', 'string', 'max:255'],
         'email' => ['required', 'email', 'max:255', 'unique:users,email'],
         'phone_number' => 'required|digits:9|unique:users,phone_number',
+        'password' => ['nullable', 'string', 'min:8'],
         'address' => ['nullable', 'string', 'max:255'],
         'status' => ['required', Rule::in(['active', 'inactive', 'banned'])],
         'account_type' => ['required', 'string', 'in:supplier,customer,admin'],
     ]);
+    $password = $request->password ?? 'Password123';
 
 
-    User::create($validated);
+     $user = User::create([
+        'full_name' => $validated['full_name'],
+        'email' => $validated['email'],
+        'phone_number' => $validated['phone_number'],
+        'address' => $validated['address'],
+        'status' => $validated['status'],
+        'password' => Hash::make($password),
+        'account_type' => $validated['account_type'],
+    ]);
 
     return response()->json(['success' => 'تم إضافة المستخدم بنجاح!']);
 }
@@ -268,6 +281,115 @@ public function toggleBan(User $user)
 
     return redirect()->back()->with('success', 'تم تحديث حالة المستخدم.');
 }
+
+public function show(User $user)
+{
+    $invoices = $user->invoices;
+
+    // ✅ الطلبات مع البحث
+    $ordersQuery = Order::with('orderItems')
+        ->where('user_id', $user->id);
+
+    if (request('tab') === 'orders' && request('search')) {
+        $searchTerm = request('search');
+        $ordersQuery->where(function ($query) use ($searchTerm) {
+            $query->where('order_number', 'like', "%$searchTerm%")
+                  ->orWhere('id', $searchTerm);
+        });
+    }
+
+    $orders = $ordersQuery->paginate(10);
+
+    // ✅ التقييمات مع البحث
+    $reviewsQuery = $user->reviews()->with('product');
+
+    if (request('tab') === 'reviews' && request('search')) {
+        $searchTerm = request('search');
+        $reviewsQuery->where(function ($query) use ($searchTerm) {
+            $query->where('id', $searchTerm)
+                  ->orWhereHas('product', function ($q) use ($searchTerm) {
+                      $q->where('name', 'like', "%$searchTerm%");
+                  });
+        });
+    }
+
+    $reviews = $reviewsQuery->paginate(10);
+
+    // ✅ الفواتير مع البحث (جديد)
+    $billsQuery = Bill::with('order')
+        ->where('user_id', $user->id);
+
+    if (request('tab') === 'bills' && request('search')) {
+        $searchTerm = request('search');
+        $billsQuery->where(function ($query) use ($searchTerm) {
+            $query->where('bill_number', 'like', "%$searchTerm%")
+                  ->orWhere('id', $searchTerm)
+                  ->orWhereHas('order', function ($q) use ($searchTerm) {
+                      $q->where('id', $searchTerm);
+                  });
+        });
+    }
+
+    $bills = $billsQuery->paginate(10);
+
+    return view('admin.users.show', compact('user', 'orders', 'invoices', 'reviews', 'bills'));
+}
+
+public function editInvoice(Bill $invoice)
+{
+    return view('admin.bills.edit', [
+        'bill' => $invoice
+    ]);
+}
+public function updateInvoice(Request $request, Bill $invoice)
+{
+    $validated = $request->validate([
+        'customer_name' => 'required',
+        'order_number'  => 'required',
+        'payment_way'   => 'required',
+        'total_price'   => 'required|numeric',
+        'status'        => 'required',
+    ]);
+
+    $user = User::where('full_name', $validated['customer_name'])
+                ->where('account_type', 'customer')
+                ->first();
+
+    if (!$user) {
+        return response()->json(['errors' => ['customer_name' => ['لم يتم العثور على هذا العميل.']]], 422);
+    }
+
+    $order = Order::where('order_number', $validated['order_number'])->first();
+    if (!$order) {
+        return response()->json(['errors' => ['order_number' => ['لم يتم العثور على هذا الطلب.']]], 422);
+    }
+
+    $invoice->update([
+        'user_id'     => $user->id,
+        'order_id'    => $order->id,
+        'payment_way' => $validated['payment_way'],
+        'total_price' => $validated['total_price'],
+        'status'      => $validated['status'],
+    ]);
+
+    return response()->json(['message' => 'تم تحديث الفاتورة بنجاح!']);
+}
+
+  public function showPdf($id)
+{
+    $invoice = Bill::with('user', 'order.orderItems')->findOrFail($id);
+
+    $pdf = Pdf::loadView('admin.bill_pdf', compact('invoice'))
+        ->setOptions([
+            'defaultFont' => 'Amiri',
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => true,
+        ]);
+
+    return $pdf->stream('فاتورة-' . $invoice->bill_number . '.pdf');
+}
+
+
 
 
 }

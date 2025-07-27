@@ -329,7 +329,7 @@
                                         {{ $statusText }}
                                     </span>
                                 </td>
-                       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 rtl:text-right">                                    {{ optional($invoice->created_at)->translatedFormat('j F Y') }}
+                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 rtl:text-right">                                    {{ optional($invoice->created_at)->translatedFormat('j F Y') }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 rtl:text-right">
                                             <a href="{{ route('invoices.edit', $invoice->id) }}"

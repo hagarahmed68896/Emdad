@@ -91,11 +91,11 @@
                 </div>
 
                 {{-- Original Filter/Search Bar: Shown when no users are selected --}}
-                <div x-show="selectedUsers.length === 0"
-                    class="flex mt-2 mx-auto flex-col md:flex-row items-center justify-between mb-4 space-y-4 md:space-y-0">
+                <div x-show="selectedUsers.length === 0"  x-cloak
+                    class="flex flex-col md:flex-row items-center justify-between mb-4 space-y-4 md:space-y-0">
 
                     <form action="{{ route('admin.users.index') }}" method="GET"
-                        class="flex flex-col md:flex-row md:items-center gap-4 w-[543px]">
+                        class="flex flex-col md:flex-row md:items-center gap-4 w-full max-w-xl">
                         <input type="hidden" name="account_type" value="customer">
 
                         <div x-data="{ open: false, selectedStatus: '{{ $statusFilter ?? '' }}', selectedSort: '{{ $sortFilter ?? '' }}' }" class="relative inline-block text-left ">
@@ -197,19 +197,19 @@
                             <input type="hidden" name="status" :value="selectedStatus">
                             <input type="hidden" name="sort" :value="selectedSort">
                         </div>
+                       {{-- Search Input --}}
+                        <div class="relative w-full ">
+                                           <input type="text" name="search" value="{{ $search }}" placeholder="بحث"
+                                class="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-green-500 focus:border-green-500">
 
-                        <div class="relative w-full md:w-auto flex-1">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                         <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-400">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                                 </svg>
                             </div>
 
-                            <input type="text" name="search" value="{{ $search }}" placeholder="بحث"
-                                class="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-green-500 focus:border-green-500">
-
+             
                             <button type="submit"
                                 class="absolute inset-y-0 left-0 flex items-center px-3 text-white bg-[#185D31] hover:bg-green-800 rounded-l-xl">
                                 بحث
@@ -289,7 +289,8 @@
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             @forelse ($users as $user)
-                                <tr>
+                              <tr onclick="window.location='{{ route('admin.users.show', $user->id) }}'"
+                                class="cursor-pointer hover:bg-gray-50">
                                     {{-- Individual Checkbox TD: Consistent padding and centered --}}
                                     <td class="px-4 py-4 whitespace-nowrap text-sm text-center">
                                         <input type="checkbox" :value="{{ $user->id }}" x-model="selectedUsers"

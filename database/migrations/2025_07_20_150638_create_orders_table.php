@@ -1,7 +1,5 @@
 <?php
 
-// database/migrations/YYYY_MM_DD_HHMMSS_create_orders_table.php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,11 +13,17 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Foreign key to users table
-            $table->string('order_number')->unique(); // Example: A unique order number
-            $table->decimal('total_amount', 10, 2)->default(0.00); // Example: Total amount of the order
-            $table->string('status')->default('pending'); // Example: pending, processing, completed, cancelled
-            // Add any other columns relevant to your orders, e.g., shipping address, payment status, etc.
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('order_number')->unique()->nullable();
+            $table->decimal('total_amount', 10, 2)->default(0.00);
+
+            // Add payment way: مثل (cash, card, transfer, etc.)
+            $table->enum('payment_way', ['cash', 'bank_transfer', 'credit_card']); // عدل القيم حسب طرق الدفع لديك
+
+            // Use ENUM-like pattern for status
+            $table->enum('status', ['completed', 'processing', 'cancelled', 'returned']
+            )->default('processing');
+
             $table->timestamps();
         });
     }

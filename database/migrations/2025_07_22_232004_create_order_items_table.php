@@ -7,14 +7,14 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('order_items', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('order_id')->constrained()->onDelete('cascade');
-            $table->string('product_name');
-            $table->integer('quantity')->default(1);
-            $table->decimal('price', 10, 2);
-            $table->timestamps();
-        });
+    Schema::create('order_items', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('order_id')->constrained()->onDelete('cascade');
+    $table->foreignId('product_id')->constrained()->onDelete('cascade'); // ربط مباشر بالمنتجات
+    $table->integer('quantity')->default(1);
+    $table->timestamps();
+});
+
     }
 
     public function down(): void

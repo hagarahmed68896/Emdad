@@ -109,6 +109,13 @@ Route::middleware('web')->group(function () {
 
     Route::get('/banned-users', [BannedUserController::class, 'index'])->name('admin.banned.index');
 
+    //account details
+    Route::get('/users/{user}', [UserController::class, 'show'])->name('admin.users.show');
+
+  Route::get('/bills/{invoice}/edit', [UserController::class, 'editInvoice'])->name('invoices.edit');
+
+    // عرض PDF للفاتورة
+    Route::get('/bills/{id}/show', [UserController::class, 'showPdf'])->name('bills.show_pdf');
 
     // ✅ إدارة الفواتير بالكامل
     Route::get('/invoices', [BillsController::class, 'index'])->name('invoices.index');
