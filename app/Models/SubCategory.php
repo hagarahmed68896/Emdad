@@ -24,8 +24,7 @@ class SubCategory extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'name_en',
-        'name_ar',
+        'name',
         'slug',
         'iconUrl',
         'category_id', // Ensure category_id is fillable as it's a foreign key

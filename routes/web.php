@@ -24,6 +24,8 @@ use App\Http\Controllers\Admin\AdminSupplierController;
 use App\Http\Controllers\Admin\BillsController;
 use App\Http\Controllers\Admin\DocumentsController;
 use App\Http\Controllers\Admin\BannedUserController;
+use App\Http\Controllers\Admin\ProductsController;
+use App\Http\Controllers\Admin\CategoriesController;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -150,9 +152,38 @@ Route::middleware('web')->group(function () {
     Route::get('/admin/documents/{id}/download', [DocumentsController::class, 'downloadPdf'])
     ->name('admin.documents.download');
 
-   Route::delete('documents/{id}', [DocumentsController::class, 'destroy'])
+    Route::delete('documents/{id}', [DocumentsController::class, 'destroy'])
         ->name('admin.documents.destroy');
 
+    // ✅ إدارة المنتجات بالكامل
+    Route::get('/products', [ProductsController::class, 'index'])
+         ->name('admin.products.index');
+
+    // ✅ تصدير المنتجات إلى CSV
+    Route::get('/products/export/csv', [ProductsController::class, 'exportCsv'])
+         ->name('admin.products.export.csv');
+
+    Route::get('/categories', [CategoriesController::class, 'index'])
+         ->name('admin.categories.index');
+
+    Route::get('categories/create', [CategoriesController::class, 'create'])->name('admin.categories.create');
+
+    Route::post('categories/store', [CategoriesController::class, 'store'])->name('admin.categories.store');
+
+     // ✅ حذف فئة واحدة (category أو sub_category)
+     Route::delete('/admin/categories/{id}', [CategoriesController::class, 'destroy'])->name('admin.categories.destroy');
+
+     // ✅ حذف جماعي للفئات
+     Route::delete('categories/bulk-delete', [CategoriesController::class, 'bulkDelete'])->name('admin.categories.bulkDelete');
+
+     // ✅ تصدير CSV للفئات
+     Route::get('/admin/categories/export', [CategoriesController::class, 'exportCsv'])->name('admin.categories.export');
+
+    Route::get('/categories/{id}/edit', [CategoriesController::class, 'edit'])->name('admin.categories.edit');
+    Route::put('/categories/{id}', [CategoriesController::class, 'update'])->name('admin.categories.update');
+
+    Route::get('/sub-categories/{id}/edit', [CategoriesController::class, 'editSubCategory'])->name('admin.sub-categories.edit');
+    Route::put('/sub-categories/{id}', [CategoriesController::class, 'updateSubCategory'])->name('admin.sub-categories.update');
 });
 
 

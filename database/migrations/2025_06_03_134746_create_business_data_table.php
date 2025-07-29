@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('national_address')->nullable();
             $table->string('iban')->nullable();
             $table->string('tax_certificate')->nullable();
+            $table->boolean(column: 'supplier_confirmed')->default(false); // If supplier confirmed
             $table->timestamps();
         });
     }

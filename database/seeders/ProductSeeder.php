@@ -41,8 +41,6 @@ class ProductSeeder extends Seeder
             'is_offer' => true,
             'discount_percent' => 15,
             'offer_expires_at' => now()->addDays(7),
-            'supplier_name' => 'Fashion Supplier',
-            'supplier_confirmed' => true,
             'min_order_quantity' => 3,
             'price_tiers' => [ // Pass as array, Laravel accessor handles
                 ['min_qty' => 3, 'max_qty' => 10, 'price' => 280.00],

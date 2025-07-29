@@ -29,8 +29,6 @@ return new class extends Migration
             $table->timestamp('offer_expires_at')->nullable(); // Optional: when the offer ends
 
             // Supplier & Basic Product Info
-            $table->string('supplier_name')->nullable(); // Supplier name
-            $table->boolean('supplier_confirmed')->default(false); // If supplier confirmed
             $table->unsignedInteger('min_order_quantity')->default(1); // Minimum order for each product
             $table->decimal('rating', 2, 1)->nullable(); // Rating (e.g., 4.5)
             $table->unsignedInteger('reviews_count')->default(0); // Total number of reviews
@@ -57,6 +55,8 @@ return new class extends Migration
 
             // Existing 'is_featured' (could be for general featured sections)
             $table->boolean('is_featured')->default(false);
+            $table->boolean('is_available')->default(true); // true if the product is on offer
+            $table->foreignId('business_data_id')->constrained('business_data')->onDelete('cascade');
 
 
             $table->timestamps();

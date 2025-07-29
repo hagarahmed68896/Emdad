@@ -9,11 +9,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Category extends Model
 {
     use HasFactory;
-    protected $fillable = ['name_en', 'name_ar', 'slug','iconUrl'];
-    public function getNameAttribute()
-    {
-        return app()->getLocale() === 'ar' ? $this->name_ar : $this->name_en;
-    }
+    protected $fillable = ['name', 'slug','iconUrl','description'];
+    // public function getNameAttribute()
+    // {
+    //     return app()->getLocale() === 'ar' ? $this->name : $this->name;
+    // }
    public function products(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
     {
         return $this->hasManyThrough(

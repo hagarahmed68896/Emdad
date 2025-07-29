@@ -6,15 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class BusinessData extends Model
 {
-    protected $fillable = [
+        protected $fillable = [
         'user_id',
         'national_id',
-        'national_id_attach',
         'company_name',
         'commercial_registration',
         'national_address',
         'iban',
         'tax_certificate',
+        'supplier_confirmed',
        
     ]; 
 

@@ -20,8 +20,6 @@ class Product extends Model
         'is_offer',
         'discount_percent',
         'offer_expires_at',
-        'supplier_name',
-        'supplier_confirmed',
         'min_order_quantity',
         'rating',
         'reviews_count',
@@ -33,6 +31,9 @@ class Product extends Model
         'quality',
         'specifications',
         'is_featured',
+        'is_available',
+        'business_data_id', // ✅ supplier ID
+
     ];
 
     /**
@@ -56,4 +57,11 @@ class Product extends Model
     return $this->hasMany(Review::class);
     }
 
+    public function supplier()
+    {
+    return $this->belongsTo(BusinessData::class, 'business_data_id');
+    }
+
+
 }
+
