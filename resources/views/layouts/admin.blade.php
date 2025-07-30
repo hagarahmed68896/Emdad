@@ -242,10 +242,13 @@
                         <span class="sidebar-text">الفواتير</span>
                     </a>
                 </li>
+
+
                 <li class="mb-2">
                     <a href="{{ route('admin.documents.index') }}"
      class="sidebar-link flex items-center p-3  transition-colors duration-200
-        {{ Request::is(patterns: 'admin/documents*') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">                         <i class="fas fa-file-alt ml-3 text-gray-500"></i>
+        {{ Request::is(patterns: 'admin/documents*') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">   
+                               <i class="fas fa-file-alt ml-3 text-gray-500"></i>
                         <span class="sidebar-text">مراجعة الوثائق</span>
                     </a>
                 </li>
@@ -286,15 +289,42 @@
 
     </ul>
 </li>
+          <li class="mb-2"
+    x-data="{ open: {{
+        (
+            Request::is('admin/orders*')
+            ) ? 'true' : 'false' }} }">
 
-                <li class="mb-2">
-                    <a href="#"
-                        class="sidebar-link flex items-center p-3 text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl transition-colors duration-200">
+    <a href="#"
+       @click.prevent="open = !open"
+       class="sidebar-link flex items-center p-3 text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl transition-colors duration-200">
                         <i class="fas fa-shopping-cart ml-3 text-gray-500"></i>
-                        <span class="sidebar-text">إدارة الطلبات</span>
-                        <i class="fas fa-chevron-down mr-auto text-gray-500 text-xs sidebar-text"></i>
-                    </a>
-                </li>
+        <span class="sidebar-text">إدارة الطلبات</span>
+        <i :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"
+           class="fas mr-auto text-gray-500 text-xs sidebar-text"></i>
+    </a>
+
+    <ul x-show="open" x-transition class="mt-2 space-y-2 pr-6 sidebar-sub-menu">
+
+        {{-- الطلبات --}}
+        <li>
+            <a href="{{ route('admin.orders.index') }}"
+               class="flex items-center p-2 transition-colors duration-200
+               {{ Request::is('admin/orders*') ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
+               الطلبات
+            </a>
+        </li>
+
+        {{-- التسويات --}}
+        <li>
+            <a href="#"
+               class="flex items-center p-2 transition-colors duration-200">
+               التسويات
+            </a>
+        </li>
+
+    </ul>
+</li>
                 <li class="mb-2">
                     <a href="#"
                         class="sidebar-link flex items-center p-3 text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl transition-colors duration-200">
@@ -303,9 +333,9 @@
                     </a>
                 </li>
                 <li class="mb-2">
-                    <a href="#"
-                        class="sidebar-link flex items-center p-3 text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl transition-colors duration-200">
-                        <i class="fas fa-star ml-3 text-gray-500"></i>
+                    <a  href="{{ route('admin.reviews.index') }}"
+     class="sidebar-link flex items-center p-3  transition-colors duration-200
+        {{ Request::is(patterns: 'admin/reviews*') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">                           <i class="fas fa-star ml-3 text-gray-500"></i>
                         <span class="sidebar-text">مراجعة التقييمات</span>
                     </a>
                 </li>

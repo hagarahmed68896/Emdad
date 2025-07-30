@@ -26,6 +26,8 @@ use App\Http\Controllers\Admin\DocumentsController;
 use App\Http\Controllers\Admin\BannedUserController;
 use App\Http\Controllers\Admin\ProductsController;
 use App\Http\Controllers\Admin\CategoriesController;
+use App\Http\Controllers\Admin\OrdersController;
+use App\Http\Controllers\Admin\ReviewsController;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -159,10 +161,10 @@ Route::middleware('web')->group(function () {
     Route::get('/products', [ProductsController::class, 'index'])
          ->name('admin.products.index');
 
-    // ✅ تصدير المنتجات إلى CSV
     Route::get('/products/export/csv', [ProductsController::class, 'exportCsv'])
          ->name('admin.products.export.csv');
 
+     // ادارة الفئات بالكامل
     Route::get('/categories', [CategoriesController::class, 'index'])
          ->name('admin.categories.index');
 
@@ -170,13 +172,10 @@ Route::middleware('web')->group(function () {
 
     Route::post('categories/store', [CategoriesController::class, 'store'])->name('admin.categories.store');
 
-     // ✅ حذف فئة واحدة (category أو sub_category)
      Route::delete('/admin/categories/{id}', [CategoriesController::class, 'destroy'])->name('admin.categories.destroy');
 
-     // ✅ حذف جماعي للفئات
      Route::delete('categories/bulk-delete', [CategoriesController::class, 'bulkDelete'])->name('admin.categories.bulkDelete');
 
-     // ✅ تصدير CSV للفئات
      Route::get('/admin/categories/export', [CategoriesController::class, 'exportCsv'])->name('admin.categories.export');
 
     Route::get('/categories/{id}/edit', [CategoriesController::class, 'edit'])->name('admin.categories.edit');
@@ -184,6 +183,27 @@ Route::middleware('web')->group(function () {
 
     Route::get('/sub-categories/{id}/edit', [CategoriesController::class, 'editSubCategory'])->name('admin.sub-categories.edit');
     Route::put('/sub-categories/{id}', [CategoriesController::class, 'updateSubCategory'])->name('admin.sub-categories.update');
+
+    // ✅ إدارة الطلبات بالكامل
+
+        Route::get('/orders', [OrdersController::class, 'index'])
+         ->name('admin.orders.index');
+
+        Route::get('/orders/export/csv', [OrdersController::class, 'exportCsv'])
+         ->name('admin.orders.export.csv');
+
+         //
+      Route::get('/reviews', [ReviewsController::class, 'index'])
+         ->name('admin.reviews.index');   
+
+       Route::get('/reviews/export/csv', [ReviewsController::class, 'exportCsv'])
+         ->name('admin.reviews.export.csv');
+
+     Route::delete('reviews/bulk-delete', [ReviewsController::class, 'bulkDelete'])->name('admin.reviews.bulkDelete');
+
+   
+
+
 });
 
 
