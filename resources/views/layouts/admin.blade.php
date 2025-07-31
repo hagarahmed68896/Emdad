@@ -334,8 +334,8 @@
                 </li>
                 <li class="mb-2">
                     <a  href="{{ route('admin.reviews.index') }}"
-     class="sidebar-link flex items-center p-3  transition-colors duration-200
-        {{ Request::is(patterns: 'admin/reviews*') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">                           <i class="fas fa-star ml-3 text-gray-500"></i>
+                  class="sidebar-link flex items-center p-3  transition-colors duration-200
+                  {{ Request::is(patterns: 'admin/reviews*') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">                           <i class="fas fa-star ml-3 text-gray-500"></i>
                         <span class="sidebar-text">مراجعة التقييمات</span>
                     </a>
                 </li>
@@ -353,13 +353,54 @@
                         <span class="sidebar-text">العروض والإشعارات</span>
                     </a>
                 </li>
-                <li class="mb-2">
-                    <a href="#"
-                        class="sidebar-link flex items-center p-3 text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl transition-colors duration-200">
-                        <i class="fas fa-cog ml-3 text-gray-500"></i>
-                        <span class="sidebar-text">الإعدادات</span>
-                    </a>
-                </li>
+                <li class="mb-2"
+    x-data="{ open: {{
+        (
+            Request::is('admin/profile*') 
+     
+        ) ? 'true' : 'false' }} }">
+
+    <a href= "#"
+       @click.prevent="open = !open"
+       class="sidebar-link flex items-center p-3 transition-colors duration-200 rounded-xl text-gray-700">
+        <i class="fas fa-cog ml-3 text-gray-500"></i>
+        <span class="sidebar-text"> الإعدادات</span>
+        <i :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"
+           class="fas mr-auto text-gray-500 text-xs sidebar-text"></i>
+    </a>
+
+    <ul x-show="open" x-transition class="mt-2 space-y-2 pr-6 sidebar-sub-menu">
+
+        <li>
+            <a href="{{ route('admin.profile.index') }}"
+               class="flex items-center p-2 transition-colors duration-200
+               {{ (Request::is('admin/profile*')) ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
+              الملف الشخصي
+            </a>
+        </li>
+
+        <li>
+            <a href="#"
+               class="flex items-center p-2 transition-colors duration-200">
+             إعدادات التواصل 
+            </a>
+        </li>
+
+        <li>
+            <a href="#"
+               class="flex items-center p-2 transition-colors duration-200">
+            الشروط و الاحكام
+            </a>
+        </li>
+     <li>
+            <a href="#"
+               class="flex items-center p-2 transition-colors duration-200">
+           نسبة الأرباح 
+            </a>
+        </li>
+    </ul>
+</li>
+ 
             </ul>
         </nav>
 

@@ -28,6 +28,7 @@ use App\Http\Controllers\Admin\ProductsController;
 use App\Http\Controllers\Admin\CategoriesController;
 use App\Http\Controllers\Admin\OrdersController;
 use App\Http\Controllers\Admin\ReviewsController;
+use App\Http\Controllers\Admin\SettingsController;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -186,28 +187,28 @@ Route::middleware('web')->group(function () {
 
     // ✅ إدارة الطلبات بالكامل
 
-        Route::get('/orders', [OrdersController::class, 'index'])
+    Route::get('/orders', [OrdersController::class, 'index'])
          ->name('admin.orders.index');
 
-        Route::get('/orders/export/csv', [OrdersController::class, 'exportCsv'])
+    Route::get('/orders/export/csv', [OrdersController::class, 'exportCsv'])
          ->name('admin.orders.export.csv');
 
-         //
-      Route::get('/reviews', [ReviewsController::class, 'index'])
+         //ادارة المراجعات بالكامل
+    Route::get('/reviews', [ReviewsController::class, 'index'])
          ->name('admin.reviews.index');   
 
-       Route::get('/reviews/export/csv', [ReviewsController::class, 'exportCsv'])
+    Route::get('/reviews/export/csv', [ReviewsController::class, 'exportCsv'])
          ->name('admin.reviews.export.csv');
 
-     Route::delete('reviews/bulk-delete', [ReviewsController::class, 'bulkDelete'])->name('admin.reviews.bulkDelete');
+    Route::delete('reviews/bulk-delete', [ReviewsController::class, 'bulkDelete'])->name('admin.reviews.bulkDelete');
 
-   
+      // ادارة الاعدادات بالكامل
+      Route::get('/settings/profile', [SettingsController::class, 'index'])->name('admin.profile.index');
+   Route::post('/profile/photo/upload', [SettingsController::class, 'updateProfilePicture'])->name('profile.photo.upload');
+Route::post('/profile/photo/delete', [SettingsController::class, 'removeProfilePicture'])->name('profile.photo.delete');
 
-
+Route::put('/profile/update', [SettingsController::class, 'updateProfile'])->name('profile.update');
 });
-
-
-
         
 
         // General user logout (if you have a separate logout for normal users)
