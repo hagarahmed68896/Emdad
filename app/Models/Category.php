@@ -29,4 +29,8 @@ class Category extends Model
                                  // that the final model references.
         );
     }
+    public function subCategories(): HasMany
+{
+    return $this->hasMany(SubCategory::class, 'category_id');
+}
 }

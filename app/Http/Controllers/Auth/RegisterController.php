@@ -47,8 +47,15 @@ class RegisterController extends Controller
 
         Auth::login($user); // User is logged in on the server
 
+           // Only send redirect for supplier
+    // $redirectUrl = null;
+    // if ($user->account_type === 'supplier') {
+    //     $redirectUrl = route('supplier.home'); // or '/supplier/dashboard'
+    // }
+
         return response()->json([
             'success' => true,
+          
             // You can optionally return user data here if needed for client-side state updates
             // 'user' => $user->only(['id', 'full_name', 'email', 'account_type']),
         ], 200);

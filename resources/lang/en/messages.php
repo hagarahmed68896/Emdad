@@ -101,12 +101,17 @@ return [
     'confirmLocation'       => 'Confirm Location',
     'locationconfirmedmsg'  => 'Location Confirmed!',
     'selectedLocation'      => 'Selected Location',
+    'address_supplier'      => 'Address Al Riyadh',
 
     // Hero Section
     'wholesale'         => 'Wholesale Retail',
     'reliableSolution'  => 'A Reliable Solution for Wholesale Trade',
     'heroDsecription'   => 'Emdad provides you with a reliable shopping experience connecting you with trusted suppliers across various sectors, from electronics to industrial materials.',
     'shopNow'           => 'Shop Now',
+    'sell_now'          => 'Start Selling Now',
+    'heroDescription_supplier' => 'Join the supplier network on Emdad platform and start showcasing your products to buyers across the Kingdom. Manage your products and track orders.',
+    'reliableSolution_supplier'   => 'Emdad provides you with a reliable shopping experience connecting you with trusted suppliers across various sectors, with easy and fast wholesale shopping solutions.',
+    
 
     // Image Upload
     'dragPhoto'      => 'Drag and drop a photo here ',
@@ -356,11 +361,42 @@ return [
     'quantaty' => 'Quantaty',
     'element' => 'Element',
     'type' => 'Type',
-
-
-
-    
-   
+    'myProducts' => 'My Products',
+    'no_products' => 'You have not added any products yet',
+       'add_new_product' => 'Add New Product',
+    'product_details' => 'Product Details',
+    'product_image' => 'Product Image',
+    'drag_or_click' => 'Drag or click to upload',
+    'product_name' => 'Product Name',
+    'select_category' => 'Select Category',
+    'select_subcategory' => 'Select Subcategory',
+    'base_price' => 'Base Price',
+    'wholesale_pricing' => 'Wholesale Pricing',
+    'from_quantity' => 'From Quantity',
+    'to_quantity' => 'To Quantity',
+    'add' => 'Add',
+    'available_sizes' => 'Available Sizes',
+    'available_colors' => 'Available Colors',
+    'material_type' => 'Material Type',
+    'available_quantity' => 'Available Quantity',
+    'description' => 'Product Description',
+    'add_offers' => 'Add Offers',
+    'offer_start' => 'Offer Start',
+    'offer_end' => 'Offer End',
+    'discount_percent' => 'Discount Percent',
+    'manufacturing_delivery_time' => 'Manufacturing/Delivery Time',
+    'preparation_days' => 'Preparation Days',
+    'shipping_days' => 'Shipping Days',
+    'production_capacity' => 'Production Capacity',
+    'product_weight' => 'Product Weight',
+    'package_dimensions' => 'Package Dimensions',
+    'attachments' => 'Attachments',
+    'success_message' => 'Product added successfully!',
+    'base_price_placeholder' => 'Enter the base price of the product',
+    'model_number_placeholder' => 'Enter the model number',
+    'product_name_placeholder' => 'Enter the product name',
+    'attachments_note' => 'Please upload the file in PDF format or image (JPG or PNG)',
+    'kg' => 'kg',
 
     
 

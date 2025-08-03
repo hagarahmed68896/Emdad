@@ -29,6 +29,7 @@ use App\Http\Controllers\Admin\CategoriesController;
 use App\Http\Controllers\Admin\OrdersController;
 use App\Http\Controllers\Admin\ReviewsController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Supplier\SupplierProductController;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -209,6 +210,15 @@ Route::post('/profile/photo/delete', [SettingsController::class, 'removeProfileP
 
 Route::put('/profile/update', [SettingsController::class, 'updateProfile'])->name('profile.update');
 });
+
+
+            // Supplier-specific routes
+Route::get('/supplier/products', [SupplierProductController::class, 'index'])
+    ->name('supplier.products.index');
+
+ Route::get('/supplier/products/create', [SupplierProductController::class, 'create'])->name('products.create');
+Route::post('/supplier/products', [SupplierProductController::class, 'store'])->name('products.store');
+
         
 
         // General user logout (if you have a separate logout for normal users)

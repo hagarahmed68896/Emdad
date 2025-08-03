@@ -19,6 +19,8 @@ class Product extends Model
         'sub_category_id',
         'is_offer',
         'discount_percent',
+        'offer_start',
+        'offer_end',
         'offer_expires_at',
         'min_order_quantity',
         'rating',
@@ -29,39 +31,43 @@ class Product extends Model
         'is_main_featured',
         'model_number',
         'quality',
-        'specifications',
         'is_featured',
         'is_available',
-        'business_data_id', // ✅ supplier ID
-
+        'business_data_id',
+        'preparation_days',
+        'shipping_days',
+        'production_capacity',
+        'product_weight',
+        'package_dimensions',
+        'attachments',
+        'material_type',
+        'available_quantity',
+        'sizes',   // ✅ أضفناها
+        'colors',  // ✅ أضفناها
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'images' => 'array',
         'price_tiers' => 'array',
-        'specifications' => 'array',
+        'sizes' => 'array',    // ✅ cast جديد
+        'colors' => 'array',   // ✅ cast جديد
         'offer_expires_at' => 'datetime',
+        'offer_start' => 'date',
+        'offer_end' => 'date',
     ];
 
     public function subCategory()
     {
         return $this->belongsTo(SubCategory::class, 'sub_category_id');
     }
+
     public function reviews()
     {
-    return $this->hasMany(Review::class);
+        return $this->hasMany(Review::class);
     }
 
     public function supplier()
     {
-    return $this->belongsTo(BusinessData::class, 'business_data_id');
+        return $this->belongsTo(BusinessData::class, 'business_data_id');
     }
-
-
 }
-
