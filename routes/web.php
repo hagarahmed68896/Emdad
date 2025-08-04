@@ -218,8 +218,8 @@ Route::middleware('web')->group(function () {
 
 
           // Supplier-specific routes
-          // Route::get('/', [SupplierProductController::class, 'index'])
-          //     ->name('supplier.products.index');
+          Route::get('/', [SupplierProductController::class, 'index'])
+              ->name('supplier.products.index');
 
           Route::get('/supplier/products/create', [SupplierProductController::class, 'create'])->name('products.create');
           Route::post('/supplier/products', [SupplierProductController::class, 'store'])->name('products.store');

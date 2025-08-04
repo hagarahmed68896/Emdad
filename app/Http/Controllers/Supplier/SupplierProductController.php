@@ -34,6 +34,9 @@ if (!$supplier) {
 
 public function store(Request $request)
 {
+     // Debug the incoming token
+    \Log::info('Request token:', [$request->header('X-CSRF-TOKEN')]);
+    \Log::info('Session token:', [session()->token()]);
     $data = $request->validate([
         'name' => 'required|string|max:255',
         'price' => 'required|numeric|min:0',

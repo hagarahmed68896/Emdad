@@ -169,19 +169,25 @@
 {{-- ✅ التسعير بالجملة --}}
 <div>
     <label class="block mb-1 font-bold">{{ __('messages.wholesale_pricing') }}</label>
-    <div class="flex items-center gap-2 mb-4">
-        <div class="flex justify-between gap-1 w-3/4">
-        <input type="number" min="0" x-model="newWholesaleItem.from" placeholder="{{ __('messages.from_quantity') }}" class="border p-2 w-full rounded-xl">
-        <input type="number" min="0" x-model="newWholesaleItem.to" placeholder="{{ __('messages.to_quantity') }}" class="border p-2 w-full rounded-xl">
-        </div>
-        <div class="flex justify-between gap-1 w-1/4">
-        <div class="relative flex-grow flex items-center">
-    <input type="number" min="0" x-model="newWholesaleItem.price" placeholder="{{ __('messages.price') }}" class="border p-2 w-full rounded-xl pr-12">
-    <img class="absolute left-0 h-full p-2  text-gray-400 border border-l-0 rounded-l-xl bg-gray-100 pointer-events-none" src="{{asset('/images/Saudi_Riyal_Symbol.svg')}}" alt="">
-</div>
-        <button type="button" @click="addWholesale" class="bg-[#185D31] text-white px-4 py-2 rounded-xl h-full">{{ __('messages.add') }}</button>
-   </div>
+<div class="flex flex-col md:flex-row md:items-center gap-2 mb-4">
+
+  <!-- FROM + TO -->
+  <div class="flex gap-1 w-full md:w-3/4">
+    <input type="number" min="0" x-model="newWholesaleItem.from" placeholder="{{ __('messages.from_quantity') }}" class="border p-2 w-full rounded-xl">
+    <input type="number" min="0" x-model="newWholesaleItem.to" placeholder="{{ __('messages.to_quantity') }}" class="border p-2 w-full rounded-xl">
+  </div>
+
+  <!-- PRICE + BUTTON -->
+  <div class="flex flex-col md:flex-row gap-1 w-full md:w-1/4">
+    <div class="relative flex-grow flex items-center">
+      <input type="number" min="0" x-model="newWholesaleItem.price" placeholder="{{ __('messages.price') }}" class="border p-2 w-full rounded-xl pr-12">
+      <img class="absolute left-0 h-full p-2 text-gray-400 border rounded-l-xl bg-gray-100 pointer-events-none" src="{{ asset('/images/Saudi_Riyal_Symbol.svg') }}" alt="">
     </div>
+    <button type="button" @click="addWholesale" class="bg-[#185D31] text-white px-4 py-2 rounded-xl h-full w-full md:w-auto">{{ __('messages.add') }}</button>
+  </div>
+
+</div>
+
 
     <div class="bg-gray-100 p-4 rounded-xl" x-show="wholesalePrices.length > 0">
         <div class="grid grid-cols-3 font-bold text-sm text-gray-500 mb-2">
@@ -308,7 +314,14 @@
             <div>
                 <label class="block mb-1 font-bold">{{ __('messages.product_weight') }}</label>
                 <div class="flex">
-                    <input type="number" min="0" name="product_weight" placeholder="{{ __('messages.product_weight') }}" class="border p-2 w-full rounded-r-xl">
+<input 
+    type="number" 
+    min="0" 
+    step="0.01" 
+    name="product_weight" 
+    placeholder="{{ __('messages.product_weight') }}" 
+    class="border p-2 w-full rounded-r-xl"
+>
                     <span class="inline-flex items-center px-3 border border-l-0 rounded-l-xl bg-gray-100">{{ __('messages.kg') }}</span>
                 </div>
             </div>
@@ -333,97 +346,89 @@
 document.getElementById('create-product-form').addEventListener('submit', function(e) {
     e.preventDefault();
 
+    // Clear all previous errors and messages
+    document.querySelectorAll('.text-red-600').forEach(el => el.textContent = '');
+    const successMessageDiv = document.getElementById('success-message');
+    successMessageDiv.classList.add('hidden');
+    successMessageDiv.classList.remove('bg-red-100', 'text-red-700');
+    successMessageDiv.classList.add('bg-green-100', 'text-green-700');
+    
     const formData = new FormData(this);
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    // Get the CSRF token from the hidden input and append it
+    const csrfToken = document.querySelector('input[name="_token"]').value;
+    formData.append('_token', csrfToken);
 
     fetch("{{ route('products.store') }}", {
         method: 'POST',
         headers: {
-            'X-CSRF-TOKEN': csrfToken,
-            'Accept': 'application/json' // Add this header to ensure JSON response
+            'Accept': 'application/json'
         },
+        credentials: 'same-origin',
         body: formData
     })
-    .then(response => {
+    .then(async response => {
+        const data = await response.json();
+        
         if (!response.ok) {
-            return response.json().then(errorData => {
-                // This is the key part: if there's a validation error, we will have access to the error messages
-                throw new Error(JSON.stringify(errorData));
-            });
-        }
-        return response.json();
-    })
- .then(data => {
-    // Clear previous errors
-    document.querySelectorAll('.text-red-600').forEach(el => el.textContent = '');
-
-    // Get the success message container
-    const successMessageDiv = document.getElementById('success-message');
-    const successMessageSpan = successMessageDiv.querySelector('span');
-
-    if (data.errors) {
-        // This handles validation errors from Laravel
-        for (const [key, messages] of Object.entries(data.errors)) {
-            const el = document.querySelector(`[name="${key}"]`);
-            if (el) {
-                let errorContainer = el.parentNode.querySelector('.text-red-600');
-                if (!errorContainer) {
-                    errorContainer = document.createElement('p');
-                    errorContainer.className = 'text-red-600 text-sm mt-1';
-                    el.parentNode.appendChild(errorContainer);
-                }
-                errorContainer.textContent = messages[0];
-            }
-        }
-    } else if (data.success) {
-        // Show the success message in the div
-        successMessageSpan.textContent = data.success;
-        successMessageDiv.classList.remove('hidden');
-
-        // Optional: Hide the message after a few seconds
-        setTimeout(() => {
-            successMessageDiv.classList.add('hidden');
-        }, 5000); // 5000 milliseconds = 5 seconds
-
-        // Redirect after the message is shown (optional)
-        if (data.redirect) {
-            window.location.href = data.redirect;
-        }
-    }
-})
-    .catch(error => {
-        try {
-            // Attempt to parse the error as JSON
-            const errorData = JSON.parse(error.message);
-            if (errorData.errors) {
-                document.querySelectorAll('.text-red-600').forEach(el => el.textContent = '');
-                for (const [key, messages] of Object.entries(errorData.errors)) {
-                    // This handles validation errors from Laravel
-                    const el = document.querySelector(`[name="${key}"]`);
-                    if (el) {
-                        let errorContainer = el.parentNode.querySelector('.text-red-600');
+            // Handle validation errors or other server errors
+            if (data.errors) {
+                for (const [key, messages] of Object.entries(data.errors)) {
+                    const input = document.querySelector(`[name="${key}"]`);
+                    if (input) {
+                        let errorContainer = input.parentNode.querySelector('.text-red-600');
                         if (!errorContainer) {
                             errorContainer = document.createElement('p');
                             errorContainer.className = 'text-red-600 text-sm mt-1';
-                            el.parentNode.appendChild(errorContainer);
+                            input.parentNode.appendChild(errorContainer);
                         }
                         errorContainer.textContent = messages[0];
                     }
                 }
-            } else {
-                console.error('An error occurred:', errorData);
+            } else if (data.message) {
+                // Handle general server error message
+                const successMessageSpan = successMessageDiv.querySelector('span');
+                successMessageSpan.textContent = data.message;
+                successMessageDiv.classList.remove('bg-green-100', 'text-green-700');
+                successMessageDiv.classList.add('bg-red-100', 'text-red-700');
+                successMessageDiv.classList.remove('hidden');
             }
-        } catch (e) {
-            // Handle non-JSON errors
-            console.error('An unexpected error occurred:', error);
-            alert('An unexpected error occurred. Please try again.');
+            throw new Error('Request failed');
         }
+        
+        return data; // Return the parsed data for the next .then()
+    })
+    .then(data => {
+        // Handle success message
+        if (data.success) {
+            const successMessageSpan = successMessageDiv.querySelector('span');
+            successMessageSpan.textContent = data.success;
+            successMessageDiv.classList.remove('hidden');
+
+            setTimeout(() => {
+                successMessageDiv.classList.add('hidden');
+            }, 5000);
+
+            if (data.redirect) {
+                window.location.href = data.redirect;
+            }
+        }
+    })
+    .catch(error => {
+        // This catch block handles network errors and the 'Request failed' error we threw earlier
+        console.error('An unexpected error occurred:', error);
+        
+        // Display a generic error message in the same success div
+        const successMessageSpan = successMessageDiv.querySelector('span');
+        successMessageSpan.textContent = 'An unexpected error occurred. Please try again.';
+        successMessageDiv.classList.remove('bg-green-100', 'text-green-700');
+        successMessageDiv.classList.add('bg-red-100', 'text-red-700');
+        successMessageDiv.classList.remove('hidden');
     });
 });
 </script>
 
 <script>
-    // This line is the only one needed now. It makes the subcategory data available to Alpine.js.
     window.subCategories = @json($categories->mapWithKeys(fn($cat) => [$cat->id => $cat->subCategories]));
 </script>
 
