@@ -10,14 +10,21 @@ use App\Models\Category;
 
 class SupplierProductController extends Controller
 {
-    public function index()
-    {
-        $supplierId = Auth::user()->business_data_id;
+public function index()
+{
+$supplier = Auth::user()->business;
 
-        $products = Product::where('business_data_id', $supplierId)->get();
+if (!$supplier) {
+    $products = collect();
+} else {
+    $products = $supplier->products()->get();
+}
 
-        return view('supplier.products.products', compact('products'));
-    }
+
+    return view('supplier.products.products', compact('products'));
+}
+
+
 
     public function create()
     {
@@ -103,6 +110,15 @@ $data['min_order_quantity'] = $data['min_order_quantity'] ?? 1;
         'success' => 'تم حفظ المنتج بنجاح',
         // 'redirect' => route('supplier.products.products')
     ]);
+}
+
+public function edit(Product $product)
+{
+    // If you need related data for the form, fetch it here:
+    // $categories = Category::all();
+    // return view with the product to edit
+
+    return view('supplier.products.edit', compact('product'));
 }
 
 }

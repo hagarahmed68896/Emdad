@@ -397,6 +397,12 @@ return [
     'product_name_placeholder' => 'Enter the product name',
     'attachments_note' => 'Please upload the file in PDF format or image (JPG or PNG)',
     'kg' => 'kg',
+    'edit_product' => 'Edit',
+    'delete_product' => 'Delete',
+    'confirm_delete' => 'Confirm Delete',
+    'are_you_sure_delete' => 'Are you sure you want to delete this product?',
+    'quantity' => 'Quantity',
+
 
     
 

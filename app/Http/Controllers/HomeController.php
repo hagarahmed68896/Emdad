@@ -19,7 +19,7 @@ class HomeController extends Controller
             ->where('is_offer', true)
             ->where(function ($query) {
                 $query->whereNull('offer_end')
-                      ->orWhere('offer_end', '>', now());
+                    ->orWhere('offer_end', '>', now());
             })
             ->get();
 
@@ -30,14 +30,16 @@ class HomeController extends Controller
             ->get();
 
         $favorites = collect();
-        $products = collect(); // ✅ Always define it!
+        $products = collect();
 
         if (Auth::check()) {
             $favorites = Auth::user()->favorites()->with('product.subCategory.category')->get();
 
-            // ✅ ✅ ✅ Add supplier products ONLY for supplier account
             if (Auth::user()->account_type === 'supplier') {
-                $products = Product::where('business_data_id', Auth::user()->business_data_id)->get();
+                $business = Auth::user()->business; // ✅ العلاقة الصحيحة
+                if ($business) {
+                    $products = $business->products()->get(); // ✅ المنتجات الحقيقية
+                }
             }
         }
 
@@ -49,8 +51,8 @@ class HomeController extends Controller
         } else {
             $sessionId = Session::getId();
             $cart = Cart::where('session_id', $sessionId)
-                         ->where('status', 'active')
-                         ->first();
+                        ->where('status', 'active')
+                        ->first();
         }
 
         if ($cart) {
@@ -77,7 +79,7 @@ class HomeController extends Controller
             'onOfferProducts',
             'featuredProducts',
             'favorites',
-            'products', // ✅ Pass it here too!
+            'products', // ✅ مهمة جداً هنا
             'cartItems',
             'notifications',
             'unreadNotificationCount'

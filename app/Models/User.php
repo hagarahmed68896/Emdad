@@ -105,15 +105,19 @@ public function likedReviews()
         return $this->favorites()->where('product_id', $productId)->exists();
     }
 
-        public function orders()
+    public function orders()
     {
         return $this->hasMany(Order::class);
     }
 
     // داخل User.php
+    // public function business()
+    // {
+    // return $this->hasOne(BusinessData::class);
+    // }
 public function business()
 {
-    return $this->hasOne(BusinessData::class);
+    return $this->hasOne(BusinessData::class, 'user_id', 'id');
 }
 
 

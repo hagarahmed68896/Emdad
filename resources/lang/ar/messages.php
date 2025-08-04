@@ -381,6 +381,12 @@ return [
     'product_name_placeholder' => ' اسم المنتج',
     'attachments_note' => 'يرجى رفع الملف بصيغة PDF أو صورة (JPG أو PNG)',
     'kg' => 'كجم',
+    'edit_product' => 'تعديل',
+    'delete_product' => 'حذف',
+    'confirm_delete' => 'تأكيد الحذف ',
+    'are_you_sure_delete' => 'هل انت متأكد من حذف هذا المنتج؟',
+    'quantity' => 'الكمية',
+
     
 
     

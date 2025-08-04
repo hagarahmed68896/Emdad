@@ -36,4 +36,17 @@ class BusinessData extends Model
             'id'             // المفتاح المحلي في User
         );
     }
+
+//     public function products()
+// {
+//     return $this->hasMany(Product::class, 'business_data_id');
+// }
+
+// App\Models\BusinessData.php
+
+public function products()
+{
+    return $this->hasMany(\App\Models\Product::class, 'business_data_id', 'id');
+}
+
 }

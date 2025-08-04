@@ -5,22 +5,51 @@
 @section('content')
 <div class="mx-[64px] mb-4 bg-white rounded-xl mt-4"
      x-data="{
-        preview: '',
-        wholesalePrices: [{from: '', to: '', price: ''}],
-        sizes: [''],
-        handleFileDrop(e) {
-            const file = e.dataTransfer.files[0];
-            if (file) this.preview = URL.createObjectURL(file);
-            this.$refs.imageInput.files = e.dataTransfer.files;
-        },
-        colors: [''],
-        handleFile(e) {
-            const file = e.target.files[0];
-            if (file) this.preview = URL.createObjectURL(file);
-        },
-        addWholesale() { this.wholesalePrices.push({from: '', to: '', price: ''}); },
-        addSize() { this.sizes.push(''); },
-        addColor() { this.colors.push(''); }
+         preview: '',
+         selectedCategoryId: null,
+         selectedSubcategoryId: null,
+         newWholesaleItem: { from: '', to: '', price: '' },
+         wholesalePrices: [],
+         newSize: '',
+         sizes: [],
+         newColor: '',
+         colors: [],
+         handleFileDrop(e) {
+             const file = e.dataTransfer.files[0];
+             if (file) this.preview = URL.createObjectURL(file);
+             this.$refs.imageInput.files = e.dataTransfer.files;
+         },
+         handleFile(e) {
+             const file = e.target.files[0];
+             if (file) this.preview = URL.createObjectURL(file);
+         },
+         addWholesale() {
+             if (this.newWholesaleItem.from && this.newWholesaleItem.to && this.newWholesaleItem.price) {
+                 this.wholesalePrices.push({...this.newWholesaleItem});
+                 this.newWholesaleItem = { from: '', to: '', price: '' };
+             }
+         },
+         removeWholesale(index) {
+             this.wholesalePrices.splice(index, 1);
+         },
+         addSize() {
+             if (this.newSize.trim() !== '') {
+                 this.sizes.push(this.newSize);
+                 this.newSize = '';
+             }
+         },
+         removeSize(index) {
+             this.sizes.splice(index, 1);
+         },
+         addColor() {
+             if (this.newColor.trim() !== '') {
+                 this.colors.push(this.newColor);
+                 this.newColor = '';
+             }
+         },
+         removeColor(index) {
+             this.colors.splice(index, 1);
+         }
      }">
 
     <h1 class="text-3xl font-bold mb-6">{{ __('messages.add_new_product') }}</h1>
@@ -74,26 +103,60 @@
             </div>
         </div>
 
-        {{-- ✅ الفئة --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <label class="block mb-1 font-bold">{{ __('messages.select_category') }}</label>
-                <select name="category_id" id="category_id" class="border p-2 w-full rounded-xl">
-                    <option value="">{{ __('messages.select_category') }}</option>
-                    @foreach ($categories as $category)
-                        <option value="{{ $category->id }}">{{ $category->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-        <div>
-            <label class="block mb-1 font-bold">{{ __('messages.select_subcategory') }}</label>
-            <select name="sub_category_id" id="sub_category_id" class="border p-2 w-full rounded-xl">
-                 <option value="">{{ __('messages.select_subcategory') }}</option>
-            </select>
-            </div>
+{{-- ✅ الفئة --}}
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4"
+    x-data="{ 
+        openCategory: false, 
+        openSubCategory: false, 
+        selectedCategory: null, 
+        selectedSubCategory: null 
+    }" 
+    @click.away="openCategory = false; openSubCategory = false"
+>
+    <div class="relative">
+        <label class="block mb-1 font-bold">{{ __('messages.select_category') }}</label>
+        <div @click="openCategory = !openCategory" class="border p-2 w-full rounded-xl cursor-pointer flex justify-between items-center bg-white">
+            <span x-text="selectedCategory ? selectedCategory.name : '{{ __('messages.select_category') }}'"></span>
+            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
         </div>
+ <ul x-show="openCategory" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-xl max-h-60 overflow-y-auto">
+    @foreach ($categories as $category)
+        <li @click="selectedCategory = {id: {{ $category->id }}, name: '{{ $category->name }}'}; selectedSubCategory = null; openCategory = false;" 
+            class="p-2 cursor-pointer hover:bg-gray-100 flex items-center">
+    <img src="{{ asset('storage/' . $category->iconUrl) }}"
+                                class="w-10 h-10 mx-2 rounded-xl p-1 bg-gray-100 object-cover" />
+                                            <span>{{ $category->name }}</span>
+        </li>
+    @endforeach
+</ul>
+        <input type="hidden" name="category_id" x-model="selectedCategory.id">
+    </div>
 
+    <div class="relative">
+        <label class="block mb-1 font-bold">{{ __('messages.select_subcategory') }}</label>
+        <div @click="if (selectedCategory) openSubCategory = !openSubCategory" 
+             :class="{'opacity-50 cursor-not-allowed': !selectedCategory}" 
+             class="border p-2 w-full rounded-xl cursor-pointer flex justify-between items-center bg-white">
+            <span x-text="selectedSubCategory ? selectedSubCategory.name : '{{ __('messages.select_subcategory') }}'"></span>
+            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+        </div>
+        <ul x-show="openSubCategory" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-xl max-h-60 overflow-y-auto">
+            <template x-for="sub in window.subCategories[selectedCategory.id]" :key="sub.id">
+           <li @click="selectedSubCategory = {id: sub.id, name: sub.name}; openSubCategory = false" 
+            class="p-2 cursor-pointer hover:bg-gray-100 flex items-center">
+            <img :src="'{{ asset('storage/') }}' + '/' + sub.iconUrl"
+                class="w-10 h-10 mx-2 rounded-xl p-1 bg-gray-100 object-cover" />
+            <span x-text="sub.name"></span>
+        </li>
+            </template>
+        </ul>
+        <input type="hidden" name="sub_category_id" x-model="selectedSubCategory.id">
+    </div>
+</div>
 
         <div>
         <label class="block mb-1 font-bold">{{ __('messages.base_price') }}</label>
@@ -102,54 +165,84 @@
             <img class="inline-flex items-center h-full p-2 border border-l-0 rounded-l-xl bg-gray-100" src="{{asset('/images/Saudi_Riyal_Symbol.svg')}}" alt="">
         </div>
 </div>
-        {{-- ✅ التسعير بالجملة --}}
-        <div>
-            <label class="block mb-1 font-bold">{{ __('messages.wholesale_pricing') }}</label>
-            <div class="w-full flex flex-col md:flex-row md:items-center">
-                <div class="flex-1">
-                    <template x-for="(item, index) in wholesalePrices" :key="index">
-                        <div class="grid grid-cols-3 gap-2 w-full">
-                            <input type="number" min="0" :name="'wholesale_from[' + index + ']'" placeholder="{{ __('messages.from_quantity') }}" class="border p-2 rounded-xl" x-model="item.from">
-                            <input type="number" min="0" :name="'wholesale_to[' + index + ']'" placeholder="{{ __('messages.to_quantity') }}" class="border p-2 rounded-xl" x-model="item.to">
-                            <div class="flex items-center">
-                            <input type="number" min="0" :name="'wholesale_price[' + index + ']'" placeholder="{{ __('messages.price') }}" class="border h-full p-2 w-full rounded-r-xl" x-model="item.price">
-                            <img class="inline-flex items-center h-full p-2 border border-l-0 rounded-l-xl bg-gray-100" src="{{asset('/images/Saudi_Riyal_Symbol.svg')}}" alt="">
-                        </div>
-                        </div>
-                    </template>
-                </div>
-                <div class="md:ml-2 md:rtl:mr-2 flex md:flex-col md:items-center">
-                    <button type="button" @click="addWholesale" class="bg-[#185D31] text-white px-4 py-2 rounded-xl">{{ __('messages.add') }}</button>
-                </div>
-            </div>
-        </div>
 
-        {{-- ✅ الأحجام --}}
-        <div>
-            <label class="block mb-1 font-bold">{{ __('messages.available_sizes') }}</label>
-            <div class="w-full flex flex-col md:flex-row md:items-center">
-                <template x-for="(size, index) in sizes" :key="index">
-                    <input type="text" name="sizes[]" placeholder="{{ __('messages.available_sizes') }}" class="border p-2 w-full rounded-xl">
-                </template>
-                <div class="md:ml-2 md:rtl:mr-2 flex md:flex-col md:items-center">
-                    <button type="button" @click="addSize" class="bg-[#185D31] text-white px-4 py-2 rounded-xl">{{ __('messages.add') }}</button>
-                </div>
-            </div>
+{{-- ✅ التسعير بالجملة --}}
+<div>
+    <label class="block mb-1 font-bold">{{ __('messages.wholesale_pricing') }}</label>
+    <div class="flex items-center gap-2 mb-4">
+        <div class="flex justify-between gap-1 w-3/4">
+        <input type="number" min="0" x-model="newWholesaleItem.from" placeholder="{{ __('messages.from_quantity') }}" class="border p-2 w-full rounded-xl">
+        <input type="number" min="0" x-model="newWholesaleItem.to" placeholder="{{ __('messages.to_quantity') }}" class="border p-2 w-full rounded-xl">
         </div>
+        <div class="flex justify-between gap-1 w-1/4">
+        <div class="relative flex-grow flex items-center">
+    <input type="number" min="0" x-model="newWholesaleItem.price" placeholder="{{ __('messages.price') }}" class="border p-2 w-full rounded-xl pr-12">
+    <img class="absolute left-0 h-full p-2  text-gray-400 border border-l-0 rounded-l-xl bg-gray-100 pointer-events-none" src="{{asset('/images/Saudi_Riyal_Symbol.svg')}}" alt="">
+</div>
+        <button type="button" @click="addWholesale" class="bg-[#185D31] text-white px-4 py-2 rounded-xl h-full">{{ __('messages.add') }}</button>
+   </div>
+    </div>
 
-        {{-- ✅ الألوان --}}
-        <div>
-            <label class="block mb-1 font-bold">{{ __('messages.available_colors') }}</label>
-            <div class="w-full flex flex-col md:flex-row md:items-center">
-                <template x-for="(color, index) in colors" :key="index">
-                    <input type="text" name="colors[]" placeholder="{{ __('messages.available_colors') }}" class="border p-2 w-full rounded-xl">
-                </template>
-                <div class="md:ml-2 md:rtl:mr-2 flex md:flex-col md:items-center">
-                    <button type="button" @click="addColor" class="bg-[#185D31] text-white px-4 py-2 rounded-xl">{{ __('messages.add') }}</button>
-                </div>
-            </div>
+    <div class="bg-gray-100 p-4 rounded-xl" x-show="wholesalePrices.length > 0">
+        <div class="grid grid-cols-3 font-bold text-sm text-gray-500 mb-2">
+            <span>{{ __('messages.quantity') }}</span>
+            <span class="col-span-2">{{ __('messages.price') }}</span>
         </div>
+        <template x-for="(item, index) in wholesalePrices" :key="index">
+            <div class="grid grid-cols-3 gap-2 items-center mb-2">
+                <input type="hidden" :name="'wholesale_from[' + index + ']'" :value="item.from">
+                <input type="hidden" :name="'wholesale_to[' + index + ']'" :value="item.to">
+                <input type="hidden" :name="'wholesale_price[' + index + ']'" :value="item.price">
+                <span x-text="item.from + ' - ' + item.to + ' ' + 'قطعة'"></span>
+                <span class="font-bold flex items-center col-span-2">
+                    <span x-text="item.price"></span>
+                    <img class="w-5 h-5 mx-1" src="{{asset('/images/Saudi_Riyal_Symbol.svg')}}" alt="">
+                    <button type="button" @click="removeWholesale(index)" class="text-red-500 hover:text-red-700 ml-auto">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </span>
+            </div>
+        </template>
+    </div>
+</div>
 
+{{-- ✅ الأحجام --}}
+<div>
+    <label class="block mb-1 font-bold">{{ __('messages.available_sizes') }}</label>
+    <div class="flex items-center gap-2 mb-4">
+        <input type="text" x-model="newSize" placeholder="{{ __('messages.available_sizes') }}" class="border p-2 w-full rounded-xl">
+        <button type="button" @click="addSize" class="bg-[#185D31] text-white px-4 py-2 rounded-xl h-full">{{ __('messages.add') }}</button>
+    </div>
+    <div class="flex flex-wrap gap-2" x-show="sizes.length > 0">
+        <template x-for="(size, index) in sizes" :key="index">
+            <div class="bg-gray-100 rounded-full px-4 py-1 flex items-center gap-2">
+                <input type="hidden" name="sizes[]" :value="size">
+                <span x-text="size"></span>
+                <button type="button" @click="removeSize(index)" class="text-red-500 text-sm font-bold">x</button>
+            </div>
+        </template>
+    </div>
+</div>
+
+{{-- ✅ الألوان --}}
+<div>
+    <label class="block mb-1 font-bold">{{ __('messages.available_colors') }}</label>
+    <div class="flex items-center gap-2 mb-4">
+        <input type="text" x-model="newColor" placeholder="{{ __('messages.available_colors') }}" class="border p-2 w-full rounded-xl">
+        <button type="button" @click="addColor" class="bg-[#185D31] text-white px-4 py-2 rounded-xl h-full">{{ __('messages.add') }}</button>
+    </div>
+    <div class="flex flex-wrap gap-2" x-show="colors.length > 0">
+        <template x-for="(color, index) in colors" :key="index">
+            <div class="bg-gray-100 rounded-full px-4 py-1 flex items-center gap-2">
+                <input type="hidden" name="colors[]" :value="color">
+                <span x-text="color"></span>
+                <button type="button" @click="removeColor(index)" class="text-red-500 text-sm font-bold">x</button>
+            </div>
+        </template>
+    </div>
+</div>
         {{-- ✅ باقي الحقول --}}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -329,23 +422,9 @@ document.getElementById('create-product-form').addEventListener('submit', functi
 });
 </script>
 
-<!-- ✅ تحميل الفئات الفرعية -->
 <script>
-document.getElementById('category_id').addEventListener('change', function () {
-    const categoryId = this.value;
-    const subCategorySelect = document.getElementById('sub_category_id');
-    subCategorySelect.innerHTML = '<option value="">اختر الفئة الفرعية</option>';
-
-    if (categoryId && window.subCategories[categoryId]) {
-        window.subCategories[categoryId].forEach(sub => {
-            const option = document.createElement('option');
-            option.value = sub.id;
-            option.textContent = sub.name;
-            subCategorySelect.appendChild(option);
-        });
-    }
-});
-window.subCategories = @json($categories->mapWithKeys(fn($cat) => [$cat->id => $cat->subCategories]));
+    // This line is the only one needed now. It makes the subcategory data available to Alpine.js.
+    window.subCategories = @json($categories->mapWithKeys(fn($cat) => [$cat->id => $cat->subCategories]));
 </script>
 
 @endsection
