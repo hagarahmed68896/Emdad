@@ -402,6 +402,8 @@ return [
     'confirm_delete' => 'Confirm Delete',
     'are_you_sure_delete' => 'Are you sure you want to delete this product?',
     'quantity' => 'Quantity',
+    'error_message' => 'An unexpected error occurred. Please try again.',
+    'product_images' => 'Product images'
 
 
     

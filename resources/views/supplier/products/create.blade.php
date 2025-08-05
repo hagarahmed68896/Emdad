@@ -5,7 +5,8 @@
 @section('content')
 <div class="mx-[64px] mb-4 bg-white rounded-xl mt-4"
      x-data="{
-         preview: '',
+         previews: [],
+         preview: '', // optional main preview
          selectedCategoryId: null,
          selectedSubcategoryId: null,
          newWholesaleItem: { from: '', to: '', price: '' },
@@ -14,14 +15,17 @@
          sizes: [],
          newColor: '',
          colors: [],
-         handleFileDrop(e) {
-             const file = e.dataTransfer.files[0];
-             if (file) this.preview = URL.createObjectURL(file);
-             this.$refs.imageInput.files = e.dataTransfer.files;
+         handleFiles(e) {
+             const files = e.target.files;
+             this.previews = [];
+             for (let i = 0; i < files.length; i++) {
+                 this.previews.push(URL.createObjectURL(files[i]));
+             }
          },
-         handleFile(e) {
-             const file = e.target.files[0];
-             if (file) this.preview = URL.createObjectURL(file);
+         handleFileDrop(e) {
+             const files = e.dataTransfer.files;
+             this.$refs.imageInput.files = files;
+             this.handleFiles({ target: { files } });
          },
          addWholesale() {
              if (this.newWholesaleItem.from && this.newWholesaleItem.to && this.newWholesaleItem.price) {
@@ -52,6 +56,7 @@
          }
      }">
 
+
     <h1 class="text-3xl font-bold mb-6">{{ __('messages.add_new_product') }}</h1>
 
     {{-- ✅ Success Message Container --}}
@@ -61,32 +66,64 @@
 
     <form id="create-product-form" enctype="multipart/form-data" class="space-y-6">
         @csrf
-
         <p class="font-bold text-[24px]">{{ __('messages.product_details') }}</p>
 
         {{-- ✅ صورة المنتج --}}
-        <div>
-            <label class="block mb-2 font-bold">{{ __('messages.product_image') }}</label>
-            <p class="text-sm text-gray-500 mb-2">PNG/JPG</p>
-            <div 
-                @click="$refs.imageInput.click()"
-                @dragover.prevent
-                @drop.prevent="handleFileDrop($event)"
-                class="flex flex-col md:flex-row items-center justify-center w-full h-40 border-2 border-dashed rounded-xl cursor-pointer"
-            >
-                <template x-if="!preview">
-                    <div class="flex flex-col md:flex-row items-center justify-center">
-                        <img src="{{ asset('images/Frame 3508.svg') }}" class="w-8 h-8 mb-2 mx-2" alt="">
-                        <p class="text-sm text-gray-500">{{ __('messages.drag_or_click') }}</p>
-                    </div>
-                </template>
-                <template x-if="preview">
-                    <img :src="preview" class="h-40 object-contain"/>
-                </template>
-                <input type="file" name="image" x-ref="imageInput" class="hidden" @change="handleFile" accept="image/*">
+{{-- ✅ MULTIPLE IMAGES UPLOAD --}}
+<div
+    x-data="{
+        previews: [],
+        files: [],
+        handleFileDrop(e) {
+            const droppedFiles = Array.from(e.dataTransfer.files);
+            this.addFiles(droppedFiles);
+        },
+        handleFiles(e) {
+            const selectedFiles = Array.from(e.target.files);
+            this.addFiles(selectedFiles);
+        },
+        addFiles(newFiles) {
+            newFiles.forEach(file => {
+                this.files.push(file);
+                this.previews.push(URL.createObjectURL(file));
+            });
+        }
+    }"
+    class="space-y-2"
+>
+    <label class="block mb-2 font-bold">{{ __('messages.product_images') }}</label>
+    <p class="text-sm text-gray-500 mb-2">PNG/JPG</p>
+
+    {{-- Drop Zone --}}
+    <div
+        @click="$refs.imageInput.click()"
+        @dragover.prevent
+        @drop.prevent="handleFileDrop($event)"
+        class="w-full h-40 border-2 border-dashed rounded-xl cursor-pointer flex items-center justify-center bg-white"
+    >
+        <template x-if="previews.length === 0">
+            <div class="flex flex-col items-center">
+                <img src="{{ asset('images/Frame 3508.svg') }}" class="w-8 h-8 mb-2" alt="">
+                <p class="text-sm text-gray-500">{{ __('messages.drag_or_click') }}</p>
             </div>
-            @error('image') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
-        </div>
+        </template>
+        <input type="file" multiple x-ref="imageInput" class="hidden" @change="handleFiles" accept="image/*">
+    </div>
+
+    {{-- ✅ PREVIEW GRID --}}
+    <div class="flex flex-wrap gap-2 mt-4" x-show="previews.length > 0">
+        <template x-for="(img, index) in previews" :key="index">
+            <div class="relative w-24 h-24 border rounded overflow-hidden">
+                <img :src="img" class="w-full h-full object-cover">
+            </div>
+        </template>
+    </div>
+
+    @error('images') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+</div>
+
+
+
 
         {{-- ✅ الاسم ورقم الموديل --}}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -352,10 +389,18 @@ document.getElementById('create-product-form').addEventListener('submit', functi
     successMessageDiv.classList.add('hidden');
     successMessageDiv.classList.remove('bg-red-100', 'text-red-700');
     successMessageDiv.classList.add('bg-green-100', 'text-green-700');
-    
+
     const formData = new FormData(this);
 
-    // Get the CSRF token from the hidden input and append it
+    // ✅ Get images from Alpine multi-upload
+    const alpine = Alpine.$data(document.querySelector('[x-data]'));
+    if (alpine.files && alpine.files.length > 0) {
+        alpine.files.forEach(file => {
+            formData.append('images[]', file);
+        });
+    }
+
+    // ✅ Add CSRF token
     const csrfToken = document.querySelector('input[name="_token"]').value;
     formData.append('_token', csrfToken);
 
@@ -369,9 +414,8 @@ document.getElementById('create-product-form').addEventListener('submit', functi
     })
     .then(async response => {
         const data = await response.json();
-        
+
         if (!response.ok) {
-            // Handle validation errors or other server errors
             if (data.errors) {
                 for (const [key, messages] of Object.entries(data.errors)) {
                     const input = document.querySelector(`[name="${key}"]`);
@@ -386,7 +430,6 @@ document.getElementById('create-product-form').addEventListener('submit', functi
                     }
                 }
             } else if (data.message) {
-                // Handle general server error message
                 const successMessageSpan = successMessageDiv.querySelector('span');
                 successMessageSpan.textContent = data.message;
                 successMessageDiv.classList.remove('bg-green-100', 'text-green-700');
@@ -395,11 +438,10 @@ document.getElementById('create-product-form').addEventListener('submit', functi
             }
             throw new Error('Request failed');
         }
-        
-        return data; // Return the parsed data for the next .then()
+
+        return data;
     })
     .then(data => {
-        // Handle success message
         if (data.success) {
             const successMessageSpan = successMessageDiv.querySelector('span');
             successMessageSpan.textContent = data.success;
@@ -415,18 +457,16 @@ document.getElementById('create-product-form').addEventListener('submit', functi
         }
     })
     .catch(error => {
-        // This catch block handles network errors and the 'Request failed' error we threw earlier
         console.error('An unexpected error occurred:', error);
-        
-        // Display a generic error message in the same success div
         const successMessageSpan = successMessageDiv.querySelector('span');
-        successMessageSpan.textContent = 'An unexpected error occurred. Please try again.';
+        successMessageSpan.textContent = {{__('message.error_message')}};
         successMessageDiv.classList.remove('bg-green-100', 'text-green-700');
         successMessageDiv.classList.add('bg-red-100', 'text-red-700');
         successMessageDiv.classList.remove('hidden');
     });
 });
 </script>
+
 
 <script>
     window.subCategories = @json($categories->mapWithKeys(fn($cat) => [$cat->id => $cat->subCategories]));

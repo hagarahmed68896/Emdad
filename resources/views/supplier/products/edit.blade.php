@@ -1,163 +1,179 @@
 @extends('layouts.app')
 
-@section('page_title', __('messages.edit_product'))
+@section('page_title', __('messages.edit_product', ['name' => $product->name]))
 
 @section('content')
 <div class="mx-[64px] mb-4 bg-white rounded-xl mt-4"
      x-data="{
-         preview: '{{ $product->image_url ? asset('storage/' . $product->image_url) : '' }}',
-         selectedCategory: { id: {{ $product->category_id }}, name: '{{ optional($product->category)->name }}' },
-         selectedSubCategory: { id: {{ $product->sub_category_id ?? 'null' }}, name: '{{ optional($product->subCategory)->name }}' },
+         previews: @json($product->images ?? []),
+         files: [],
+         removedImages: [],
+         handleFiles(e) {
+             const newFiles = Array.from(e.target.files);
+             newFiles.forEach(file => {
+                 this.files.push(file);
+                 this.previews.push(URL.createObjectURL(file));
+             });
+         },
+         handleFileDrop(e) {
+             e.preventDefault();
+             const droppedFiles = Array.from(e.dataTransfer.files);
+             droppedFiles.forEach(file => {
+                 this.files.push(file);
+                 this.previews.push(URL.createObjectURL(file));
+             });
+             this.$refs.imageInput.files = new DataTransfer().files;
+         },
+         removeImage(index) {
+             const existingImage = this.previews[index];
+             if (typeof existingImage === 'string' && !existingImage.startsWith('blob:')) {
+                 this.removedImages.push(existingImage);
+             } else {
+                 this.files.splice(index - this.removedImages.length, 1);
+             }
+             this.previews.splice(index, 1);
+         },
+
+         selectedCategoryId: {{ $product->category_id ?? 'null' }},
+         selectedSubcategoryId: {{ $product->sub_category_id ?? 'null' }},
+
          newWholesaleItem: { from: '', to: '', price: '' },
-         wholesalePrices: @json($product->wholesalePrices ?? []),
+         wholesalePrices: @json($product->wholesale_prices ?? []),
+
          newSize: '',
          sizes: @json($product->sizes ?? []),
+
          newColor: '',
-         colors: @json($product->colors ?? []),
-         handleFileDrop(e) {
-             const file = e.dataTransfer.files[0];
-             if (file) this.preview = URL.createObjectURL(file);
-             this.$refs.imageInput.files = e.dataTransfer.files;
-         },
-         handleFile(e) {
-             const file = e.target.files[0];
-             if (file) this.preview = URL.createObjectURL(file);
-         },
-         addWholesale() {
-             if (this.newWholesaleItem.from && this.newWholesaleItem.to && this.newWholesaleItem.price) {
-                 this.wholesalePrices.push({...this.newWholesaleItem});
-                 this.newWholesaleItem = { from: '', to: '', price: '' };
-             }
-         },
-         removeWholesale(index) {
-             this.wholesalePrices.splice(index, 1);
-         },
-         addSize() {
-             if (this.newSize.trim() !== '') {
-                 this.sizes.push(this.newSize);
-                 this.newSize = '';
-             }
-         },
-         removeSize(index) {
-             this.sizes.splice(index, 1);
-         },
-         addColor() {
-             if (this.newColor.trim() !== '') {
-                 this.colors.push(this.newColor);
-                 this.newColor = '';
-             }
-         },
-         removeColor(index) {
-             this.colors.splice(index, 1);
-         }
+         colors: @json($product->colors ?? [])
      }">
 
-    <h1 class="text-3xl font-bold mb-6">{{ __('messages.edit_product') }}</h1>
+    <h1 class="text-3xl font-bold mb-6">{{ __('messages.edit_product', ['name' => $product->name]) }}</h1>
 
-    <form method="POST" action="{{ route('products.update', $product->id) }}" enctype="multipart/form-data" class="space-y-6">
+    <form id="edit-product-form" method="POST" action="{{ route('products.update', $product->id) }}" enctype="multipart/form-data" class="space-y-6">
         @csrf
         @method('PUT')
 
-        {{-- ✅ صورة المنتج --}}
-        <div>
-            <label class="block mb-2 font-bold">{{ __('messages.product_image') }}</label>
-            <div 
-                @click="$refs.imageInput.click()"
-                @dragover.prevent
-                @drop.prevent="handleFileDrop($event)"
-                class="flex flex-col md:flex-row items-center justify-center w-full h-40 border-2 border-dashed rounded-xl cursor-pointer"
-            >
-                <template x-if="!preview">
-                    <div class="flex flex-col md:flex-row items-center justify-center">
-                        <img src="{{ asset('images/Frame 3508.svg') }}" class="w-8 h-8 mb-2 mx-2" alt="">
-                        <p class="text-sm text-gray-500">{{ __('messages.drag_or_click') }}</p>
-                    </div>
-                </template>
-                <template x-if="preview">
-                    <img :src="preview" class="h-40 object-contain"/>
-                </template>
-                <input type="file" name="image" x-ref="imageInput" class="hidden" @change="handleFile" accept="image/*">
-            </div>
-        </div>
-
-        {{-- ✅ الاسم ورقم الموديل --}}
+        {{-- ✅ Product Name --}}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
                 <label class="block mb-1 font-bold">{{ __('messages.product_name') }}</label>
                 <input type="text" name="name" class="border p-2 w-full rounded-xl" value="{{ old('name', $product->name) }}">
             </div>
+
             <div>
                 <label class="block mb-1 font-bold">{{ __('messages.model_number') }}</label>
                 <input type="text" name="model_number" class="border p-2 w-full rounded-xl" value="{{ old('model_number', $product->model_number) }}">
             </div>
         </div>
 
-        {{-- ✅ الفئة والتصنيف --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4"
-            x-data="{
-                openCategory: false,
-                openSubCategory: false,
-                selectedCategory: { id: {{ $product->category_id }}, name: '{{ optional($product->category)->name }}' },
-                selectedSubCategory: { id: {{ $product->sub_category_id ?? 'null' }}, name: '{{ optional($product->subCategory)->name }}' }
-            }"
-            @click.away="openCategory = false; openSubCategory = false"
-        >
-            <div class="relative">
-                <label class="block mb-1 font-bold">{{ __('messages.select_category') }}</label>
-                <div @click="openCategory = !openCategory" class="border p-2 w-full rounded-xl cursor-pointer flex justify-between items-center bg-white">
-                    <span x-text="selectedCategory.name || '{{ __('messages.select_category') }}'"></span>
-                    <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                    </svg>
-                </div>
-                <ul x-show="openCategory" class="absolute z-10 w-full mt-1 bg-white border rounded-xl max-h-60 overflow-y-auto">
-                    @foreach ($categories as $category)
-                        <li @click="selectedCategory = {id: {{ $category->id }}, name: '{{ $category->name }}'}; selectedSubCategory = null; openCategory = false;"
-                            class="p-2 cursor-pointer hover:bg-gray-100 flex items-center">
-                            <img src="{{ asset('storage/' . $category->iconUrl) }}" class="w-10 h-10 mx-2 rounded-xl p-1 bg-gray-100 object-cover" />
-                            <span>{{ $category->name }}</span>
-                        </li>
-                    @endforeach
-                </ul>
-                <input type="hidden" name="category_id" :value="selectedCategory.id">
-            </div>
+        {{-- ✅ Image Uploader --}}
+        @include('products.partials.image-uploader-edit', ['product' => $product])
 
-            <div class="relative">
-                <label class="block mb-1 font-bold">{{ __('messages.select_subcategory') }}</label>
-                <div @click="if (selectedCategory) openSubCategory = !openSubCategory"
-                    :class="{'opacity-50 cursor-not-allowed': !selectedCategory}"
-                    class="border p-2 w-full rounded-xl cursor-pointer flex justify-between items-center bg-white">
-                    <span x-text="selectedSubCategory.name || '{{ __('messages.select_subcategory') }}'"></span>
-                    <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                    </svg>
-                </div>
-                <ul x-show="openSubCategory" class="absolute z-10 w-full mt-1 bg-white border rounded-xl max-h-60 overflow-y-auto">
-                    <template x-for="sub in window.subCategories[selectedCategory.id]" :key="sub.id">
-                        <li @click="selectedSubCategory = {id: sub.id, name: sub.name}; openSubCategory = false;"
-                            class="p-2 cursor-pointer hover:bg-gray-100 flex items-center">
-                            <img :src="'{{ asset('storage/') }}/' + sub.iconUrl" class="w-10 h-10 mx-2 rounded-xl p-1 bg-gray-100 object-cover" />
-                            <span x-text="sub.name"></span>
-                        </li>
-                    </template>
-                </ul>
-                <input type="hidden" name="sub_category_id" :value="selectedSubCategory.id">
-            </div>
-        </div>
+        {{-- ✅ Category/Subcategory --}}
+        @include('products.partials.category-select', [
+            'categories' => $categories,
+            'selectedCategoryId' => $product->category_id,
+            'selectedSubCategoryId' => $product->sub_category_id
+        ])
 
-        {{-- ✅ السعر --}}
+        {{-- ✅ Base Price --}}
         <div>
             <label class="block mb-1 font-bold">{{ __('messages.base_price') }}</label>
             <div class="flex">
-                <input type="number" min="0" name="price" class="border p-2 w-full rounded-r-xl" value="{{ old('price', $product->price) }}">
+                <input type="number" min="0" name="price" value="{{ old('price', $product->price) }}" class="border p-2 w-full rounded-r-xl">
                 <img class="inline-flex items-center h-full p-2 border border-l-0 rounded-l-xl bg-gray-100" src="{{asset('/images/Saudi_Riyal_Symbol.svg')}}" alt="">
             </div>
         </div>
 
-        {{-- ✅ باقي الحقول: Wholesale, Sizes, Colors, Description, Shipping, etc --}}
-        {{-- Just copy same logic from your create form and bind to $product fields --}}
+        {{-- ✅ Wholesale --}}
+        @include('products.partials.wholesale', ['wholesalePrices' => $product->wholesale_prices ?? []])
 
-        <button type="submit" class="bg-[#185D31] text-white px-6 py-3 rounded-xl">{{ __('messages.save_changes') }}</button>
+        {{-- ✅ Sizes --}}
+        @include('products.partials.sizes', ['sizes' => $product->sizes ?? []])
+
+        {{-- ✅ Colors --}}
+        @include('products.partials.colors', ['colors' => $product->colors ?? []])
+
+        {{-- ✅ Other Fields --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block mb-1 font-bold">{{ __('messages.material_type') }}</label>
+                <input type="text" name="material_type" value="{{ old('material_type', $product->material_type) }}" class="border p-2 w-full rounded-xl">
+            </div>
+            <div>
+                <label class="block mb-1 font-bold">{{ __('messages.available_quantity') }}</label>
+                <input type="number" name="available_quantity" value="{{ old('available_quantity', $product->available_quantity) }}" class="border p-2 w-full rounded-xl">
+            </div>
+        </div>
+
+        <div>
+            <label class="block mb-1 font-bold">{{ __('messages.min_order_quantity') }}</label>
+            <input type="number" name="min_order_quantity" value="{{ old('min_order_quantity', $product->min_order_quantity) }}" class="border p-2 w-full rounded-xl">
+        </div>
+
+        <div>
+            <label class="block mb-1 font-bold">{{ __('messages.description') }}</label>
+            <textarea name="description" class="border p-2 w-full rounded-xl" rows="4">{{ old('description', $product->description) }}</textarea>
+        </div>
+
+        {{-- ✅ Offers --}}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="block mb-1 font-bold">{{ __('messages.offer_start') }}</label>
+                <input type="date" name="offer_start" value="{{ old('offer_start', optional($product->offer_start)->format('Y-m-d')) }}" class="border p-2 w-full rounded-xl">
+            </div>
+            <div>
+                <label class="block mb-1 font-bold">{{ __('messages.offer_end') }}</label>
+                <input type="date" name="offer_end" value="{{ old('offer_end', optional($product->offer_end)->format('Y-m-d')) }}" class="border p-2 w-full rounded-xl">
+            </div>
+            <div>
+                <label class="block mb-1 font-bold">{{ __('messages.discount_percent') }}</label>
+                <input type="number" name="discount_percent" value="{{ old('discount_percent', $product->discount_percent) }}" class="border p-2 w-full rounded-xl">
+            </div>
+        </div>
+
+        {{-- ✅ Delivery Time --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block mb-1 font-bold">{{ __('messages.preparation_days') }}</label>
+                <input type="number" name="preparation_days" value="{{ old('preparation_days', $product->preparation_days) }}" class="border p-2 w-full rounded-xl">
+            </div>
+            <div>
+                <label class="block mb-1 font-bold">{{ __('messages.shipping_days') }}</label>
+                <input type="number" name="shipping_days" value="{{ old('shipping_days', $product->shipping_days) }}" class="border p-2 w-full rounded-xl">
+            </div>
+        </div>
+
+        {{-- ✅ Production Capacity --}}
+        <div>
+            <label class="block mb-1 font-bold">{{ __('messages.production_capacity') }}</label>
+            <input type="text" name="production_capacity" value="{{ old('production_capacity', $product->production_capacity) }}" class="border p-2 w-full rounded-xl">
+        </div>
+
+        {{-- ✅ Shipping Info --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block mb-1 font-bold">{{ __('messages.product_weight') }}</label>
+                <input type="number" step="0.01" name="product_weight" value="{{ old('product_weight', $product->product_weight) }}" class="border p-2 w-full rounded-xl">
+            </div>
+            <div>
+                <label class="block mb-1 font-bold">{{ __('messages.package_dimensions') }}</label>
+                <input type="text" name="package_dimensions" value="{{ old('package_dimensions', $product->package_dimensions) }}" class="border p-2 w-full rounded-xl">
+            </div>
+        </div>
+
+        {{-- ✅ Attachments --}}
+        <div>
+            <label class="block mb-1 font-bold">{{ __('messages.attachments') }}</label>
+            <input type="file" name="attachments" accept=".pdf,image/*" class="border p-2 w-full rounded-xl">
+            @if ($product->attachments)
+                <p class="text-sm text-gray-500 mt-1">
+                    <a href="{{ asset('storage/' . $product->attachments) }}" target="_blank" class="text-blue-600 underline">{{ __('messages.view_attachment') }}</a>
+                </p>
+            @endif
+        </div>
+
+        <button type="submit" class="bg-[#185D31] text-white px-6 py-3 rounded-xl">{{ __('messages.update_product') }}</button>
     </form>
 </div>
 

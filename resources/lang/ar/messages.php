@@ -386,6 +386,8 @@ return [
     'confirm_delete' => 'تأكيد الحذف ',
     'are_you_sure_delete' => 'هل انت متأكد من حذف هذا المنتج؟',
     'quantity' => 'الكمية',
+    'error_message' => 'حدث خطأ برجاء مراجعة الاخطاء',
+    'product_images' => 'صور المنتج',
 
     
 
