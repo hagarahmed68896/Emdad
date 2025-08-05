@@ -388,6 +388,7 @@ return [
     'quantity' => 'الكمية',
     'error_message' => 'حدث خطأ برجاء مراجعة الاخطاء',
     'product_images' => 'صور المنتج',
+    'remove' => 'حذف',
 
     
 

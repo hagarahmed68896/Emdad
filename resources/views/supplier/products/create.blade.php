@@ -64,12 +64,13 @@
         <span class="font-medium"></span>
     </div>
 
-    <form id="create-product-form" enctype="multipart/form-data" class="space-y-6">
+    <form id="create-product-form" enctype="multipart/form-data"
+        @submit.prevent="syncFilesToInput(); $el.submit()"  {{-- <== this is the key line --}}
+ class="space-y-6">
         @csrf
         <p class="font-bold text-[24px]">{{ __('messages.product_details') }}</p>
 
         {{-- ✅ صورة المنتج --}}
-{{-- ✅ MULTIPLE IMAGES UPLOAD --}}
 <div
     x-data="{
         previews: [],
@@ -87,40 +88,68 @@
                 this.files.push(file);
                 this.previews.push(URL.createObjectURL(file));
             });
-        }
+        },
+        removeImage(index) {
+            URL.revokeObjectURL(this.previews[index]);
+            this.previews.splice(index, 1);
+            this.files.splice(index, 1);
+        },
+            syncFilesToInput() {
+        const dataTransfer = new DataTransfer();
+        this.files.forEach(file => dataTransfer.items.add(file));
+        this.$refs.imageInput.files = dataTransfer.files;
+    }
     }"
     class="space-y-2"
 >
     <label class="block mb-2 font-bold">{{ __('messages.product_images') }}</label>
-    <p class="text-sm text-gray-500 mb-2">PNG/JPG</p>
+    <p class="text-sm text-gray-500 mb-2">PNG, JPG</p>
 
-    {{-- Drop Zone --}}
+    {{-- ✅ Dropzone --}}
     <div
         @click="$refs.imageInput.click()"
         @dragover.prevent
         @drop.prevent="handleFileDrop($event)"
-        class="w-full h-40 border-2 border-dashed rounded-xl cursor-pointer flex items-center justify-center bg-white"
+        class="w-full h-40 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer flex items-center justify-center bg-white"
     >
-        <template x-if="previews.length === 0">
+        <template x-if="previews.length >= 0">
             <div class="flex flex-col items-center">
-                <img src="{{ asset('images/Frame 3508.svg') }}" class="w-8 h-8 mb-2" alt="">
+                <img src="{{ asset('images/Frame 3508.svg') }}" alt="" class="w-8 h-8 mb-2">
                 <p class="text-sm text-gray-500">{{ __('messages.drag_or_click') }}</p>
             </div>
         </template>
-        <input type="file" multiple x-ref="imageInput" class="hidden" @change="handleFiles" accept="image/*">
+        <input 
+            type="file" 
+            multiple 
+            name="images[]"
+            x-ref="imageInput" 
+            class="hidden" 
+            @change="handleFiles" 
+            accept="image/*"
+        >
     </div>
 
-    {{-- ✅ PREVIEW GRID --}}
+    {{-- ✅ Preview Grid --}}
     <div class="flex flex-wrap gap-2 mt-4" x-show="previews.length > 0">
         <template x-for="(img, index) in previews" :key="index">
-            <div class="relative w-24 h-24 border rounded overflow-hidden">
-                <img :src="img" class="w-full h-full object-cover">
+            <div class="relative w-24 h-24 border rounded overflow-hidden group">
+                <img :src="img" alt="" class="w-full h-full object-cover">
+<button
+    @click.stop="removeImage(index)"
+    type="button"
+class="absolute top-1 left-1 bg-red-500 text-white rounded-full p-1 leading-none w-5 h-5 flex items-center justify-center"    title="{{ __('messages.remove') }}"
+>✕</button>
+
+
             </div>
         </template>
     </div>
 
-    @error('images') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+    @error('images') 
+        <p class="text-red-600 text-sm mt-1">{{ $message }}</p> 
+    @enderror
 </div>
+
 
 
 
@@ -375,7 +404,8 @@
             <p class="text-sm text-gray-500 mt-1">{{ __('messages.attachments_note') }}</p>
         </div>
 
-        <button type="submit" class="bg-[#185D31] text-white px-6 py-3 rounded-xl">{{ __('messages.add_product') }}</button>
+        <button type="submit" x-bind:disabled="loading" x-on:click="loading = true"
+         class="bg-[#185D31] text-white px-6 py-3 rounded-xl">{{ __('messages.add_product') }}</button>
     </form>
 </div>
 
