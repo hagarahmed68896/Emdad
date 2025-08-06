@@ -389,6 +389,23 @@ return [
     'error_message' => 'حدث خطأ برجاء مراجعة الاخطاء',
     'product_images' => 'صور المنتج',
     'remove' => 'حذف',
+    'Office_supplies' => 'مستلزمات مكتبية',
+
+
+     'required_name' => 'الاسم مطلوب.',
+    'string_name' => 'يجب أن يكون الاسم نصًا.',
+    'max_name' => 'يجب ألا يتجاوز الاسم 255 حرفًا.',
+
+    'required_slug' => 'المُعرف مطلوب.',
+    'unique_slug' => 'المُعرف مستخدم بالفعل.',
+
+    'required_price' => 'السعر مطلوب.',
+    'numeric_price' => 'يجب أن يكون السعر رقمًا.',
+    'min_price' => 'يجب ألا يكون السعر أقل من 0.',
+
+    'unique_model_number' => 'رقم الموديل يجب أن يكون فريدًا.',
+
+    'required_sub_category' => 'الفئة مطلوبة'
 
     
 

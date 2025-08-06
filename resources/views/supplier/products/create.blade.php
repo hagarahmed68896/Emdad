@@ -223,13 +223,24 @@ class="absolute top-1 left-1 bg-red-500 text-white rounded-full p-1 leading-none
         <input type="hidden" name="sub_category_id" x-model="selectedSubCategory.id">
     </div>
 </div>
-
+{{--السعر الاساسي--}}
         <div>
         <label class="block mb-1 font-bold">{{ __('messages.base_price') }}</label>
-        <div class="flex">
-            <input type="number" min="0" name="price" placeholder="{{ __('messages.base_price_placeholder') }}" class="border h-full p-2 w-full rounded-r-xl" value="{{ old('price') }}">
-            <img class="inline-flex items-center h-full p-2 border border-l-0 rounded-l-xl bg-gray-100" src="{{asset('/images/Saudi_Riyal_Symbol.svg')}}" alt="">
-        </div>
+  <div class="flex">
+    <input 
+        type="number" 
+        min="0" 
+        name="price" 
+        placeholder="{{ __('messages.base_price_placeholder') }}" 
+        class="border p-2 w-full rounded-r-xl h-[42px]" 
+        value="{{ old('price') }}"
+    >
+
+    <div class="flex items-center justify-center border border-l-0 rounded-l-xl bg-gray-100 h-[42px] w-[42px]">
+        <img src="{{ asset('/images/Saudi_Riyal_Symbol.svg') }}" alt="" class="w-5 h-5">
+    </div>
+</div>
+
 </div>
 
 {{-- ✅ التسعير بالجملة --}}
@@ -404,8 +415,15 @@ class="absolute top-1 left-1 bg-red-500 text-white rounded-full p-1 leading-none
             <p class="text-sm text-gray-500 mt-1">{{ __('messages.attachments_note') }}</p>
         </div>
 
-        <button type="submit" x-bind:disabled="loading" x-on:click="loading = true"
-         class="bg-[#185D31] text-white px-6 py-3 rounded-xl">{{ __('messages.add_product') }}</button>
+      <button 
+    type="submit" 
+    x-bind:disabled="loading" 
+    x-on:click="loading = true; window.scrollTo({ top: 0, behavior: 'smooth' });" 
+    class="bg-[#185D31] text-white px-6 py-3 rounded-xl"
+>
+    {{ __('messages.add_product') }}
+</button>
+
     </form>
 </div>
 

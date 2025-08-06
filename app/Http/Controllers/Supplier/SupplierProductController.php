@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
+
 
 
 class SupplierProductController extends Controller
@@ -38,7 +40,7 @@ public function create()
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
-            'model_number' => 'nullable|string',
+            'model_number' => ['nullable', 'string', Rule::unique('products', 'model_number')],
             'sub_category_id' => 'required|exists:sub_categories,id',
             'image' => 'nullable|image',
             'images.*' => 'nullable|image',
@@ -60,7 +62,23 @@ public function create()
             'wholesale_from' => 'nullable|array',
             'wholesale_to' => 'nullable|array',
             'wholesale_price' => 'nullable|array',
-        ]);
+        ],
+     [
+    'name.required' => __('messages.required_name'),
+    'name.string' => __('messages.string_name'),
+    'name.max' => __('messages.max_name'),
+
+    'slug.required' => __('messages.required_slug'),
+    'slug.unique' => __('messages.unique_slug'),
+
+    'price.required' => __('messages.required_price'),
+    'price.numeric' => __('messages.numeric_price'),
+    'price.min' => __('messages.min_price'),
+
+    'model_number.unique' => __('messages.unique_model_number'),
+
+    'sub_category_id.required' => __('messages.required_sub_category')
+]);
 
         // ✅ Generate a unique slug for the product
        $data['slug'] = \Illuminate\Support\Str::slug($data['name']) . '-' . uniqid();

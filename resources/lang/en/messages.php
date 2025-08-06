@@ -406,6 +406,20 @@ return [
     'product_images' => 'Product images',
     'remove' => 'Remove',
 
+    'required_name' => 'Name is required.',
+    'string_name' => 'The name must be a string.',
+    'max_name' => 'The name may not be greater than 255 characters.',
+
+    'required_slug' => 'Slug is required.',
+    'unique_slug' => 'Slug has already been taken.',
+
+    'required_price' => 'Price is required.',
+    'numeric_price' => 'The price must be a number.',
+    'min_price' => 'The price must be at least 0.',
+
+    'unique_model_number' => 'Model number must be unique.',
+
+    'required_sub_category' => 'Sub-category is required.',
 
     
 
