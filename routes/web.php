@@ -225,7 +225,7 @@ Route::middleware('web')->group(function () {
           Route::post('/supplier/products', [SupplierProductController::class, 'store'])->name('products.store');
           Route::get('/products/{product}/edit', [SupplierProductController::class, 'edit'])->name('products.edit');
           Route::delete('/products/{product}', [SupplierProductController::class, 'destroy'])->name('products.destroy');
-Route::put('/products/{product}', [SupplierProductController::class, 'update'])->name('products.update');
+          Route::patch('/products/{product}', [SupplierProductController::class, 'update'])->name('products.update');
 
 
 

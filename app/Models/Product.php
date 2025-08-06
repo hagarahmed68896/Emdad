@@ -42,15 +42,17 @@ class Product extends Model
         'attachments',
         'material_type',
         'available_quantity',
-        'sizes',   // ✅ أضفناها
-        'colors',  // ✅ أضفناها
+        'sizes',   
+        'colors',  
+        'product_status', 
+
     ];
 
     protected $casts = [
         'images' => 'array',
         'price_tiers' => 'array',
-        'sizes' => 'array',    // ✅ cast جديد
-        'colors' => 'array',   // ✅ cast جديد
+        'sizes' => 'array',    
+        'colors' => 'array',   
         'offer_expires_at' => 'datetime',
         'offer_start' => 'date',
         'offer_end' => 'date',

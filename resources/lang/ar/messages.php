@@ -405,7 +405,10 @@ return [
 
     'unique_model_number' => 'رقم الموديل يجب أن يكون فريدًا.',
 
-    'required_sub_category' => 'الفئة مطلوبة'
+    'required_sub_category' => 'الفئة مطلوبة',
+
+    'Cancel' => 'تجاهل',
+    'trash_product' => 'حذف المنتج',
 
     
 

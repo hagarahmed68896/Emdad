@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
 
 
 
@@ -62,6 +63,8 @@ public function create()
             'wholesale_from' => 'nullable|array',
             'wholesale_to' => 'nullable|array',
             'wholesale_price' => 'nullable|array',
+            'product_status' => 'nullable|string|in:ready_for_delivery,made_to_order', 
+
         ],
      [
     'name.required' => __('messages.required_name'),
@@ -166,8 +169,10 @@ public function edit(Product $product)
 
 
 
+
 public function update(Request $request, Product $product)
 {
+    // Validate the request data
     $data = $request->validate([
         'name' => 'required|string|max:255',
         'price' => 'required|numeric|min:0',
@@ -176,28 +181,57 @@ public function update(Request $request, Product $product)
         'image' => 'nullable|image',
         'images.*' => 'nullable|image',
         'description' => 'nullable|string',
-        'min_order_quantity' => 'nullable|integer',
-        'discount_percent' => 'nullable|integer',
+        'min_order_quantity' => 'nullable|integer|min:1',
+        'discount_percent' => 'nullable|integer|between:0,100',
         'offer_start' => 'nullable|date',
         'offer_end' => 'nullable|date',
-        'preparation_days' => 'nullable|integer',
-        'shipping_days' => 'nullable|integer',
+        'preparation_days' => 'nullable|integer|min:0',
+        'shipping_days' => 'nullable|integer|min:0',
         'production_capacity' => 'nullable|string',
-        'product_weight' => 'nullable|numeric',
+        'product_weight' => 'nullable|numeric|min:0',
         'package_dimensions' => 'nullable|string',
         'attachments' => 'nullable|file|mimes:pdf,jpg,jpeg,png',
         'material_type' => 'nullable|string',
-        'available_quantity' => 'nullable|integer',
+        'available_quantity' => 'nullable|integer|min:0',
         'sizes' => 'nullable|array',
         'colors' => 'nullable|array',
         'wholesale_from' => 'nullable|array',
+        'wholesale_from.*' => 'nullable|integer|min:1',
         'wholesale_to' => 'nullable|array',
+        'wholesale_to.*' => 'nullable|integer|min:1',
         'wholesale_price' => 'nullable|array',
-    ]);
+        'wholesale_price.*' => 'nullable|numeric|min:0',
+        'existing_images' => 'nullable|array',
+        'existing_images.*' => 'string',
+        'product_status' => 'nullable|string|in:ready_for_delivery,made_to_order', 
 
-    $data['slug'] = \Illuminate\Support\Str::slug($data['name']) . '-' . uniqid();
 
-    // ✅ Main image
+    ],
+     [
+    'name.required' => __('messages.required_name'),
+    'name.string' => __('messages.string_name'),
+    'name.max' => __('messages.max_name'),
+
+    'slug.required' => __('messages.required_slug'),
+    'slug.unique' => __('messages.unique_slug'),
+
+    'price.required' => __('messages.required_price'),
+    'price.numeric' => __('messages.numeric_price'),
+    'price.min' => __('messages.min_price'),
+
+    'model_number.unique' => __('messages.unique_model_number'),
+
+    'sub_category_id.required' => __('messages.required_sub_category')
+]);
+
+    // Check if the product name has changed and update the slug accordingly
+    if ($product->name !== $data['name']) {
+        $data['slug'] = Str::slug($data['name']) . '-' . Str::random(8);
+    }
+    
+    // --- Handle File Uploads ---
+
+    // Handle main image
     if ($request->hasFile('image')) {
         if ($product->image) {
             Storage::disk('public')->delete($product->image);
@@ -205,7 +239,7 @@ public function update(Request $request, Product $product)
         $data['image'] = $request->file('image')->store('products', 'public');
     }
 
-    // ✅ Attachment
+    // Handle attachment
     if ($request->hasFile('attachments')) {
         if ($product->attachments) {
             Storage::disk('public')->delete($product->attachments);
@@ -213,35 +247,43 @@ public function update(Request $request, Product $product)
         $data['attachments'] = $request->file('attachments')->store('attachments', 'public');
     }
 
-    // ✅ Gallery images
-    $images = $product->images ?? [];
+    // Handle gallery images
+    $existingImages = $request->input('existing_images', []);
+    $updatedImages = $existingImages; // Start with the existing images that were not removed
+    
+    // Add new images to the array
     if ($request->hasFile('images')) {
         foreach ($request->file('images') as $file) {
-            $images[] = $file->store('products', 'public');
+            $updatedImages[] = $file->store('products', 'public');
+        }
+    }
+    
+    // Delete images that are no longer in the existing_images array
+    if ($product->images) {
+        $imagesToDelete = array_diff($product->images, $existingImages);
+        foreach ($imagesToDelete as $imagePath) {
+            Storage::disk('public')->delete($imagePath);
         }
     }
 
-    // ✅ Remove any images that were deleted on the frontend
-    $existingImages = $request->input('existing_images', []);
-    $images = array_filter($images, function ($img) use ($existingImages) {
-        return in_array($img, $existingImages);
-    });
+    $data['images'] = $updatedImages;
 
-    $data['images'] = array_values($images); // re-index
-
-    // ✅ If image not re-uploaded and original is deleted, fallback
-    if (!$request->hasFile('image') && count($data['images'])) {
+    // Set the main image to the first gallery image if no main image was provided
+    if (!$request->hasFile('image') && !isset($data['image']) && count($data['images'])) {
         $data['image'] = $data['images'][0];
     }
+    
+    // --- Handle Dynamic Data (Wholesale, Sizes, Colors) ---
 
-    // ✅ Wholesale tiers
+    // Wholesale tiers
     $wholesaleTiers = [];
     $from = $request->input('wholesale_from', []);
     $to = $request->input('wholesale_to', []);
     $prices = $request->input('wholesale_price', []);
 
+    // Filter out rows that are empty
     for ($i = 0; $i < count($from); $i++) {
-        if ($from[$i] || $to[$i] || $prices[$i]) {
+        if (isset($from[$i], $to[$i], $prices[$i]) && $from[$i] && $to[$i] && $prices[$i]) {
             $wholesaleTiers[] = [
                 'from' => $from[$i],
                 'to' => $to[$i],
@@ -249,30 +291,20 @@ public function update(Request $request, Product $product)
             ];
         }
     }
-
     $data['price_tiers'] = $wholesaleTiers;
 
-    // ✅ Sizes and colors
+    // Sizes and colors
     $data['sizes'] = $request->input('sizes', []);
     $data['colors'] = $request->input('colors', []);
-
-    // ✅ Ensure product belongs to a supplier
-    $user = Auth::user();
-    if (!$user || !$user->business) {
-        return response()->json([
-            'message' => 'لا يمكن تعديل المنتج: المورّد غير معرف.',
-        ], 422);
-    }
-
-    $data['business_data_id'] = $user->business->id;
+    
+    // Set default min_order_quantity if not provided
     $data['min_order_quantity'] = $data['min_order_quantity'] ?? 1;
 
-    // ✅ Update product
+    // --- Final Update ---
     $product->update($data);
 
     return response()->json([
         'success' => 'تم تحديث المنتج بنجاح',
-        // 'redirect' => route('supplier.products.products')
     ]);
 }
 

@@ -421,6 +421,10 @@ return [
 
     'required_sub_category' => 'Sub-category is required.',
 
+    'Cancel' => 'Cancel',
+    'trash' => 'Delete product',
+
+
     
 
 

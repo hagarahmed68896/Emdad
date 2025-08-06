@@ -11,7 +11,7 @@
             files: [],
             existingImages: @json($product->images ?? []),
             removedImages: [],
-            wholesalePrices: @json($product->wholesale_prices ?? []),
+            wholesalePrices: @json($product->price_tiers ?? []),
             newWholesaleItem: { from: '', to: '', price: '' },
             sizes: @json($product->sizes ?? []),
             newSize: '',
@@ -19,11 +19,19 @@
             newColor: '',
             selectedSubCategory: @json($product->subCategory),
             selectedCategory: @json($product->subCategory->category),
-
-
+            openCategory: false,
+            openSubCategory: false,
+            confirmingId: null,
             // ✅ Alpine methods
             handleFiles(e) {
                 const newFiles = Array.from(e.target.files);
+                newFiles.forEach(file => {
+                    this.files.push(file);
+                    this.previews.push(URL.createObjectURL(file));
+                });
+            },
+            handleFileDrop(e) {
+                const newFiles = Array.from(e.dataTransfer.files);
                 newFiles.forEach(file => {
                     this.files.push(file);
                     this.previews.push(URL.createObjectURL(file));
@@ -34,6 +42,8 @@
                 this.files.splice(index, 1);
             },
             removeExistingImage(index) {
+                // Add the removed image path to a hidden input for the backend to handle
+                this.removedImages.push(this.existingImages[index]);
                 this.existingImages.splice(index, 1);
             },
             addWholesale() {
@@ -62,7 +72,38 @@
             },
             removeColor(index) {
                 this.colors.splice(index, 1);
-            }
+            },
+                    // ✅ New method to re-populate state from server errors
+            repopulateState(errors) {
+                // Repopulate dynamic wholesale prices
+                if (errors.wholesale_from && errors.wholesale_from.length > 0) {
+                    this.wholesalePrices = errors.wholesale_from.map((msg, index) => {
+                        return { 
+                            from: old('wholesale_from.' + index), 
+                            to: old('wholesale_to.' + index), 
+                            price: old('wholesale_price.' + index) 
+                        };
+                    });
+                } else if (old('wholesale_from')) {
+                    // Handle case where old data exists but no specific error
+                    this.wholesalePrices = old('wholesale_from').map((from, index) => {
+                        return {
+                            from: from,
+                            to: old('wholesale_to')[index],
+                            price: old('wholesale_price')[index]
+                        };
+                    });
+                }
+
+                if (old('sizes')) {
+                    this.sizes = old('sizes');
+                }
+
+                if (old('colors')) {
+                    this.colors = old('colors');
+                }
+            },
+            
         };
     }
 </script>
@@ -77,7 +118,7 @@
 
     <form id="edit-product-form" method="POST" action="{{ route('products.update', $product) }}" enctype="multipart/form-data" class="space-y-6">
         @csrf
-        @method('PATCH')
+        @method('PUT')
         <p class="font-bold text-[24px]">{{ __('messages.product_details') }}</p>
 
         {{-- ✅ MULTIPLE IMAGES UPLOAD --}}
@@ -91,15 +132,15 @@
                 @dragover.prevent
                 @drop.prevent="handleFileDrop($event)"
                 class="w-full h-40 border-2 border-dashed rounded-xl cursor-pointer flex items-center justify-center bg-white"
-                :class="{'border-gray-300': existingImages.length === 0 && previews.length === 0, 'border-[#185D31]': existingImages.length > 0 || previews.length > 0}"
+                :class="{'border-gray-300': existingImages.length === 0 && previews.length === 0, 'border-gray-300': existingImages.length > 0 || previews.length > 0}"
             >
-                <template x-if="existingImages.length === 0 && previews.length === 0">
+                <template x-if="existingImages.length >= 0 && previews.length >= 0">
                     <div class="flex flex-col items-center">
                         <img src="{{ asset('images/Frame 3508.svg') }}" class="w-8 h-8 mb-2" alt="">
                         <p class="text-sm text-gray-500">{{ __('messages.drag_or_click') }}</p>
                     </div>
                 </template>
-                <input type="file" multiple x-ref="imageInput" class="hidden" @change="handleFiles" accept="image/*">
+                <input type="file" multiple x-ref="imageInput" class="hidden" @change="handleFiles" accept="image/*" name="images[]">
             </div>
 
             {{-- ✅ PREVIEW GRID --}}
@@ -107,7 +148,7 @@
                 <template x-for="(img, index) in existingImages" :key="'existing-' + index">
                     <div class="relative w-24 h-24 border rounded overflow-hidden">
                         <img :src="'{{ asset('storage') }}' + '/' + img" class="w-full h-full object-cover">
-                        <input type="hidden" name="existing_images[]" :value="img.id">
+                        <input type="hidden" name="existing_images[]" :value="img">
                         <button type="button" @click="removeExistingImage(index)" class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 leading-none w-5 h-5 flex items-center justify-center">x</button>
                     </div>
                 </template>
@@ -120,6 +161,7 @@
             </div>
 
             @error('images') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+            @error('images.*') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
         </div>
 
         {{-- ✅ الاسم ورقم الموديل --}}
@@ -192,6 +234,7 @@
                 <input type="number" min="0" name="price" placeholder="{{ __('messages.base_price_placeholder') }}" class="border h-full p-2 w-full rounded-r-xl" value="{{ old('price', $product->price) }}">
                 <img class="inline-flex items-center h-full p-2 border border-l-0 rounded-l-xl bg-gray-100" src="{{asset('/images/Saudi_Riyal_Symbol.svg')}}" alt="">
             </div>
+            @error('price') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
         </div>
 
         {{-- ✅ التسعير بالجملة --}}
@@ -222,9 +265,9 @@
                 </div>
                 <template x-for="(item, index) in wholesalePrices" :key="index">
                     <div class="grid grid-cols-3 gap-2 items-center mb-2">
-                        <input type="hidden" :name="'wholesale_prices[' + index + '][from]'" :value="item.from">
-                        <input type="hidden" :name="'wholesale_prices[' + index + '][to]'" :value="item.to">
-                        <input type="hidden" :name="'wholesale_prices[' + index + '][price]'" :value="item.price">
+                        <input type="hidden" :name="'wholesale_from[]'" :value="item.from">
+                        <input type="hidden" :name="'wholesale_to[]'" :value="item.to">
+                        <input type="hidden" :name="'wholesale_price[]'" :value="item.price">
                         <span x-text="item.from + ' - ' + item.to + ' ' + '{{ __('messages.pieces') }}'"></span>
                         <span class="font-bold flex items-center col-span-2">
                             <span x-text="item.price"></span>
@@ -293,6 +336,40 @@
             <input type="number" min="0" name="min_order_quantity" placeholder="{{ __('messages.min_order_quantity') }}" class="border p-2 w-full rounded-xl" value="{{ old('min_order_quantity', $product->min_order_quantity) }}">
         </div>
 
+        {{-- ✅ حالة المنتج (Product Status) --}}
+<div class="mb-4" x-data="{ 
+    open: false, 
+    selectedStatus: '{{ old('product_status', $product->product_status ?? '') }}', 
+    statusOptions: {
+        'ready_for_delivery': 'جاهز للتوصيل الفوري',
+        'made_to_order': 'حسب الطلب'
+    },
+    get selectedStatusText() {
+        return this.statusOptions[this.selectedStatus] || 'حدد حالة المنتج';
+    }
+}">
+    <label class="block mb-1 font-bold">حالة المنتج</label>
+    
+    <div class="relative">
+        <input type="hidden" name="product_status" x-model="selectedStatus">
+
+        <button type="button" @click="open = !open" class="flex justify-between items-center w-full px-2 py-2 border rounded-xl bg-white text-right">
+            <span x-text="selectedStatusText"></span>
+            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" :class="{ 'transform rotate-180': open }">
+                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+        </button>
+
+        <ul x-show="open" @click.away="open = false" class="absolute z-10 w-full mt-1 bg-white rounded-xl shadow-lg border">
+            <template x-for="(text, value) in statusOptions" :key="value">
+                <li @click="selectedStatus = value; open = false" class="px-2 py-2 cursor-pointer hover:bg-gray-100 rounded-xl">
+                    <span x-text="text"></span>
+                </li>
+            </template>
+        </ul>
+    </div>
+</div>
+
         <div>
             <label class="block mb-1 font-bold">{{ __('messages.description') }}</label>
             <textarea name="description" placeholder="{{ __('messages.description') }}" rows="4" class="border p-2 w-full rounded-xl">{{ old('description', $product->description) }}</textarea>
@@ -302,14 +379,24 @@
 
         {{-- ✅ إضافة العروض --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-                <label class="block mb-1 font-bold">{{ __('messages.offer_start') }}</label>
-                <input type="date" name="offer_start" class="border p-2 w-full rounded-xl" value="{{ old('offer_start', $product->offer_start) }}">
-            </div>
-            <div>
-                <label class="block mb-1 font-bold">{{ __('messages.offer_end') }}</label>
-                <input type="date" name="offer_end" class="border p-2 w-full rounded-xl" value="{{ old('offer_end', $product->offer_end) }}">
-            </div>
+     <div>
+    <label class="block mb-1 font-bold">{{ __('messages.offer_start') }}</label>
+    <input 
+        type="date" 
+        name="offer_start" 
+        class="border p-2 w-full rounded-xl" 
+        value="{{ old('offer_start', \Carbon\Carbon::parse($product->offer_start)->format('Y-m-d')) }}"
+    >
+</div>
+<div>
+    <label class="block mb-1 font-bold">{{ __('messages.offer_end') }}</label>
+    <input 
+        type="date" 
+        name="offer_end" 
+        class="border p-2 w-full rounded-xl" 
+        value="{{ old('offer_end', \Carbon\Carbon::parse($product->offer_end)->format('Y-m-d')) }}"
+    >
+</div>
             <div>
                 <label class="block mb-1 font-bold">{{ __('messages.discount_percent') }}</label>
                 <input type="number" min="0" name="discount_percent" placeholder="{{ __('messages.discount_percent') }}" class="border p-2 w-full rounded-xl" value="{{ old('discount_percent', $product->discount_percent) }}">
@@ -370,10 +457,50 @@
             @endif
             <p class="text-sm text-gray-500 mt-1">{{ __('messages.attachments_note') }}</p>
         </div>
+        <div>
+            <button type="button" @click="confirmingId = {{ $product->id }}"
+                class="flex-1 flex items-center justify-center gap-1 text-center text-red-500 py-2 rounded-xl transition">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                </svg>
+                <span class="underline text-black"> {{__('messages.trash_product')}}</span>
+            </button>
+        </div>
+        <div class="flex gap-3">
+            <button type="submit" class="bg-[#185D31] text-white px-6 py-2 rounded-xl">
+                {{ __('messages.save') }}
+            </button>
 
-        <button type="submit" class="bg-[#185D31] text-white px-6 py-3 rounded-xl">{{ __('messages.save_changes') }}</button>
+            <a href="{{ url()->previous() }}" class="bg-gray-300 text-black px-6 py-2 rounded-xl">
+                {{ __('messages.Cancel') }}
+            </a>
+        </div>
+        <input type="hidden" name="image" id="main_image_input">
     </form>
+    <div x-show="confirmingId" x-cloak class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <div class="bg-white p-6 rounded-lg max-w-md w-full">
+            <h2 class="text-xl font-bold mb-4">{{ __('messages.confirm_delete') }}</h2>
+            <p class="mb-4 text-gray-600">{{ __('messages.are_you_sure_delete') }}</p>
+            <div class="flex justify-end space-x-2">
+                <button @click="confirmingId = null" class="px-4 py-2 mx-2 bg-gray-300 rounded hover:bg-gray-400">
+                    {{ __('messages.cancel') }}
+                </button>
+                <form :action="'/products/' + confirmingId" method="POST">
+                    @csrf
+                    @method('DELETE')
+      <button 
+    type="submit" 
+    x-bind:disabled="loading" 
+    x-on:click="loading = true; window.scrollTo({ top: 0, behavior: 'smooth' });" 
+    class="bg-[#185D31] text-white px-6 py-3 rounded-xl"
+>                        {{ __('messages.delete') }}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
+<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
 <script>
     document.getElementById('edit-product-form').addEventListener('submit', function(e) {
@@ -385,51 +512,36 @@
 
         const formData = new FormData(this);
 
-        // Append new images from Alpine.js state
+        // Append new files from Alpine.js state
         const alpine = Alpine.$data(document.querySelector('[x-data]'));
         if (alpine.files && alpine.files.length > 0) {
             alpine.files.forEach(file => {
                 formData.append('images[]', file);
             });
         }
+
+        // Add _method field for PATCH request
+        formData.append('_method', 'PATCH');
         
-        // Append IDs of existing images to keep
-        const existingImageIds = alpine.existingImages.map(img => img.id);
-        existingImageIds.forEach(id => {
-            formData.append('existing_images[]', id);
-        });
-
-        // Add CSRF token
-        const csrfToken = document.querySelector('input[name="_token"]').value;
-        formData.append('_token', csrfToken);
-
-        fetch("{{ route('products.update', $product) }}", {
-            method: 'POST', // Use POST with _method('PATCH')
-            headers: {
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': csrfToken // Ensure CSRF token is sent with headers
-            },
+        fetch(this.action, {
+            method: 'POST', // Use POST for form submission
             body: formData
         })
         .then(async response => {
             const data = await response.json();
             if (!response.ok) {
                 // Handle validation errors or other server-side errors
-                for (const [key, messages] of Object.entries(data.errors)) {
-                    // This part will need to be more robust to handle nested fields like wholesale_prices
-                    const input = document.querySelector(`[name="${key}"]`);
-                    if (input) {
-                        let errorContainer = input.parentNode.querySelector('.text-red-600');
-                        if (!errorContainer) {
-                            errorContainer = document.createElement('p');
-                            errorContainer.className = 'text-red-600 text-sm mt-1';
-                            input.parentNode.appendChild(errorContainer);
-                        }
-                        errorContainer.textContent = messages[0];
+                let errorMessages = '';
+                if (data.errors) {
+                    for (const [key, messages] of Object.entries(data.errors)) {
+                        errorMessages += messages[0] + '<br>';
                     }
+                } else {
+                    errorMessages = data.message || 'An error occurred during the update.';
                 }
+
                 const statusMessageSpan = statusMessageDiv.querySelector('span');
-                statusMessageSpan.textContent = data.message || 'An error occurred during update.';
+                statusMessageSpan.innerHTML = errorMessages;
                 statusMessageDiv.classList.add('bg-red-100', 'text-red-700');
                 statusMessageDiv.classList.remove('hidden');
                 throw new Error('Request failed');
@@ -443,10 +555,6 @@
                 statusMessageDiv.classList.add('bg-green-100', 'text-green-700');
                 statusMessageDiv.classList.remove('hidden');
 
-                setTimeout(() => {
-                    statusMessageDiv.classList.add('hidden');
-                }, 5000);
-
                 if (data.redirect) {
                     window.location.href = data.redirect;
                 }
@@ -455,7 +563,9 @@
         .catch(error => {
             console.error('An unexpected error occurred:', error);
             const statusMessageSpan = statusMessageDiv.querySelector('span');
-            statusMessageSpan.textContent = '{{ __('message.error_message') }}';
+            if (statusMessageSpan.textContent === '') {
+                 statusMessageSpan.textContent = '{{ __('messages.error_message') }}';
+            }
             statusMessageDiv.classList.add('bg-red-100', 'text-red-700');
             statusMessageDiv.classList.remove('hidden');
         });

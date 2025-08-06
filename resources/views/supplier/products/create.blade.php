@@ -8,7 +8,7 @@
          previews: [],
          preview: '', // optional main preview
          selectedCategoryId: null,
-         selectedSubcategoryId: null,
+         selectedSubcategoryId: null,mk
          newWholesaleItem: { from: '', to: '', price: '' },
          wholesalePrices: [],
          newSize: '',
@@ -342,6 +342,40 @@ class="absolute top-1 left-1 bg-red-500 text-white rounded-full p-1 leading-none
             <label class="block mb-1 font-bold">{{ __('messages.min_order_quantity') }}</label>
             <input type="number" min="0" name="min_order_quantity" placeholder="{{ __('messages.min_order_quantity') }}" class="border p-2 w-full rounded-xl">
         </div>
+
+        {{-- ✅ حالة المنتج (Product Status) --}}
+<div class="mb-4" x-data="{ 
+    open: false, 
+    selectedStatus: '{{ old('product_status', $product->product_status ?? '') }}',
+    statusOptions: {
+        'ready_for_delivery': 'جاهز للتوصيل الفوري',
+        'made_to_order': 'حسب الطلب'
+    },
+    get selectedStatusText() {
+        return this.statusOptions[this.selectedStatus] || 'حدد حالة المنتج';
+    }
+}">
+    <label class="block mb-1 font-bold ">حالة المنتج</label>
+    
+    <div class="relative">
+        <input type="hidden" name="product_status" x-model="selectedStatus">
+
+        <button type="button" @click="open = !open" class="flex justify-between items-center w-full px-2 py-2 border rounded-xl bg-white text-right">
+            <span x-text="selectedStatusText"></span>
+            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" :class="{ 'transform rotate-180': open }">
+                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+        </button>
+
+        <ul x-show="open" @click.away="open = false" class="absolute z-10 w-full mt-1 bg-white rounded-xl shadow-lg border">
+            <template x-for="(text, value) in statusOptions" :key="value">
+                <li @click="selectedStatus = value; open = false" class="px-2 py-2 cursor-pointer hover:bg-gray-100 rounded-xl">
+                    <span x-text="text"></span>
+                </li>
+            </template>
+        </ul>
+    </div>
+</div>
 
         <div>
             <label class="block mb-1 font-bold">{{ __('messages.description') }}</label>
