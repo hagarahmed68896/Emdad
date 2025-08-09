@@ -191,7 +191,7 @@
             </svg>
 
             @if ($product->subCategory && $product->subCategory->category)
-                <a href="#" class="hover:underline">{{ $product->subCategory->category->name_ar }}</a>
+                <a href="#" class="hover:underline">{{ $product->subCategory->category->name }}</a>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" class="size-4 mx-1 mt-1">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
@@ -199,7 +199,7 @@
             @endif
             @if ($product->subCategory)
                 <a href="{{ route('products.index', ['sub_category_id' => $product->subCategory->id]) }}"
-                    class="hover:underline">{{ $product->subCategory->name_ar }}</a>
+                    class="hover:underline">{{ $product->subCategory->name }}</a>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" class="size-4 mx-1 mt-1">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
@@ -221,22 +221,20 @@
                         <div class="swiper product-main-swiper w-full h-full rounded-lg flex items-center justify-center">
                             <div class="swiper-wrapper">
                                 @php
-                                    $images = is_string($product->images)
-                                        ? json_decode($product->images, true)
-                                        : $product->images ?? [];
+                                    $images = collect(is_string($product->images) ? json_decode($product->images, true) : ($product->images ?? []));
                                 @endphp
-                                @forelse ($images as $imagePath)
-                                    <div class="swiper-slide flex items-center justify-center">
-                                        <img src="{{ asset($imagePath) }}"
-                                            onerror="this.onerror=null;this.src='https://placehold.co/600x600/F0F0F0/ADADAD?text=Image+Not+Found';"
-                                            alt="{{ $product->name }}"
-                                            class="max-w-full max-h-full object-contain rounded-lg">
+
+                                @forelse ($images as $image)
+                                    <div class="swiper-slide">
+                                        <img src="{{ Storage::url($image) }}"
+                                             onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
+                                             class="w-full h-full object-contain">
                                     </div>
                                 @empty
-                                    <div class="swiper-slide flex items-center justify-center">
-                                        <img src="https://placehold.co/600x600/F0F0F0/ADADAD?text=No+Images"
-                                            alt="No image available"
-                                            class="max-w-full max-h-full object-contain rounded-lg">
+                                    <div class="swiper-slide">
+                                        <img src="{{ asset($product->image ?? 'https://placehold.co/300x200/F0F0F0/ADADAD?text=No+Image') }}"
+                                             onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
+                                             class="w-full h-full object-contain">
                                     </div>
                                 @endforelse
                             </div>
@@ -279,13 +277,13 @@
                 {{-- Thumbnail Swiper --}}
                 <div class="swiper product-thumbnail-swiper w-full bg-white mt-4 px-1">
                     <div class="swiper-wrapper gap-3">
-                        @forelse ($images as $imagePath)
+                        @forelse ($images as $image)
                             <div
                                 class="swiper-slide w-[120px] h-[150px] bg-[#EDEDED] rounded-md overflow-hidden border-2 border-transparent hover:border-[#185D31] transition-all duration-200 cursor-pointer">
-                                <img src="{{ asset($imagePath) }}"
-                                    onerror="this.onerror=null;this.src='https://placehold.co/120x120/F0F0F0/ADADAD?text=Thumb';"
-                                    alt="Thumbnail" class="w-full h-full object-cover rounded-md">
-                            </div>
+                               <img src="{{ Storage::url($image) }}"
+                                             onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
+                                             class="w-full h-full object-contain">
+                                   </div>
                         @empty
                             {{-- No thumbnails if no images --}}
                         @endforelse
@@ -339,11 +337,11 @@
 
                 {{-- Supplier Info --}}
                 <div class="flex items-center mb-2">
-                    @if ($product->supplier_confirmed)
+                    @if ($product->supplier->supplier_confirmed)
                         <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]" src="{{ asset('images/Success.svg') }}"
                             alt="Confirmed Supplier">
                     @endif
-                    <p class="text-[20px] text-[#212121]">{{ $product->supplier_name }}</p>
+                    <p class="text-[20px] text-[#212121]">{{ $product->supplier->company_name }}</p>
                 </div>
 
                 <div class="mb-2 w-full bg-[#F8F9FA] p-4 rounded-[12px]">
@@ -366,10 +364,10 @@
                         @forelse ($product->price_tiers as $tier)
                             <div class="p-3">
                                 <p class="text-[16px] text-[#696969]">
-                                    @if (isset($tier['max_qty']))
-                                        {{ $tier['min_qty'] }}-{{ $tier['max_qty'] }} {{ __('messages.pieces') }}
+                                    @if (isset($tier['to']))
+                                        {{ $tier['from'] }}-{{ $tier['to'] }} {{ __('messages.pieces') }}
                                     @else
-                                        {{ $tier['min_qty'] }}+ {{ __('messages.pieces') }}
+                                        {{ $tier['from'] }}+ {{ __('messages.pieces') }}
                                     @endif
                                 </p>
                                 <p class="price-item text-[20px] md:text-[32px] text-[#212121] font-bold">
@@ -393,65 +391,53 @@
                     </div>
                 </div>
 
-                {{-- Variations: Colors --}}
-                <div class=" border-b border-t border-[#EDEDED] py-3">
-                    @php
-                        // Safely access specifications and decode if it's a string
-                $specifications = $product->specifications;
-                if (is_string($specifications)) {
-                    $specifications = json_decode($specifications, true);
-                }
-                // Ensure $specifications is an array/object, then safely access 'colors'
-                $productColors =
-                    is_array($specifications) && isset($specifications['colors'])
-                        ? $specifications['colors']
-                        : [];
+            {{-- ✅ Colors --}}
+<div class="border-b border-t border-[#EDEDED] py-3">
+    @php
+        // Get colors directly from the 'colors' column
+        $productColors = $product->colors ?? [];
 
-                // Ensure $productColors is an array, even if it was null or malformed previously
-                if (!is_array($productColors)) {
-                    $productColors = [];
-                }
+        // Ensure valid array structure
+        if (!is_array($productColors)) {
+            $productColors = [];
+        }
 
-                // Determine default selected color name (first available, or null if none)
-                $defaultSelectedColorName = null;
-                if (
-                    !empty($productColors) &&
-                    is_array($productColors[0] ?? null) &&
-                    isset($productColors[0]['name'])
-                ) {
-                    $defaultSelectedColorName = $productColors[0]['name'];
-                        }
-                        $baseProductPrice = $product->price ?? 0;
-                        $productDiscountPercent = $product->discount_percent ?? 0;
-                        $shippingCost = $product->shipping_cost ?? 0;
-                        $priceTiers = $product->price_tiers ?? [];
-                    @endphp
+        // Get the first color's name to mark as default selected
+        $defaultSelectedColorName = $productColors[0]['name'] ?? null;
+    @endphp
 
+    {{-- Select changes popup --}}
+    @include('categories.selectChanges_popup')
 
-                    {{-- select changes popup --}}
-                    @include('categories.selectChanges_popup')
+    <h3 class="text-lg font-bold text-gray-800 mb-2">
+        {{ __('messages.colors') }} (<span id="colorCount">{{ count($productColors) }}</span>):
+        <span id="selectedColorName" class="font-normal text-[#212121]"></span>
+    </h3>
 
-                    <h3 class="text-lg font-bold text-gray-800 mb-2">
-                        {{ __('messages.colors') }} (<span id="colorCount">{{ count($productColors ?? []) }}</span>):
-                        <span id="selectedColorName" class="font-normal text-[#212121]"></span>
-                    </h3>
-                    <div class="flex gap-2">
+    <div class="flex gap-2">
+        @forelse ($productColors as $colorOption)
+      @if (isset($colorOption['name'], $colorOption['image']))
+    @php
+        // Check if the image value is a Base64 string
+        $isBase64 = str_starts_with($colorOption['image'], 'data:image');
+        $imageSrc = $isBase64 ? $colorOption['image'] : asset($colorOption['image']);
+    @endphp
 
-                        @forelse ($productColors as $colorOption)
-                            @if (is_array($colorOption) && isset($colorOption['name']) && isset($colorOption['swatch_image']))
-                                <div class="color-swatch cursor-pointer {{ $defaultSelectedColorName == $colorOption['name'] ? 'selected' : '' }}"
-                                    data-color-name="{{ $colorOption['name'] }}"
-                                    data-swatch-image="{{ asset($colorOption['swatch_image']) }}"
-                                    title="{{ $colorOption['name'] }}">
-                                    <img src="{{ asset($colorOption['swatch_image']) }}"
-                                        alt="{{ $colorOption['name'] }} Swatch">
-                                </div>
-                            @endif
-                        @empty
-                            <p class="text-gray-500 text-sm">{{ __('messages.no_colors_available') }}</p>
-                        @endforelse
-                    </div>
-                </div>
+    <div class="color-swatch cursor-pointer {{ $defaultSelectedColorName == $colorOption['name'] ? 'selected' : '' }}"
+        data-color-name="{{ $colorOption['name'] }}"
+        data-swatch-image="{{ $imageSrc }}"
+        title="{{ $colorOption['name'] }}">
+        <img src="{{ $imageSrc }}"
+             alt="{{ $colorOption['name'] }} Swatch"
+             class=" border object-cover">
+    </div>
+@endif
+        @empty
+            <p class="text-gray-500 text-sm">{{ __('messages.no_colors_available') }}</p>
+        @endforelse
+    </div>
+</div>
+
 
 
 
@@ -1112,15 +1098,15 @@
                                 <span
                                     class="text-[#696969] text-[20px]">{{ $product->subCategory->category->name ?? 'غير مصنف' }}</span>
                                 <div class="flex mt-2">
-                                    @if ($product->supplier_confirmed)
+                                    @if ($product->supplier->supplier_confirmed)
                                         <span class="flex items-center text-[#185D31]">
                                             <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]"
                                                 src="{{ asset('images/Success.svg') }}" alt="Confirmed Supplier">
-                                            <p class="text-[20px] text-[#212121] ">{{ $product->supplier_name }}
+                                            <p class="text-[20px] text-[#212121] ">{{ $product->supplier->company_name }}
                                             </p>
                                         </span>
                                     @else
-                                        <p class="text-[20px] text-[#212121] ">{{ $product->supplier_name }}
+                                        <p class="text-[20px] text-[#212121] ">{{ $product->supplier->company_name }}
                                         </p>
                                     @endif
                                 </div>

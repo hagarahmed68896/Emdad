@@ -25,9 +25,9 @@
              return this.selected.reduce((sum, item) => sum + item.count, 0);
          },
          get typesCount() {
-        return this.selected.filter(item => item.count > 0).length;
-    }
-
+             return this.selected.filter(item => item.count > 0).length;
+         }
+     
      }">
          <button
              @click=" 
@@ -84,11 +84,11 @@
                              @forelse ($product->price_tiers as $tier)
                                  <div class="p-1">
                                      <p class="text-[16px] text-[#696969]">
-                                         @if (isset($tier['max_qty']))
-                                             {{ $tier['min_qty'] }}-{{ $tier['max_qty'] }}
+                                         @if (isset($tier['to']))
+                                             {{ $tier['from'] }}-{{ $tier['to'] }}
                                              {{ __('messages.pieces') }}
                                          @else
-                                             {{ $tier['min_qty'] }}+ {{ __('messages.pieces') }}
+                                             {{ $tier['from'] }}+ {{ __('messages.pieces') }}
                                          @endif
                                      </p>
                                      <p class="price-item text-[24px] text-[#212121] font-bold">
@@ -115,41 +115,39 @@
                          <h3 class="text-lg font-bold text-gray-800 mb-2">
                              {{ __('messages.colors') }}
                          </h3>
+<!-- Colors loop: each pushes to selected -->
+@foreach ($product->colors as $index => $color)
+    @php
+        $colorName = $color['name'] ?? 'Unnamed';
+        // Check if the image value is a Base64 string.
+        $isBase64 = isset($color['image']) && str_starts_with($color['image'], 'data:image');
+        $swatchImage = isset($color['image'])
+            ? ($isBase64 ? $color['image'] : asset($color['image']))
+            : 'https://placehold.co/40x40/F0F0F0/ADADAD?text=N/A';
+    @endphp
 
-                         <!-- Colors loop: each pushes to selected -->
-                         @foreach ($product->specifications['colors'] as $index => $color)
-                             @php
-                                 $colorName = is_array($color) && isset($color['name']) ? $color['name'] : $color;
-                                 $swatchImage =
-                                     is_array($color) && isset($color['swatch_image'])
-                                         ? asset($color['swatch_image'])
-                                         : 'https://placehold.co/40x40/F0F0F0/ADADAD?text=N/A';
-                                 $colorPrice = is_array($color) && isset($color['price']) ? $color['price'] : 0;
-                             @endphp
-
-                             <div x-init="selected.push({
-                                 name: '{{ $colorName }}',
-                                 swatchImage: '{{ $swatchImage }}',
-                                 price: {{ $colorPrice }},
-                                 count: 0
-                             })" class="flex items-center justify-between border-b pb-2">
-                                 <div class="flex items-center ">
-                                     <img :src="selected[{{ $index }}].swatchImage" alt="{{ $colorName }}"
-                                         class="w-[64px] h-[64px] rounded-[12px] ml-3 bg-[#EDEDED] cursor-pointer object-cover"
-                                         @click="
-    openSwatchModal = true;
-    $nextTick(() => {
-      if (swiperInstance) swiperInstance.destroy(true, true);
-      swiperInstance = new Swiper('.swatchSwiper', {
-        initialSlide: {{ $index }},
-        loop: true,
-        navigation: {
-          nextEl: '.swiper-button-next',
-          prevEl: '.swiper-button-prev',
-        },
-      });
-    });
-  " />
+    <div x-init="selected.push({
+        name: '{{ $colorName }}',
+        swatchImage: '{{ $swatchImage }}',
+        count: 0
+    })" class="flex items-center justify-between border-b pb-2">
+        <div class="flex items-center ">
+            <img :src="selected[{{ $index }}].swatchImage" alt="{{ $colorName }}"
+                class="w-[64px] h-[64px] rounded-[12px] ml-3 bg-[#EDEDED] cursor-pointer object-cover"
+                @click="
+                    openSwatchModal = true;
+                    $nextTick(() => {
+                        if (swiperInstance) swiperInstance.destroy(true, true);
+                        swiperInstance = new Swiper('.swatchSwiper', {
+                            initialSlide: {{ $index }},
+                            loop: true,
+                            navigation: {
+                                nextEl: '.swiper-button-next',
+                                prevEl: '.swiper-button-prev',
+                            },
+                        });
+                    });
+                " />
 
 
                                      <span class="text-gray-800 font-medium"
@@ -158,8 +156,8 @@
 
                                  <div class="flex items-center">
                                      <div class="flex text-[20px] ml-2">
-                                         <p x-text="`${getUnitPrice(selected[{{ $index }}]).toFixed(2)} `">
-                                         </p>
+                                                 <span class="text-xl font-semibold">{{$product->price}}</span>
+
                                          <img class="mx-1 w-[16px] h-[16px] mt-2 inline-block"
                                              src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}" alt="">
                                      </div>
@@ -254,16 +252,12 @@
                                  <!-- Swiper -->
                                  <div class="swiper swatchSwiper">
                                      <div class="swiper-wrapper">
-                                         @foreach ($product->specifications['colors'] as $index => $color)
+                                         @foreach ($product->colors as $index => $color)
                                              @php
-                                                 $colorName =
-                                                     is_array($color) && isset($color['name'])
-                                                         ? $color['name']
-                                                         : $color;
-                                                 $swatchImage =
-                                                     is_array($color) && isset($color['swatch_image'])
-                                                         ? asset($color['swatch_image'])
-                                                         : 'https://placehold.co/40x40/F0F0F0/ADADAD?text=N/A';
+                                                 $colorName = $color['name'] ?? 'Unnamed';
+                                                 $swatchImage = isset($color['image'])
+                                                     ? asset($color['image'])
+                                                     : 'https://placehold.co/40x40/F0F0F0/ADADAD?text=N/A';
                                              @endphp
 
                                              <div class="swiper-slide flex flex-col items-center">
@@ -285,7 +279,7 @@
 
                      </div>
 
-                
+
                  </div>
 
 
@@ -320,20 +314,20 @@
                                              alt="">
                                          <div>
                                              <p class="text-sm text-gray-600">
-                                                 {{__('messages.color_name')}}:
+                                                 {{ __('messages.color_name') }}:
                                                  <span class="font-medium mx-1" x-text="item.name"></span>
                                              </p>
 
                                              <p class="text-sm text-gray-600">
-                                                 {{__('messages.quantaty')}}:
+                                                 {{ __('messages.quantaty') }}:
                                                  <span class="font-medium mx-1" x-text="item.count"></span>
                                              </p>
 
                                          </div>
                                      </td>
-                                     <td class="p-2" >
-                                        <span x-text="getUnitPrice(item).toFixed(2)" class="text-[18px]"></span>
-                                             <img class="mx-1 w-[16px] h-[16px] inline-block"
+                                     <td class="p-2">
+                                         <span class="text-[18px]">{{$product->price}}</span>
+                                         <img class="mx-1 w-[16px] h-[16px] inline-block"
                                              src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}" alt="">
                                      </td>
                                      <td class="p-2">
@@ -359,102 +353,99 @@
 
 
 
-                        <!-- Price Section with Collapse -->
-                         <div x-data="{ isPriceDetailsOpen: false }" class="tex border-t pt-4 mb-4">
+                 <!-- Price Section with Collapse -->
+                 <div x-data="{ isPriceDetailsOpen: false }" class="tex border-t pt-4 mb-4">
 
-                             <!-- 1️⃣ Collapsed: total + arrow on the right -->
-                             <template x-if="!isPriceDetailsOpen">
-                                 <div class="font-bold flex text-[20px] justify-between cursor-pointer"
-                                     @click="isPriceDetailsOpen = true">
-                                     <span>{{ __('messages.total') }}</span>
-                                     <div class="flex items-center">
-                                         <span x-text="`${total.toFixed(2)}`"></span>
-                                         <img class="mx-1 w-[16px] h-[16px] mt-2 inline-block"
-                                             src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}" alt="">
-                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                             stroke-width="1.5" stroke="currentColor" class="size-6"
-                                             :class="{ 'rotate-180': isPriceDetailsOpen }">
-                                             <path stroke-linecap="round" stroke-linejoin="round"
-                                                 d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                                         </svg>
-                                     </div>
-                                 </div>
-                             </template>
-
-                             <!-- 2️⃣ Expanded: details + arrow moved next to Price heading -->
-                             <div x-show="isPriceDetailsOpen" x-collapse>
-                                 <div class="flex justify-between items-center mb-3">
-                                     <p class="text-[24px] font-bold">{{ __('messages.price') }}</p>
-                                     <!-- Arrow here next to heading -->
-                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                         stroke-width="1.5" stroke="currentColor" class="size-6 cursor-pointer"
-                                         @click="isPriceDetailsOpen = false"
-                                         :class="{ 'rotate-180': isPriceDetailsOpen }">
-                                         <path stroke-linecap="round" stroke-linejoin="round"
-                                             d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                                     </svg>
-                                 </div>
-
-                                 <!-- Details -->
-                                 <div class="flex justify-between mb-2">
-                                     <div class="flex">
-                                         <span
-                                             class="text-[20px] text-[#212121]">{{ __('messages.total_elements') }}</span>
-                                      <span class="underline text-[#696969] cursor-pointer text-[20px] mr-1"
-      @click="showItemsTable = true">
-    (<span x-text="typesCount"></span> {{__('messages.type')}} 
-     <span x-text="totalItems"></span> {{__('messages.element')}})
-</span>
-
-                                     </div>
-                                     <div class="flex">
-                                         <span x-text="`${subtotal.toFixed(2)}`"></span>
-                                         <img class="mx-1 w-[16px] h-[16px] mt-1 inline-block"
-                                             src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}" alt="">
-                                     </div>
-                                 </div>
-
-                                 <div class="flex justify-between border-b pb-3 mb-2">
-                                     <span
-                                         class="text-[20px] text-[#212121]">{{ __('messages.shipping_price') }}</span>
-                                     <div class="flex">
-                                         <span x-text="`${shipping.toFixed(2)}`"></span>
-                                         <img class="mx-1 w-[16px] h-[16px] mt-1 inline-block"
-                                             src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}" alt="">
-                                     </div>
-                                 </div>
-
-                                 <!-- Bottom total: no arrow -->
-                                 <div class="font-bold flex text-[20px] justify-between cursor-pointer mt-4"
-                                     @click="isPriceDetailsOpen = false">
-                                     <span>{{ __('messages.total') }}</span>
-                                     <div class="flex items-center">
-                                         <span x-text="`${total.toFixed(2)}`"></span>
-                                         <img class="mx-1 w-[16px] h-[16px] mt-2 inline-block"
-                                             src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}" alt="">
-                                     </div>
-                                 </div>
+                     <!-- 1️⃣ Collapsed: total + arrow on the right -->
+                     <template x-if="!isPriceDetailsOpen">
+                         <div class="font-bold flex text-[20px] justify-between cursor-pointer"
+                             @click="isPriceDetailsOpen = true">
+                             <span>{{ __('messages.total') }}</span>
+                             <div class="flex items-center">
+                                 <span x-text="`${total.toFixed(2)}`"></span>
+                                 <img class="mx-1 w-[16px] h-[16px] mt-2 inline-block"
+                                     src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}" alt="">
+                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke-width="1.5" stroke="currentColor" class="size-6"
+                                     :class="{ 'rotate-180': isPriceDetailsOpen }">
+                                     <path stroke-linecap="round" stroke-linejoin="round"
+                                         d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                                 </svg>
                              </div>
+                         </div>
+                     </template>
 
+                     <!-- 2️⃣ Expanded: details + arrow moved next to Price heading -->
+                     <div x-show="isPriceDetailsOpen" x-collapse>
+                         <div class="flex justify-between items-center mb-3">
+                             <p class="text-[24px] font-bold">{{ __('messages.price') }}</p>
+                             <!-- Arrow here next to heading -->
+                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                 stroke-width="1.5" stroke="currentColor" class="size-6 cursor-pointer"
+                                 @click="isPriceDetailsOpen = false" :class="{ 'rotate-180': isPriceDetailsOpen }">
+                                 <path stroke-linecap="round" stroke-linejoin="round"
+                                     d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                             </svg>
                          </div>
 
-                              {{-- Action Buttons --}}
-                     <div class="flex flex-col md:flex-row gap-3 mb-3 py-4">
-                         <button x-on:click="handleAddToCart()" x-bind:disabled="totalItems === 0"
-                             class="flex flex-1 px-6 py-3 bg-[#185D31] text-white rounded-lg font-semibold hover:bg-green-700 transition-colors shadow-md text-center justify-center items-center">
-                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                 stroke-width="1.5" stroke="currentColor" class="size-6 ml-2"> {{-- Changed ml-1 to mr-2 for spacing --}}
-                                 <path stroke-linecap="round" stroke-linejoin="round"
-                                     d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
-                             </svg>
-                             {{ __('messages.add_to_cart') }}
-                         </button>
-                         <button x-on:click="handleContactSupplier()"
-                             class="flex-1 px-6 py-3 bg-[#EDEDED] text-[#696969] rounded-lg font-semibold hover:bg-gray-200 transition-colors shadow-md">
-                             {{ __('messages.connect_to_supplier') }}
-                         </button>
+                         <!-- Details -->
+                         <div class="flex justify-between mb-2">
+                             <div class="flex">
+                                 <span class="text-[20px] text-[#212121]">{{ __('messages.total_elements') }}</span>
+                                 <span class="underline text-[#696969] cursor-pointer text-[20px] mr-1"
+                                     @click="showItemsTable = true">
+                                     (<span x-text="typesCount"></span> {{ __('messages.type') }}
+                                     <span x-text="totalItems"></span> {{ __('messages.element') }})
+                                 </span>
 
+                             </div>
+                             <div class="flex">
+                                 <span x-text="`${subtotal.toFixed(2)}`"></span>
+                                 <img class="mx-1 w-[16px] h-[16px] mt-1 inline-block"
+                                     src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}" alt="">
+                             </div>
+                         </div>
+
+                         <div class="flex justify-between border-b pb-3 mb-2">
+                             <span class="text-[20px] text-[#212121]">{{ __('messages.shipping_price') }}</span>
+                             <div class="flex">
+                                 <span x-text="`${shipping.toFixed(2)}`"></span>
+                                 <img class="mx-1 w-[16px] h-[16px] mt-1 inline-block"
+                                     src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}" alt="">
+                             </div>
+                         </div>
+
+                         <!-- Bottom total: no arrow -->
+                         <div class="font-bold flex text-[20px] justify-between cursor-pointer mt-4"
+                             @click="isPriceDetailsOpen = false">
+                             <span>{{ __('messages.total') }}</span>
+                             <div class="flex items-center">
+                                 <span x-text="`${total.toFixed(2)}`"></span>
+                                 <img class="mx-1 w-[16px] h-[16px] mt-2 inline-block"
+                                     src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}" alt="">
+                             </div>
+                         </div>
                      </div>
+
+                 </div>
+
+                 {{-- Action Buttons --}}
+                 <div class="flex flex-col md:flex-row gap-3 mb-3 py-4">
+                     <button x-on:click="handleAddToCart()" x-bind:disabled="totalItems === 0"
+                         class="flex flex-1 px-6 py-3 bg-[#185D31] text-white rounded-lg font-semibold hover:bg-green-700 transition-colors shadow-md text-center justify-center items-center">
+                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                             stroke-width="1.5" stroke="currentColor" class="size-6 ml-2"> {{-- Changed ml-1 to mr-2 for spacing --}}
+                             <path stroke-linecap="round" stroke-linejoin="round"
+                                 d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                         </svg>
+                         {{ __('messages.add_to_cart') }}
+                     </button>
+                     <button x-on:click="handleContactSupplier()"
+                         class="flex-1 px-6 py-3 bg-[#EDEDED] text-[#696969] rounded-lg font-semibold hover:bg-gray-200 transition-colors shadow-md">
+                         {{ __('messages.connect_to_supplier') }}
+                     </button>
+
+                 </div>
 
 
              </div>

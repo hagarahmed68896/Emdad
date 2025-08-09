@@ -130,8 +130,15 @@ public function create()
 
         // ✅ Process sizes and colors (Already handled by the cast in the model)
         $data['sizes'] = $request->input('sizes', []);
-        $data['colors'] = $request->input('colors', []);
+        // $data['colors'] = $request->input('colors', []);
         
+
+        $colors = collect($request->input('colors'))
+    ->map(fn($colorJson) => json_decode($colorJson, true))
+    ->toArray();
+
+$data['colors'] = $colors;
+
         // ✅ Assign the product to the authenticated user's business
         $user = Auth::user();
         if (!$user || !$user->business) {
@@ -161,9 +168,32 @@ public function edit(Product $product)
     // Fetch all categories and their subcategories for the dropdowns
     $categories = Category::with('subCategories')->get();
 
+    // Make sure 'colors' is cast to an array in your Product model
+    $productColors = $product->colors ?? [];
+
+    // Format the colors array correctly for the front-end
+    $productColorsJson = array_map(function($color) {
+        $imagePath = $color['image'];
+
+        // Check if the image is a Base64 string or a file path.
+        if (str_starts_with($imagePath, 'data:image')) {
+            // It's a Base64 string, use it directly.
+            $formattedImage = $imagePath;
+        } else {
+            // It's a file path, so prepend the storage URL.
+            $formattedImage = asset('storage/' . $imagePath);
+        }
+
+        return [
+            'name' => $color['name'],
+            'image' => $formattedImage,
+        ];
+    }, $productColors);
+
     return view('supplier.products.edit', [
         'product' => $product,
         'categories' => $categories,
+        'productColorsJson' => $productColorsJson, // Pass the formatted array
     ]);
 }
 
@@ -227,7 +257,7 @@ public function update(Request $request, Product $product)
     // Check if the product name has changed and update the slug accordingly
     if ($product->name !== $data['name']) {
         $data['slug'] = Str::slug($data['name']) . '-' . Str::random(8);
-    }
+    } 
     
     // --- Handle File Uploads ---
 
@@ -295,7 +325,14 @@ public function update(Request $request, Product $product)
 
     // Sizes and colors
     $data['sizes'] = $request->input('sizes', []);
-    $data['colors'] = $request->input('colors', []);
+$data['colors'] = array_map(function ($color) {
+    if (is_string($color)) {
+        $decoded = json_decode($color, true);
+        return is_array($decoded) ? $decoded : [];
+    }
+    return is_array($color) ? $color : [];
+}, $request->input('colors', []));
+
     
     // Set default min_order_quantity if not provided
     $data['min_order_quantity'] = $data['min_order_quantity'] ?? 1;

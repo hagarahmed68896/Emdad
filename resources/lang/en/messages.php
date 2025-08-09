@@ -423,6 +423,8 @@ return [
 
     'Cancel' => 'Cancel',
     'trash' => 'Delete product',
+    'upload_color_image' => 'Upload color image',
+    'no_pricing_tiers_available' => 'No pricing tiers available',
 
 
     

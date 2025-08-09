@@ -74,13 +74,13 @@
         @if (request()->has('sub_category_id'))
             <input type="hidden" name="sub_category_id" value="{{ request('sub_category_id') }}">
         @endif
-
+ 
         <div class="mb-6">
             <input type="text" id="search" name="search" placeholder="{{ __('messages.search_products') }}"
                 value="{{ request('search') }}"
                 class="w-full p-3 border border-gray-300 rounded-lg transition duration-200">
         </div>
-
+ 
         {{-- Description filter (assuming it's still a separate top-level column) --}}
         <div class="mb-6 border-b pb-3">
             <div class="flex flex-col space-y-2">
@@ -98,79 +98,84 @@
                 @endforelse
             </div>
         </div>
+  
+{{-- COLORS --}}
+@php
+    $selectedColors = (array) request('colors');
+@endphp
 
-        {{-- Dynamic Specification Filters --}}
-        @php
-            // Make sure the colorHexMap is defined or passed from the controller if needed here.
-            // It's better to pass it from the controller to keep the Blade clean.
-            // For now, I'll assume it's available or define a minimal one if not.
-            $colorHexMap = $colorHexMap ?? [
-                'أحمر' => '#FF0000', 'أزرق' => '#0000FF', 'أخضر' => '#008000', 'أصفر' => '#FFFF00',
-                'أسود' => '#000000', 'أبيض' => '#FFFFFF', 'رمادي' => '#808080',
-                // Add all your colors here
-            ];
-            $filterableSpecsConfig = config('products.filterable_specifications', []);
-        @endphp
+@if (!empty($availableSpecifications['colors']))
+    <div class="mb-6 border-b pb-3">
+        <h3 class="text-lg font-semibold text-gray-800 mb-3">{{ __('messages.colors') }}</h3>
+        <div class="grid grid-cols-6 gap-2">
+            @foreach ($availableSpecifications['colors'] as $color)
+                @php
+                    $colorName = $color['name'] ?? '';
+                    $swatchImage = $color['image'] ?? null;
+                    $bgColor = $colorHexMap[$colorName] ?? '#ccc';
+                    $isSelected = in_array($colorName, $selectedColors);
+                @endphp
+                <label class="flex items-center justify-center">
+                    <input type="checkbox" name="colors[]" value="{{ $colorName }}" class="hidden"
+                        {{ $isSelected ? 'checked' : '' }}
+                        onchange="document.getElementById('filterForm').submit()">
+                    <div class="color-swatch {{ $isSelected ? 'selected' : '' }} h-[37px] w-[37px] rounded-full border border-gray-300"
+                        style="{{ $swatchImage
+                            ? 'background-image: url(' . $swatchImage . ');'
+                            : 'background-color: ' . $bgColor }}; background-size: cover; background-position: center;"
+                        title="{{ $colorName }}">
+                    </div>
+                </label>
+            @endforeach
+        </div>
+    </div>
+@endif
 
-        @foreach($filterableSpecsConfig as $specKey => $specConfig)
-            @php
-                $options = $availableSpecifications[$specKey] ?? [];
-                $selectedOptions = (array) request($specKey);
-            @endphp
 
-            @if (!empty($options))
-                <div class="mb-6 border-b pb-3">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-3">{{ __('messages.' . $specKey) }}</h3>
+{{-- SIZES --}}
+@php
+    $selectedSizes = (array) request('sizes');
+@endphp
 
-                    @if ($specKey === 'colors')
-                        <div class="grid grid-cols-6 gap-2">
-                            @foreach($options as $colorOption)
-                                @php
-                                    // Use 'name' property for color and look up hex from map
-                                    $colorName = $colorOption['name'];
-                                    $swatchImage = $colorOption['swatch_image'] ?? null;
-                                    $backgroundColor = $colorHexMap[$colorName] ?? '#ccc';
-                                    $isSelected = in_array($colorName, $selectedOptions);
-                                @endphp
-                                <label class="flex items-center justify-center">
-                                    <input type="checkbox" name="{{ $specKey }}[]" value="{{ $colorName }}" class="hidden"
-                                        {{ $isSelected ? 'checked' : '' }}
-                                        onchange="document.getElementById('filterForm').submit()">
-                                    <div class="color-swatch {{ $isSelected ? 'selected' : '' }} h-[37px] w-[37px]"
-                                        style="background-color: {{ $backgroundColor }}; {{ $swatchImage ? 'background-image: url(' . asset($swatchImage) . '); background-size: cover; background-position: center;' : '' }}"
-                                        title="{{ $colorName }}">
-                                        {{-- You can display text for colors here if swatch image/color isn't enough --}}
-                                    </div>
-                                </label>
-                            @endforeach
-                        </div>
-                    @elseif ($specConfig['type'] === 'array_of_strings' || $specConfig['type'] === 'string')
-                        {{-- For size, gender, material, processor, ram, storage, graphics_card, screen_size, operating_system --}}
-                        <div class="{{ $specKey === 'size' ? 'grid grid-cols-4 gap-2' : 'flex flex-col space-y-2' }}">
-                            @foreach($options as $option)
-                                @php $isSelected = in_array($option, $selectedOptions); @endphp
-                                <label class="{{ $specKey === 'size' ? 'flex items-center justify-center' : 'inline-flex items-center' }}">
-                                    <input type="checkbox" name="{{ $specKey }}[]" value="{{ $option }}"
-                                        class="{{ $specKey === 'size' ? 'hidden' : 'form-checkbox h-[20px] w-[20px] rounded-[6px]  border-2 border-black focus:ring-[#185D31] accent-[#185D31]' }}"
-                                        {{ $isSelected ? 'checked' : '' }}
-                                        onchange="document.getElementById('filterForm').submit()">
-                                    @if ($specKey === 'size')
-                                        <div class="size-button w-[71px] bg-[#EDEDED] py-1 justify-center items-center text-center px-2 {{ $isSelected ? 'selected' : '' }}">
-                                            {{ $option }}
-                                        </div>
-                                    @else
-                                        <span class="rtl:mr-3 ltr:ml-3 text-[#212121] text-base">{{ $option }}</span>
-                                    @endif
-                                </label>
-                            @endforeach
-                        </div>
-                    @else
-                        {{-- Fallback for unexpected types --}}
-                        <p class="text-gray-500 text-sm">No options available for {{ $specKey }}.</p>
-                    @endif
-                </div>
-            @endif
+@if (!empty($availableSpecifications['sizes']))
+    <div class="mb-6 border-b pb-3">
+        <h3 class="text-lg font-semibold text-gray-800 mb-3">{{ __('messages.sizes') }}</h3>
+        <div class="grid grid-cols-4 gap-2">
+            @foreach ($availableSpecifications['sizes'] as $size)
+                @php $isSelected = in_array($size, $selectedSizes); @endphp
+                <label class="flex items-center justify-center">
+                    <input type="checkbox" name="sizes[]" value="{{ $size }}" class="hidden"
+                        {{ $isSelected ? 'checked' : '' }}
+                        onchange="document.getElementById('filterForm').submit()">
+                    <div class="size-button w-[71px] bg-[#EDEDED] py-1 text-center px-2 rounded {{ $isSelected ? 'border border-[#185D31]' : '' }}">
+                        {{ $size }}
+                    </div>
+                </label>
+            @endforeach
+        </div>
+    </div>
+@endif
+
+
+{{-- MATERIAL TYPE --}}
+@php
+    $selectedMaterial = request('material_type');
+@endphp
+
+@if (!empty($availableSpecifications['material_type']))
+    <div class="mb-6 border-b pb-3">
+        <h3 class="text-lg font-semibold text-gray-800 mb-3">{{ __('messages.material_type') }}</h3>
+        @foreach ($availableSpecifications['material_type'] as $materialType)
+            <label class="inline-flex items-center space-x-2">
+                <input type="checkbox" name="material_type" value="{{ $materialType }}"
+                    class="form-checkbox h-[20px] w-[20px] rounded-[6px] border-2 border-black focus:ring-[#185D31] accent-[#185D31] rtl:ml-2"
+                    {{ $selectedMaterial == $materialType ? 'checked' : '' }}
+                    onchange="document.getElementById('filterForm').submit()">
+                <span class="text-[#212121] text-base">{{ $materialType }}</span>
+            </label>
         @endforeach
+    </div>
+@endif
 
         {{-- Rating --}}
         <div class="mb-6 border-b pb-3">
@@ -343,14 +348,14 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
                             </svg>
                     @if ($currentCategory)
-                        <a href="#" class="hover:underline">{{ $currentCategory->name_ar }}</a>
+                        <a href="#" class="hover:underline">{{ $currentCategory->name }}</a>
                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4 mx-1 mt-1">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
                             </svg>                    @endif
 
                     @if ($currentSubCategory)
                         <a href="{{ route('products.index', ['sub_category_id' => $currentSubCategory->id]) }}"
-                            class="hover:underline">{{ $currentSubCategory->name_ar }}</a>
+                            class="hover:underline">{{ $currentSubCategory->name }}</a>
                     @endif
         
                 </p>
@@ -419,28 +424,25 @@
                     @forelse ($products as $product)
                         <div class="product-card bg-white rounded-xl overflow-hidden shadow-md flex flex-col">
                             <div class="relative w-full h-48 sm:h-56 overflow-hidden product-image-swiper inner-swiper">
-                                <div class="swiper-wrapper">
-                                    @php
-                                        $images = is_string($product->images)
-                                            ? json_decode($product->images, true)
-                                            : $product->images ?? [];
-                                    @endphp
-                                    @if (!empty($images) && count($images) > 0)
-                                        @foreach ($images as $image)
-                                            <div class="swiper-slide">
-                                                <img src="{{ asset($image) }}"
-                                                    onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
-                                                    class="w-full h-full object-contain">
-                                            </div>
-                                        @endforeach
-                                    @else
-                                        <div class="swiper-slide">
-                                            <img src="{{ asset($product->image ?? 'https://placehold.co/300x200/F0F0F0/ADADAD?text=No+Image') }}"
-                                                onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
-                                                class="w-full h-full object-contain">
-                                        </div>
-                                    @endif
-                                </div>
+                                  <div class="swiper-wrapper">
+                                @php
+                                    $images = collect(is_string($product->images) ? json_decode($product->images, true) : ($product->images ?? []));
+                                @endphp
+
+                                @forelse ($images as $image)
+                                    <div class="swiper-slide">
+                                        <img src="{{ Storage::url($image) }}"
+                                             onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
+                                             class="w-full h-full object-contain">
+                                    </div>
+                                @empty
+                                    <div class="swiper-slide">
+                                        <img src="{{ asset($product->image ?? 'https://placehold.co/300x200/F0F0F0/ADADAD?text=No+Image') }}"
+                                             onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
+                                             class="w-full h-full object-contain">
+                                    </div>
+                                @endforelse
+                            </div>
                                 @php
                                     $images = is_string($product->images)
                                         ? json_decode($product->images, true)
@@ -483,15 +485,15 @@
                                 <span
                                     class="text-[#696969] text-[20px]">{{ $product->subCategory->category->name ?? 'غير مصنف' }}</span>
                                 <div class="flex mt-2">
-                                    @if ($product->supplier_confirmed)
+                                    @if ($product->supplier->supplier_confirmed)
                                         <span class="flex items-center text-[#185D31]">
                                             <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]"
                                                 src="{{ asset('images/Success.svg') }}" alt="Confirmed Supplier">
-                                            <p class="text-[20px] text-[#212121] ">{{ $product->supplier_name }}
+                                            <p class="text-[20px] text-[#212121] ">{{ $product->supplier->company_name }}
                                             </p>
                                         </span>
                                     @else
-                                        <p class="text-[20px] text-[#212121] ">{{ $product->supplier_name }}
+                                        <p class="text-[20px] text-[#212121] ">{{ $product->supplier->company_name }}
                                         </p>
                                     @endif
                                 </div>

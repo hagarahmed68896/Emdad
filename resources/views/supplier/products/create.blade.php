@@ -6,15 +6,13 @@
 <div class="mx-[64px] mb-4 bg-white rounded-xl mt-4"
      x-data="{
          previews: [],
-         preview: '', // optional main preview
+         preview: '', 
          selectedCategoryId: null,
-         selectedSubcategoryId: null,mk
+         selectedSubcategoryId: null,
          newWholesaleItem: { from: '', to: '', price: '' },
          wholesalePrices: [],
          newSize: '',
          sizes: [],
-         newColor: '',
-         colors: [],
          handleFiles(e) {
              const files = e.target.files;
              this.previews = [];
@@ -45,15 +43,7 @@
          removeSize(index) {
              this.sizes.splice(index, 1);
          },
-         addColor() {
-             if (this.newColor.trim() !== '') {
-                 this.colors.push(this.newColor);
-                 this.newColor = '';
-             }
-         },
-         removeColor(index) {
-             this.colors.splice(index, 1);
-         }
+
      }">
 
 
@@ -310,22 +300,96 @@ class="absolute top-1 left-1 bg-red-500 text-white rounded-full p-1 leading-none
 </div>
 
 {{-- ✅ الألوان --}}
-<div>
+<div x-data="{
+    newColorName: '',
+    newColorImage: null,
+    colors: [],
+    addColor() {
+        if (!this.newColorName) return; // ✅ require at least name
+
+        if (this.newColorImage) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                this.colors.push({
+                    name: this.newColorName,
+                    image: e.target.result
+                });
+                this.resetInputs();
+            };
+            reader.readAsDataURL(this.newColorImage);
+        } else {
+            // ✅ Add without image
+            this.colors.push({
+                name: this.newColorName,
+                image: null
+            });
+            this.resetInputs();
+        }
+    },
+    resetInputs() {
+        this.newColorName = '';
+        this.newColorImage = null;
+        if (this.$refs.imageInput) {
+            this.$refs.imageInput.value = null;
+        }
+    },
+    removeColor(index) {
+        this.colors.splice(index, 1);
+    }
+}">
+    {{-- ✅ Color Name --}}
     <label class="block mb-1 font-bold">{{ __('messages.available_colors') }}</label>
-    <div class="flex items-center gap-2 mb-4">
-        <input type="text" x-model="newColor" placeholder="{{ __('messages.available_colors') }}" class="border p-2 w-full rounded-xl">
-        <button type="button" @click="addColor" class="bg-[#185D31] text-white px-4 py-2 rounded-xl h-full">{{ __('messages.add') }}</button>
+
+    {{-- Input group (responsive) --}}
+    <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-4">
+        <input type="text"
+               x-model="newColorName"
+               placeholder="{{ __('messages.color_name') }}"
+               class="border p-2 w-full rounded-xl">
+
+        {{-- ✅ Color Image --}}
+        <input type="file"
+               x-ref="imageInput"
+               @change="newColorImage = $event.target.files[0]"
+               accept="image/*"
+               class="border p-2 rounded-xl w-full sm:w-auto">
+
+        {{-- ✅ Add Button --}}
+        <button type="button"
+                @click="addColor"
+                class="bg-[#185D31] text-white px-4 py-2 rounded-xl w-full sm:w-auto">
+            {{ __('messages.add') }}
+        </button>
     </div>
+
+    {{-- ✅ Show colors --}}
     <div class="flex flex-wrap gap-2" x-show="colors.length > 0">
         <template x-for="(color, index) in colors" :key="index">
-            <div class="bg-gray-100 rounded-full px-4 py-1 flex items-center gap-2">
-                <input type="hidden" name="colors[]" :value="color">
-                <span x-text="color"></span>
-                <button type="button" @click="removeColor(index)" class="text-red-500 text-sm font-bold">x</button>
+            <div class="bg-gray-100 rounded-xl px-4 py-2 flex items-center gap-3 w-full sm:w-auto">
+                {{-- Hidden input --}}
+                <input type="hidden" name="colors[]" :value="JSON.stringify(color)">
+
+                {{-- Show color name --}}
+                <span x-text="color.name" class="font-bold"></span>
+
+                {{-- Show preview image if exists --}}
+                <template x-if="color.image">
+                    <img :src="color.image" alt="color" class="w-8 h-8 rounded-full object-cover border">
+                </template>
+
+                {{-- Remove button --}}
+                <button type="button"
+                        @click="removeColor(index)"
+                        class="text-red-500 text-sm font-bold">
+                    ✕
+                </button>
             </div>
         </template>
     </div>
 </div>
+
+
+
         {{-- ✅ باقي الحقول --}}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>

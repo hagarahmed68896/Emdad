@@ -85,28 +85,24 @@
                     <div class="product-card bg-white rounded-xl overflow-hidden shadow-md flex flex-col">
                         {{-- Product Image Carousel (Inner Swiper) --}}
                         <div class="relative w-full h-48 sm:h-56 overflow-hidden product-image-swiper inner-swiper">
-                            <div class="swiper-wrapper">
+                             <div class="swiper-wrapper">
                                 @php
-                                    $images = is_string($product->images)
-                                        ? json_decode($product->images, true)
-                                        : $product->images ?? [];
+                                    $images = collect(is_string($product->images) ? json_decode($product->images, true) : ($product->images ?? []));
                                 @endphp
 
-                                @if (!empty($images) && count($images) > 0)
-                                    @foreach ($images as $image)
-                                        <div class="swiper-slide">
-                                            <img src="{{ asset($image) }}"
-                                                onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
-                                                class="w-full h-full object-contain">
-                                        </div>
-                                    @endforeach
-                                @else
+                                @forelse ($images as $image)
+                                    <div class="swiper-slide">
+                                        <img src="{{ Storage::url($image) }}"
+                                             onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
+                                             class="w-full h-full object-contain">
+                                    </div>
+                                @empty
                                     <div class="swiper-slide">
                                         <img src="{{ asset($product->image ?? 'https://placehold.co/300x200/F0F0F0/ADADAD?text=No+Image') }}"
-                                            onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
-                                            class="w-full h-full object-contain">
+                                             onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
+                                             class="w-full h-full object-contain">
                                     </div>
-                                @endif
+                                @endforelse
                             </div>
                             {{-- Inner Swiper Pagination --}}
                          @php
@@ -161,10 +157,10 @@
                                     <span class="flex items-center text-[#185D31]">
                                         <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]"
                                             src="{{ asset('images/Success.svg') }}" alt="Confirmed Supplier">
-                                        <p class="text-[20px] text-[#212121] ">{{ $product->supplier_name }}</p>
+                                        <p class="text-[20px] text-[#212121] ">{{ $product->supplier->company_name }}</p>
                                     </span>
                                 @else
-                                    <p class="text-[20px] text-[#212121] ">{{ $product->supplier_name }}</p>
+                                    <p class="text-[20px] text-[#212121] ">{{ $product->supplier->company_name }}</p>
                                 @endif
                             </div>
                             <div class="flex items-center mb-2">

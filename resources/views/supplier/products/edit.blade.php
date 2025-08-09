@@ -15,8 +15,6 @@
             newWholesaleItem: { from: '', to: '', price: '' },
             sizes: @json($product->sizes ?? []),
             newSize: '',
-            colors: @json($product->colors ?? []),
-            newColor: '',
             selectedSubCategory: @json($product->subCategory),
             selectedCategory: @json($product->subCategory->category),
             openCategory: false,
@@ -64,15 +62,8 @@
             removeSize(index) {
                 this.sizes.splice(index, 1);
             },
-            addColor() {
-                if (this.newColor.trim() !== '') {
-                    this.colors.push(this.newColor);
-                    this.newColor = '';
-                }
-            },
-            removeColor(index) {
-                this.colors.splice(index, 1);
-            },
+ 
+
                     // ✅ New method to re-populate state from server errors
             repopulateState(errors) {
                 // Repopulate dynamic wholesale prices
@@ -191,7 +182,7 @@
                         <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                     </svg>
                 </div>
-                <ul x-show="openCategory" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-xl max-h-60 overflow-y-auto">
+                <ul x-show="openCategory" x-cloak class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-xl max-h-60 overflow-y-auto">
                     @foreach ($categories as $category)
                         <li @click="selectedCategory = {id: {{ $category->id }}, name: '{{ $category->name }}'}; selectedSubCategory = null; openCategory = false;"
                             class="p-2 cursor-pointer hover:bg-gray-100 flex items-center">
@@ -213,7 +204,7 @@
                         <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                     </svg>
                 </div>
-                <ul x-show="openSubCategory" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-xl max-h-60 overflow-y-auto">
+                <ul x-show="openSubCategory" x-cloak class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-xl max-h-60 overflow-y-auto">
                     <template x-if="selectedCategory">
                         <template x-for="sub in window.subCategories[selectedCategory.id]" :key="sub.id">
                             <li @click="selectedSubCategory = {id: sub.id, name: sub.name}; openSubCategory = false"
@@ -301,23 +292,82 @@
             </div>
         </div>
 
-        {{-- ✅ الألوان --}}
-        <div>
-            <label class="block mb-1 font-bold">{{ __('messages.available_colors') }}</label>
-            <div class="flex items-center gap-2 mb-4">
-                <input type="text" x-model="newColor" placeholder="{{ __('messages.available_colors') }}" class="border p-2 w-full rounded-xl">
-                <button type="button" @click="addColor" class="bg-[#185D31] text-white px-4 py-2 rounded-xl h-full">{{ __('messages.add') }}</button>
-            </div>
-            <div class="flex flex-wrap gap-2" x-show="colors.length > 0">
-                <template x-for="(color, index) in colors" :key="index">
-                    <div class="bg-gray-100 rounded-full px-4 py-1 flex items-center gap-2">
-                        <input type="hidden" name="colors[]" :value="color">
-                        <span x-text="color"></span>
-                        <button type="button" @click="removeColor(index)" class="text-red-500 text-sm font-bold">x</button>
-                    </div>
+{{-- ✅ الألوان --}}
+<script>
+    window.productColors = @json($productColorsJson);
+</script>
+
+<div x-data="{
+    newColor: '',
+    newColorImage: null,
+    colors: window.productColors ?? [],
+    addColor() {
+        if (!this.newColor) return;
+
+        if (this.newColorImage) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                this.colors.push({
+                    name: this.newColor,
+                    image: e.target.result
+                });
+                this.resetFields();
+            };
+            reader.readAsDataURL(this.newColorImage);
+        } else {
+            // No image provided
+            this.colors.push({
+                name: this.newColor,
+                image: null
+            });
+            this.resetFields();
+        }
+    },
+    resetFields() {
+        this.newColor = '';
+        this.newColorImage = null;
+        if (this.$refs.colorImageInput) {
+            this.$refs.colorImageInput.value = null;
+        }
+    },
+    removeColor(index) {
+        this.colors.splice(index, 1);
+    }
+}">
+
+    <label class="block mb-1 font-bold">{{ __('messages.available_colors') }}</label>
+
+    <div class="flex flex-col md:flex-row md:items-center gap-2 mb-4">
+        <input type="text" x-model="newColor" placeholder="{{ __('messages.color_name') }}" class="border p-2 rounded-xl w-full">
+
+        <input type="file" @change="e => newColorImage = e.target.files[0]" x-ref="colorImageInput" accept="image/*" class="border p-2 rounded-xl w-full">
+
+        <button type="button" @click="addColor" class="bg-[#185D31] text-white px-4 py-2 rounded-xl h-full">
+            {{ __('messages.add') }}
+        </button>
+    </div>
+
+    <div class="flex flex-wrap gap-2" x-show="colors.length > 0">
+        <template x-for="(color, index) in colors" :key="index">
+            <div class="bg-gray-100 rounded-xl px-4 py-2 flex items-center gap-4">
+                <input type="hidden" name="colors[]" :value="JSON.stringify(color)">
+                <template x-if="color.image">
+                    <img :src="color.image" class="w-8 h-8 rounded-full object-cover border">
                 </template>
+                <span x-text="color.name" class="font-bold"></span>
+                <button type="button" @click="removeColor(index)" class="text-red-500 text-sm font-bold">x</button>
             </div>
-        </div>
+        </template>
+    </div>
+</div>
+
+
+
+
+
+
+
+
         
         {{-- ✅ باقي الحقول --}}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -488,12 +538,12 @@
                 <form :action="'/products/' + confirmingId" method="POST">
                     @csrf
                     @method('DELETE')
-      <button 
+    <button 
     type="submit" 
     x-bind:disabled="loading" 
     x-on:click="loading = true; window.scrollTo({ top: 0, behavior: 'smooth' });" 
     class="bg-[#185D31] text-white px-6 py-3 rounded-xl"
->                        {{ __('messages.delete') }}
+>                       {{ __('messages.delete') }}
                     </button>
                 </form>
             </div>

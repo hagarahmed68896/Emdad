@@ -21,110 +21,93 @@ class ProductController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\View\View
      */
-public function index(Request $request)
+
+   public function index(Request $request)
     {
-        // 1. Initialize queries
+        // Initial query builders for products and filter options
         $productsQuery = Product::with('subCategory.category');
-        // This query will be used to determine the *available* filter options
-        // It should start with general filters (search, category, etc.)
-        // but NOT specific specification filters, rating, price range, etc.,
-        // as those should be used to filter the *products*, not the *available options*.
-        // We will apply general context filters to filterOptionsQuery.
         $filterOptionsBaseQuery = Product::query();
 
-        // 2. Apply general contextual filters to BOTH queries
-        // These filters narrow down the *set of products* for which
-        // we want to display filter options.
+        // === Filtering Logic ===
 
-        // Apply Search Filter
+        // Search filter
         if ($request->filled('search')) {
             $search = $request->input('search');
-            $productsQuery->where(function($q) use ($search) {
-                $q->where('name', 'like', '%' . $search . '%')
-                  ->orWhere('description', 'like', '%' . $search . '%');
+            $productsQuery->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%$search%")
+                  ->orWhere('description', 'like', "%$search%");
             });
-            $filterOptionsBaseQuery->where(function($q) use ($search) {
-                $q->where('name', 'like', '%' . $search . '%')
-                  ->orWhere('description', 'like', '%' . $search . '%');
+            $filterOptionsBaseQuery->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%$search%")
+                  ->orWhere('description', 'like', "%$search%");
             });
         }
 
-        // Apply Sub Category Filter
+        // Subcategory filter
         if ($request->filled('sub_category_id')) {
             $productsQuery->where('sub_category_id', $request->input('sub_category_id'));
             $filterOptionsBaseQuery->where('sub_category_id', $request->input('sub_category_id'));
         }
 
-        // Apply Trusted Factory (supplier_confirmed)
+        // Supplier confirmed filter (using whereHas for the relationship)
         if ($request->has('supplier_confirmed') && $request->input('supplier_confirmed') == '1') {
-            $productsQuery->where('supplier_confirmed', true);
-            $filterOptionsBaseQuery->where('supplier_confirmed', true);
+            $productsQuery->whereHas('supplier', function ($q) {
+                $q->where('supplier_confirmed', true);
+            });
+            $filterOptionsBaseQuery->whereHas('supplier', function ($q) {
+                $q->where('supplier_confirmed', true);
+            });
         }
 
-        // Filter by Delivery Date (only for products, not for options derivation)
-        // If you want delivery options to reflect current delivery filter, apply it to options query too
+        // Delivery date filter
         if ($request->filled('delivery_date')) {
-            try {
-                $maxDays = (int) $request->input('delivery_date');
-                $productsQuery->where('estimated_delivery_days', '<=', $maxDays);
-                // $filterOptionsBaseQuery->where('estimated_delivery_days', '<=', $maxDays); // Uncomment if options should narrow based on delivery
-            } catch (\Exception $e) {
-                Log::warning("Invalid delivery_date (expected integer days): " . $request->input('delivery_date') . " - " . $e->getMessage());
-            }
+            $productsQuery->where('estimated_delivery_days', '<=', (int) $request->input('delivery_date'));
         }
 
-        // Filter by Minimum Order Quantity (only for products, not for options derivation)
+        // Quantity, price, rating
         if ($request->filled('min_order_quantity')) {
             $productsQuery->where('min_order_quantity', '>=', (int) $request->input('min_order_quantity'));
-            // $filterOptionsBaseQuery->where('min_order_quantity', '>=', (int) $request->input('min_order_quantity')); // Uncomment if options should narrow based on MOQ
         }
-
-        // Filter by Price Range (only for products, not for options derivation)
         if ($request->filled('min_price')) {
             $productsQuery->where('price', '>=', (float) $request->input('min_price'));
-            // $filterOptionsBaseQuery->where('price', '>=', (float) $request->input('min_price')); // Uncomment if options should narrow based on price
         }
         if ($request->filled('max_price')) {
             $productsQuery->where('price', '<=', (float) $request->input('max_price'));
-            // $filterOptionsBaseQuery->where('price', '<=', (float) $request->input('max_price')); // Uncomment if options should narrow based on price
         }
-
-        // Filter by Rating (only for products, not for options derivation)
         if ($request->filled('rating')) {
             $productsQuery->where('rating', '>=', (float) $request->input('rating'));
-            // $filterOptionsBaseQuery->where('rating', '>=', (float) $request->input('rating')); // Uncomment if options should narrow based on rating
         }
 
-
-        // 3. Apply SPECIFIC filter values (from request) to the $productsQuery only
-        // These are the filters that actually narrow down the displayed products.
-        $filterableSpecifications = Config::get('products.filterable_specifications', []);
-        foreach ($filterableSpecifications as $specKey => $specConfig) {
-            if ($request->has($specKey) && is_array($request->input($specKey))) {
-                $selectedOptions = array_filter($request->input($specKey));
-
-                if (!empty($selectedOptions)) {
-                    $productsQuery->where(function($q) use ($specKey, $selectedOptions, $specConfig) {
-                        foreach ($selectedOptions as $optionValue) {
-                            if ($specKey === 'colors') {
-                                // For colors, query by 'name' property within the JSON array
-                                $q->orWhereJsonContains("specifications->{$specKey}", ['name' => $optionValue]);
-                                // Also handle cases where color is a simple string directly in the array
-                                $q->orWhereJsonContains("specifications->{$specKey}", $optionValue);
-                            } elseif ($specConfig['type'] === 'array_of_strings') {
-                                // For array of strings (like 'size'), check if the value exists in the array
-                                $q->orWhereJsonContains("specifications->{$specKey}", $optionValue);
-                            } else {
-                                // For single string values (gender, material, processor, etc.)
-                                $q->orWhere("specifications->{$specKey}", $optionValue);
-                            }
-                        }
-                    });
-                }
+        // === Filter by COLORS ===
+        if ($request->has('colors') && is_array($request->input('colors'))) {
+            $selectedColors = array_filter($request->input('colors'));
+            if (!empty($selectedColors)) {
+                $productsQuery->where(function ($query) use ($selectedColors) {
+                    foreach ($selectedColors as $value) {
+                        $query->orWhereJsonContains('colors->name', $value);
+                    }
+                });
             }
         }
 
-        // Filter by Description (if it's a top-level column, not in specifications JSON)
+        // === Filter by SIZES ===
+        if ($request->has('sizes') && is_array($request->input('sizes'))) {
+            $selectedSizes = array_filter($request->input('sizes'));
+            if (!empty($selectedSizes)) {
+                $productsQuery->where(function ($query) use ($selectedSizes) {
+                    foreach ($selectedSizes as $size) {
+                        $query->orWhereJsonContains('sizes', $size);
+                    }
+                });
+            }
+        }
+
+        // === Filter by MATERIAL TYPE ===
+        if ($request->filled('material_type')) {
+            $productsQuery->where('material_type', $request->input('material_type'));
+        }
+
+        // === Filter by Description ===
         if ($request->has('description') && is_array($request->input('description'))) {
             $selectedDescriptions = array_filter($request->input('description'));
             if (!empty($selectedDescriptions)) {
@@ -132,73 +115,81 @@ public function index(Request $request)
             }
         }
 
-
-        // 4. Apply Sorting to the main products query
-        // if ($request->filled('sort_by')) {
-        //     switch ($request->input('sort_by')) {
-        //         case 'price_asc':
-        //             $productsQuery->orderBy('price', 'asc');
-        //             break;
-        //         case 'price_desc':
-        //             $productsQuery->orderBy('price', 'desc');
-        //             break;
-        //         case 'latest':
-        //             $productsQuery->latest();
-        //             break;
-        //         case 'rating_desc':
-        //             $productsQuery->orderBy('rating', 'desc');
-        //             break;
-        //         default:
-        //             $productsQuery->latest();
-        //             break;
-        //     }
-        // } else {
-        //     $productsQuery->latest();
-        // }
-        // Assuming $productsQuery is your Eloquent query builder instance (e.g., Product::query())
-
-if ($request->filled('sort_by')) {
-    switch ($request->input('sort_by')) {
-        case 'price_asc':
-            // Sort by discounted price if an active offer exists, otherwise by original price (ASC)
-            $productsQuery->orderByRaw('
-                CASE
-                    WHEN is_offer = 1 AND offer_expires_at > NOW() THEN price * (1 - discount_percent / 100)
-                    ELSE price
-                END ASC
-            ');
-            break;
-        case 'price_desc':
-            // Sort by discounted price if an active offer exists, otherwise by original price (DESC)
-            $productsQuery->orderByRaw('
-                CASE
-                    WHEN is_offer = 1 AND offer_expires_at > NOW() THEN price * (1 - discount_percent / 100)
-                    ELSE price
-                END DESC
-            ');
-            break;
-        case 'latest':
+        // === Sorting ===
+        if ($request->filled('sort_by')) {
+            switch ($request->input('sort_by')) {
+                case 'price_asc':
+                    $productsQuery->orderByRaw("CASE WHEN is_offer = 1 AND offer_expires_at > NOW() THEN price * (1 - discount_percent / 100) ELSE price END ASC");
+                    break;
+                case 'price_desc':
+                    $productsQuery->orderByRaw("CASE WHEN is_offer = 1 AND offer_expires_at > NOW() THEN price * (1 - discount_percent / 100) ELSE price END DESC");
+                    break;
+                case 'latest':
+                    $productsQuery->latest();
+                    break;
+                case 'rating_desc':
+                    $productsQuery->orderBy('rating', 'desc');
+                    break;
+                default:
+                    $productsQuery->latest();
+                    break;
+            }
+        } else {
             $productsQuery->latest();
-            break;
-        case 'rating_desc':
-            $productsQuery->orderBy('rating', 'asc');
-            break;
-        default:
-            // Default sorting if an invalid 'sort_by' value is provided
-            $productsQuery->latest();
-            break;
-    }
-} else {
-    // Default sorting if 'sort_by' is not provided in the request
-    $productsQuery->latest();
-}
+        }
 
-// ... rest of your controller logic to paginate or get results ...
-
-        // 5. Get the paginated product results
         $products = $productsQuery->paginate(12)->withQueryString();
 
-        // 6. Define fixed data for the view
+        // === Fetching Available Filter Values (for UI) ===
+        $availableSpecifications = [];
+
+        // Available COLORS
+        // The original code was too complex and had a key error. This is the cleaner, correct way.
+        $availableSpecifications['colors'] = $filterOptionsBaseQuery->clone()
+            ->pluck('colors')
+            ->filter()
+            ->flatten(1)
+            ->unique('name')
+            ->map(function ($color) {
+                $imagePath = $color['image'] ?? null;
+                $isBase64 = $imagePath && str_starts_with($imagePath, 'data:image');
+                $imageSrc = $isBase64 ? $imagePath : asset($imagePath);
+                return [
+                    'name' => $color['name'] ?? null,
+                    'image' => $imageSrc,
+                ];
+            })
+            ->values()
+            ->toArray();
+
+        // Available SIZES
+        $availableSpecifications['sizes'] = $filterOptionsBaseQuery->clone()
+            ->pluck('sizes')
+            ->filter()
+            ->flatten()
+            ->unique()
+            ->values()
+            ->toArray();
+
+        // Available MATERIAL TYPES
+        $availableSpecifications['material_type'] = $filterOptionsBaseQuery->clone()
+            ->whereNotNull('material_type')
+            ->pluck('material_type')
+            ->unique()
+            ->values()
+            ->toArray();
+
+        // === Other available filters ===
+        $availableDescriptions = $filterOptionsBaseQuery->clone()
+            ->distinct()
+            ->whereNotNull('description')
+            ->pluck('description')
+            ->sort()
+            ->values()
+            ->toArray();
+
+        $availableSubCategories = SubCategory::has('products')->get();
+
         $deliveryOptions = [
             '5' => ['label_key' => 'delivery_in_days', 'days_param' => 5],
             '10' => ['label_key' => 'delivery_in_days', 'days_param' => 10],
@@ -206,97 +197,11 @@ if ($request->filled('sort_by')) {
         ];
 
         $colorHexMap = [
-            'Red' => '#FF0000', 'Blue' => '#0000FF', 'Green' => '#008000', 'Yellow' => '#FFFF00',
-            'Orange' => '#FFA500', 'Purple' => '#800080', 'Black' => '#000000', 'White' => '#FFFFFF',
-            'Gray' => '#808080', 'Brown' => '#A52A2A', 'Pink' => '#FFC0CB', 'Turquoise' => '#40E0D0',
-            'Navy' => '#000080', 'Maroon' => '#800000', 'Silver' => '#C0C0C0', 'Gold' => '#FFD700',
-            'Cyan' => '#00FFFF', 'Magenta' => '#FF00FF', 'Lime' => '#00FF00', 'Teal' => '#008080',
-            'Olive' => '#808000', 'Nike Red' => '#BB0000', 'Adidas Blue' => '#0050A0',
-            'Pink-purpple' => '#DDB7D3', 'Caffe' => '#e9dcd9',
-            // Add Arabic names if your database uses them consistently
             'أحمر' => '#FF0000', 'أزرق' => '#0000FF', 'أخضر' => '#008000', 'أصفر' => '#FFFF00',
-            'برتقالي' => '#FFA500', 'بنفسجي' => '#800080', 'أسود' => '#000000', 'أبيض' => '#FFFFFF',
-            'رمادي' => '#808080', 'بني' => '#A52A2A', 'وردي' => '#FFC0CB', 'تركواز' => '#40E0D0',
-            'كحلي' => '#000080', 'عنابي' => '#800000', 'فضي' => '#C0C0C0', 'ذهبي' => '#FFD700',
-            'سماوي' => '#00FFFF', 'أرجواني' => '#FF00FF', 'ليموني' => '#00FF00', 'بطيخي' => '#008080',
-            'زيتي' => '#808000', 'أحمر نايكي' => '#BB0000', 'أزرق أديداس' => '#0050A0',
-            'Blue Titanium' => '#4682B4', // Make sure this is in your map if used
-            'Brown Titanium' => '#8B4513', // Make sure this is in your map if used
-            'Gold Titanium' => '#FFD700', // Make sure this is in your map if used
+            'أسود' => '#000000', 'أبيض' => '#FFFFFF', 'رمادي' => '#808080',
         ];
 
-        // 7. Generate Available Filter Options for Dynamic Specifications
-        // This must be done from $filterOptionsBaseQuery which has only the broad context filters applied.
-        $availableSpecifications = [];
-        foreach ($filterableSpecifications as $specKey => $specConfig) {
-            $options = [];
-            $allExtractedValues = $filterOptionsBaseQuery->clone()
-                ->select(DB::raw("JSON_EXTRACT(specifications, '$.{$specKey}') as extracted_json"))
-                ->get()
-                ->pluck('extracted_json')
-                ->filter(); // Remove nulls
-
-            foreach ($allExtractedValues as $jsonValue) {
-                $decoded = json_decode($jsonValue, true);
-
-                if (json_last_error() !== JSON_ERROR_NONE) {
-                    Log::error("JSON Decode Error for key '{$specKey}': " . json_last_error_msg() . " - Value: " . $jsonValue);
-                    continue; // Skip this malformed JSON value
-                }
-
-                if ($specKey === 'colors') {
-                    // Handle colors which can be ['Orange'] or [{'name': 'Blue', 'swatch': '...'}]
-                    if (is_array($decoded)) {
-                        foreach ($decoded as $color) {
-                            if (is_array($color) && isset($color['name'])) {
-                                $options[$color['name']] = ['name' => $color['name'], 'swatch_image' => $color['swatch_image'] ?? null];
-                            } elseif (is_string($color)) {
-                                $options[$color] = ['name' => $color, 'swatch_image' => null]; // For simple string colors
-                            }
-                        }
-                    } elseif (is_string($decoded)) { // Handle case where 'colors' might contain a single string
-                        $options[$decoded] = ['name' => $decoded, 'swatch_image' => null];
-                    }
-                } elseif ($specConfig['type'] === 'array_of_strings' && is_array($decoded)) {
-                    // Handle generic arrays of strings (e.g., size, features, storage_gb)
-                    foreach ($decoded as $item) {
-                        if (is_string($item) || is_numeric($item)) { // Ensure it's a scalar value
-                            $options[(string) $item] = (string) $item;
-                        }
-                    }
-                } elseif ($specConfig['type'] === 'string' && (is_string($decoded) || is_numeric($decoded) || is_bool($decoded))) {
-                    // Handle simple string values (e.g., gender, material, processor)
-                    if (is_bool($decoded)) {
-                        $options[(string)$decoded] = $decoded ? __('messages.yes') : __('messages.no');
-                    } else {
-                        $options[(string) $decoded] = (string) $decoded;
-                    }
-                }
-            }
-            // Sort and store the unique options
-            if ($specKey === 'colors') {
-                // Sort colors by name
-                uksort($options, function($a, $b) {
-                    return strcasecmp($a, $b);
-                });
-                $availableSpecifications[$specKey] = array_values($options); // Re-index after sorting
-            } else {
-                $availableSpecifications[$specKey] = array_values(array_unique($options));
-                sort($availableSpecifications[$specKey]);
-            }
-        }
-
-        // 8. Fetch distinct descriptions (assuming it's still a top-level column for filters)
-        // This should also use the $filterOptionsBaseQuery for context.
-        $availableDescriptions = $filterOptionsBaseQuery->clone()->distinct()->whereNotNull('description')
-                               ->pluck('description')->sort()->values()->toArray();
-
-        // 9. Fetch available subcategories (for the subcategory filter itself)
-        // This usually should list all subcategories, or subcategories that have products under current general filters.
-        $availableSubCategories = SubCategory::has('products')->get(); // Only show subcategories with products
-
-
-        // 10. Prepare data for breadcrumbs
+        // Category context
         $currentCategory = null;
         $currentSubCategory = null;
         if ($request->filled('sub_category_id')) {
@@ -306,10 +211,6 @@ if ($request->filled('sort_by')) {
             }
         }
 
-        // For debugging available specifications, uncomment this:
-        // dd($availableSpecifications);
-
-        // 11. Pass all necessary data to the view
         return view('categories.product', compact(
             'products',
             'availableSpecifications',
@@ -321,6 +222,9 @@ if ($request->filled('sort_by')) {
             'colorHexMap'
         ));
     }
+
+
+
 
     /**
      * Display a listing of products that are currently on offer.
@@ -362,7 +266,7 @@ if ($request->filled('sort_by')) {
 
         // Get "You may also like" products: same subcategory AND same supplier name
  $relatedProducts = Product::where('sub_category_id', $product->sub_category_id)
-                          ->where('supplier_name', $product->supplier_name)
+                          ->where('business_data_id', $product->supplier->id)
                           ->where('id', '!=', $product->id)
                           ->inRandomOrder()
                           ->paginate(4);

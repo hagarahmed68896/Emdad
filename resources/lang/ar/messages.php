@@ -409,6 +409,8 @@ return [
 
     'Cancel' => 'تجاهل',
     'trash_product' => 'حذف المنتج',
+    'upload_color_image' => 'اختر صورة ل اللون',
+    'no_pricing_tiers_available' => 'لا يوجد اسعار جملة متاحة',
 
     
 
