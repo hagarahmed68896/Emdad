@@ -85,9 +85,9 @@
     </div>
 </section>
 
+@if($supplierCategoryCount > 1)
+    @include('supplier.supplier_categories', ['categories' => $supplierCategories])
+@endif
+
+@include('supplier.offers.index')
 @include('supplier.products.products')
-{{-- @include('partials/categories_choosed')
-@include( 'partials/best_offers')
-@include('partials/Promotional_Offer')
-@include('partials/Featured_products') --}}
-{{-- @endsection --}}

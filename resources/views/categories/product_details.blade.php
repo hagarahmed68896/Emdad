@@ -245,10 +245,10 @@
                         </div>
 
                         {{-- Discount Badge  --}}
-                        @if ($product->is_offer && $product->discount_percent)
+                        @if ($product->offer->is_offer && $product->offer->discount_percent)
                             <span
                                 class="absolute top-3 right-3 bg-[#FAE1DF] text-[#C62525] text-xs font-bold px-4 py-2 rounded-full z-10">
-                                {{ __('messages.discount_percentage', ['percent' => $product->discount_percent]) }}
+                                {{ __('messages.discount_percentage', ['percent' => $product->offer->discount_percent]) }}
                             </span>
                         @endif
 
@@ -350,11 +350,11 @@
                         <p
                             class="bg-white ml-4  md:mb-0 items-center text-center justify-center mb-2 h-[40px] px-[16px] py-[8px] rounded-[40px]">
                             {{ __('messages.selectable') }}</p>
-                        @if ($product->is_offer && $product->discount_percent)
+                        @if ($product->offer->is_offer && $product->offer->discount_percent)
                             <span
                                 class="h-[40px] bg-[#FAE1DF] text-[#C62525] text-xs font-bold px-3 rounded-full z-10
            flex items-center justify-center">
-                                {{ __('messages.discount_percentage', ['percent' => $product->discount_percent]) }}
+                                {{ __('messages.discount_percentage', ['percent' => $product->offer->discount_percent]) }}
                             </span>
                         @endif
                     </div>
@@ -371,12 +371,12 @@
                                     @endif
                                 </p>
                                 <p class="price-item text-[20px] md:text-[32px] text-[#212121] font-bold">
-                                    {{ number_format($tier['price'] * (1 - ($product->discount_percent ?? 0) / 100)) }}
+                                    {{ number_format($tier['price'] * (1 - ($product->offer->discount_percent ?? 0) / 100)) }}
 
                                     <img class="currency-symbol inline-block mx-1 md:w-[24px] md:h-[27px] w-[20px] h-[22px]"
                                         src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}" alt="Currency">
                                 </p>
-                                @if ($product->is_offer && $product->discount_percent)
+                                @if ($product->offer->is_offer && $product->offer->discount_percent)
                                     <p class="flex text-sm text-gray-400 line-through ">
                                         {{ number_format($product->price, 2) }}
                                         <img class="mx-1 w-[14px] h-[14px] mt-1 inline-block"
@@ -1063,10 +1063,10 @@
                                 @endphp
                                 <div class="swiper-pagination image-pagination"
                                     style="{{ count($images) <= 1 ? 'display:none;' : '' }}"></div>
-                                @if ($product->is_offer && $product->discount_percent)
+                                @if ($product->offer->is_offer && $product->offer->discount_percent)
                                     <span
                                         class="absolute top-3 right-3 bg-[#FAE1DF] text-[#C62525] text-xs font-bold px-[16px] py-[8px] rounded-full z-10">
-                                        {{ __('messages.discount_percentage', ['percent' => $product->discount_percent]) }}
+                                        {{ __('messages.discount_percentage', ['percent' => $product->offer->discount_percent]) }}
                                     </span>
                                 @endif
                                 <button
@@ -1112,11 +1112,11 @@
                                 </div>
                                 <div class="flex items-center mb-2">
                                     <span class=" flex text-lg font-bold text-gray-800">
-                                        {{ number_format($product->price * (1 - ($product->discount_percent ?? 0) / 100), 2) }}
+                                        {{ number_format($product->price * (1 - ($product->offer->discount_percent ?? 0) / 100), 2) }}
                                         <img class="mx-1 w-[20px] h-[21px]" src="{{ asset('images/Vector (3).svg') }}"
                                             alt="">
                                     </span>
-                                    @if ($product->is_offer && $product->discount_percent)
+                                    @if ($product->offer->is_offer && $product->offer->discount_percent)
                                         <span class="flex text-sm text-gray-400 line-through mr-2 mr-1">
                                             {{ number_format($product->price, 2) }}
                                             <img class="mx-1 w-[14px] h-[14px] mt-1 inline-block"

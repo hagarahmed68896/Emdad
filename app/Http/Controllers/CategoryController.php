@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\SubCategory;
 use App\Models\Product;
+use Illuminate\Support\Facades\Auth;
+
 
 use Illuminate\Http\Request;
 
@@ -50,4 +52,25 @@ public function filterByCategory($slug)
 
     return view('categories.index', compact('categories'));
 }
+
+public function userSubCategoriesWithProducts()
+{
+    $user = Auth::user();
+
+    if (!$user || !$user->business) {
+        return collect(); // no subcategories if user has no business
+    }
+
+    $businessId = $user->business->id;
+
+    // Get subcategories where the user's business products exist
+    $subCategories = SubCategory::whereHas('products', function ($query) use ($businessId) {
+        $query->where('business_data_id', $businessId); // match the business id column in products
+    })->with('category') // load parent category
+      ->get();
+
+    return view('supplier.supplier_sub_categories', compact('subCategories'));
+}
+
+
 }

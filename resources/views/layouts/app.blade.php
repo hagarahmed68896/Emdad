@@ -67,7 +67,7 @@
         @endauth
 
         {{-- HERO SECTION (Only for Home Page) --}}
-        @if (Request::is('/'))
+        @if (Request::is('/') || Request::is('supplier'))
             @auth
                 @if(Auth::user()->account_type === 'supplier')
                     @include('supplier.heroSection_supplier')

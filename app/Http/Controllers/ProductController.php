@@ -115,28 +115,38 @@ class ProductController extends Controller
             }
         }
 
-        // === Sorting ===
-        if ($request->filled('sort_by')) {
-            switch ($request->input('sort_by')) {
-                case 'price_asc':
-                    $productsQuery->orderByRaw("CASE WHEN is_offer = 1 AND offer_expires_at > NOW() THEN price * (1 - discount_percent / 100) ELSE price END ASC");
-                    break;
-                case 'price_desc':
-                    $productsQuery->orderByRaw("CASE WHEN is_offer = 1 AND offer_expires_at > NOW() THEN price * (1 - discount_percent / 100) ELSE price END DESC");
-                    break;
-                case 'latest':
-                    $productsQuery->latest();
-                    break;
-                case 'rating_desc':
-                    $productsQuery->orderBy('rating', 'desc');
-                    break;
-                default:
-                    $productsQuery->latest();
-                    break;
-            }
-        } else {
-            $productsQuery->latest();
-        }
+// === Sorting ===
+if ($request->filled('sort_by')) {
+    switch ($request->input('sort_by')) {
+        case 'price_asc':
+            $productsQuery->orderByRaw("
+                CASE 
+                    WHEN offers.id IS NOT NULL THEN products.price * (1 - offers.discount_percent / 100)
+                    ELSE products.price 
+                END ASC
+            ");
+            break;
+        case 'price_desc':
+            $productsQuery->orderByRaw("
+                CASE 
+                    WHEN offers.id IS NOT NULL THEN products.price * (1 - offers.discount_percent / 100)
+                    ELSE products.price 
+                END DESC
+            ");
+            break;
+        case 'latest':
+            $productsQuery->orderBy('products.created_at', 'desc');
+            break;
+        case 'rating_desc':
+            $productsQuery->orderBy('products.rating', 'desc');
+            break;
+        default:
+            $productsQuery->orderBy('products.created_at', 'desc');
+            break;
+    }
+} else {
+    $productsQuery->orderBy('products.created_at', 'desc');
+}
 
         $products = $productsQuery->paginate(12)->withQueryString();
 
@@ -232,21 +242,25 @@ class ProductController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function offers()
-    {
-        // Fetch products that are currently on offer and where the offer has not expired
-        $products = Product::with('subCategory.category')
-                           ->where('is_offer', true)
-                           ->where(function ($query) {
-                               $query->whereNull('offer_expires_at') // Offer never expires
-                                     ->orWhere('offer_expires_at', '>', now()); // Offer expires in the future
-                           })
-                           ->orderBy('created_at', 'desc')
-                           ->take(4) // Limiting to 4 products for a typical "featured offers" section
-                           ->get();
+public function offers()
+{
+    // Fetch products that have an active, non-expired offer
+    $products = Product::with(['subCategory.category', 'offer'])
+       ->whereHas('offer', function ($query) {
+       $query->where('start_date', '<=', now())
+          ->where(function ($q) {
+              $q->whereNull('offer_expires_at')
+                ->orWhere('offer_expires_at', '>', now());
+          });
+})
 
-        return view('offers', compact('products'));
-    }
+        ->orderBy('created_at', 'desc')
+        ->take(4)
+        ->get();
+
+    return view('offers', compact('products'));
+}
+
 
     /**
      * Display the specified product by its slug.
@@ -422,13 +436,13 @@ class ProductController extends Controller
                     $swatchImagePath = $swatchImageFile->store('products/swatches', 'public');
                     $processedColors[] = [
                         'name' => $colorName,
-                        'swatch_image' => $swatchImagePath,
+                        'image' => $swatchImagePath,
                     ];
                 } elseif ($colorName && isset($colorData['swatch_image_path_existing'])) {
                     // Handle case where an existing swatch image path is sent (e.g., on product edit)
                     $processedColors[] = [
                         'name' => $colorName,
-                        'swatch_image' => $colorData['swatch_image_path_existing'],
+                        'image' => $colorData['swatch_image_path_existing'],
                     ];
                 }
             }

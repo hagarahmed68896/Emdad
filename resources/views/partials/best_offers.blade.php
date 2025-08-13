@@ -113,7 +113,7 @@
 
 
                             {{-- DISCOUNT BADGE - MOVED HERE --}}
-                            @if ($product->is_offer && $product->discount_percent)
+                            @if ($product->offer->is_offer && $product->offer->discount_percent)
                                 <span
                                     class="absolute top-3 rtl:right-3 ltr:left-3 bg-[#FAE1DF] text-[#C62525] text-xs font-bold px-[16px] py-[8px] rounded-full z-10">
                                     {{-- Translated: Discount X % --}}
@@ -169,7 +169,7 @@
                                     <img class="mx-1 w-[20px] h-[21px]" src="{{ asset('images/Vector (3).svg') }}"
                                         alt="">
                                 </span>
-                                @if ($product->is_offer && $product->discount_percent)
+                                @if ($product->offer->is_offer && $product->offer->discount_percent)
                                     <span class="flex text-sm text-gray-400 line-through mr-2 mr-1">
                                         {{ number_format($product->price, 2) }}
                                       <img class="mx-1 w-[14px] h-[14px] mt-1 inline-block"

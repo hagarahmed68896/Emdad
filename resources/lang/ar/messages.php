@@ -411,6 +411,26 @@ return [
     'trash_product' => 'حذف المنتج',
     'upload_color_image' => 'اختر صورة ل اللون',
     'no_pricing_tiers_available' => 'لا يوجد اسعار جملة متاحة',
+    'myOffers' => 'عروضي',
+    'addOffer' => 'اضافة عرض', 'add_offer' => 'إضافة عرض',
+    'offer_image' => 'صورة العرض',
+    'offer_name' => 'اسم العرض',
+    'enter_offer_name' => 'أدخل اسم العرض',
+    'select_product' => 'اختر المنتج',
+    'enter_discount_percentage' => 'أدخل نسبة الخصم',
+    'offer_description' => 'وصف العرض',
+    'enter_offer_description' => 'أدخل وصف العرض',
+    'product_status' => 'حالة المنتج',
+    'select_product_status' => 'حدد حالة المنتج',
+    'ready_for_immediate_delivery' => 'جاهز للتوصيل الفوري',
+    'made_to_order' => 'حسب الطلب',
+    'no_offers' => 'لا توجد عروض حاليًا',
+    'discount_percentage_text' => 'خصم :percent%',
+    'offer_created_successfully' => 'تم إنشاء العرض بنجاح',
+    'offer_updated_successfully' => 'تم تحديث العرض بنجاح',
+    'offer_deleted_successfully' => 'تم حذف العرض بنجاح',
+    'update_offer' => 'تحديث العرض',
+
 
     
 

@@ -120,5 +120,10 @@ public function business()
     return $this->hasOne(BusinessData::class, 'user_id', 'id');
 }
 
+public function offers()
+{
+    return $this->hasMany(Offer::class);
+}
+
 
 }

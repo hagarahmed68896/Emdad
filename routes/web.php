@@ -30,6 +30,7 @@ use App\Http\Controllers\Admin\OrdersController;
 use App\Http\Controllers\Admin\ReviewsController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Supplier\SupplierProductController;
+use App\Http\Controllers\Supplier\OfferController;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -218,7 +219,8 @@ Route::middleware('web')->group(function () {
 
 
           // Supplier-specific routes
-          Route::get('/', [SupplierProductController::class, 'index'])
+          //products
+          Route::get('/supplier', [SupplierProductController::class, 'index'])
               ->name('supplier.products.index');
 
           Route::get('/supplier/products/create', [SupplierProductController::class, 'create'])->name('products.create');
@@ -227,6 +229,13 @@ Route::middleware('web')->group(function () {
           Route::delete('/products/{product}', [SupplierProductController::class, 'destroy'])->name('products.destroy');
           Route::patch('/products/{product}', [SupplierProductController::class, 'update'])->name('products.update');
 
+          //offers
+          Route::get('/supplier', [OfferController::class, 'index'])->name('offeres.index'); // Show all offers
+          Route::get('/create', [OfferController::class, 'create'])->name('offers.create'); // Create form
+          Route::post('/', [OfferController::class, 'store'])->name('offers.store'); // Store new offer
+          Route::get('/{offer}/edit', [OfferController::class, 'edit'])->name('offers.edit'); // Edit form
+          Route::put('/{offer}', [OfferController::class, 'update'])->name('offers.update'); // Update offer
+          Route::delete('/{offer}', [OfferController::class, 'destroy'])->name('offers.destroy'); // Delete offer
 
 
           // General user logout (if you have a separate logout for normal users)
@@ -265,6 +274,7 @@ Route::middleware('web')->group(function () {
      Route::get('/products/featured', [ProductController::class, 'showFeaturedProducts'])->name('products.featured');
      Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
      Route::get('/categories/{slug}', [CategoryController::class, 'filterByCategory'])->name('categories.show');
+     Route::get('/categories/{slug}', [CategoryController::class, 'userSubCategoriesWithProducts'])->name('sub_categories.show');
      Route::get('/products/suggestions', [ProductSuggestionController::class, 'getSuggestions']);
 
      Route::get('language/{locale}', function ($locale) {

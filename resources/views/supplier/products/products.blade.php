@@ -83,27 +83,41 @@
                             <h3 class="text-[24px] font-bold text-[#212121] mb-1">{{ $product->name }}</h3>
                             <span class="text-[#696969] text-[20px]">{{ $product->subCategory->category->name ?? 'غير مصنف' }}</span>
                             <div class="flex mt-2">
-                                @if ($product->supplier_confirmed)
+                                @if ($product->supplier->supplier_confirmed)
                                     <span class="flex items-center text-[#185D31]">
                                         <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]" src="{{ asset('images/Success.svg') }}" alt="Confirmed Supplier">
-                                        <p class="text-[20px] text-[#212121]">{{ $product->supplier_name }}</p>
+                                        <p class="text-[20px] text-[#212121]">{{ $product->supplier->company_name }}</p>
                                     </span>
                                 @else
-                                    <p class="text-[20px] text-[#212121]">{{ $product->supplier_name }}</p>
+                                    <p class="text-[20px] text-[#212121]">{{ $product->supplier->company_name }}</p>
                                 @endif
                             </div>
-                            <div class="flex items-center mb-2">
-                                <span class="flex text-lg font-bold text-gray-800">
-                                    {{ number_format($product->price * (1 - ($product->discount_percent ?? 0) / 100), 2) }}
-                                    <img class="mx-1 w-[20px] h-[21px]" src="{{ asset('images/Vector (3).svg') }}" alt="">
-                                </span>
-                                @if ($product->is_offer && $product->discount_percent)
-                                    <span class="flex text-sm text-gray-400 line-through mr-2">
-                                        {{ number_format($product->price, 2) }}
-                                        <img class="mx-1 w-[14px] h-[14px] mt-1 inline-block" src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}" alt="currency">
-                                    </span>
-                                @endif
-                            </div>
+                    <div class="flex items-center mb-2">
+    @php
+        $offer = $product->offer; // Relationship: Product hasOne Offer
+    @endphp
+
+    @if ($offer && $offer->discount_percent)
+        {{-- Discounted Price --}}
+        <span class="flex text-lg font-bold text-gray-800">
+            {{ number_format($product->price * (1 - ($offer->discount_percent / 100)), 2) }}
+            <img class="mx-1 w-[20px] h-[21px]" src="{{ asset('images/Vector (3).svg') }}" alt="">
+        </span>
+
+        {{-- Original Price (crossed out) --}}
+        <span class="flex text-sm text-gray-400 line-through mr-2">
+            {{ number_format($product->price, 2) }}
+            <img class="mx-1 w-[14px] h-[14px] mt-1 inline-block" src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}" alt="currency">
+        </span>
+    @else
+        {{-- Regular Price --}}
+        <span class="flex text-lg font-bold text-gray-800">
+            {{ number_format($product->price, 2) }}
+            <img class="mx-1 w-[20px] h-[21px]" src="{{ asset('images/Vector (3).svg') }}" alt="">
+        </span>
+    @endif
+</div>
+ 
                             <p class="text-sm text-gray-600 mb-4">
                                 {{ __('messages.minimum_order_quantity', ['quantity' => $product->min_order_quantity ?? '1']) }}
                             </p>

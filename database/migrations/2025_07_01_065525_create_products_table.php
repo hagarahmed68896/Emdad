@@ -23,11 +23,6 @@ return new class extends Migration
             $table->json('images')->nullable();
             $table->foreignId('sub_category_id')->constrained('sub_categories')->onDelete('cascade');
 
-            // Offer-related columns
-            $table->boolean('is_offer')->default(false);
-            $table->unsignedTinyInteger('discount_percent')->nullable();
-            $table->date('offer_start')->nullable();
-            $table->date('offer_end')->nullable();
 
             // Supplier & Basic Product Info
             $table->unsignedInteger('min_order_quantity')->default(1);

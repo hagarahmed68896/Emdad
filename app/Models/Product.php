@@ -17,11 +17,6 @@ class Product extends Model
         'image',
         'images',
         'sub_category_id',
-        'is_offer',
-        'discount_percent',
-        'offer_start',
-        'offer_end',
-        'offer_expires_at',
         'min_order_quantity',
         'rating',
         'reviews_count',
@@ -72,4 +67,10 @@ class Product extends Model
     {
         return $this->belongsTo(BusinessData::class, 'business_data_id');
     }
+
+    public function offer()
+    {
+    return $this->hasOne(Offer::class);
+    }
+
 }

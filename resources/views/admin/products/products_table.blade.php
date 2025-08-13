@@ -69,7 +69,7 @@
 
                 {{-- ✅ الفئة --}}
                 <td class="px-4 py-3 text-right text-gray-800">
-                    {{ $product->category->name ?? '—' }}
+                    {{ $product->subCategory->category->name ?? '—' }}
                 </td>
 
                 {{-- ✅ الوصف --}}
@@ -100,7 +100,7 @@
 
                 {{-- ✅ الحالة --}}
                 <td class="px-4 py-3 text-right">
-                    @if ($product->status)
+                    @if ($product->product_status)
                         <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-xl">متاح</span>
                     @else
                         <span class="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-xl">غير متاح</span>

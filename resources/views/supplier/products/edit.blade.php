@@ -109,7 +109,7 @@
 
     <form id="edit-product-form" method="POST" action="{{ route('products.update', $product) }}" enctype="multipart/form-data" class="space-y-6">
         @csrf
-        @method('PUT')
+        @method('PATCH')
         <p class="font-bold text-[24px]">{{ __('messages.product_details') }}</p>
 
         {{-- ✅ MULTIPLE IMAGES UPLOAD --}}
@@ -300,7 +300,7 @@
 <div x-data="{
     newColor: '',
     newColorImage: null,
-    colors: window.productColors ?? [],
+colors: Array.isArray(window.productColors) ? window.productColors : [],
     addColor() {
         if (!this.newColor) return;
 
@@ -352,6 +352,7 @@
             <div class="bg-gray-100 rounded-xl px-4 py-2 flex items-center gap-4">
                 <input type="hidden" name="colors[]" :value="JSON.stringify(color)">
                 <template x-if="color.image">
+                    
                     <img :src="color.image" class="w-8 h-8 rounded-full object-cover border">
                 </template>
                 <span x-text="color.name" class="font-bold"></span>
@@ -431,12 +432,11 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
      <div>
     <label class="block mb-1 font-bold">{{ __('messages.offer_start') }}</label>
-    <input 
-        type="date" 
-        name="offer_start" 
-        class="border p-2 w-full rounded-xl" 
-        value="{{ old('offer_start', \Carbon\Carbon::parse($product->offer_start)->format('Y-m-d')) }}"
-    >
+<input type="date"
+       value="{{ old('offer_start', ($product->offer ? \Carbon\Carbon::parse($product->offer->offer_start)->format('Y-m-d') : null)) }}"
+       name="offer_start"
+               class="border p-2 w-full rounded-xl" 
+>
 </div>
 <div>
     <label class="block mb-1 font-bold">{{ __('messages.offer_end') }}</label>
@@ -444,12 +444,13 @@
         type="date" 
         name="offer_end" 
         class="border p-2 w-full rounded-xl" 
-        value="{{ old('offer_end', \Carbon\Carbon::parse($product->offer_end)->format('Y-m-d')) }}"
+        value="{{ old('offer_end', $product->offer ? \Carbon\Carbon::parse($product->offer->offer_end)->format('Y-m-d'):null) }}"
     >
 </div>
             <div>
                 <label class="block mb-1 font-bold">{{ __('messages.discount_percent') }}</label>
-                <input type="number" min="0" name="discount_percent" placeholder="{{ __('messages.discount_percent') }}" class="border p-2 w-full rounded-xl" value="{{ old('discount_percent', $product->discount_percent) }}">
+                <input type="number" min="0" name="discount_percent" placeholder="{{ __('messages.discount_percent') }}"
+                 class="border p-2 w-full rounded-xl" value="{{ old('discount_percent', $product->offer ? $product->offer->discount_percent:null ) }}">
             </div>
         </div>
 
@@ -517,11 +518,15 @@
             </button>
         </div>
         <div class="flex gap-3">
-            <button type="submit" class="bg-[#185D31] text-white px-6 py-2 rounded-xl">
-                {{ __('messages.save') }}
+    <button 
+    type="submit" 
+    x-bind:disabled="loading" 
+    x-on:click="loading = true; window.scrollTo({ top: 0, behavior: 'smooth' });" 
+    class="bg-[#185D31] text-white px-6 py-3 rounded-xl"
+>                 {{ __('messages.save') }}
             </button>
 
-            <a href="{{ url()->previous() }}" class="bg-gray-300 text-black px-6 py-2 rounded-xl">
+            <a href="{{ url()->previous() }}" class="bg-gray-300 text-black px-6 py-3 rounded-xl">
                 {{ __('messages.Cancel') }}
             </a>
         </div>
@@ -538,13 +543,9 @@
                 <form :action="'/products/' + confirmingId" method="POST">
                     @csrf
                     @method('DELETE')
-    <button 
-    type="submit" 
-    x-bind:disabled="loading" 
-    x-on:click="loading = true; window.scrollTo({ top: 0, behavior: 'smooth' });" 
-    class="bg-[#185D31] text-white px-6 py-3 rounded-xl"
->                       {{ __('messages.delete') }}
-                    </button>
+         <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                                {{ __('messages.delete') }}
+                            </button>
                 </form>
             </div>
         </div>
@@ -553,73 +554,73 @@
 <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
 <script>
-    document.getElementById('edit-product-form').addEventListener('submit', function(e) {
-        e.preventDefault();
+   document.getElementById('edit-product-form').addEventListener('submit', function(e) {
+    e.preventDefault();
 
-        const statusMessageDiv = document.getElementById('status-message');
-        statusMessageDiv.classList.add('hidden');
-        statusMessageDiv.classList.remove('bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700');
+    const statusMessageDiv = document.getElementById('status-message');
+    statusMessageDiv.classList.add('hidden');
+    statusMessageDiv.classList.remove('bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700');
 
-        const formData = new FormData(this);
+    const formData = new FormData(this);
 
-        // Append new files from Alpine.js state
-        const alpine = Alpine.$data(document.querySelector('[x-data]'));
-        if (alpine.files && alpine.files.length > 0) {
-            alpine.files.forEach(file => {
-                formData.append('images[]', file);
-            });
-        }
+    // ✅ Fix 1: Manually append the _method field for PATCH request
+    formData.append('_method', 'PATCH');
+    
+    // Append new files from Alpine.js state
+    const alpine = Alpine.$data(document.querySelector('[x-data]'));
+    if (alpine.files && alpine.files.length > 0) {
+        alpine.files.forEach(file => {
+            formData.append('images[]', file);
+        });
+    }
 
-        // Add _method field for PATCH request
-        formData.append('_method', 'PATCH');
-        
-        fetch(this.action, {
-            method: 'POST', // Use POST for form submission
-            body: formData
-        })
-        .then(async response => {
-            const data = await response.json();
-            if (!response.ok) {
-                // Handle validation errors or other server-side errors
-                let errorMessages = '';
-                if (data.errors) {
-                    for (const [key, messages] of Object.entries(data.errors)) {
-                        errorMessages += messages[0] + '<br>';
-                    }
-                } else {
-                    errorMessages = data.message || 'An error occurred during the update.';
+    fetch(this.action, {
+        method: 'POST', // Use POST for form submission
+        body: formData
+    })
+    .then(async response => {
+        const data = await response.json();
+        if (!response.ok) {
+            // Handle validation errors or other server-side errors
+            let errorMessages = '';
+            if (data.errors) {
+                for (const [key, messages] of Object.entries(data.errors)) {
+                    errorMessages += messages[0] + '<br>';
                 }
-
-                const statusMessageSpan = statusMessageDiv.querySelector('span');
-                statusMessageSpan.innerHTML = errorMessages;
-                statusMessageDiv.classList.add('bg-red-100', 'text-red-700');
-                statusMessageDiv.classList.remove('hidden');
-                throw new Error('Request failed');
+            } else {
+                errorMessages = data.message || 'An error occurred during the update.';
             }
-            return data;
-        })
-        .then(data => {
-            if (data.success) {
-                const statusMessageSpan = statusMessageDiv.querySelector('span');
-                statusMessageSpan.textContent = data.success;
-                statusMessageDiv.classList.add('bg-green-100', 'text-green-700');
-                statusMessageDiv.classList.remove('hidden');
 
-                if (data.redirect) {
-                    window.location.href = data.redirect;
-                }
-            }
-        })
-        .catch(error => {
-            console.error('An unexpected error occurred:', error);
             const statusMessageSpan = statusMessageDiv.querySelector('span');
-            if (statusMessageSpan.textContent === '') {
-                 statusMessageSpan.textContent = '{{ __('messages.error_message') }}';
-            }
+            statusMessageSpan.innerHTML = errorMessages;
             statusMessageDiv.classList.add('bg-red-100', 'text-red-700');
             statusMessageDiv.classList.remove('hidden');
-        });
+            throw new Error('Request failed');
+        }
+        return data;
+    })
+    .then(data => {
+        if (data.success) {
+            const statusMessageSpan = statusMessageDiv.querySelector('span');
+            statusMessageSpan.textContent = data.success;
+            statusMessageDiv.classList.add('bg-green-100', 'text-green-700');
+            statusMessageDiv.classList.remove('hidden');
+
+            if (data.redirect) {
+                window.location.href = data.redirect;
+            }
+        }
+    })
+    .catch(error => {
+        console.error('An unexpected error occurred:', error);
+        const statusMessageSpan = statusMessageDiv.querySelector('span');
+        if (statusMessageSpan.textContent === '') {
+             statusMessageSpan.textContent = '{{ __('messages.error_message') }}';
+        }
+        statusMessageDiv.classList.add('bg-red-100', 'text-red-700');
+        statusMessageDiv.classList.remove('hidden');
     });
+});
 </script>
 
 <script>

@@ -8,20 +8,22 @@ use App\Models\Product;
 use App\Models\Cart;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use App\Models\Offer;
 
 class HomeController extends Controller
 {
     public function index()
     {
         $categories = Category::all();
-
         $onOfferProducts = Product::with('subCategory.category')
-            ->where('is_offer', true)
-            ->where(function ($query) {
-                $query->whereNull('offer_end')
-                    ->orWhere('offer_end', '>', now());
-            })
-            ->get();
+    ->whereHas('offer', function ($query) {
+        $query->where(function ($q) {
+            $q->whereNull('offer_end')
+              ->orWhere('offer_end', '>', now());
+        });
+    })
+    ->get();
+
 
         $featuredProducts = Product::with('subCategory.category')
             ->where('is_featured', true)
@@ -31,14 +33,26 @@ class HomeController extends Controller
 
         $favorites = collect();
         $products = collect();
+        $offers  = collect();
 
         if (Auth::check()) {
             $favorites = Auth::user()->favorites()->with('product.subCategory.category')->get();
+$offers = Auth::user()
+    ->offers()
+    ->with([
+        'product.offer',
+        'product.subCategory.category'
+    ])
+    ->paginate(20); // only load 20 offers at a time
 
             if (Auth::user()->account_type === 'supplier') {
                 $business = Auth::user()->business; // ✅ العلاقة الصحيحة
+                // dd(Auth::user()->business);
+
                 if ($business) {
                     $products = $business->products()->get(); // ✅ المنتجات الحقيقية
+
+
                 }
             }
         }
@@ -74,15 +88,33 @@ class HomeController extends Controller
             return redirect('/');
         }
 
+        $supplierCategories = collect();
+$supplierCategoryCount = 0;
+
+if (Auth::check() && Auth::user()->account_type === 'supplier') {
+    $business = Auth::user()->business;
+
+    if ($business) {
+        $supplierCategories = Category::whereHas('subCategories.products', function ($query) use ($business) {
+            $query->where('business_data_id', $business->id);
+        })->distinct()->get();
+
+        $supplierCategoryCount = $supplierCategories->count();
+    }
+}
+
         return view('layouts.app', compact(
             'categories',
             'onOfferProducts',
             'featuredProducts',
             'favorites',
-            'products', // ✅ مهمة جداً هنا
+            'products', 
             'cartItems',
             'notifications',
-            'unreadNotificationCount'
+            'unreadNotificationCount',
+            'offers',
+            'supplierCategories',
+            'supplierCategoryCount'
         ));
     }
 }
