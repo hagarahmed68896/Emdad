@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+
 
 class ProductController extends Controller
 {
@@ -206,10 +208,19 @@ if ($request->filled('sort_by')) {
             '15' => ['label_key' => 'delivery_in_days', 'days_param' => 15],
         ];
 
-        $colorHexMap = [
-            'أحمر' => '#FF0000', 'أزرق' => '#0000FF', 'أخضر' => '#008000', 'أصفر' => '#FFFF00',
-            'أسود' => '#000000', 'أبيض' => '#FFFFFF', 'رمادي' => '#808080',
-        ];
+$colorsData = include resource_path('data/colors.php');
+
+$colorHexMap = [];
+foreach ($colorsData as $color) {
+    if (!empty($color['en']) && !empty($color['hex'])) {
+        $colorHexMap[strtolower($color['en'])] = $color['hex'];
+    }
+    if (!empty($color['ar']) && !empty($color['hex'])) {
+        $colorHexMap[mb_strtolower($color['ar'])] = $color['hex'];
+    }
+}
+
+
 
         // Category context
         $currentCategory = null;
@@ -221,6 +232,7 @@ if ($request->filled('sort_by')) {
             }
         }
 
+
         return view('categories.product', compact(
             'products',
             'availableSpecifications',
@@ -229,7 +241,7 @@ if ($request->filled('sort_by')) {
             'currentCategory',
             'currentSubCategory',
             'deliveryOptions',
-            'colorHexMap'
+            'colorHexMap',
         ));
     }
 
@@ -500,6 +512,14 @@ public function offers()
         }
 
         return redirect()->route('products.index')->with('success', 'Product created successfully!');
+    }
+
+        public function destroy($id)
+    {
+        $product = Product::findOrFail($id);
+        $product->delete();
+
+        return redirect()->back()->with('success', 'Product deleted successfully');
     }
 
     // You might have other methods like edit, update, destroy, etc., here.

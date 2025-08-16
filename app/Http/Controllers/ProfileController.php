@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Session;
 use App\Models\Cart;
+use App\Models\BusinessData;
+use App\Models\Document;
+
 
 class ProfileController extends Controller
 {
@@ -19,40 +22,36 @@ class ProfileController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function show(Request $request)
+  public function show(Request $request)
     {
-        Paginator::useTailwind(); 
+        Paginator::useTailwind();
 
-        $user = Auth::user();
+        // Fix: Correctly eager load the nested relationship.
+        // The documents are related to the business data, which is related to the user.
+        $user = Auth::user()->load('business.documents');
 
         $names = preg_split('/\s+/', trim($user->full_name), -1, PREG_SPLIT_NO_EMPTY);
         $user->first_name = $names[0] ?? '';
-        $user->last_name = implode(' ', array_slice($names, 1)); // All remaining parts
+        $user->last_name = implode(' ', array_slice($names, 1));
 
         $favorites = collect();
         if ($user) {
-            // Only paginate if the request is not AJAX or if it's explicitly for favorites via AJAX
-            // This prevents loading all favorites data when just switching to 'Account' or 'Notifications' section
-            if (!$request->ajax() || ($request->ajax() && $request->route()->getName() === 'profile.favorites.ajax')) {
-                 $favorites = $user->favorites()->with('product.category')->paginate(3);
-            }
+            $favorites = $user->favorites()->with('product.subCategory.category')->paginate(3);
         }
-
 
         $notificationSettings = $user->notification_settings ?? $this->getDefaultNotificationSettings();
 
         if ($request->ajax()) {
-                        if ($request->path() === 'profile/favorites') { 
+            if ($request->path() === 'profile/favorites') {
                 return view('partials.favorites_list', compact('favorites'));
             }
         }
-
 
         // Logic for Cart
         $cartItems = collect();
         $cart = null;
 
-        if (Auth::check()) { // Already checked by middleware, but good to be explicit
+        if (Auth::check()) {
             $cart = Auth::user()->cart;
         } else {
             $sessionId = Session::getId();
@@ -64,7 +63,8 @@ class ProfileController extends Controller
         if ($cart) {
             $cartItems = $cart->items()->with('product')->get();
         }
-           // Logic for Notifications
+
+        // Logic for Notifications
         $notifications = collect();
         $unreadNotificationCount = 0;
         if (Auth::check()) {
@@ -72,10 +72,44 @@ class ProfileController extends Controller
             $unreadNotificationCount = Auth::user()->unreadNotifications->count();
         }
 
-     $section = $request->query('section');
-     
-     return view('profile.account', compact('user', 'favorites', 'notificationSettings', 'section','cartItems', 'notifications', 'unreadNotificationCount'));
+        $section = $request->query('section');
+        $products = collect();
+        $businessData = null; // Initialize the variable for business data
 
+        if (Auth::check()) {
+            $favorites = Auth::user()->favorites()->with('product.subCategory.category')->get();
+            $offers = Auth::user()
+                ->offers()
+                ->with([
+                    'product.offer',
+                    'product.subCategory.category'
+                ])
+                ->paginate(20);
+
+            if (Auth::user()->account_type === 'supplier') {
+                // Now retrieve the business data from the eager-loaded user model
+                $businessData = $user->business;
+
+                if ($businessData) {
+                    $products = $businessData->products()->paginate(3);
+                }
+            }
+        }
+
+        // Pass the business data and documents to the view
+        // The documents are now accessible via $businessData->documents
+        return view('profile.account',
+            compact('user',
+                'favorites',
+                'notificationSettings',
+                'section',
+                'cartItems',
+                'notifications',
+                'unreadNotificationCount',
+                'products',
+                'offers',
+                'businessData' // This is the business data loaded with documents
+            ));
     }
 
     /**
@@ -84,44 +118,117 @@ class ProfileController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function updateDetails(Request $request)
-    {
-        $user = Auth::user();
+public function updateDetails(Request $request)
+{
+    $user = Auth::user();
 
-        $validator = Validator::make($request->all(), [
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'phone_number' => 'nullable|string|digits:9|unique:users,phone_number,' . $user->id,
-            'address' => 'nullable|string|max:255',
-        ],
-        [
-            'first_name.required' => __('messages.first_name_required'),
-            'last_name.required' => __('messages.last_name_required'),
-            'email.required' => __('messages.email_required'),
-            'email.email' => __('messages.email_invalid'),
-            'email.unique' => __('messages.email_unique'),
-            'phone_number.digits' => __('messages.phone_number_digits'),
-            'phone_number.unique' => __('messages.phone_number_unique'),
+    // 1. Define base validation rules for all users
+    $rules = [
+        'first_name' => 'required|string|max:255',
+        'last_name' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+        'phone_number' => 'nullable|string|digits:9|unique:users,phone_number,' . $user->id,
+        'address' => 'nullable|string|max:255',
+    ];
+    
+    // 2. Define base validation messages
+    $messages = [
+        'first_name.required' => __('messages.first_name_required'),
+        'last_name.required' => __('messages.last_name_required'),
+        'email.required' => __('messages.email_required'),
+        'email.email' => __('messages.email_invalid'),
+        'email.unique' => __('messages.email_unique'),
+        'phone_number.digits' => __('messages.phone_number_digits'),
+        'phone_number.unique' => __('messages.phone_number_unique'),
+    ];
+
+    // 3. Conditionally add supplier-specific rules and messages
+    if ($user->account_type === 'supplier') {
+        $rules = array_merge($rules, [
+            'company_name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+            'experience_years' => 'nullable|integer|min:0',
+            'created_at' => 'nullable|date',
+            'product_category' => 'nullable|string', 
+            'certificate' => 'nullable|file|mimes:jpeg,png,pdf|max:2048',
+            'national_id' => 'nullable|file|mimes:jpeg,png,pdf|max:2048',
+            'commercial_register' => 'nullable|file|mimes:jpeg,png,pdf|max:2048',
+            'national_address' => 'nullable|file|mimes:jpeg,png,pdf|max:2048',
+            'iban' => 'nullable|file|mimes:jpeg,png,pdf|max:2048',
+            'training_certificate' => 'nullable|file|mimes:jpeg,png,pdf|max:2048',
         ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $user->update([
-            'full_name' => $request->input('first_name') . ' ' . $request->input('last_name'),
-            'email' => $request->email,
-            'phone_number' => $request->phone_number,
-            'address' => $request->address,
-        ]);
-
-        // *** THIS IS THE CRITICAL CHANGE ***
-        return response()->json([
-            'success' => true,
-            'message' => __('messages.account_details_updated_successfully') 
+        
+        $messages = array_merge($messages, [
+            'company_name.required' => 'Company name is required.',
+            'product_category.required' => 'Product category is required.',
+            'certificate.mimes' => 'The certificate must be a file of type: jpeg, png, pdf.',
+            // Add more specific messages for supplier fields
         ]);
     }
+
+    // 4. Create the validator object with both rules and messages
+    $validator = Validator::make($request->all(), $rules, $messages);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
+    }
+    
+    // 5. Update the core user model
+    $user->update([
+        'full_name' => $request->input('first_name') . ' ' . $request->input('last_name'),
+        'email' => $request->email,
+        'phone_number' => $request->phone_number,
+        'address' => $request->address,
+    ]);
+
+    // 6. Conditionally update supplier details and documents
+    if ($user->account_type === 'supplier') {
+        $businessData = $user->business()->firstOrNew(['user_id' => $user->id]);
+        $businessData->fill([
+            'company_name' => $request->company_name,
+            'supplier_desc' => $request->description,
+            'exp_years' => $request->experience_years,
+            'company_created_at' => $request->created_at,
+            'product_category_id' => $request->product_category,
+        ]);
+        $businessData->save();
+
+        $documentFields = [
+            'certificate',
+            'national_id',
+            'commercial_register',
+            'national_address',
+            'iban',
+            'training_certificate'
+        ];
+        
+        foreach ($documentFields as $field) {
+            if ($request->hasFile($field)) {
+                $file = $request->file($field);
+                $path = $file->store('supplier_documents', 'public');
+                $oldDocument = Document::where('user_id', $user->id)
+                    ->where('document_type', $field)
+                    ->first();
+                    
+                if ($oldDocument) {
+                    Storage::disk('public')->delete($oldDocument->file_path);
+                    $oldDocument->delete();
+                }
+
+                Document::create([
+                    'user_id' => $user->id,
+                    'document_type' => $field,
+                    'file_path' => $path,
+                ]);
+            }
+        }
+    }
+    
+    return response()->json([
+        'success' => true,
+        'message' => __('messages.account_details_updated_successfully') 
+    ]);
+}
 
     /**
      * Update the user's password.

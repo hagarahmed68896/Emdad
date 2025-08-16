@@ -88,6 +88,7 @@
                                 </span>
                             @endif
                             {{-- FAVORITE BUTTON - MOVED HERE --}}
+                             @if (!Auth::check() || Auth::user()->account_type !== 'supplier')
                             <button
                                 class="offer-button absolute top-3 rtl:left-3 ltr:right-3 bg-white p-2 rounded-full shadow-md text-gray-500 hover:text-red-500 transition-colors duration-200 z-10"
                                 data-product-id="{{ $offer->product->id }}" aria-label="Add to offers">
@@ -106,6 +107,7 @@
                                     </svg>
                                 @endif
                             </button>
+                            @endif
                         </div> {{-- End of product-image-swiper --}}
 
                         {{-- Product Details --}}
@@ -152,7 +154,7 @@
 
                            <div class="mt-auto flex justify-between">
                                 <div class="w-2/3 h-full">
-                                    <a href="#"
+                                    <a href="{{ route('products.show', $offer->product->slug) }}"
                                        class="block bg-[#185D31] text-white text-center py-[10px] px-[15px] rounded-[12px] font-medium transition-colors duration-200">
                                         {{-- Translated: View Details --}}
                                         {{ __('messages.view_details') }}

@@ -274,7 +274,7 @@ Route::middleware('web')->group(function () {
      Route::get('/products/featured', [ProductController::class, 'showFeaturedProducts'])->name('products.featured');
      Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
      Route::get('/categories/{slug}', [CategoryController::class, 'filterByCategory'])->name('categories.show');
-     Route::get('/categories/{slug}', [CategoryController::class, 'userSubCategoriesWithProducts'])->name('sub_categories.show');
+     Route::get('/sub_categories/{slug}', [CategoryController::class, 'userSubCategoriesWithProducts'])->name('sub_categories.show');
      Route::get('/products/suggestions', [ProductSuggestionController::class, 'getSuggestions']);
 
      Route::get('language/{locale}', function ($locale) {

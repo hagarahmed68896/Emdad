@@ -445,6 +445,14 @@ return [
     'offer_updated_successfully' => 'Offer updated successfully',
     'offer_deleted_successfully' => 'Offer deleted successfully',
     'update_offer' => 'Update Offer',
+    'heigh_quality' => 'High Quality',
+    'edit' => 'Edit',
+
+    'supplier_name' => 'Supplier Name',
+    'supplier_desc' => 'General description of the supplier',
+    'certificates' => 'Certificates',
+    'exp_years' => 'Years of experience',
+    'company_created_at' => 'Date of commercial activity',
 
 
     

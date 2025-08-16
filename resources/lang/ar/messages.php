@@ -430,6 +430,15 @@ return [
     'offer_updated_successfully' => 'تم تحديث العرض بنجاح',
     'offer_deleted_successfully' => 'تم حذف العرض بنجاح',
     'update_offer' => 'تحديث العرض',
+    'category' => 'الفئة',
+    'heigh_quality' => 'جودة عالية',
+    'edit' => 'تعديل',
+    'supplier_name' => 'اسم المورد',
+    'supplier_desc' => 'وصف عام عن المورد',
+    'certificates' => 'شهادات',
+    'exp_years' => 'عدد سنوات الخبرة',
+    'company_created_at' => 'تاريخ بدء النشاط التجاري',
+
 
 
     

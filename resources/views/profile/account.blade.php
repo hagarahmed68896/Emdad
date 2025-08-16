@@ -150,7 +150,9 @@
                                 {{ __('messages.MyAccount') }}
                             </a>
                         </li>
-                        <li>
+                             @if (!Auth::check() || Auth::user()->account_type !== 'supplier')
+
+                                  <li>
                             <a href="#" id="myOrdersLink"
                                 class="flex items-center p-3 text-lg text-gray-700 rounded-lg hover:text-white hover:bg-[#185D31] transition-colors duration-200">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-3" fill="none"
@@ -161,6 +163,21 @@
                                 {{ __('messages.MyOrders') }}
                             </a>
                         </li>
+                        @endif
+                             @if (!Auth::check() || Auth::user()->account_type == 'supplier')
+
+                        <li>
+                            <a href="#" id="myProductsLink"
+                                class="flex items-center p-3 text-lg text-gray-700 rounded-lg hover:text-white hover:bg-[#185D31] transition-colors duration-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-3" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                                </svg>
+                                {{ __('messages.myProducts') }}
+                            </a>
+                        </li>
+                        @endif
                         <li>
                             <a href="#" id="messagesLink"
                                 class="flex items-center p-3 text-lg text-gray-700 rounded-lg  hover:text-white hover:bg-[#185D31] transition-colors duration-200">
@@ -172,6 +189,8 @@
                                 {{ __('messages.messages') }}
                             </a>
                         </li>
+                             @if (!Auth::check() || Auth::user()->account_type !== 'supplier')
+
                         <li>
                             <a href="#" id="favLink"
                                 class="flex items-center p-3 text-lg text-gray-700 rounded-lg hover:text-white hover:bg-[#185D31] transition-colors duration-200">
@@ -183,6 +202,7 @@
                                 {{ __('messages.Fav') }}
                             </a>
                         </li>
+                        @endif
                         <li>
                             <a href="#" id="notificationsLink"
                                 class="flex items-center p-3 text-lg text-gray-700 rounded-lg hover:text-white hover:bg-[#185D31] transition-colors duration-200">
@@ -219,156 +239,19 @@
                 </div>
 
                 {{-- My Account and Password Section --}}
-<section id="myAccountContentSection"
-    class="bg-white p-6 rounded-lg shadow-sm mb-8 border border-gray-200 {{ request('section') === 'favoritesSection' ? 'hidden' : '' }}">
-          <h2 class="text-2xl font-semibold text-gray-800 mb-6">{{ __('messages.account_details') }}</h2>
+@include('profile.accountSection')
 
-                    {{-- START: Account Details Form (Now powered by Alpine.js AJAX) --}}
-                    {{-- Pass the initial user data to the Alpine component --}}
-                    <div x-data="accountDetailsForm({{ json_encode($user) }})"> 
-                        
-                        {{-- Success Message for account details form--}}
-                        <div x-show="success" 
-                            x-cloak
-                            x-transition:enter="transition ease-out duration-300"
-                            x-transition:enter-start="opacity-0 transform -translate-y-2"
-                            x-transition:enter-end="opacity-100 transform translate-y-0"
-                            x-transition:leave="transition ease-in duration-300"
-                            x-transition:leave-start="opacity-100 transform translate-y-0"
-                            x-transition:leave-end="opacity-0 transform -translate-y-2"
-                            class="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded mb-4" 
-                            x-text="success"
-                            x-init="setTimeout(() => success = '', 5000)"></div>
+     @if (!Auth::check() || Auth::user()->account_type == 'supplier')
+     @include('profile.productSection')
+     @endif
 
-                        {{-- Error List for account details form--}}
-                        <template x-if="Object.keys(errors).length">
-                            <ul class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4 text-sm list-disc list-inside"
-                                x-transition:enter="transition ease-out duration-300"
-                                x-transition:enter-start="opacity-0 transform -translate-y-2"
-                                x-transition:enter-end="opacity-100 transform translate-y-0"
-                                x-transition:leave="transition ease-in duration-300"
-                                x-transition:leave-start="opacity-100 transform translate-y-0"
-                                x-transition:leave-end="opacity-0 transform -translate-y-2">
-                                <template x-for="[key, messages] of Object.entries(errors)" :key="key">
-                                    <li x-text="messages[0]"></li>
-                                </template>
-                            </ul>
-                        </template>
-
-                        <form @submit.prevent="submitDetailsForm" action="{{ route('profile.updateDetails') }}" method="POST">
-                            @csrf
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                                <div>
-                                    <label for="first_name" class="block text-gray-700 text-sm font-medium mb-2">{{ __('messages.first_name') }}</label>
-                                    <input type="text" id="first_name" name="first_name"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition-all duration-200 outline-none"
-                                        placeholder="أدخل اسمك الأول" x-model="formData.first_name">
-                                </div>
-                                <div>
-                                    <label for="last_name" class="block text-gray-700 text-sm font-medium mb-2">
-                                        {{ __('messages.last_name') }}</label>
-                                    <input type="text" id="last_name" name="last_name"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition-all duration-200 outline-none"
-                                        placeholder="{{ __('messages.enter_family_name') }}" x-model="formData.last_name">
-                                </div>
-                                <div>
-                                    <label for="email" class="block text-gray-700 text-sm font-medium mb-2">
-                                        {{ __('messages.email') }}</label>
-                                    <input type="email" id="email" name="email"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition-all duration-200 outline-none"
-                                        placeholder="{{ __('messages.emailMSG') }}"
-                                        x-model="formData.email">
-                                </div>
-                                <div>
-                                    <label for="phone_number" class="block text-gray-700 text-sm font-medium mb-2">
-                                        {{ __('messages.phone_number') }}</label>
-                                    <input type="text" id="phone_number" name="phone_number" maxlength="9"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition-all duration-200 outline-none"
-                                        placeholder=" {{ __('messages.phoneMSG') }}" x-model="formData.phone_number">
-                                </div>
-                                <div class="md:col-span-2">
-                                    <label for="address" class="block text-gray-700 text-sm font-medium mb-2">{{ __('messages.address') }}</label>
-                                    <input type="text" id="address" name="address"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition-all duration-200 outline-none"
-                                        placeholder="{{ __('messages.addressMSG') }}" x-model="formData.address">
-                                </div>
-                            </div>
-                            <div class="flex justify-start gap-4 mb-8">
-                                <button type="submit"
-                                    class="px-6 py-2 text-white rounded-lg bg-[#185D31] transition-colors duration-200 shadow-md">{{ __('messages.save') }}</button>
-                            </div>
-                        </form>
-                    </div>
-                    {{-- END: Account Details Form --}}
-
-                    {{-- Password Form (Your existing Alpine.js form) --}}
-                    <div x-data="passwordForm()" class=" bg-white mx-auto">
-                        <h2 class="text-2xl font-semibold text-gray-800 mb-6">{{__('messages.change_password')}}</h2>
-                        {{-- Success Message for password form--}}
-                        <div x-show="success" x-cloak
-                            x-transition:enter="transition ease-out duration-300"
-                            x-transition:enter-start="opacity-0 transform -translate-y-2"
-                            x-transition:enter-end="opacity-100 transform translate-y-0"
-                            x-transition:leave="transition ease-in duration-300"
-                            x-transition:leave-start="opacity-100 transform translate-y-0"
-                            x-transition:leave-end="opacity-0 transform -translate-y-2"
-                            class="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded mb-4" 
-                            x-text="success"
-                            x-init="setTimeout(() => success = '', 5000)"></div>
-
-                        {{-- Error List for password form--}}
-                        <template x-if="Object.keys(errors).length">
-                            <ul class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4 text-sm list-disc list-inside"
-                                x-transition:enter="transition ease-out duration-300"
-                                x-transition:enter-start="opacity-0 transform -translate-y-2"
-                                x-transition:enter-end="opacity-100 transform translate-y-0"
-                                x-transition:leave="transition ease-in duration-300"
-                                x-transition:leave-start="opacity-100 transform translate-y-0"
-                                x-transition:leave-end="opacity-0 transform -translate-y-2">
-                                <template x-for="[key, messages] of Object.entries(errors)" :key="key">
-                                    <li x-text="messages[0]"></li>
-                                </template>
-                            </ul>
-                        </template>
-
-                        <form @submit.prevent="submitPasswordForm" action="{{ route('profile.updatePassword') }}" method="POST">
-                            @csrf
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                                <div class="md:col-span-2">
-                                    <label for="current_password" class="block text-gray-700 text-sm font-medium mb-2">{{__('messages.last_password')}}</label>
-                                    <input type="password" id="current_password" name="current_password" x-model="formData.current_password"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition-all duration-200 outline-none"
-                                        placeholder="{{__('messages.last_password_msg')}}">
-                                </div>
-                                <div class="md:col-span-2">
-                                    <label for="password" class="block text-gray-700 text-sm font-medium mb-2"> 
-                                        {{__('messages.new_password')}}</label>
-                                    <input type="password" id="password" name="password" x-model="formData.password"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition-all duration-200 outline-none"
-                                        placeholder="{{__('messages.new_password_msg')}}">
-                                </div>
-                                <div class="md:col-span-2">
-                                    <label for="password_confirmation"
-                                        class="block text-gray-700 text-sm font-medium mb-2">{{__('messages.confirm_passwordMSG')}}</label>
-                                    <input type="password" id="password_confirmation" name="password_confirmation" x-model="formData.password_confirmation"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition-all duration-200 outline-none"
-                                        placeholder="{{__('messages.confirm_passwordMSG')}}">
-                                </div>
-                            </div>
-                            <div class="flex justify-start gap-4">
-                                <button type="submit"
-                                    class="px-6 py-2 text-white rounded-lg bg-[#185D31] transition-colors duration-200 shadow-md">{{__('messages.save')}}</button>
-                            </div>
-                        </form>
-                    </div>
-                </section>
-
+     {{-- @if (!Auth::check() || Auth::user()->account_type !== 'supplier') --}}
                 {{-- Favorites Section --}}
 <section id="favoritesSection"
     class="bg-white p-6 rounded-lg shadow-sm mb-8 border border-gray-200 {{ request('section') === 'favoritesSection' ? '' : 'hidden' }}">
-    @include('partials.favorites', ['favorites' => $favorites])
+    @include('partials.favorites_list', ['favorites' => $favorites])
 </section>
-
+{{-- @endif --}}
 
                 {{-- Notifications Section (New!) --}}
  <section id="notificationsSection" class="bg-white p-6 rounded-lg shadow-sm mb-8 border border-gray-200 {{ request('section') === 'notificationsSection' ? '' : 'hidden' }}">
@@ -511,138 +394,191 @@
             <div id="modalMessage" class="mt-4 text-sm text-center"></div>
         </div>
     </div>
- <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get references to main page elements
-            const profileImage = document.getElementById('profilePageImage');
-            const openProfileModalBtn = document.getElementById('openProfileModalBtn');
-            const profilePictureInput = document.getElementById('profilePictureInput');
-            const saveProfilePhotoBtn = document.getElementById('saveProfilePhotoBtn');
-            const uploadLoading = document.getElementById('uploadLoading');
-            const uploadMessage = document.getElementById('uploadMessage');
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get references to main page elements
+        const profileImage = document.getElementById('profilePageImage');
+        const openProfileModalBtn = document.getElementById('openProfileModalBtn');
+        const profilePictureInput = document.getElementById('profilePictureInput');
+        const saveProfilePhotoBtn = document.getElementById('saveProfilePhotoBtn');
+        const uploadLoading = document.getElementById('uploadLoading');
+        const uploadMessage = document.getElementById('uploadMessage');
 
-            // Get references to modal elements
-            const profileModal = document.getElementById('profileModal');
-            const modalProfileImage = document.getElementById('modalProfileImage');
-            const changePhotoBtn = document.getElementById('changePhotoBtn');
-            const removePhotoBtn = document.getElementById('removePhotoBtn');
-            const closeModalBtn = document.getElementById('closeModalBtn');
-            const modalMessage = document.getElementById('modalMessage');
+        // Get references to modal elements
+        const profileModal = document.getElementById('profileModal');
+        const modalProfileImage = document.getElementById('modalProfileImage');
+        const changePhotoBtn = document.getElementById('changePhotoBtn');
+        const removePhotoBtn = document.getElementById('removePhotoBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const modalMessage = document.getElementById('modalMessage');
 
-            let selectedFile = null;
+        let selectedFile = null;
 
-            // Get references to content sections and navigation links
-            const myAccountContentSection = document.getElementById('myAccountContentSection');
-            const favoritesSection = document.getElementById('favoritesSection');
-            const notificationsSection = document.getElementById('notificationsSection'); // NEW!
+        // Get references to all content sections and navigation links
+        const sections = {
+            'myAccountContentSection': document.getElementById('myAccountContentSection'),
+            'favoritesSection': document.getElementById('favoritesSection'),
+            'notificationsSection': document.getElementById('notificationsSection'),
+            'myProductsSection': document.getElementById('myProductsSection'),
+            'myOrdersSection': document.getElementById('myOrdersSection'),
+        };
 
-            const myAccountLink = document.getElementById('myAccountLink');
-            const favLink = document.getElementById('favLink');
-            const notificationsLink = document.getElementById('notificationsLink'); // NEW!
+        const navLinks = {
+            'myAccountLink': document.getElementById('myAccountLink'),
+            'favLink': document.getElementById('favLink'),
+            'notificationsLink': document.getElementById('notificationsLink'),
+            'myProductsLink': document.getElementById('myProductsLink'),
+            'myOrdersLink': document.getElementById('myOrdersLink'),
+            'messagesLink': document.getElementById('messagesLink'),
+        };
+        
+        const mainContentTitle = document.getElementById('mainContentTitle');
+        const breadcrumbs = document.getElementById('breadcrumbs');
 
-            const mainContentTitle = document.getElementById('mainContentTitle');
-            const breadcrumbs = document.getElementById('breadcrumbs');
+        // Pass translations from PHP to JavaScript
+        const translations = {
+            MyAccount: "{{ __('messages.MyAccount') }}",
+            home: "{{ __('messages.home') }}",
+            Fav: "{{ __('messages.Fav') }}",
+            settings_notifications: "{{ __('messages.settings_notifications') }}",
+            myProducts: "{{__('messages.myProducts')}}",
+            MyOrders: "{{ __('messages.MyOrders') }}",
+            messages: "{{ __('messages.messages') }}",
+        };
 
-            // Pass translations from PHP to JavaScript
-            const translations = {
-                MyAccount: "{{ __('messages.MyAccount') }}",
-                home: "{{ __('messages.home') }}",
-                Fav: "{{ __('messages.Fav') }}",
-                settings_notifications: "{{ __('messages.settings_notifications') }}" // NEW!
-                // Add any other translations you might need dynamically here
-            };
-
-            // Function to manage active link styling
-            function setActiveLink(activeLinkElement) {
-                const navLinks = document.querySelectorAll('aside nav ul li a');
-                navLinks.forEach(link => {
-                    link.classList.remove('bg-[#185D31]', 'text-white', 'font-medium', 'shadow-sm');
-                    link.classList.add('text-gray-700');
-                });
+        // Function to manage active link styling
+        function setActiveLink(activeLinkElement) {
+            const allNavLinks = document.querySelectorAll('aside nav ul li a');
+            allNavLinks.forEach(link => {
+                link.classList.remove('bg-[#185D31]', 'text-white', 'font-medium', 'shadow-sm');
+                link.classList.add('text-gray-700');
+            });
+            if (activeLinkElement) {
                 activeLinkElement.classList.add('bg-[#185D31]', 'text-white', 'font-medium', 'shadow-sm');
                 activeLinkElement.classList.remove('text-gray-700');
             }
+        }
 
-            // Function to show/hide content sections and update title/breadcrumbs
-            function showContent(sectionId, titleKey, breadcrumbKey) {
-                // Hide all main content sections
-                myAccountContentSection.classList.add('hidden');
-                favoritesSection.classList.add('hidden');
-                notificationsSection.classList.add('hidden'); // NEW!
-
-                // Show the requested section
-                document.getElementById(sectionId).classList.remove('hidden');
-
-                // Update title and breadcrumbs
-                mainContentTitle.textContent = translations[titleKey];
-                breadcrumbs.innerHTML = translations['home'] + ' <span class="mx-1">&gt;</span> ' + translations[breadcrumbKey];
+        // Function to show/hide content sections, update title/breadcrumbs, and update URL
+        function showContent(sectionId, titleKey) {
+            // Hide all sections dynamically
+            for (const key in sections) {
+                if (sections[key]) {
+                    sections[key].classList.add('hidden');
+                }
             }
 
-            // Determine section from URL query string
-const urlParams = new URLSearchParams(window.location.search);
-const section = urlParams.get('section');
+            // Show the requested section if it exists
+            const activeSection = sections[sectionId];
+            if (activeSection) {
+                activeSection.classList.remove('hidden');
+            }
 
-switch (section) {
-    case 'favoritesSection':
-        setActiveLink(favLink);
-        showContent('favoritesSection', 'Fav', 'Fav');
-        break;
-    case 'notificationsSection':
-        setActiveLink(notificationsLink);
-        showContent('notificationsSection', 'settings_notifications', 'settings_notifications');
-        break;
-    default:
-        setActiveLink(myAccountLink);
-        showContent('myAccountContentSection', 'MyAccount', 'MyAccount');
-}
+            // Update title and breadcrumbs
+            mainContentTitle.textContent = translations[titleKey] || titleKey;
+            breadcrumbs.innerHTML = translations['home'] + ' <span class="mx-1">&gt;</span> ' + (translations[titleKey] || titleKey);
 
+            // Update the URL to allow for back/forward navigation and refreshing
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set('section', sectionId);
+            history.pushState(null, '', `${window.location.pathname}?${urlParams.toString()}`);
+        }
 
+        // Map link IDs to their corresponding section IDs and translation keys
+        const linkMap = {
+            'myAccountLink': { section: 'myAccountContentSection', title: 'MyAccount' },
+            'favLink': { section: 'favoritesSection', title: 'Fav' },
+            'notificationsLink': { section: 'notificationsSection', title: 'settings_notifications' },
+            'myProductsLink': { section: 'myProductsSection', title: 'myProducts' },
+            'myOrdersLink': { section: 'myOrdersSection', title: 'MyOrders' },
+            'messagesLink': { section: 'messagesSection', title: 'messages' }, // Added messages
+        };
+        
+        // Determine initial section from URL query string
+        const urlParams = new URLSearchParams(window.location.search);
+        const sectionParam = urlParams.get('section');
+        let initialSection = 'myAccountContentSection';
+        let initialLink = navLinks.myAccountLink;
+        
+        // Find the correct initial section based on the URL parameter
+        for (const linkId in linkMap) {
+            if (linkMap[linkId].section === sectionParam) {
+                initialSection = sectionParam;
+                initialLink = navLinks[linkId];
+                break;
+            }
+        }
 
-            // Event listener for "My Account" link
-            myAccountLink.addEventListener('click', function(e) {
-                e.preventDefault();
-                setActiveLink(myAccountLink);
-                showContent('myAccountContentSection', 'MyAccount', 'MyAccount');
-            });
+        const initialLinkData = linkMap[initialLink.id];
+        showContent(initialSection, initialLinkData.title);
+        setActiveLink(initialLink);
 
-            // Event listener for "Fav" link
-            favLink.addEventListener('click', function(e) {
-                e.preventDefault();
-                setActiveLink(favLink);
-                showContent('favoritesSection', 'Fav', 'Fav');
-            });
+        // Add event listeners to all links in a loop using the map
+        for (const linkId in navLinks) {
+            const link = navLinks[linkId];
+            if (link) {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const linkData = linkMap[link.id];
+                    if (linkData) {
+                        setActiveLink(link);
+                        showContent(linkData.section, linkData.title);
+                    }
+                });
+            }
+        }
 
-            // Event listener for "Notifications" link (NEW!)
-            notificationsLink.addEventListener('click', function(e) {
-                e.preventDefault();
-                setActiveLink(notificationsLink);
-                showContent('notificationsSection', 'settings_notifications', 'settings_notifications');
-            });
+        // Handle browser back/forward buttons
+        window.addEventListener('popstate', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sectionParam = urlParams.get('section');
+            let foundSection = false;
+            for (const linkId in linkMap) {
+                if (linkMap[linkId].section === sectionParam) {
+                    setActiveLink(navLinks[linkId]);
+                    showContent(linkMap[linkId].section, linkMap[linkId].title);
+                    foundSection = true;
+                    break;
+                }
+            }
+            if (!foundSection) {
+                // Default to My Account if URL is invalid or empty
+                setActiveLink(navLinks.myAccountLink);
+                showContent('myAccountContentSection', 'MyAccount');
+            }
+        });
 
-            // --- Modal Open/Close Logic ---
+        // --- Modal Open/Close Logic ---
+        if (openProfileModalBtn) {
             openProfileModalBtn.addEventListener('click', function() {
                 modalProfileImage.src = profileImage.src;
                 profileModal.style.display = 'flex';
                 modalMessage.textContent = '';
             });
-
+        }
+        
+        if (closeModalBtn) {
             closeModalBtn.addEventListener('click', function() {
                 profileModal.style.display = 'none';
             });
+        }
 
-            window.addEventListener('click', function(event) {
-                if (event.target == profileModal) {
-                    profileModal.style.display = 'none';
-                }
-            });
+        window.addEventListener('click', function(event) {
+            if (event.target == profileModal) {
+                profileModal.style.display = 'none';
+            }
+        });
 
-            // --- Change Photo (via hidden input triggered from modal) ---
+        // --- Change Photo (via hidden input triggered from modal) ---
+        if (changePhotoBtn) {
             changePhotoBtn.addEventListener('click', function() {
                 profilePictureInput.click();
                 profileModal.style.display = 'none';
             });
+        }
 
-            // --- Handle File Selection (from hidden input after modal closes) ---
+        // --- Handle File Selection (from hidden input after modal closes) ---
+        if (profilePictureInput) {
             profilePictureInput.addEventListener('change', function(event) {
                 const file = event.target.files[0];
                 if (file) {
@@ -660,8 +596,10 @@ switch (section) {
                 }
                 event.target.value = '';
             });
+        }
 
-            // --- Handle Save Profile Photo Button Click (AJAX upload) ---
+        // --- Handle Save Profile Photo Button Click (AJAX upload) ---
+        if (saveProfilePhotoBtn) {
             saveProfilePhotoBtn.addEventListener('click', async function() {
                 if (!selectedFile) {
                     uploadMessage.className = 'mt-2 text-sm text-red-500 text-center';
@@ -687,27 +625,22 @@ switch (section) {
                     });
 
                     const data = await response.json();
-
                     uploadLoading.classList.add('hidden');
 
                     if (response.ok) {
                         const newImageUrl = data.profile_picture_url + '?' + new Date().getTime();
                         profileImage.src = newImageUrl;
                         modalProfileImage.src = newImageUrl;
-
                         uploadMessage.className = 'mt-2 text-sm text-green-500 text-center';
                         uploadMessage.textContent = data.message || 'تم تحديث صورة الملف الشخصي بنجاح!';
                         selectedFile = null;
                         profilePictureInput.value = '';
-
                         if (removePhotoBtn) {
                             removePhotoBtn.classList.remove('hidden');
                         }
                     } else {
-                        let errorMessage = 'حدث خطأ أثناء تحميل الصورة.';
-                        if (data.message) {
-                            errorMessage = data.message;
-                        } else if (data.errors && data.errors.profile_picture) {
+                        let errorMessage = data.message || 'حدث خطأ أثناء تحميل الصورة.';
+                        if (data.errors && data.errors.profile_picture) {
                             errorMessage = data.errors.profile_picture[0];
                         }
                         uploadMessage.className = 'mt-2 text-sm text-red-500 text-center';
@@ -722,17 +655,17 @@ switch (section) {
                     saveProfilePhotoBtn.classList.remove('hidden');
                 }
             });
+        }
 
-            // --- Handle Remove Photo Button Click (AJAX removal) ---
-            @if (Auth::user()->profile_picture)
+        // --- Handle Remove Photo Button Click (AJAX removal) ---
+        @if (Auth::user()->profile_picture)
+            if (removePhotoBtn) {
                 removePhotoBtn.addEventListener('click', async function() {
                     if (!confirm('{{ __('messages.confirm_delete_image') }}')) {
                         return;
                     }
-
                     modalMessage.textContent = '';
-                    uploadLoading.classList.remove('hidden'); // Use the same loading indicator or add a new one
-
+                    uploadLoading.classList.remove('hidden');
                     try {
                         const response = await fetch('{{ route('profile.removeProfilePicture') }}', {
                             method: 'POST',
@@ -741,20 +674,18 @@ switch (section) {
                                 'Accept': 'application/json'
                             }
                         });
-
                         const data = await response.json();
                         uploadLoading.classList.add('hidden');
-
                         if (response.ok) {
                             const defaultImageUrl = '{{ asset('images/Unknown_person.jpg') }}';
                             profileImage.src = defaultImageUrl;
                             modalProfileImage.src = defaultImageUrl;
                             modalMessage.className = 'mt-4 text-sm text-green-500 text-center';
                             modalMessage.textContent = data.message || 'تم حذف الصورة الشخصية بنجاح.';
-                            removePhotoBtn.classList.add('hidden'); // Hide remove button
-                            saveProfilePhotoBtn.classList.add('hidden'); // Hide save button as no file selected
-                            profilePictureInput.value = ''; // Clear file input
-                            selectedFile = null; // Clear selected file
+                            removePhotoBtn.classList.add('hidden');
+                            saveProfilePhotoBtn.classList.add('hidden');
+                            profilePictureInput.value = '';
+                            selectedFile = null;
                         } else {
                             modalMessage.className = 'mt-4 text-sm text-red-500 text-center';
                             modalMessage.textContent = data.message || 'حدث خطأ أثناء حذف الصورة.';
@@ -766,181 +697,156 @@ switch (section) {
                         modalMessage.textContent = 'حدث خطأ غير متوقع أثناء الحذف.';
                     }
                 });
-            @endif
-        });
-
-                // This typically goes into your app.js or a script tag before </body>
-function passwordForm() {
-    return {
-        success: '',
-        errors: {},
-        formData: {
-            current_password: '',
-            password: '',
-            password_confirmation: ''
-        },
-
-        async submitPasswordForm() {
-            this.success = ''; // Clear previous messages
-            this.errors = {}; // Clear previous errors
-
-            try {
-                // Get CSRF token from meta tag
-                const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-
-                const response = await fetch('{{ route('profile.updatePassword') }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken // Send CSRF token
-                    },
-                    body: JSON.stringify(this.formData) // Send form data as JSON
-                });
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    // Handle HTTP errors (e.g., 422 Unprocessable Entity)
-                    if (response.status === 422) {
-                        this.errors = data.errors; // Laravel validation errors
-                    } else {
-                        // Generic error or server error
-                        this.errors = { general: [data.message || 'An unexpected error occurred.'] };
-                    }
-                    this.success = ''; // Clear success if there was an error
-                } else {
-                    // Success!
-                    this.success = data.message;
-                    this.errors = {}; // Clear any previous errors
-                    // Clear form fields on success
-                    this.formData.current_password = '';
-                    this.formData.password = '';
-                    this.formData.password_confirmation = '';
-                }
-
-            } catch (error) {
-                console.error('Error submitting password form:', error);
-                this.errors = { general: ['Network error or something went wrong.'] };
-                this.success = '';
             }
-        }
-    }
-}
-// Add this function to your JavaScript file (e.g., resources/js/app.js)
-function accountDetailsForm(initialUser) { // Pass initial user data
-    return {
-        success: '',
-        errors: {},
-        formData: {
-            first_name: initialUser.first_name || '',
-            last_name: initialUser.last_name || '',
-            email: initialUser.email || '',
-            phone_number: initialUser.phone_number || '',
-            address: initialUser.address || '',
-        },
+        @endif
+    });
 
-        async submitDetailsForm(event) {
-            this.success = ''; // Clear previous messages
-            this.errors = {}; // Clear previous errors
+    // --- Alpine.js Components ---
 
-            try {
-                const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-                const form = event.target; // Get the form element
-
-                const response = await fetch(form.action, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken
-                    },
-                    body: JSON.stringify(this.formData) // Send form data as JSON
-                });
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    if (response.status === 422) {
-                        this.errors = data.errors; // Laravel validation errors
-                    } else {
-                        this.errors = { general: [data.message || 'An unexpected error occurred.'] };
-                    }
-                    this.success = ''; // Clear success if there was an error
-                } else {
-                    // Success!
-                    this.success = data.message;
-                    this.errors = {}; // Clear any previous errors
-
-                    // Optional: You might want to update the displayed user data
-                    // if the controller returns the new user object, or simply rely
-                    // on the x-model bindings to keep the form data updated.
-                    // If you fetch `user` object again, update initialUser.
-                }
-
-            } catch (error) {
-                console.error('Error submitting account details form:', error);
-                this.errors = { general: ['Network error or something went wrong.'] };
+    // Password Form Component
+    function passwordForm() {
+        return {
+            success: '',
+            errors: {},
+            formData: {
+                current_password: '',
+                password: '',
+                password_confirmation: ''
+            },
+            async submitPasswordForm() {
                 this.success = '';
-            }
-        }
-    }
-}
-// Make the function available globally
-window.accountDetailsForm = accountDetailsForm;
-
-
-        // Alpine.js component for notifications form (NEW!)
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('notificationsForm', (initialSettings) => ({
-                formData: {
-                    receive_in_app: initialSettings.receive_in_app || false,
-                    receive_chat: initialSettings.receive_chat || false,
-                    order_status_updates: initialSettings.order_status_updates || false,
-                    offers_discounts: initialSettings.offers_discounts || false,
-                    viewed_products_offers: initialSettings.viewed_products_offers || false,
-                },
-                success: '',
-                errors: {},
-
-                async submitNotificationsForm() {
-                    this.errors = {}; // Clear previous errors
-                    this.success = ''; // Clear previous success message
-
-                    try {
-                        const response = await fetch(this.$el.action, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                            },
-                            body: JSON.stringify(this.formData)
-                        });
-
-                        const data = await response.json();
-
-                        if (response.ok) {
-                            this.success = data.message || 'تم تحديث إعدادات الإشعارات بنجاح!';
-                            // Optionally, update the formData if the backend sends back canonical values
-                            // this.formData = { ...data.settings };
+                this.errors = {};
+                try {
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+                    const response = await fetch('{{ route('profile.updatePassword') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: JSON.stringify(this.formData)
+                    });
+                    const data = await response.json();
+                    if (!response.ok) {
+                        if (response.status === 422) {
+                            this.errors = data.errors;
                         } else {
-                            if (response.status === 422) { // Validation errors
-                                this.errors = data.errors;
-                            } else {
-                                this.errors = {
-                                    general: [data.message || 'حدث خطأ أثناء تحديث إعدادات الإشعارات.']
-                                };
-                            }
+                            this.errors = { general: [data.message || 'An unexpected error occurred.'] };
                         }
-                    } catch (error) {
-                        console.error('Error submitting notification form:', error);
-                        this.errors = {
-                            general: ['حدث خطأ في الشبكة. يرجى المحاولة مرة أخرى.']
-                        };
+                        this.success = '';
+                    } else {
+                        this.success = data.message;
+                        this.errors = {};
+                        this.formData.current_password = '';
+                        this.formData.password = '';
+                        this.formData.password_confirmation = '';
                     }
+                } catch (error) {
+                    console.error('Error submitting password form:', error);
+                    this.errors = { general: ['Network error or something went wrong.'] };
+                    this.success = '';
                 }
-            }));
-        });
-    </script>
+            }
+        }
+    }
+    window.passwordForm = passwordForm;
+
+    // Account Details Form Component
+    function accountDetailsForm(initialUser, initialBusiness) {
+        return {
+            success: '',
+            errors: {},
+            formData: {
+                first_name: initialUser.first_name || '',
+                last_name: initialUser.last_name || '',
+                email: initialUser.email || '',
+                phone_number: initialUser.phone_number || '',
+                address: initialUser.address || '',
+                company_name: initialBusiness?.company_name || '',
+                business_start_date: initialBusiness?.created_at || '',
+                experience_years: initialBusiness?.experience_years || '',
+                description: initialBusiness?.description || '',
+                certificate: null
+            },
+            async submitDetailsForm(event) {
+                this.success = '';
+                this.errors = {};
+                try {
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+                    const form = event.target;
+                    const response = await fetch(form.action, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: JSON.stringify(this.formData)
+                    });
+                    const data = await response.json();
+                    if (!response.ok) {
+                        if (response.status === 422) {
+                            this.errors = data.errors;
+                        } else {
+                            this.errors = { general: [data.message || 'An unexpected error occurred.'] };
+                        }
+                        this.success = '';
+                    } else {
+                        this.success = data.message;
+                        this.errors = {};
+                    }
+                } catch (error) {
+                    console.error('Error submitting account details form:', error);
+                    this.errors = { general: ['Network error or something went wrong.'] };
+                    this.success = '';
+                }
+            }
+        }
+    }
+    window.accountDetailsForm = accountDetailsForm;
+
+    // Alpine.js component for notifications form
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('notificationsForm', (initialSettings) => ({
+            formData: {
+                receive_in_app: initialSettings.receive_in_app || false,
+                receive_chat: initialSettings.receive_chat || false,
+                order_status_updates: initialSettings.order_status_updates || false,
+                offers_discounts: initialSettings.offers_discounts || false,
+                viewed_products_offers: initialSettings.viewed_products_offers || false,
+            },
+            success: '',
+            errors: {},
+            async submitNotificationsForm() {
+                this.errors = {};
+                this.success = '';
+                try {
+                    const response = await fetch(this.$el.action, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify(this.formData)
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        this.success = data.message || 'تم تحديث إعدادات الإشعارات بنجاح!';
+                    } else {
+                        if (response.status === 422) {
+                            this.errors = data.errors;
+                        } else {
+                            this.errors = { general: [data.message || 'حدث خطأ أثناء تحديث إعدادات الإشعارات.'] };
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error submitting notification form:', error);
+                    this.errors = { general: ['حدث خطأ في الشبكة. يرجى المحاولة مرة أخرى.'] };
+                }
+            }
+        }));
+    });
+</script>
 @endsection

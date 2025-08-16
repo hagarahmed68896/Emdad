@@ -215,26 +215,31 @@
             <div class="w-full lg:w-1/2  rounded-[12px]  flex flex-col items-center">
 
                 {{-- Main Product Image Swiper --}}
-                <div class="relative w-full md:h-[1080px] bg-[#EDEDED] py-4 overflow-hidden rounded-[12px]">
-                    <div class="relative w-full aspect-[3/4] md:aspect-[3/5] lg:aspect-[2/3] rounded-lg">
-
+                <div
+                    class="relative w-full {{ !Auth::check() || Auth::user()->account_type !== 'supplier' ? 'md:h-[1080px]' : 'md:h-[600px]' }} bg-[#EDEDED] py-4 overflow-hidden rounded-[12px]">
+                    {{-- Remove the aspect-[...] class from this div --}}
+                    <div class="relative w-full h-full rounded-lg">
                         <div class="swiper product-main-swiper w-full h-full rounded-lg flex items-center justify-center">
                             <div class="swiper-wrapper">
                                 @php
-                                    $images = collect(is_string($product->images) ? json_decode($product->images, true) : ($product->images ?? []));
+                                    $images = collect(
+                                        is_string($product->images)
+                                            ? json_decode($product->images, true)
+                                            : $product->images ?? [],
+                                    );
                                 @endphp
 
                                 @forelse ($images as $image)
                                     <div class="swiper-slide">
                                         <img src="{{ Storage::url($image) }}"
-                                             onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
-                                             class="w-full h-full object-contain">
+                                            onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
+                                            class="w-full h-full object-cover">
                                     </div>
                                 @empty
                                     <div class="swiper-slide">
                                         <img src="{{ asset($product->image ?? 'https://placehold.co/300x200/F0F0F0/ADADAD?text=No+Image') }}"
-                                             onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
-                                             class="w-full h-full object-contain">
+                                            onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
+                                            class="w-full h-full object-cover">
                                     </div>
                                 @endforelse
                             </div>
@@ -244,8 +249,12 @@
                             <div class="swiper-button-prev text-[#212121] bg-white rounded-full p-3 shadow-sm"></div>
                         </div>
 
-                        {{-- Discount Badge  --}}
-                        @if ($product->offer->is_offer && $product->offer->discount_percent)
+                        {{-- Discount Badge --}}
+                        @php
+                            $offer = $product->offer; // Relationship: Product hasOne Offer
+                        @endphp
+
+                        @if ($offer && $offer->discount_percent)
                             <span
                                 class="absolute top-3 right-3 bg-[#FAE1DF] text-[#C62525] text-xs font-bold px-4 py-2 rounded-full z-10">
                                 {{ __('messages.discount_percentage', ['percent' => $product->offer->discount_percent]) }}
@@ -253,24 +262,26 @@
                         @endif
 
                         {{-- Favorite Button (Top Left) --}}
-                        <button
-                            class="favorite-button absolute top-3 rtl:left-3 ltr:right-3 bg-white p-2 rounded-full shadow-md text-gray-500 hover:text-red-500 transition-colors duration-200 z-10"
-                            data-product-id="{{ $product->id }}" aria-label="Add to favorites">
-                            {{-- Conditional SVG for filled/unfilled heart --}}
-                            @if (Auth::check() && Auth::user()->hasFavorited($product->id))
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"
-                                    stroke-width="1.5" stroke="currentColor" class="size-6 text-red-500">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-                                </svg>
-                            @else
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                    stroke-width="1.5" stroke="currentColor" class="size-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-                                </svg>
-                            @endif
-                        </button>
+                        @if (!Auth::check() || Auth::user()->account_type !== 'supplier')
+                            <button
+                                class="favorite-button absolute top-3 rtl:left-3 ltr:right-3 bg-white p-2 rounded-full shadow-md text-gray-500 hover:text-red-500 transition-colors duration-200 z-10"
+                                data-product-id="{{ $product->id }}" aria-label="Add to favorites">
+                                {{-- Conditional SVG for filled/unfilled heart --}}
+                                @if (Auth::check() && Auth::user()->hasFavorited($product->id))
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" class="size-6 text-red-500">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                                    </svg>
+                                @else
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                                    </svg>
+                                @endif
+                            </button>
+                        @endif
                     </div>
                 </div>
 
@@ -280,10 +291,10 @@
                         @forelse ($images as $image)
                             <div
                                 class="swiper-slide w-[120px] h-[150px] bg-[#EDEDED] rounded-md overflow-hidden border-2 border-transparent hover:border-[#185D31] transition-all duration-200 cursor-pointer">
-                               <img src="{{ Storage::url($image) }}"
-                                             onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
-                                             class="w-full h-full object-contain">
-                                   </div>
+                                <img src="{{ Storage::url($image) }}"
+                                    onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
+                                    class="w-full h-full object-contain">
+                            </div>
                         @empty
                             {{-- No thumbnails if no images --}}
                         @endforelse
@@ -298,7 +309,21 @@
 
                 {{-- Product Header --}}
                 <div class=" items-center mb-1">
-                    <h1 class="text-[32px] font-bold text-[#212121] mb-3">{{ $product->name }}</h1>
+                    <div class="flex justify-between">
+                        <h1 class="text-[32px] font-bold text-[#212121] mb-3">{{ $product->name }}</h1>
+                        <div>
+                        <a href="{{ route('products.edit', $product->id) }}"
+                            class="flex-1 flex items-center justify-center gap-1 text-center text-white py-2 px-3 bg-[#185D31] rounded-xl transition">
+                            {{-- Edit icon --}}
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                            </svg>
+                            {{__('messages.edit')}}
+                        </a>
+                    </div>
+                    </div>
                     <div class="flex items-center">
 
                         @php
@@ -312,7 +337,8 @@
 
                         {{-- Display Full Stars --}}
                         @for ($i = 0; $i < $fullStars; $i++)
-                            <img class="ml-1 w-[20px] h-[20px]" src="{{ asset('images/Vector (4).svg') }}" alt="Full Star">
+                            <img class="ml-1 w-[20px] h-[20px]" src="{{ asset('images/Vector (4).svg') }}"
+                                alt="Full Star">
                         @endfor
 
                         {{-- Display Half Star (if any) --}}
@@ -336,21 +362,26 @@
                 </div>
 
                 {{-- Supplier Info --}}
-                <div class="flex items-center mb-2">
-                    @if ($product->supplier->supplier_confirmed)
-                        <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]" src="{{ asset('images/Success.svg') }}"
-                            alt="Confirmed Supplier">
-                    @endif
-                    <p class="text-[20px] text-[#212121]">{{ $product->supplier->company_name }}</p>
-                </div>
-
+                @if (!Auth::check() || Auth::user()->account_type !== 'supplier')
+                    <div class="flex items-center mb-2">
+                        @if ($product->supplier->supplier_confirmed)
+                            <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]" src="{{ asset('images/Success.svg') }}"
+                                alt="Confirmed Supplier">
+                        @endif
+                        <p class="text-[20px] text-[#212121]">{{ $product->supplier->company_name }}</p>
+                    </div>
+                @endif
                 <div class="mb-2 w-full bg-[#F8F9FA] p-4 rounded-[12px]">
                     {{-- Top flex row with "selectable" and discount --}}
                     <div class="flex flex-col md:flex-row">
                         <p
                             class="bg-white ml-4  md:mb-0 items-center text-center justify-center mb-2 h-[40px] px-[16px] py-[8px] rounded-[40px]">
                             {{ __('messages.selectable') }}</p>
-                        @if ($product->offer->is_offer && $product->offer->discount_percent)
+                        @php
+                            $offer = $product->offer; // Relationship: Product hasOne Offer
+                        @endphp
+
+                        @if ($offer && $offer->discount_percent)
                             <span
                                 class="h-[40px] bg-[#FAE1DF] text-[#C62525] text-xs font-bold px-3 rounded-full z-10
            flex items-center justify-center">
@@ -376,7 +407,11 @@
                                     <img class="currency-symbol inline-block mx-1 md:w-[24px] md:h-[27px] w-[20px] h-[22px]"
                                         src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}" alt="Currency">
                                 </p>
-                                @if ($product->offer->is_offer && $product->offer->discount_percent)
+                                @php
+                                    $offer = $product->offer; // Relationship: Product hasOne Offer
+                                @endphp
+
+                                @if ($offer && $offer->discount_percent)
                                     <p class="flex text-sm text-gray-400 line-through ">
                                         {{ number_format($product->price, 2) }}
                                         <img class="mx-1 w-[14px] h-[14px] mt-1 inline-block"
@@ -391,52 +426,51 @@
                     </div>
                 </div>
 
-            {{-- ✅ Colors --}}
-<div class="border-b border-t border-[#EDEDED] py-3">
-    @php
-        // Get colors directly from the 'colors' column
-        $productColors = $product->colors ?? [];
+                {{-- ✅ Colors --}}
+                <div class="border-b border-t border-[#EDEDED] py-3">
+                    @php
+                        // Get colors directly from the 'colors' column
+                        $productColors = $product->colors ?? [];
 
-        // Ensure valid array structure
-        if (!is_array($productColors)) {
-            $productColors = [];
-        }
+                        // Ensure valid array structure
+                        if (!is_array($productColors)) {
+                            $productColors = [];
+                        }
 
-        // Get the first color's name to mark as default selected
-        $defaultSelectedColorName = $productColors[0]['name'] ?? null;
-    @endphp
+                        // Get the first color's name to mark as default selected
+$defaultSelectedColorName = $productColors[0]['name'] ?? null;
+                    @endphp
 
-    {{-- Select changes popup --}}
-    @include('categories.selectChanges_popup')
+                    @if (!Auth::check() || Auth::user()->account_type !== 'supplier')
+                        {{-- Select changes popup --}}
+                        @include('categories.selectChanges_popup')
+                    @endif
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">
+                        {{ __('messages.colors') }} (<span id="colorCount">{{ count($productColors) }}</span>):
+                        <span id="selectedColorName" class="font-normal text-[#212121]"></span>
+                    </h3>
 
-    <h3 class="text-lg font-bold text-gray-800 mb-2">
-        {{ __('messages.colors') }} (<span id="colorCount">{{ count($productColors) }}</span>):
-        <span id="selectedColorName" class="font-normal text-[#212121]"></span>
-    </h3>
+                    <div class="flex gap-2">
+                        @forelse ($productColors as $colorOption)
+                            @if (isset($colorOption['name'], $colorOption['image']))
+                                @php
+                                    // Check if the image value is a Base64 string
+                                    $isBase64 = str_starts_with($colorOption['image'], 'data:image');
+                                    $imageSrc = $isBase64 ? $colorOption['image'] : asset($colorOption['image']);
+                                @endphp
 
-    <div class="flex gap-2">
-        @forelse ($productColors as $colorOption)
-      @if (isset($colorOption['name'], $colorOption['image']))
-    @php
-        // Check if the image value is a Base64 string
-        $isBase64 = str_starts_with($colorOption['image'], 'data:image');
-        $imageSrc = $isBase64 ? $colorOption['image'] : asset($colorOption['image']);
-    @endphp
-
-    <div class="color-swatch cursor-pointer {{ $defaultSelectedColorName == $colorOption['name'] ? 'selected' : '' }}"
-        data-color-name="{{ $colorOption['name'] }}"
-        data-swatch-image="{{ $imageSrc }}"
-        title="{{ $colorOption['name'] }}">
-        <img src="{{ $imageSrc }}"
-             alt="{{ $colorOption['name'] }} Swatch"
-             class=" border object-cover">
-    </div>
-@endif
-        @empty
-            <p class="text-gray-500 text-sm">{{ __('messages.no_colors_available') }}</p>
-        @endforelse
-    </div>
-</div>
+                                <div class="color-swatch cursor-pointer {{ $defaultSelectedColorName == $colorOption['name'] ? 'selected' : '' }}"
+                                    data-color-name="{{ $colorOption['name'] }}" data-swatch-image="{{ $imageSrc }}"
+                                    title="{{ $colorOption['name'] }}">
+                                    <img src="{{ $imageSrc }}" alt="{{ $colorOption['name'] }} Swatch"
+                                        class=" border object-cover">
+                                </div>
+                            @endif
+                        @empty
+                            <p class="text-gray-500 text-sm">{{ __('messages.no_colors_available') }}</p>
+                        @endforelse
+                    </div>
+                </div>
 
 
 
@@ -484,72 +518,74 @@
                 </div>
 
 
+                @if (!Auth::check() || Auth::user()->account_type !== 'supplier')
+                    {{-- Action Buttons --}}
+                    <div class="flex gap-4">
+                        <button
+                            class="flex-1 bg-[#185D31] text-white py-3 rounded-[12px] font-semibold transition duration-300 shadow-md flex items-center justify-center gap-2">
+                            {{ __('messages.place_order') }}
+                        </button>
+                        <button
+                            class="flex-1 bg-[#EDEDED] text-[#696969] py-3 rounded-[12px] font-semibold transition duration-300 shadow-md flex items-center justify-center gap-2">
+                            {{ __('messages.contact_supplier') }}
+                        </button>
+                    </div>
 
-                {{-- Action Buttons --}}
-                <div class="flex gap-4">
-                    <button
-                        class="flex-1 bg-[#185D31] text-white py-3 rounded-[12px] font-semibold transition duration-300 shadow-md flex items-center justify-center gap-2">
-                        {{ __('messages.place_order') }}
-                    </button>
-                    <button
-                        class="flex-1 bg-[#EDEDED] text-[#696969] py-3 rounded-[12px] font-semibold transition duration-300 shadow-md flex items-center justify-center gap-2">
-                        {{ __('messages.contact_supplier') }}
-                    </button>
-                </div>
+                    {{-- 4 Interest-Free Payments (Conditional Logic) --}}
 
-                {{-- 4 Interest-Free Payments (Conditional Logic) --}}
-                <div class="rounded-lg border-b border-[#EDEDED] pb-4">
-                    @if (($product->price ?? 0) >= 100)
-                        <div class="flex items-start text-gray-700 mt-4 pt-4 border-t border-gray-200">
-                            <img class="rtl:ml-2 ltr:mr-2 mt-1 w-[16px] h-[16px] flex-shrink-0"
-                                src="{{ asset('images/interface-alert-warning-circle--warning-alert-frame-exclamation-caution-circle--Streamline-Core.svg') }}"
-                                onerror="this.onerror=null;this.src='https://placehold.co/24x24/F0F0F0/ADADAD?text=I';"
-                                alt="{{ __('messages.interest_free_payments_info') }} Icon">
+                    <div class="rounded-lg border-b border-[#EDEDED] pb-4">
+                        @if (($product->price ?? 0) >= 100)
+                            <div class="flex items-start text-gray-700 mt-4 pt-4 border-t border-gray-200">
+                                <img class="rtl:ml-2 ltr:mr-2 mt-1 w-[16px] h-[16px] flex-shrink-0"
+                                    src="{{ asset('images/interface-alert-warning-circle--warning-alert-frame-exclamation-caution-circle--Streamline-Core.svg') }}"
+                                    onerror="this.onerror=null;this.src='https://placehold.co/24x24/F0F0F0/ADADAD?text=I';"
+                                    alt="{{ __('messages.interest_free_payments_info') }} Icon">
 
-                            <p class="font-semibold text-[16px]">{{ __('messages.interest_free_payments_info') }}</p>
-                            <div class="flex gap-2 rtl:mr-2 ltr:ml-2">
-                                <img src="{{ asset('images/Tabby.svg') }}"
-                                    onerror="this.onerror=null;this.src='https://placehold.co/60x20/F0F0F0/ADADAD?text=Tabby';"
-                                    alt="Tabby Logo" class="h-5 object-contain">
-                                <img src="{{ asset('images/tamara.svg') }}"
-                                    onerror="this.onerror=null;this.src='https://placehold.co/60x20/F0F0F0/ADADAD?text=Tamara';"
-                                    alt="Tamara Logo" class="h-5 object-contain">
+                                <p class="font-semibold text-[16px]">{{ __('messages.interest_free_payments_info') }}</p>
+                                <div class="flex gap-2 rtl:mr-2 ltr:ml-2">
+                                    <img src="{{ asset('images/Tabby.svg') }}"
+                                        onerror="this.onerror=null;this.src='https://placehold.co/60x20/F0F0F0/ADADAD?text=Tabby';"
+                                        alt="Tabby Logo" class="h-5 object-contain">
+                                    <img src="{{ asset('images/tamara.svg') }}"
+                                        onerror="this.onerror=null;this.src='https://placehold.co/60x20/F0F0F0/ADADAD?text=Tamara';"
+                                        alt="Tamara Logo" class="h-5 object-contain">
+                                </div>
+
                             </div>
-
-                        </div>
-                    @endif
-                </div>
-
-                {{-- Product Protection --}}
-                <div class="rounded-lg pb-4">
-                    <h3 class="text-[24px] font-bold text-gray-800 mb-2">{{ __('messages.product_protection') }}</h3>
-
-                    {{-- Secure Payments --}}
-                    <div class="flex items-start text-gray-700 mb-3">
-                        <img class="rtl:ml-2 ltr:mr-2 w-[23.5px] h-[23.5px] mt-1 flex-shrink-0"
-                            src="{{ asset('images/interface-security-shield-3--shield-pay-product-secure-money-cash-currency-security-business--Streamline-Core.svg') }}"
-                            onerror="this.onerror=null;this.src='https://placehold.co/24x24/F0F0F0/ADADAD?text=P';"
-                            alt="{{ __('messages.secure_payments') }} Icon">
-                        <div>
-                            <p class="font-bold text-[20px]">{{ __('messages.secure_payments') }}</p>
-                            <p class="text-[16px] text-[#212121]">{{ __('messages.secure_payments_description') }}</p>
-                        </div>
+                        @endif
                     </div>
+                    {{-- Product Protection --}}
+                    <div class="rounded-lg pb-4">
+                        <h3 class="text-[24px] font-bold text-gray-800 mb-2">{{ __('messages.product_protection') }}</h3>
 
-                    {{-- Easy Returns and Refunds --}}
-                    <div class="flex items-start text-gray-700 mb-3">
-                        <img class="rtl:ml-2 ltr:mr-2 w-[23.5px] h-[23.5px] mt-1 flex-shrink-0"
-                            src="{{ asset('images/Vector (8).svg') }}"
-                            onerror="this.onerror=null;this.src='https://placehold.co/24x24/F0F0F0/ADADAD?text=R';"
-                            alt="{{ __('messages.easy_returns_refunds') }} Icon">
-                        <div>
-                            <p class="font-bold text-[20px]">{{ __('messages.easy_returns_refunds') }}</p>
-                            <p class="text-[16px] text-[#212121]">{{ __('messages.easy_returns_refunds_description') }}
-                            </p>
+                        {{-- Secure Payments --}}
+                        <div class="flex items-start text-gray-700 mb-3">
+                            <img class="rtl:ml-2 ltr:mr-2 w-[23.5px] h-[23.5px] mt-1 flex-shrink-0"
+                                src="{{ asset('images/interface-security-shield-3--shield-pay-product-secure-money-cash-currency-security-business--Streamline-Core.svg') }}"
+                                onerror="this.onerror=null;this.src='https://placehold.co/24x24/F0F0F0/ADADAD?text=P';"
+                                alt="{{ __('messages.secure_payments') }} Icon">
+                            <div>
+                                <p class="font-bold text-[20px]">{{ __('messages.secure_payments') }}</p>
+                                <p class="text-[16px] text-[#212121]">{{ __('messages.secure_payments_description') }}</p>
+                            </div>
                         </div>
-                    </div>
 
-                </div>
+                        {{-- Easy Returns and Refunds --}}
+                        <div class="flex items-start text-gray-700 mb-3">
+                            <img class="rtl:ml-2 ltr:mr-2 w-[23.5px] h-[23.5px] mt-1 flex-shrink-0"
+                                src="{{ asset('images/Vector (8).svg') }}"
+                                onerror="this.onerror=null;this.src='https://placehold.co/24x24/F0F0F0/ADADAD?text=R';"
+                                alt="{{ __('messages.easy_returns_refunds') }} Icon">
+                            <div>
+                                <p class="font-bold text-[20px]">{{ __('messages.easy_returns_refunds') }}</p>
+                                <p class="text-[16px] text-[#212121]">
+                                    {{ __('messages.easy_returns_refunds_description') }}
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+                @endif
             </div>
         </div>
 
@@ -581,36 +617,6 @@
                     </p>
                 </div>
 
-                {{-- Key Features --}}
-                <div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-3">{{ __('messages.key_features') }}</h3>
-                    @php
-                        $features =
-                            is_array($product->specifications) && isset($product->specifications['features'])
-                                ? $product->specifications['features']
-                                : [];
-                        if (!is_array($features)) {
-                            $features = [];
-                        }
-                    @endphp
-                    @if (!empty($features))
-                        <ul class="list-none p-0 m-0">
-                            @foreach ($features as $feature)
-                                <li class="flex items-center text-gray-700 mb-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                        class="w-5 h-5 text-[#185D31] rtl:ml-2 ltr:mr-2" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                    </svg>
-                                    <span class="text-base">{{ $feature }}</span>
-                                </li>
-                            @endforeach
-                        </ul>
-                    @else
-                        <p class="text-gray-500 text-sm">{{ __('messages.no_features_available') }}</p>
-                    @endif
-                </div>
 
                 {{-- Specifications --}}
                 <div>
@@ -621,33 +627,31 @@
                                 <tr class="bg-gray-50">
                                     <td class="px-6 py-3 text-sm font-medium text-gray-900">
                                         {{ __('messages.color_name') }}</td>
+                                    @php
+                                        $colorNames = collect($product->colors ?? [])
+                                            ->pluck('name')
+                                            ->filter() // remove null/empty
+                                            ->implode(', ');
+                                    @endphp
+
                                     <td class="px-6 py-3 text-sm text-gray-700">
-                                        @php
-                                            $firstColorName = null;
-                                            if (
-                                                is_array($product->specifications) &&
-                                                isset($product->specifications['colors']) &&
-                                                is_array($product->specifications['colors']) &&
-                                                !empty($product->specifications['colors'][0]['name'])
-                                            ) {
-                                                $firstColorName = $product->specifications['colors'][0]['name'];
-                                            }
-                                        @endphp
-                                        {{ $firstColorName ?? __('messages.not_available') }}
+                                        {{ $colorNames ?: __('messages.not_available') }}
                                     </td>
+
+
                                 </tr>
                                 <tr>
-                                    <td class="px-6 py-3 text-sm font-medium text-gray-900">{{ __('messages.gender') }}
+                                    <td class="px-6 py-3 text-sm font-medium text-gray-900">{{ __('messages.category') }}
                                     </td>
                                     <td class="px-6 py-3 text-sm text-gray-700">
-                                        {{ $product->specifications['gender'] ?? __('messages.not_available') }}
+                                        {{ $product->subCategory->category->name ?? __('messages.not_available') }}
                                     </td>
                                 </tr>
                                 <tr class="bg-gray-50">
                                     <td class="px-6 py-3 text-sm font-medium text-gray-900">{{ __('messages.material') }}
                                     </td>
                                     <td class="px-6 py-3 text-sm text-gray-700">
-                                        {{ $product->specifications['material'] ?? __('messages.not_available') }}
+                                        {{ $product->material_type ?? __('messages.not_available') }}
                                     </td>
                                 </tr>
                                 <tr>
@@ -661,7 +665,7 @@
                                     <td class="px-6 py-3 text-sm font-medium text-gray-900">{{ __('messages.quality') }}
                                     </td>
                                     <td class="px-6 py-3 text-sm text-gray-700">
-                                        {{ $product->quality ?? __('messages.not_available') }}
+                                        {{ $product->quality ?? __('messages.heigh_quality') }}
                                     </td>
                                 </tr>
                             </tbody>
@@ -714,7 +718,10 @@
                             <span>{{ $percent }}%</span>
                         </div>
                     @endforeach
-                    <p class="mt-5 mb-2 text-[#272727] text-[16px]">{{ __('messages.add_review_desc') }}</p>
+
+                    @if (!Auth::check() || Auth::user()->account_type !== 'supplier')
+                        <p class="mt-5 mb-2 text-[#272727] text-[16px]">{{ __('messages.add_review_desc') }}</p>
+                    @endif
                     <!-- Add Review Button -->
                     <div x-cloak x-data="{
                         open: false,
@@ -722,8 +729,9 @@
                         comment: '',
                         errorMessage: ''
                     }">
-                        <button
-                            @click="
+                        @if (!Auth::check() || Auth::user()->account_type !== 'supplier')
+                            <button
+                                @click="
             @auth open = true;
                 errorMessage = ''; // Clear error message when opening the modal
                 rating = 0; // Reset rating when opening
@@ -731,10 +739,10 @@
             @else 
                 window.location.href = '{{ route('login') }}' @endauth
         "
-                            class="mt-3 bg-[#185D31] w-full hover:bg-green-800 text-white py-2 px-4 rounded-lg text-sm">
-                            {{ __('messages.add_review') }}
-                        </button>
-
+                                class="mt-3 bg-[#185D31] w-full hover:bg-green-800 text-white py-2 px-4 rounded-lg text-sm">
+                                {{ __('messages.add_review') }}
+                            </button>
+                        @endif
                         <div x-show="open" x-cloak
                             class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                             <div @click.away="open = false; errorMessage = ''"
@@ -1026,7 +1034,7 @@
             </div>
         </div>
 
-
+                                @if (!Auth::check() || Auth::user()->account_type !== 'supplier')
         @if ($relatedProducts->count())
             <div class="mt-10">
                 <h2 class="text-[40px] font-bold mb-4">{{ __('messages.may_like') }}</h2>
@@ -1034,28 +1042,25 @@
                     @forelse ($relatedProducts as $product)
                         <div class="product-card bg-white rounded-xl overflow-hidden shadow-md flex flex-col">
                             <div class="relative w-full h-48 sm:h-56 overflow-hidden product-image-swiper inner-swiper">
-                                <div class="swiper-wrapper">
-                                    @php
-                                        $images = is_string($product->images)
-                                            ? json_decode($product->images, true)
-                                            : $product->images ?? [];
-                                    @endphp
-                                    @if (!empty($images) && count($images) > 0)
-                                        @foreach ($images as $image)
-                                            <div class="swiper-slide">
-                                                <img src="{{ asset($image) }}"
-                                                    onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
-                                                    class="w-full h-full object-contain">
-                                            </div>
-                                        @endforeach
-                                    @else
-                                        <div class="swiper-slide">
-                                            <img src="{{ asset($product->image ?? 'https://placehold.co/300x200/F0F0F0/ADADAD?text=No+Image') }}"
-                                                onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
-                                                class="w-full h-full object-contain">
-                                        </div>
-                                    @endif
-                                </div>
+                                   <div class="swiper-wrapper">
+                                @php
+                                    $images = collect(is_string($offer->product->images) ? json_decode($offer->product->images, true) : ($offer->product->images ?? []));
+                                @endphp
+
+                                @forelse ($images as $image)
+                                    <div class="swiper-slide">
+                                        <img src="{{ Storage::url($image) }}"
+                                             onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
+                                             class="w-full h-full object-contain">
+                                    </div>
+                                @empty
+                                    <div class="swiper-slide">
+                                        <img src="{{ asset($offer->product->image ?? 'https://placehold.co/300x200/F0F0F0/ADADAD?text=No+Image') }}"
+                                             onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
+                                             class="w-full h-full object-contain">
+                                    </div>
+                                @endforelse
+                            </div>
                                 @php
                                     $images = is_string($product->images)
                                         ? json_decode($product->images, true)
@@ -1063,7 +1068,11 @@
                                 @endphp
                                 <div class="swiper-pagination image-pagination"
                                     style="{{ count($images) <= 1 ? 'display:none;' : '' }}"></div>
-                                @if ($product->offer->is_offer && $product->offer->discount_percent)
+                                @php
+                                    $offer = $product->offer; // Relationship: Product hasOne Offer
+                                @endphp
+
+                                @if ($offer && $offer->discount_percent)
                                     <span
                                         class="absolute top-3 right-3 bg-[#FAE1DF] text-[#C62525] text-xs font-bold px-[16px] py-[8px] rounded-full z-10">
                                         {{ __('messages.discount_percentage', ['percent' => $product->offer->discount_percent]) }}
@@ -1116,7 +1125,11 @@
                                         <img class="mx-1 w-[20px] h-[21px]" src="{{ asset('images/Vector (3).svg') }}"
                                             alt="">
                                     </span>
-                                    @if ($product->offer->is_offer && $product->offer->discount_percent)
+                                    @php
+                                        $offer = $product->offer; // Relationship: Product hasOne Offer
+                                    @endphp
+
+                                    @if ($offer && $offer->discount_percent)
                                         <span class="flex text-sm text-gray-400 line-through mr-2 mr-1">
                                             {{ number_format($product->price, 2) }}
                                             <img class="mx-1 w-[14px] h-[14px] mt-1 inline-block"
@@ -1149,7 +1162,7 @@
                 </div>
             </div>
         @endif
-
+@endif
 
 
 
