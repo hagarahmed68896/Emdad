@@ -270,12 +270,33 @@ Route::middleware('web')->group(function () {
      Route::get('/search', [SearchController::class, 'index'])->name('search');
      Route::get('/products/category/{slug}', [CategoryController::class, 'filterByCategory'])->name('products.filterByCategory');
      Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+     Route::get('/products/suggestions', function (Request $request) {
+    $query = $request->input('query');
+    
+    if ($query) {
+        // Search for products where the name contains the query string
+        $suggestions = Product::where('name', 'LIKE', '%' . $query . '%')
+                              ->pluck('name')
+                              ->take(5) // Limit the number of suggestions
+                              ->toArray();
+    } else {
+        // If the query is empty, return a list of a few random products
+        $suggestions = Product::inRandomOrder()
+                              ->pluck('name')
+                              ->take(5)
+                              ->toArray();
+    }
+
+    return response()->json($suggestions);
+});
      Route::get('/offers', [ProductController::class, 'offers'])->name('offers.index');
      Route::get('/products/featured', [ProductController::class, 'showFeaturedProducts'])->name('products.featured');
      Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
      Route::get('/categories/{slug}', [CategoryController::class, 'filterByCategory'])->name('categories.show');
      Route::get('/sub_categories/{slug}', [CategoryController::class, 'userSubCategoriesWithProducts'])->name('sub_categories.show');
-     Route::get('/products/suggestions', [ProductSuggestionController::class, 'getSuggestions']);
+     // Route::get('/products/suggestions', [ProductSuggestionController::class, 'getSuggestions']);
+// This is the API route for product suggestions
+// This is the API route for product suggestions
 
      Route::get('language/{locale}', function ($locale) {
           if (in_array($locale, ['en', 'ar'])) {

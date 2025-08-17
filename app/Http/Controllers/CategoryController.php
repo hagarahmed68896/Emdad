@@ -33,9 +33,9 @@ public function filterByCategory($slug)
 
         // Get products on offer for the selected category
         // This assumes Product has a relationship to SubCategory, and SubCategory to Category.
-        $onOfferProducts = Product::whereHas('subCategory.category', function ($query) use ($selectedCategory) {
-            $query->where('id', $selectedCategory->id);
-        })->where('is_offer', true)->get();
+   $onOfferProducts = Product::whereHas('subCategory.category', function ($query) use ($selectedCategory) {
+    $query->where('id', $selectedCategory->id);
+})->whereHas('offer')->get();
 
         // Get featured products for the selected category
         $onFeaturedProducts = Product::whereHas('subCategory.category', function ($query) use ($selectedCategory) {

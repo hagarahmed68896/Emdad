@@ -8,6 +8,7 @@
             Search Results
         @endif
     </h2>
+    
 
     @if ($results->isEmpty())
         <p class="text-gray-600">No results found matching your search criteria.</p>

@@ -29,7 +29,7 @@
                         <div class="relative w-full h-48 sm:h-56 overflow-hidden product-image-swiper inner-swiper">
                                 <div class="swiper-wrapper">
                                 @php
-                                    $images = collect(is_string($product->images) ? json_decode($product->images, true) : ($product->images ?? []));
+                                    $images = collect(is_string($featuredProduct->images) ? json_decode($featuredProduct->images, true) : ($featuredProduct->images ?? []));
                                 @endphp
 
                                 @forelse ($images as $image)
@@ -40,7 +40,7 @@
                                     </div>
                                 @empty
                                     <div class="swiper-slide">
-                                        <img src="{{ asset($product->image ?? 'https://placehold.co/300x200/F0F0F0/ADADAD?text=No+Image') }}"
+                                        <img src="{{ asset($featuredProduct->image ?? 'https://placehold.co/300x200/F0F0F0/ADADAD?text=No+Image') }}"
                                              onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
                                              class="w-full h-full object-contain">
                                     </div>

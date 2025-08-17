@@ -143,7 +143,7 @@
                                         @endphp
                                         <div class="swiper-pagination image-pagination"
                                             style="{{ count($images) <= 1 ? 'display:none;' : '' }}"></div>
-                                        @if ($product->is_offer && $product->discount_percent)
+                                        @if ($product->offer && $product->offer->discount_percent)
                                             <span
                                                 class="absolute top-3 rtl:right-3 ltr:left-3 bg-[#FAE1DF] text-[#C62525] text-xs font-bold px-[16px] py-[8px] rounded-full z-10">
                                                 {{ __('messages.discount_percentage', ['percent' => $product->discount_percent]) }}
@@ -180,25 +180,25 @@
                                         <span
                                             class="text-[#696969] text-[20px]">{{ $product->subCategory->category->name ?? 'غير مصنف' }}</span>
                                         <div class="flex mt-2">
-                                            @if ($product->supplier_confirmed)
+                                            @if ($product->supplier->supplier_confirmed)
                                                 <span class="flex items-center text-[#185D31]">
                                                     <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]"
                                                         src="{{ asset('images/Success.svg') }}" alt="Confirmed Supplier">
-                                                    <p class="text-[20px] text-[#212121] ">{{ $product->supplier_name }}
+                                                    <p class="text-[20px] text-[#212121] ">{{ $product->supplier->company_name }}
                                                     </p>
                                                 </span>
                                             @else
-                                                <p class="text-[20px] text-[#212121]">{{ $product->supplier_name }}
+                                                <p class="text-[20px] text-[#212121]">{{ $product->supplier->company_name}}
                                                 </p>
                                             @endif
                                         </div>
                                         <div class="flex items-center mb-2">
                                             <span class=" flex text-lg font-bold text-gray-800">
-                                                {{ number_format($product->price * (1 - ($product->discount_percent ?? 0) / 100), 2) }}
+                                                {{ number_format($product->price * (1 - ($product->offer->discount_percent ?? 0) / 100), 2) }}
                                                 <img class="mx-1 w-[20px] h-[21px]"
                                                     src="{{ asset('images/Vector (3).svg') }}" alt="">
                                             </span>
-                                            @if ($product->is_offer && $product->discount_percent)
+                                            @if ($product->offer && $product->offer->discount_percent)
                                                 <span class="flex text-sm text-gray-400 line-through mr-2 mr-1">
                                                     {{ number_format($product->price, 2) }}
                                              <img class="mx-1 w-[14px] h-[14px] mt-1 inline-block"
@@ -281,7 +281,7 @@
 
 
                             {{-- DISCOUNT BADGE - MOVED HERE --}}
-                            @if ($featuredProduct->is_offer && $featuredProduct->discount_percent)
+                            @if ($featuredProduct->offer && $featuredProduct->offer->discount_percent)
                                 <span
                                     class="absolute top-3 rtl:right-3 ltr:left-3 bg-[#FAE1DF] text-[#C62525] text-xs font-bold px-[16px] py-[8px] rounded-full z-10">
                                     {{-- Translated: Discount X % --}}
@@ -337,7 +337,7 @@
                                     <img class="mx-1 w-[20px] h-[21px]" src="{{ asset('images/Vector (3).svg') }}"
                                         alt="">
                                 </span>
-                                @if ($featuredProduct->is_offer && $featuredProduct->discount_percent)
+                                @if ($featuredProduct->offer && $featuredProduct->offer->discount_percent)
                                     <span class="flex text-sm text-gray-400 line-through mr-2 mr-1">
                                         {{ number_format($featuredProduct->price, 2) }}
                                           <img class="mx-1 w-[14px] h-[14px] mt-1 inline-block"

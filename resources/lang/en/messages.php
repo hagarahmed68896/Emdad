@@ -454,6 +454,10 @@ return [
     'exp_years' => 'Years of experience',
     'company_created_at' => 'Date of commercial activity',
 
+    'no_result' => 'No relevant search results found.',
+    'no_suggestion' => 'No recommended products at the moment.',
+    ''
+
 
     
 

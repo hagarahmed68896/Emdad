@@ -438,6 +438,8 @@ return [
     'certificates' => 'شهادات',
     'exp_years' => 'عدد سنوات الخبرة',
     'company_created_at' => 'تاريخ بدء النشاط التجاري',
+    'no_result' => 'لا توجد نتائج',
+    'no_suggestion' => 'لا توجد اقتراحات',
 
 
 
