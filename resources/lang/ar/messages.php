@@ -144,7 +144,7 @@ return [
     'satisfied_customers' => 'العملاء الراضين',
     'tax_certificate' => ' الشهادة الضربية',
     'tax_certificateMSG' => 'أدخل الرقم الضريبي',
-    'tax_certificate_attach' => ' الشهادة الضربية',
+    'tax_certificate_attach' => 'إرفق الشهادة الضربية',
     'terms_and_conditions' => 'الشروط والأحكام',
     'use_email_instead' => ' أو استخدم البريد الإلكتروني بدلاً من رقم الهاتف',
     'use_phone_instead' => ' أو استخدم رقم الهاتف بدلاً من البريد الإلكتروني',
@@ -433,6 +433,8 @@ return [
     'category' => 'الفئة',
     'heigh_quality' => 'جودة عالية',
     'edit' => 'تعديل',
+    'supplier_label' => 'نبذة عن المورد',
+    'supplier_info' => 'أدخل معلومات شركتك التي ستُعرض للعملاء في صفحتك العامة التي تساعد العملاء على الوثوق بك.',
     'supplier_name' => 'اسم المورد',
     'supplier_desc' => 'وصف عام عن المورد',
     'certificates' => 'شهادات',
@@ -440,7 +442,15 @@ return [
     'company_created_at' => 'تاريخ بدء النشاط التجاري',
     'no_result' => 'لا توجد نتائج',
     'no_suggestion' => 'لا توجد اقتراحات',
-
+    'national_id_attach' => 'إرفق الهوية الوطنية',
+    'select_file' =>  'اختر ملف او صورة',
+    'commercial_registration_attach' => 'إرفق رقم السجل التجاري',
+    'certificates_notes' => 'ملاحظة: أرفق أي شهادات أو مستندات رسمية تعزز موثوقيتك كمورد (مثل ISO)',
+    'enter_supplier_name' => 'ادخل اسم المورد',
+    'category_of_products' => 'فئة المنتجات',
+    'select_category_of_products' => 'حدد فئة المنتجات',
+    'enter_first_name'=> 'ادخل اسمك الأول',
+    
 
 
     

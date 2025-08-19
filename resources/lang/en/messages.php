@@ -447,7 +447,8 @@ return [
     'update_offer' => 'Update Offer',
     'heigh_quality' => 'High Quality',
     'edit' => 'Edit',
-
+    'supplier_label' => 'Supplier Informations',
+    'supplier_info' => 'Enter your company information that will be displayed to customers on your public page to help customers trust you.',
     'supplier_name' => 'Supplier Name',
     'supplier_desc' => 'General description of the supplier',
     'certificates' => 'Certificates',
@@ -456,7 +457,14 @@ return [
 
     'no_result' => 'No relevant search results found.',
     'no_suggestion' => 'No recommended products at the moment.',
-    ''
+    'national_id_attach' => 'Attach national id',
+    'select_file' => 'Select file',
+    'commercial_registration_attach' => 'Attach commercial registration',
+    'certificates_notes' => 'Note: Attach any official certificates or documents that enhance your credibility as a supplier (such as ISO)',
+    'enter_supplier_name' => 'Enter supplier name',
+    'category_of_products' => 'Category of products',
+    'select_category_of_products' => 'select category of products',
+    'enter_first_name' => 'Enter first name',
 
 
     

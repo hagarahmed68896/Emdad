@@ -11,6 +11,7 @@ class Document extends Model
         'document_name',
         'supplier_id',
         'file_path',   // ✅ أضف هذا
+        'original_name',
         'status',
         'notes',
     ];

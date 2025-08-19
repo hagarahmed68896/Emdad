@@ -14,7 +14,9 @@ class BusinessData extends Model
         'national_address',
         'iban',
         'tax_certificate',
-        'supplier_confirmed',
+        'description',
+        'experience_years',
+        'start_date'
        
     ]; 
 

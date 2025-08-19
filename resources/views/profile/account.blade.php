@@ -752,60 +752,117 @@
     }
     window.passwordForm = passwordForm;
 
-    // Account Details Form Component
-    function accountDetailsForm(initialUser, initialBusiness) {
-        return {
-            success: '',
-            errors: {},
-            formData: {
-                first_name: initialUser.first_name || '',
-                last_name: initialUser.last_name || '',
-                email: initialUser.email || '',
-                phone_number: initialUser.phone_number || '',
-                address: initialUser.address || '',
+  // A simple example of the Alpine.js data object
+// This is what you probably have on your page
+function accountDetailsForm(initialUser, initialBusiness) {
+    return {
+        success: '',
+        errors: {},
+        formData: {
+            first_name: initialUser.first_name || '',
+            last_name: initialUser.last_name || '',
+            email: initialUser.email || '',
+            phone_number: initialUser.phone_number || '',
+            address: initialUser.address || '',
+            business: {
                 company_name: initialBusiness?.company_name || '',
-                business_start_date: initialBusiness?.created_at || '',
+                start_date: initialBusiness?.start_date || '',
+                national_id: initialBusiness?.national_id || '',
+                tax_certificate: initialBusiness?.tax_certificate || '',
+                iban: initialBusiness?.iban || '',
+                national_address: initialBusiness?.national_address || '',
+                commercial_registration: initialBusiness?.commercial_registration || '',
                 experience_years: initialBusiness?.experience_years || '',
                 description: initialBusiness?.description || '',
-                certificate: null
+                documents: initialBusiness?.documents || [] // Keep this for showing the old documents
             },
-            async submitDetailsForm(event) {
-                this.success = '';
-                this.errors = {};
-                try {
-                    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-                    const form = event.target;
-                    const response = await fetch(form.action, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json',
-                            'X-CSRF-TOKEN': csrfToken
-                        },
-                        body: JSON.stringify(this.formData)
-                    });
-                    const data = await response.json();
-                    if (!response.ok) {
-                        if (response.status === 422) {
-                            this.errors = data.errors;
-                        } else {
-                            this.errors = { general: [data.message || 'An unexpected error occurred.'] };
-                        }
-                        this.success = '';
-                    } else {
-                        this.success = data.message;
-                        this.errors = {};
-                    }
-                } catch (error) {
-                    console.error('Error submitting account details form:', error);
-                    this.errors = { general: ['Network error or something went wrong.'] };
-                    this.success = '';
+            // Define separate variables to hold new file objects
+            national_id_attach: null,
+            commercial_registration_attach: null,
+            national_address_attach: null,
+            iban_attach: null,
+            tax_certificate_attach: null,
+            certificate: null,
+        },
+        async submitDetailsForm(event) {
+            this.success = '';
+            this.errors = {};
+
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+                const form = event.target;
+                
+                // 1. Create a new FormData object
+                const data = new FormData();
+
+                // 2. Append all the text fields and nested 'business' data
+                data.append('first_name', this.formData.first_name);
+                data.append('last_name', this.formData.last_name);
+                data.append('email', this.formData.email);
+                data.append('phone_number', this.formData.phone_number);
+                data.append('address', this.formData.address);
+
+             for (const key in this.formData.business) {
+    // Skip 'documents' only, since certificate is also a normal field
+    if (key !== 'documents') {
+        data.append(`business[${key}]`, this.formData.business[key]);
+    }
+}
+
+                
+                // 3. Append the file inputs if they exist
+                if (this.formData.national_id_attach) {
+                    data.append('documents[national_id]', this.formData.national_id_attach);
                 }
+                if (this.formData.commercial_registration_attach) {
+                    data.append('documents[commercial_registration]', this.formData.commercial_registration_attach);
+                }
+                if (this.formData.national_address_attach) {
+                    data.append('documents[national_address]', this.formData.national_address_attach);
+                }
+                if (this.formData.iban_attach) {
+                    data.append('documents[iban]', this.formData.iban_attach);
+                }
+                if (this.formData.tax_certificate_attach) {
+                    data.append('documents[tax_certificate]', this.formData.tax_certificate_attach);
+                }
+                if (this.formData.certificate) {
+                    data.append('documents[certificate]', this.formData.certificate);
+                }
+
+                // 4. Update the fetch call to send the FormData object
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                        // Do NOT set Content-Type; FormData will set it automatically
+                    },
+                    body: data
+                });
+
+                const responseData = await response.json();
+                
+                if (!response.ok) {
+                    if (response.status === 422) {
+                        this.errors = responseData.errors;
+                    } else {
+                        this.errors = { general: [responseData.message || 'An unexpected error occurred.'] };
+                    }
+                    this.success = '';
+                } else {
+                    this.success = responseData.message;
+                    this.errors = {};
+                }
+            } catch (error) {
+                console.error('Error submitting account details form:', error);
+                this.errors = { general: ['Network error or something went wrong.'] };
+                this.success = '';
             }
         }
     }
-    window.accountDetailsForm = accountDetailsForm;
-
+}
+window.accountDetailsForm = accountDetailsForm;
     // Alpine.js component for notifications form
     document.addEventListener('alpine:init', () => {
         Alpine.data('notificationsForm', (initialSettings) => ({
