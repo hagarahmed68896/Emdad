@@ -156,7 +156,6 @@ if ($request->filled('sort_by')) {
         $availableSpecifications = [];
 
         // Available COLORS
-        // The original code was too complex and had a key error. This is the cleaner, correct way.
         $availableSpecifications['colors'] = $filterOptionsBaseQuery->clone()
             ->pluck('colors')
             ->filter()

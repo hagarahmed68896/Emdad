@@ -450,7 +450,8 @@ return [
     'category_of_products' => 'فئة المنتجات',
     'select_category_of_products' => 'حدد فئة المنتجات',
     'enter_first_name'=> 'ادخل اسمك الأول',
-    
+    'offers' => 'العروض',
+
 
 
     

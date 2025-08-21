@@ -60,13 +60,13 @@
                                     <div class="swiper-slide">
                                         <img src="{{ Storage::url($image) }}"
                                              onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
-                                             class="w-full h-full object-contain">
+                                             class="w-full h-full object-contain bg-[#F8F9FA]">
                                     </div>
                                 @empty
                                     <div class="swiper-slide">
                                         <img src="{{ asset($offer->product->image ?? 'https://placehold.co/300x200/F0F0F0/ADADAD?text=No+Image') }}"
                                              onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
-                                             class="w-full h-full object-contain">
+                                             class="w-full h-full object-contain bg-[#F8F9FA]">
                                     </div>
                                 @endforelse
                             </div>
@@ -115,8 +115,10 @@
                             <div class="flex w-full items-center text-sm mb-2 justify-between">
                                 <h3 class="text-[24px] font-bold text-[#212121] mb-1">{{ $offer->product->name }}</h3>
                                 <div class="flex items-center ">
-                                    <img class="mx-1" src="{{ asset('images/Vector (4).svg') }}" alt="">
-                                    <span class="text-[18px]">{{ $offer->product->rating ?? '4.5' }}</span>
+                                    @if($offer->product->rating)
+                                        <img class="mx-1" src="{{ asset('images/Vector (4).svg') }}" alt="">
+                                    @endif
+                                    <span class="text-[18px]">{{ $offer->product->rating }}</span>
                                 </div>
                             </div>
                             <span

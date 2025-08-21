@@ -1,5 +1,5 @@
-<section id="myAccountContentSection"
-    class="bg-white p-6 rounded-lg shadow-sm mb-8 border border-gray-200 {{ request('section') === 'favoritesSection' ? 'hidden' : '' }}">
+<section id="myAccountContentSection" 
+    class="bg-white p-6 rounded-lg shadow-sm mb-8 border border-gray-200 {{ $section === 'myAccount' ? '' : 'hidden' }}">
     <h2 class="text-2xl font-semibold text-gray-800 mb-6">{{ __('messages.account_details') }}</h2>
 
     {{--

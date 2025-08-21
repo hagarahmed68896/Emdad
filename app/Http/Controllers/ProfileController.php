@@ -29,27 +29,11 @@ public function show(Request $request)
 {
     Paginator::useTailwind();
 
-    // جلب المستخدم مع بيانات البزنس والمستندات
     $user = Auth::user()->load('business.documents');
-
-    // تقسيم الاسم الكامل إلى اسم أول واسم عائلة
     $names = preg_split('/\s+/', trim($user->full_name), -1, PREG_SPLIT_NO_EMPTY);
     $user->first_name = $names[0] ?? '';
     $user->last_name = implode(' ', array_slice($names, 1));
 
-    // المفضلات
-    $favorites = collect();
-    if ($user) {
-        $favorites = $user->favorites()->with('product.subCategory.category')->paginate(3);
-    }
-
-    $notificationSettings = $user->notification_settings ?? $this->getDefaultNotificationSettings();
-
-    if ($request->ajax() && $request->path() === 'profile/favorites') {
-        return view('partials.favorites_list', compact('favorites'));
-    }
-
-    // عربة التسوق
     $cartItems = collect();
     $cart = null;
 
@@ -66,7 +50,6 @@ public function show(Request $request)
         $cartItems = $cart->items()->with('product')->get();
     }
 
-    // الإشعارات
     $notifications = collect();
     $unreadNotificationCount = 0;
     if (Auth::check()) {
@@ -74,13 +57,24 @@ public function show(Request $request)
         $unreadNotificationCount = Auth::user()->unreadNotifications->count();
     }
 
-    $section = $request->query('section');
+    // $section = $request->query('section', 'personal-info');
+
+    $defaultSection = ($user->account_type === 'supplier') ? 'myProducts' : 'myAccount';
+    $section = $request->query('section', $defaultSection);
+
     $products = collect();
     $businessData = null;
     $offers = collect();
+    $favorites = collect();
+    $notificationSettings = $user->notification_settings ?? $this->getDefaultNotificationSettings();
+
+    // Prepare variables for the view
+    $availableSpecifications = [];
+    $colorHexMap = [];
 
     if (Auth::check()) {
         $favorites = Auth::user()->favorites()->with('product.subCategory.category')->get();
+
         $offers = Auth::user()
             ->offers()
             ->with(['product.offer', 'product.subCategory.category'])
@@ -90,14 +84,94 @@ public function show(Request $request)
             $businessData = $user->business;
 
             if ($businessData) {
-                $products = $businessData->products()->paginate(3);
+                $query = $businessData->products();
+
+                // Create a separate query for filter options based on all of the supplier's products.
+                $filterOptionsBaseQuery = $businessData->products();
+
+                if ($request->filled('categories')) {
+                    $query->whereHas('subCategory.category', function($q) use ($request) {
+                        $q->whereIn('id', $request->input('categories'));
+                    });
+                    $filterOptionsBaseQuery->whereHas('subCategory.category', function($q) use ($request) {
+                        $q->whereIn('id', $request->input('categories'));
+                    });
+                }
+                
+                // === Filter by COLORS ===
+                if ($request->has('colors') && is_array($request->input('colors'))) {
+                    $selectedColors = array_filter($request->input('colors'));
+                    if (!empty($selectedColors)) {
+                        $query->where(function ($q) use ($selectedColors) {
+                            foreach ($selectedColors as $colorName) {
+                                $q->orWhereJsonContains('colors', ['name' => $colorName]);
+                            }
+                        });
+                        // Also apply this filter to the filter options query to show correct counts (if needed).
+                        $filterOptionsBaseQuery->where(function ($q) use ($selectedColors) {
+                            foreach ($selectedColors as $colorName) {
+                                $q->orWhereJsonContains('colors', ['name' => $colorName]);
+                            }
+                        });
+                    }
+                }
+
+                // price, rating
+                if ($request->filled('min_price')) {
+                    $query->where('price', '>=', (float) $request->input('min_price'));
+                    $filterOptionsBaseQuery->where('price', '>=', (float) $request->input('min_price'));
+                }
+                if ($request->filled('max_price')) {
+                    $query->where('price', '<=', (float) $request->input('max_price'));
+                    $filterOptionsBaseQuery->where('price', '<=', (float) $request->input('max_price'));
+                }
+                if ($request->filled('rating')) {
+                    $query->where('rating', '>=', (float) $request->input('rating'));
+                    $filterOptionsBaseQuery->where('rating', '>=', (float) $request->input('rating'));
+                }
+
+                $products = $query->paginate(3);
+
+                // === Fetching Available Filter Values (for UI) ===
+                $availableSpecifications['colors'] = $filterOptionsBaseQuery->pluck('colors')
+                    ->filter()
+                    ->flatten(1)
+                    ->unique('name')
+                    ->map(function ($color) {
+                        $imagePath = $color['image'] ?? null;
+                        $isBase64 = $imagePath && str_starts_with($imagePath, 'data:image');
+                        $imageSrc = $isBase64 ? $imagePath : asset($imagePath);
+                        return [
+                            'name' => $color['name'] ?? null,
+                            'image' => $imageSrc,
+                        ];
+                    })
+                    ->values()
+                    ->toArray();
+
+                $colorsData = include resource_path('data/colors.php');
+                foreach ($colorsData as $color) {
+                    if (!empty($color['en']) && !empty($color['hex'])) {
+                        $colorHexMap[strtolower($color['en'])] = $color['hex'];
+                    }
+                    if (!empty($color['ar']) && !empty($color['hex'])) {
+                        $colorHexMap[mb_strtolower($color['ar'])] = $color['hex'];
+                    }
+                }
             }
         }
     }
 
+    $categories = Category::pluck('name', 'id')->toArray();
+    $userSelectedCategories = $businessData
+        ? $businessData->products()
+            ->with('subCategory.category')
+            ->get()
+            ->pluck('subCategory.category.id')
+            ->unique()
+            ->toArray()
+        : [];
 
-
-    // إرسال البيانات إلى الـ Blade
     return view('profile.account', compact(
         'user',
         'favorites',
@@ -109,7 +183,10 @@ public function show(Request $request)
         'products',
         'offers',
         'businessData',
- 
+        'categories',
+        'userSelectedCategories',
+        'availableSpecifications', // Added
+        'colorHexMap' // Added
     ));
 }
 

@@ -1,7 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
+
     <style>
+        [x-cloak] { display: none !important; }
+
         /* Modal specific styles */
         .modal {
             display: none;
@@ -140,9 +143,8 @@
                 <nav>
                     <ul class="space-y-2">
                         <li>
-                            <a href="#" id="myAccountLink"
-                                class="flex items-center p-3 text-lg font-medium text-white bg-[#185D31] rounded-lg hover:text-white hover:bg-[#185D31] transition-colors duration-200 shadow-sm">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-3" fill="none"
+                                                   <a href="{{ route('profile.show', ['section' => 'myAccount']) }}" id="myAccountLink" class="flex items-center p-3 text-lg font-medium rounded-lg transition-colors duration-200 shadow-sm {{ $section === 'myAccount' ? 'text-white bg-[#185D31]' : 'text-gray-700 hover:text-white hover:bg-[#185D31]' }}">
+ <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-3" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -153,9 +155,8 @@
                              @if (!Auth::check() || Auth::user()->account_type !== 'supplier')
 
                                   <li>
-                            <a href="#" id="myOrdersLink"
-                                class="flex items-center p-3 text-lg text-gray-700 rounded-lg hover:text-white hover:bg-[#185D31] transition-colors duration-200">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-3" fill="none"
+                                                       <a href="{{ route('profile.show', ['section' => 'myOrders']) }}" id="myOrdersLink" class="flex items-center p-3 text-lg rounded-lg transition-colors duration-200 {{ $section === 'myOrders' ? 'text-white bg-[#185D31]' : 'text-gray-700 hover:text-white hover:bg-[#185D31]' }}">
+<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-3" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
@@ -167,9 +168,8 @@
                              @if (!Auth::check() || Auth::user()->account_type == 'supplier')
 
                         <li>
-                            <a href="#" id="myProductsLink"
-                                class="flex items-center p-3 text-lg text-gray-700 rounded-lg hover:text-white hover:bg-[#185D31] transition-colors duration-200">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-3" fill="none"
+                                                        <a href="{{ route('profile.show', ['section' => 'myProducts']) }}" id="myProductsLink" class="flex items-center p-3 text-lg rounded-lg transition-colors duration-200 {{ $section === 'myProducts' ? 'text-white bg-[#185D31]' : 'text-gray-700 hover:text-white hover:bg-[#185D31]' }}">
+<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-3" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
@@ -192,9 +192,8 @@
                              @if (!Auth::check() || Auth::user()->account_type !== 'supplier')
 
                         <li>
-                            <a href="#" id="favLink"
-                                class="flex items-center p-3 text-lg text-gray-700 rounded-lg hover:text-white hover:bg-[#185D31] transition-colors duration-200">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-3" fill="none"
+                                                      <a href="{{ route('profile.show', ['section' => 'favorites']) }}" id="favLink" class="flex items-center p-3 text-lg rounded-lg transition-colors duration-200 {{ $section === 'favorites' ? 'text-white bg-[#185D31]' : 'text-gray-700 hover:text-white hover:bg-[#185D31]' }}">
+ <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-3" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -239,10 +238,10 @@
                 </div>
 
                 {{-- My Account and Password Section --}}
-@include('profile.accountSection')
+    @include('profile.accountSection', ['section' => $section])
 
      @if (!Auth::check() || Auth::user()->account_type == 'supplier')
-     @include('profile.productSection')
+        @include('profile.productSection', ['section' => $section])
      @endif
 
      {{-- @if (!Auth::check() || Auth::user()->account_type !== 'supplier') --}}

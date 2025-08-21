@@ -465,6 +465,7 @@ return [
     'category_of_products' => 'Category of products',
     'select_category_of_products' => 'select category of products',
     'enter_first_name' => 'Enter first name',
+    'offers' => 'Offers',
 
 
     

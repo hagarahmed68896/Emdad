@@ -63,13 +63,13 @@
                                     <div class="swiper-slide">
                                         <img src="{{ Storage::url($image) }}"
                                              onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
-                                             class="w-full h-full object-contain">
+                                             class="w-full h-full object-contain bg-[#F8F9FA]">
                                     </div>
                                 @empty
                                     <div class="swiper-slide">
                                         <img src="{{ asset($product->image ?? 'https://placehold.co/300x200/F0F0F0/ADADAD?text=No+Image') }}"
                                              onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
-                                             class="w-full h-full object-contain">
+                                             class="w-full h-full object-contain bg-[#F8F9FA]">
                                     </div>
                                 @endforelse
                             </div>
@@ -80,7 +80,16 @@
 
                         {{-- Product Details --}}
                         <div class="p-4 flex flex-col flex-grow">
+                                                        <div class="flex w-full items-center text-sm mb-2 justify-between">
+
                             <h3 class="text-[24px] font-bold text-[#212121] mb-1">{{ $product->name }}</h3>
+                                   <div class="flex items-center ">
+                                    @if($product->rating)
+                                        <img class="mx-1" src="{{ asset('images/Vector (4).svg') }}" alt="">
+                                    @endif
+                                    <span class="text-[18px]">{{ $product->rating }}</span>
+                                </div>
+                                                        </div>
                             <span class="text-[#696969] text-[20px]">{{ $product->subCategory->category->name ?? 'غير مصنف' }}</span>
                             <div class="flex mt-2">
                                 @if ($product->supplier->supplier_confirmed)

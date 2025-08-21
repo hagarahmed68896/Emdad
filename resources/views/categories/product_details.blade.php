@@ -311,6 +311,7 @@
                 <div class=" items-center mb-1">
                     <div class="flex justify-between">
                         <h1 class="text-[32px] font-bold text-[#212121] mb-3">{{ $product->name }}</h1>
+                       @if (!Auth::check() || Auth::user()->account_type === 'supplier')
                         <div>
                         <a href="{{ route('products.edit', $product->id) }}"
                             class="flex-1 flex items-center justify-center gap-1 text-center text-white py-2 px-3 bg-[#185D31] rounded-xl transition">
@@ -323,6 +324,7 @@
                             {{__('messages.edit')}}
                         </a>
                     </div>
+                    @endif
                     </div>
                     <div class="flex items-center">
 
@@ -1044,7 +1046,7 @@ $defaultSelectedColorName = $productColors[0]['name'] ?? null;
                             <div class="relative w-full h-48 sm:h-56 overflow-hidden product-image-swiper inner-swiper">
                                    <div class="swiper-wrapper">
                                 @php
-                                    $images = collect(is_string($offer->product->images) ? json_decode($offer->product->images, true) : ($offer->product->images ?? []));
+                                    $images = collect(is_string($product->images) ? json_decode($product->images, true) : ($product->images ?? []));
                                 @endphp
 
                                 @forelse ($images as $image)
@@ -1099,9 +1101,11 @@ $defaultSelectedColorName = $productColors[0]['name'] ?? null;
                             <div class="p-4 flex flex-col flex-grow">
                                 <div class="flex w-full items-center text-sm mb-2 justify-between">
                                     <h3 class="text-[24px] font-bold text-[#212121] mb-1">{{ $product->name }}</h3>
-                                    <div class="flex items-center ">
+                                      <div class="flex items-center ">
+                                        @if( $product->rating)
                                         <img class="mx-1" src="{{ asset('images/Vector (4).svg') }}" alt="">
-                                        <span class="text-[18px]">{{ $product->rating ?? '4.5' }}</span>
+                                        @endif
+                                        <span class="text-[18px]">{{ $product->rating }}</span>
                                     </div>
                                 </div>
                                 <span

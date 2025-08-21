@@ -497,8 +497,10 @@
                                 <div class="flex w-full items-center text-sm mb-2 justify-between">
                                     <h3 class="text-[24px] font-bold text-[#212121] mb-1">{{ $product->name }}</h3>
                                     <div class="flex items-center ">
+                                        @if( $product->rating)
                                         <img class="mx-1" src="{{ asset('images/Vector (4).svg') }}" alt="">
-                                        <span class="text-[18px]">{{ $product->rating ?? '4.5' }}</span>
+                                        @endif
+                                        <span class="text-[18px]">{{ $product->rating }}</span>
                                     </div>
                                 </div>
                                 <span
