@@ -13,32 +13,70 @@
             {{-- Added product-card class for easier JS selection --}}
             <div class="bg-white rounded-xl overflow-hidden shadow-md flex flex-col product-card">
                 {{-- Product Image --}}
-                <div class="relative w-full h-48 sm:h-56 overflow-hidden">
-                    <img src="{{ asset($favorite->product->image ?? 'https://placehold.co/300x200/F0F0F0/ADADAD?text=No+Image') }}"
-                        alt="{{ $favorite->product->name }}"
-                        onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
-                        class="w-full h-full object-contain">
+              <div class="relative w-full h-48 sm:h-56 overflow-hidden product-image-swiper inner-swiper">
+    <div class="swiper-wrapper">
+        @php
+            $images = collect(
+                is_string($favorite->product->images)
+                    ? json_decode($favorite->product->images, true)
+                    : $favorite->product->images ?? [],
+            );
+        @endphp
 
-                    {{-- Favorite Button (with active state for easy removal) --}}
-                    <button
-                        class="favorite-button absolute top-3 rtl:left-3 ltr:right-3 bg-white p-2 rounded-full shadow-md text-red-500 hover:text-gray-500 transition-colors duration-200 z-10"
-                        data-product-id="{{ $favorite->product->id }}" aria-label="Remove from favorites">
-                        {{-- Always display filled heart for favorited products --}}
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"
-                            stroke-width="1.5" stroke="currentColor" class="size-6 text-red-500">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-                        </svg>
-                    </button>
-                </div>
+        @forelse ($images as $image)
+            <div class="swiper-slide">
+                <img src="{{ Storage::url($image) }}"
+                     onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
+                     class="w-full h-full object-cover" alt="Product image">
+            </div>
+        @empty
+            <div class="swiper-slide">
+                <img src="{{ $favorite->product->image 
+                                ? Storage::url($favorite->product->image) 
+                                : 'https://placehold.co/300x200/F0F0F0/ADADAD?text=No+Image' }}"
+                     onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
+                     class="w-full h-full object-cover" alt="No image">
+            </div>
+        @endforelse
+    </div>
+
+    {{-- DISCOUNT BADGE --}}
+    @if ($favorite->product->offer && $favorite->product->offer->discount_percent)
+        <span class="absolute top-3 rtl:right-3 ltr:left-3 bg-[#FAE1DF] text-[#C62525] text-xs font-bold px-[16px] py-[8px] rounded-full z-10">
+            {{ __('messages.discount_percentage', ['percent' => $favorite->product->offer->discount_percent]) }}
+        </span>
+    @endif
+
+    {{-- FAVORITE BUTTON --}}
+    <button
+        class="favorite-button absolute top-3 rtl:left-3 ltr:right-3 bg-white p-2 rounded-full shadow-md text-gray-500 hover:text-red-500 transition-colors duration-200 z-10"
+        data-product-id="{{ $favorite->product->id }}" aria-label="Add to favorites">
+        @if (Auth::check() && Auth::user()->hasFavorited($favorite->product->id))
+            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"
+                 stroke-width="1.5" stroke="currentColor" class="size-6 text-red-500">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+            </svg>
+        @else
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                 stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+            </svg>
+        @endif
+    </button>
+</div>
+
 
                 {{-- Product Details --}}
                 <div class="p-4 flex flex-col flex-grow">
                     <div class="flex w-full items-center text-sm mb-2 justify-between">
                         <h3 class="text-[24px] font-bold text-[#212121] mb-1">{{ $favorite->product->name }}</h3>
                         <div class="flex items-center ">
+                            @if($favorite->product->rating)
                             <img class="mx-1" src="{{ asset('images/Vector (4).svg') }}" alt="">
-                            <span class="text-[18px]">{{ $favorite->product->rating ?? '4.5' }}</span>
+                            @endif
+                            <span class="text-[18px]">{{ $favorite->product->rating }}</span>
                         </div>
                     </div>
                     <span

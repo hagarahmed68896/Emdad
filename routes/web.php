@@ -31,6 +31,7 @@ use App\Http\Controllers\Admin\ReviewsController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Supplier\SupplierProductController;
 use App\Http\Controllers\Supplier\OfferController;
+use App\Http\Controllers\OrderController;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -69,6 +70,15 @@ Route::middleware('web')->group(function () {
 
      // Authenticated routes
      Route::middleware('auth')->group(function () {
+
+               //cart
+               Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+               Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
+               Route::get('/user/last-cart/{product_id}', [CartController::class, 'getLastOrder']);
+
+               //orders
+               Route::get('/order', [OrderController::class, 'index'])->name('order.index');
+
 
           // Admin-specific routes
           Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
@@ -215,6 +225,9 @@ Route::middleware('web')->group(function () {
                Route::post('/profile/photo/delete', [SettingsController::class, 'removeProfilePicture'])->name('profile.photo.delete');
 
                Route::put('/profile/update', [SettingsController::class, 'updateProfile'])->name('profile.update');
+          
+          
+             
           });
 
 
@@ -251,8 +264,7 @@ Route::middleware('web')->group(function () {
           Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
           Route::post('/profile/update-notifications', [ProfileController::class, 'updateNotifications'])->name('profile.updateNotifications');
 
-          Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-          Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
+    
 
           Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
           Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');

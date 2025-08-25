@@ -314,6 +314,7 @@ public function update(Request $request, Product $product)
     // -------------------------
     // ✅ Gallery images
     // -------------------------
+
     $existingImages = $request->input('existing_images', []);
     $updatedImages = $existingImages;
 
@@ -352,18 +353,39 @@ public function update(Request $request, Product $product)
     // -------------------------
     // ✅ Colors
     // -------------------------
-    $productData['colors'] = collect($request->input('colors', []))
-        ->map(function ($color) {
-            if (is_string($color)) {
-                $decoded = json_decode($color, true);
-                $color = is_array($decoded) ? $decoded : [];
-            }
-            return [
-                'name' => $color['name'] ?? null,
-                'hex'  => $color['hex'] ?? null,
-            ];
-        })
-        ->toArray();
+$productData['colors'] = collect($request->input('colors', []))
+    ->map(function ($color) {
+        if (is_string($color)) {
+            $decoded = json_decode($color, true);
+            $color = is_array($decoded) ? $decoded : [];
+        }
+
+        // ✅ Prefer image if available
+        $image = $color['image'] ?? null;
+
+        if (!empty($image) && str_starts_with($image, 'data:image')) {
+            // Handle new base64 upload
+            $image_parts = explode(";base64,", $image);
+            $image_base64 = base64_decode($image_parts[1]);
+
+            $extension = explode('/', mime_content_type($image))[1];
+            $fileName = 'color_images/' . uniqid() . '.' . $extension;
+
+            Storage::disk('public')->put($fileName, $image_base64);
+
+            $image = $fileName;
+        }
+
+        return [
+            'name'  => $color['name'] ?? null,
+            // ✅ if image exists, save it; otherwise fall back to hex
+            'hex'   => empty($image) ? ($color['hex'] ?? null) : null,
+            'image' => $image,
+        ];
+    })
+    ->toArray();
+
+
 
     // -------------------------
     // ✅ Default min_order_quantity if missing

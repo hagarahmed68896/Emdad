@@ -704,11 +704,12 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
                             @foreach ($favorites->take(2) as $favorite)
                                 <div class="flex items-center justify-between bg-[#F8F9FA] rounded-lg shadow-md p-3">
                                     {{-- Product Image Container --}}
-                                    <div class="w-20 h-20 bg-white rtl:ml-4 ltr:mr-4 rounded-[12px] flex-shrink-0">
-                                        <img src="{{ asset($favorite->product->image ?? 'https://via.placeholder.com/80x80?text=No+Image') }}"
-                                            onerror="this.onerror=null;this.src='https://via.placeholder.com/80x80?text=Image+Error';"
-                                            class="w-full h-full object-contain rounded-md">
-                                    </div>
+                                     <div class="w-16 h-16 bg-white rounded-md flex-shrink-0 overflow-hidden mx-2">
+                                <img src="{{ Storage::url($favorite->product->image ?? '') }}"
+     onerror="this.onerror=null;this.src='https://via.placeholder.com/80x80?text=Image+Error';"
+     class="w-full h-full object-contain">
+
+                            </div>
                                     {{-- Product Details (Text Content) --}}
                                     <div class="flex flex-col flex-grow rtl:ml-3 ltr:mr-3">
                                         {{-- Product Name --}}
@@ -716,14 +717,16 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
                                             {{ $favorite->product->name }}
                                         </p>
                                         <div class="flex items-center text-[16px] text-[#212121] mb-1">
+                                            @if($favorite->product->supplier->is_confirmed)
                                             <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]"
                                                 src="{{ asset('images/Success.svg') }}" alt="Confirmed Supplier">
-                                            <span>{{ $favorite->product->supplier_name ?? 'Fuzhou Green' }}</span>
+                                            @endif
+                                            <span>{{ $favorite->product->supplier->company_name }}</span>
 
                                         </div>
                                         <p class=" text-[#212121] flex font-bold">
                                             <span class="flex text-[16px] font-bold text-gray-800">
-                                                {{ number_format($favorite->product->price * (1 - ($favorite->product->discount_percent ?? 0) / 100), 2) }}
+                                                {{ number_format($favorite->product->price * (1 - ($favorite->product->offer->discount_percent ?? 0) / 100), 2) }}
                                                 <img class="mx-1 w-[15px] h-[15px] mt-1"
                                                     src="{{ asset('images/Vector (3).svg') }}"
                                                     class="text-[#212121]">
@@ -748,98 +751,7 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
 
 
         {{-- Cart Icon and Popup (MODIFIED TO MIRROR FAVORITES LOGIC) --}}
-        <div x-data="{ showCartPopup: false, buttonRect: null }" x-init="$watch('showCartPopup', value => {
-            if (value) {
-                buttonRect = $el.querySelector('a').getBoundingClientRect();
-            } else {
-                buttonRect = null;
-            }
-        })" class="relative inline-block">
-            <a href="#" @click.prevent="showCartPopup = !showCartPopup"
-                class="relative w-[18px] h-[18px] z-10">
-                <img src="{{ asset('images/Group.svg') }}" alt="Cart Icon">
-                {{-- Optional: Cart Item Count Badge --}}
-                @if ($cartItems->sum('quantity') > 0)
-                    <span
-                        class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-xs w-4 h-4 flex items-center justify-center">
-                        {{ $cartItems->sum('quantity') }}
-                    </span>
-                @endif
-            </a>
-
-            <div x-show="showCartPopup" x-cloak @click.away="showCartPopup = false"
-                x-transition:enter="transition ease-out duration-300"
-                class="bg-white shadow-lg rounded-lg p-4
-            fixed inset-x-0 top-[5%] w-[calc(100%-4rem)] max-w-[360px] mx-auto z-20 overflow-auto max-h-[85vh]
-            sm:absolute sm:top-full sm:mt-2 sm:w-[404px] sm:h-auto sm:max-h-none sm:mx-0
-            rtl:sm:left-0 rtl:sm:right-auto
-            ltr:sm:right-0 ltr:sm:left-auto
-            md:absolute md:top-full md:mt-2 md:w-[404px] md:h-auto md:max-h-none md:mx-0
-            rtl:md:left-0 rtl:md:right-auto
-            ltr:md:right-0 ltr:md:left-auto
-            lg:absolute lg:top-full lg:mt-2 lg:w-[404px] lg:h-auto lg:max-h-none lg:mx-0
-            rtl:lg:left-0 rtl:lg:right-auto
-            ltr:lg:right-0 ltr:lg:left-auto
-        ">
-                <h3 class="text-xl font-bold text-right text-gray-900 mb-4">{{ __('عربة التسوق') }}</h3>
-                <div id="cart-content-area" class="w-full flex flex-col items-center">
-                    @if ($cartItems->isEmpty())
-                        <div class="flex flex-col justify-center items-center w-full py-10 text-gray-600">
-                            <img src="{{ asset('images/Illustrations (2).svg') }}" alt="No cart items illustration"
-                                class="w-[156px] h-[163px] mb-10 ">
-                            <p class="text-[#696969] text-[20px] text-center">لم تقم بإضافة أي منتج الي عربة التسوق
-                                بعد.</p>
-                            <a href="{{ route('products.index') }}"
-                                class="px-[20px] py-[12px] bg-[#185D31] text-[white] rounded-[12px] mt-3">
-                                {{ __('تصفح المنتجات') }}
-                            </a>
-                        </div>
-                    @else
-                        <div class="grid grid-cols-1 gap-4 w-full" id="cart-grid">
-                            {{-- Limit to the first two cart items for popup, or remove take(2) for full list --}}
-                            @foreach ($cartItems->take(2) as $item)
-                                <div class="flex items-center justify-between bg-[#F8F9FA] rounded-lg shadow-md p-3">
-                                    {{-- Product Image --}}
-                                    <div class="w-20 h-20 bg-white rtl:ml-4 ltr:mr-4 rounded-[12px] flex-shrink-0">
-                                        <img src="{{ asset($item->product->image ?? 'https://via.placeholder.com/80x80?text=No+Image') }}"
-                                            onerror="this.onerror=null;this.src='https://via.placeholder.com/80x80?text=Image+Error';"
-                                            class="w-full h-full object-contain rounded-md">
-                                    </div>
-                                    {{-- Product Details --}}
-                                    <div class="flex flex-col flex-grow rtl:ml-3 ltr:mr-3">
-                                        <p class="text-[16px] font-semibold text-[#212121] mb-1">
-                                            {{ $item->product->name }}
-                                        </p>
-                                        <p class="text-sm text-gray-600">{{ __('الكمية') }}: {{ $item->quantity }}
-                                        </p>
-                                        @if ($item->options)
-                                            @foreach (json_decode($item->options, true) as $key => $value)
-                                                <p class="text-xs text-gray-500">{{ ucfirst($key) }}:
-                                                    {{ $value }}</p>
-                                            @endforeach
-                                        @endif
-                                    </div>
-                                    {{-- Price --}}
-                                    <p class="text-[16px] font-bold text-gray-800 flex items-center">
-                                        {{ number_format($item->quantity * $item->price_at_addition, 2) }}
-                                        <img class="mx-1 w-[15px] h-[15px] inline-block"
-                                            src="{{ asset('images/Vector (3).svg') }}" alt="currency">
-                                    </p>
-                                </div>
-                            @endforeach
-                        </div>
-
-                        {{-- "Go to Cart" Button --}}
-                        <div class="mt-6 text-center w-full">
-                            <a href="{{ route('cart.index') }}"
-                                class="mt-2 w-full px-[20px] py-[11px] bg-[#185D31] text-white rounded-[12px] text-[16px] ">
-                                {{ __('عرض العربة') }}
-                            </a>
-                        </div>
-                    @endif
-                </div>
-            </div>
-        </div>
+@include('partials.cart_popup')
 
         {{-- Notification Icon and Popup (only if user is logged in) --}}
         @auth

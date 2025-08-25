@@ -467,6 +467,15 @@ return [
     'enter_first_name' => 'Enter first name',
     'offers' => 'Offers',
 
+    'Cart' => 'Cart',
+    'show_cart' => 'Show Cart',
+    'added_to_cart' => 'Added to cart',
+    'error_adding_to_cart' => 'Error adding to cart. Please try again.',
+    'must_login_before_cart' => 'Must login before adding products to cart.',
+
+    'order_details' => 'Order Details',
+    'sizes' => 'Sizes',
+
 
     
 
