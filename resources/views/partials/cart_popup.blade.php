@@ -4,7 +4,7 @@
         <img src="{{ asset('images/Group.svg') }}" alt="Cart Icon">
         @if ($cartItems->sum('quantity') > 0)
             <span
-                class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-xs w-4 h-4 flex items-center justify-center">
+                class="absolute -top-3 -right-4 bg-red-500 text-white rounded-full text-xs w-7 h-7 flex items-center justify-center">
                 {{ $cartItems->sum('quantity') }}
             </span>
         @endif

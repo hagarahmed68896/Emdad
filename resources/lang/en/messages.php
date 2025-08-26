@@ -476,6 +476,9 @@ return [
     'order_details' => 'Order Details',
     'sizes' => 'Sizes',
 
+    'insufficient_quantity' => 'Sorry, the requested quantity is not fully available. Available: :available pieces. 
+You can continue the order by submitting a special request, and it will be prioritized once the stock is available.',
+
 
     
 

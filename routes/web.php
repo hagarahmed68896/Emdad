@@ -74,7 +74,7 @@ Route::middleware('web')->group(function () {
                //cart
                Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
                Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
-               Route::get('/user/last-cart/{product_id}', [CartController::class, 'getLastOrder']);
+               Route::get('/cart/last/{product_id}', [CartController::class, 'getLastOrder']);
 
                //orders
                Route::get('/order', [OrderController::class, 'index'])->name('order.index');

@@ -9,6 +9,7 @@ use App\Models\Cart;
 use App\Models\CartItem; 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Storage;
 
 
 class CartController extends Controller
@@ -138,41 +139,67 @@ public function store(Request $request)
      * Get the last order details for a specific product and authenticated user.
      * This method is placed logically within the CartController.
      */
-    public function getLastOrder(Request $request, $productId)
-    {
-        // Check if the user is authenticated
-        if (!Auth::check()) {
-            return response()->json(['message' => 'User not authenticated'], 401);
-        }
+// app/Http/Controllers/CartController.php
 
-        $user = Auth::user();
-
-        // Find the user's last cart item for the given product
-        // Note: The previous logic of querying `Order` is incorrect for a 'cart' feature.
-        // It should be looking at the `Cart` and `CartItem` models.
-        $lastCartItem = CartItem::whereHas('cart', function($query) use ($user) {
-                $query->where('user_id', $user->id);
-            })
-            ->where('product_id', $productId)
-            ->latest() // Assumes a `created_at` timestamp to get the "last" item
-            ->first();
-
-        // If a cart item is found, return its details
-        if ($lastCartItem) {
-            return response()->json([
-                'items' => [
-                    [
-                        'color'    => $lastCartItem->options['color'] ?? 'Default',
-                        'quantity' => $lastCartItem->quantity,
-                        'unit_price' => $lastCartItem->price_at_addition,
-                    ]
-                ]
-            ]);
-        }
-
-        // If no previous cart item is found, return an empty response
-        return response()->json(['items' => []]);
+public function getLastOrder(Request $request, $productId)
+{
+    if (!Auth::check()) {
+        return response()->json(['message' => 'User not authenticated'], 401);
     }
+
+    $user = Auth::user();
+
+    $lastCartItem = CartItem::whereHas('cart', function($query) use ($user) {
+            $query->where('user_id', $user->id);
+        })
+        ->where('product_id', $productId)
+        ->latest()
+        ->with('product') // make sure product is eager loaded
+        ->first();
+
+    if ($lastCartItem) {
+        $optionsData = $lastCartItem->options;
+
+        if (isset($optionsData['variants']) && is_array($optionsData['variants'])) {
+            $variants = $optionsData['variants'];
+            $items = [];
+
+            // product colors array
+            $colors = $lastCartItem->product->colors ?? [];
+
+            foreach ($variants as $key => $quantity) {
+                $parts = explode('|', $key);
+                $colorName = $parts[0] ?? null;
+                $size      = $parts[1] ?? null;
+
+                // find matching color
+                $colorData = collect($colors)->firstWhere('name', $colorName);
+
+                // same logic you used in Blade
+                if ($colorData) {
+                    $isBase64 = isset($colorData['image']) && str_starts_with($colorData['image'], 'data:image');
+$relativePath = ltrim(str_replace('storage/', '', $colorData['image']), '/');
+$swatchImage  = Storage::url($relativePath);
+
+                } else {
+                    $swatchImage = 'https://placehold.co/64x64/F0F0F0/ADADAD?text=N/A';
+                }
+
+                $items[] = [
+                    'color'       => $colorName,
+                    'size'        => $size,
+                    'quantity'    => $quantity,
+                    'unit_price'  => $lastCartItem->price_at_addition,
+                    'swatchImage' => $swatchImage,
+                ];
+            }
+
+            return response()->json(['items' => $items]);
+        }
+    }
+
+    return response()->json(['items' => []]);
+}
 
     // You might also add other methods like updateQuantity, removeItem, clearCart here
 /**

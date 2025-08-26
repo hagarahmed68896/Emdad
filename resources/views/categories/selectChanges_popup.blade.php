@@ -1,3 +1,11 @@
+<script>
+    // Put the translations into a JS variable
+    window.translations = {
+        insufficient_quantity_1: @json(__('messages.insufficient_quantity_1')),
+        insufficient_quantity_2: @json(__('messages.insufficient_quantity_2')),
+        insufficient_quantity_3: @json(__('messages.insufficient_quantity_13'))
+    };
+</script>
 <div class="flex w-full justify-between">
      <p class="text-[24px] font-bold mb-3">{{ __('messages.changes') }}</p>
 
@@ -12,20 +20,30 @@
         totalPrice: 0,
         showItemsTable: false,
         selected: [],
+        productAvailable: {{ $product->available_quantity ?? 0 }},
+       async fetchLastCart() {
+    try {
+        const response = await fetch(`/cart/last/{{ $product->id }}`);
+        const data = await response.json();
 
-        async fetchLastCart() {
-            try {
-                const response = await fetch('/cart/last');
-                const data = await response.json();
-                if (data.items && data.items.length > 0) {
-                    this.selected = data.items;
-                    this.$dispatch('product-updated', { selectedItems: this.selected });
-                }
-            } catch (e) {
-                console.error('Failed to fetch last cart:', e);
-            }
-        },
+        if (data.items && data.items.length > 0) {
+            this.selected = data.items.map(item => ({
+                key: item.color + '|' + item.size,
+                color: item.color,
+                size: item.size,
+                count: item.quantity,
+                price: item.unit_price,
+                swatchImage: 'https://via.placeholder.com/64x64.png?text=' + (item.color?.charAt(0) || '?')
+            }));
 
+            // 🚀 Broadcast so other Alpine components update too
+            this.$dispatch('product-updated', { selectedItems: this.selected });
+        }
+    } catch (e) {
+        console.error('Failed to fetch last cart:', e);
+    }
+}
+,
         discount: {{ $product->offer->discount_percent ?? 0 }} || 0,
         shipping_cost_per_item: {{ $product->shipping_cost ?? 0 }} || 0,
         openSwatchModal: false,
@@ -69,7 +87,21 @@
                 this.messageType = 'error';
                 return;
             }
+     // 3. Validate quantity
+            const totalRequested = itemsToAdd.reduce((sum, it) => sum + it.quantity, 0);
 
+            if (totalRequested > this.productAvailable) {
+                this.message = `
+                    <div class='bg-yellow-100 border border-yellow-300 text-yellow-800 p-4 rounded-lg space-y-1'>
+                        <p>${window.translations.insufficient_quantity_1}</p>
+                        <p>${window.translations.insufficient_quantity_2.replace(':available', this.productAvailable)}</p>
+                        <p>${window.translations.insufficient_quantity_3}</p>
+                    </div>
+                `;
+                this.messageType = 'error';
+                setTimeout(() => this.message = '', 6000);
+                return;
+            }
             // 3. Send the data to your server using a fetch API call
             fetch('/cart', {
                 method: 'POST',
@@ -109,6 +141,7 @@
     @click=" 
         open_Poduct = true;
         showItemsTable = false;
+        selected = [];
         fetchLastCart();
     "
     class="underline text-[#696969] text-[14px]">{{ __('messages.selectChanges') }}</button>
@@ -148,6 +181,8 @@
                      <p class="text-gray-600 mb-6 text-sm md:text-base">
                          {{ __('messages.select_changes') }}
                      </p>
+<div x-html="message"></div>
+
 
                      {{-- Price Tiers --}}
                      <div class="mb-6 border-b pb-4">
@@ -181,7 +216,7 @@
                                      {{ __('messages.no_pricing_tiers_available') }}
                                  </p>
                              @endforelse
-                         </div>
+                         </div> 
                      </div>
 
                      <div class="space-y-6">
@@ -192,10 +227,9 @@
     x-data="{
         selectedColor: null,
         price: {{ $product->price ?? 0 }},
-        selected: [],
+        {{-- selected: [], --}}
 
         changeQty(size, delta) {
-            // Check if a color is selected for products with sizes
             if ({{ $product->sizes ? 'true' : 'false' }} && !this.selectedColor) {
                 return;
             }
@@ -216,7 +250,6 @@
                 this.selected[i].count = Math.max(0, this.selected[i].count + delta);
             }
 
-            // Dispatch a custom event with the updated data
             this.$dispatch('product-updated', { selectedItems: this.selected });
         },
 
@@ -231,7 +264,6 @@
             return this.selected.filter(it => it.color === name).reduce((s, it) => s + it.count, 0);
         },
 
-        // This `totalItems` property is only for this component's internal use (if needed)
         get totalItems() {
             return this.selected.reduce((sum, it) => sum + it.count, 0);
         }
@@ -289,7 +321,7 @@
                     <div class="flex items-center mt-2">
                         <div class="flex rounded-[12px] items-center py-1 w-[113px] bg-[#EDEDED] overflow-hidden">
                             <button type="button" @click.stop="changeQty('N/A', -1)" class="px-3 py-1">-</button>
-                            <input type="number" min="0" :value="getCountForSize('N/A')" class="flex-grow w-full text-center mr-2 border-0 bg-[#EDEDED]" readonly>
+                            <input type="number" min="0" :value="getCountForSize('N/A')" class="flex-grow w-full text-center mr-2 border-0 bg-[#EDEDED]" >
                             <button type="button" @click.stop="changeQty('N/A', 1)" class="px-3 py-1">+</button>
                         </div>
                     </div>
@@ -313,7 +345,7 @@
                     <div class="flex rounded-[12px] items-center py-1 w-[140px] bg-[#EDEDED] overflow-hidden ml-2"
                          :class="{ 'opacity-50 pointer-events-none': !selectedColor }">
                         <button type="button" @click="changeQty('{{ $size }}', -1)" class="px-3 py-1">-</button>
-                        <input type="number" min="0" :value="getCountForSize('{{ $size }}')" class="flex-grow w-full text-center mr-2 border-0 bg-[#EDEDED]" readonly>
+                        <input type="number" min="0" :value="getCountForSize('{{ $size }}')" class="flex-grow w-full text-center mr-2 border-0 bg-[#EDEDED]" >
                         <button type="button" @click="changeQty('{{ $size }}', 1)" class="px-3 py-1">+</button>
                     </div>
                 </div>
@@ -444,47 +476,65 @@
                              </tr>
                          </thead>
                          <tbody>
-                             <template x-for="item in selected.filter(i => i.count > 0)" :key="item.name">
-                                 <tr class="border-b">
-                                     <td class="p-2 flex items-center gap-2">
-                                         <img :src="item.swatchImage"
-                                             class="w-[88px] h-[88px] bg-[#EDEDED] rounded-md object-cover"
-                                             alt="">
-                                         <div>
-                                             <p class="text-sm text-gray-600">
-                                                 {{ __('messages.color_name') }}:
-                                                 <span class="font-medium mx-1" x-text="item.name"></span>
-                                             </p>
+                           <template x-for="item in selected.filter(i => i.count > 0)" :key="item.key">
+    <tr class="border-b">
+        <td class="p-2 flex items-center gap-2">
+@php
+    $colorName = $color['name'] ?? 'Unnamed';
+    $isBase64 = isset($color['image']) && str_starts_with($color['image'], 'data:image');
+    $swatchImage = isset($color['image'])
+        ? ($isBase64 ? $color['image'] : asset('storage/' . $color['image']))
+        : 'https://placehold.co/64x64/F0F0F0/ADADAD?text=N/A';
+@endphp
 
-                                             <p class="text-sm text-gray-600">
-                                                 {{ __('messages.quantaty') }}:
-                                                 <span class="font-medium mx-1" x-text="item.count"></span>
-                                             </p>
+<div 
+    x-data="{
+        selected: [{
+            name: '{{ $colorName }}',
+            swatchImage: '{{ $swatchImage }}'
+        }]
+    }"
+>
+    <template x-for="item in selected" :key="item.name">
+        <img :src="item.swatchImage"
+             class="w-[88px] h-[88px] bg-[#EDEDED] rounded-md object-cover"
+             alt="">
+    </template>
+</div>
 
-                                         </div>
-                                     </td>
-                                     <td class="p-2">
-                                         <span class="text-[18px]">{{$product->price}}</span>
-                                         <img class="mx-1 w-[16px] h-[16px] inline-block"
-                                             src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}" alt="">
-                                     </td>
-                                     <td class="p-2">
-                                         <div
-                                             class="flex rounded-[12px] items-center py-1 w-[113px] bg-[#EDEDED] overflow-hidden">
-                                             <button type="button" @click="item.count = Math.max(0, item.count - 1)"
-                                                 class="px-3 py-1">
-                                                 -
-                                             </button>
-                                             <input type="number" min="0" x-model="item.count"
-                                                 class="flex-grow w-full text-center mr-2 border-0 bg-[#EDEDED]"
-                                                 readonly>
-                                             <button type="button" @click="item.count++" class="px-3 py-1">
-                                                 +
-                                             </button>
-                                         </div>
-                                     </td>
-                                 </tr>
-                             </template>
+
+            <div>
+                <p class="text-sm text-gray-600"> 
+                    {{ __('messages.color_name') }}:
+                    <span class="font-medium mx-1" x-text="item.color"></span>
+                </p>
+                <p class="text-sm text-gray-600">
+                    {{ __('messages.size') }}:
+                    <span class="font-medium mx-1" x-text="item.size"></span>
+                </p>
+                <p class="text-sm text-gray-600">
+                    {{ __('messages.quantaty') }}:
+                    <span class="font-medium mx-1" x-text="item.count"></span>
+                </p>
+            </div>
+        </td>
+        <td class="p-2">
+            <span class="text-[18px]">{{$product->price}}</span>
+            <img class="mx-1 w-[16px] h-[16px] inline-block"
+                src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}" alt="">
+        </td>
+        <td class="p-2">
+            <div
+                class="flex rounded-[12px] items-center py-1 w-[113px] bg-[#EDEDED] overflow-hidden">
+                <button type="button" @click="item.count = Math.max(0, item.count - 1)" class="px-3 py-1">-</button>
+                <input type="number" min="0" x-model="item.count"
+                    class="flex-grow w-full text-center mr-2 border-0 bg-[#EDEDED]" >
+                <button type="button" @click="item.count++" class="px-3 py-1">+</button>
+            </div>
+        </td>
+    </tr>
+</template>
+
                          </tbody>
                      </table>
                  </div>
@@ -573,17 +623,17 @@
     <!-- ✅ Message Display -->
   <div 
     x-show="message" 
-    x-text="message"
+    x-html="message"
     :class="messageType === 'success' 
-        ? 'bg-green-100 text-green-700 border border-green-400' 
-        : 'bg-red-100 text-red-700 border border-red-400'"
-    class="absolute -top-12 left-0 right-0 p-3 rounded shadow text-center z-10 cursor-pointer"
+        ? 'bg-green-100 text-green-700 border border-green-400 p-3'  
+        : 'bg-red-100 text-red-700 border border-red-400 p-3'"
+    class="absolute -top-12 left-0 right-0 rounded shadow text-center z-10 cursor-pointer"
     x-transition
     @click="message = ''"
     x-init="
         $watch('message', value => {
             if(value){
-                setTimeout(() => message = '', 3000) // ⏳ يختفي بعد 3 ثواني
+                setTimeout(() => message = '', 5000) // ⏳ يختفي بعد 3 ثواني
             }
         })
     "
