@@ -252,6 +252,12 @@
 </section>
 {{-- @endif --}}
 
+
+{{--my orders section--}}
+     @if (!Auth::check() || Auth::user()->account_type === 'customer')
+        @include('profile.orderSection', ['section' => $section])
+        @endif
+
                 {{-- Notifications Section (New!) --}}
 @include('profile.notifications', ['section' => $section])
                 {{-- End Notifications Section --}}

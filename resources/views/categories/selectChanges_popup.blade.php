@@ -181,7 +181,6 @@
                      <p class="text-gray-600 mb-6 text-sm md:text-base">
                          {{ __('messages.select_changes') }}
                      </p>
-<div x-html="message"></div>
 
 
                      {{-- Price Tiers --}}
@@ -227,21 +226,20 @@
     x-data="{
         selectedColor: null,
         price: {{ $product->price ?? 0 }},
-        {{-- selected: [], --}}
+        selected: [],
+        openSwatchModal: false,
+        activeSlide: 0,
 
-        changeQty(size, delta) {
-            if ({{ $product->sizes ? 'true' : 'false' }} && !this.selectedColor) {
-                return;
-            }
-
-            const key = this.selectedColor + '|' + size;
+        changeQty(color, size, delta) {
+            if (!color) return;
+            const key = color + '|' + size;
             const i = this.selected.findIndex(it => it.key === key);
 
             if (i === -1) {
                 if (delta <= 0) return;
                 this.selected.push({
                     key,
-                    color: this.selectedColor,
+                    color,
                     size,
                     count: delta,
                     price: this.price
@@ -253,19 +251,38 @@
             this.$dispatch('product-updated', { selectedItems: this.selected });
         },
 
-        getCountForSize(size) {
-            if (!this.selectedColor) return 0;
-            const key = this.selectedColor + '|' + size;
+        getCount(color, size) {
+            const key = color + '|' + size;
             const it = this.selected.find(it => it.key === key);
             return it ? it.count : 0;
         },
 
         getColorQty(name) {
-            return this.selected.filter(it => it.color === name).reduce((s, it) => s + it.count, 0);
+            return this.selected
+                .filter(it => it.color === name)
+                .reduce((s, it) => s + it.count, 0);
         },
 
         get totalItems() {
             return this.selected.reduce((sum, it) => sum + it.count, 0);
+        },
+
+        initSwiper() {
+            // A small delay is sometimes needed for Alpine to fully render the element
+            this.$nextTick(() => {
+                const swiper = new Swiper(this.$refs.swatchSwiper, {
+                    initialSlide: this.activeSlide,
+                    navigation: {
+                        nextEl: '.swiper-button-next',
+                        prevEl: '.swiper-button-prev',
+                    },
+                });
+
+                // Re-initialize swiper when a different swatch is clicked while the modal is open
+                this.$watch('activeSlide', (value) => {
+                    swiper.slideTo(value);
+                });
+            });
         }
     }"
     @if (!$product->sizes)
@@ -278,10 +295,11 @@
             count: 0,
             price: price
         });
-        // Dispatch initial state
         $dispatch('product-updated', { selectedItems: selected });
     "
     @endif
+        x-on:load.window="initSwiper" {{-- This is the key change --}}
+
 >
     <h3 class="text-lg font-bold text-gray-800 mb-2">
         {{ __('messages.colors') }} ({{ count($product->colors) }})
@@ -298,15 +316,16 @@
             @endphp
 
             <div
-                @click="selectedColor = '{{ $colorName }}'"
-                class="relative flex flex-col items-center cursor-pointer rounded-lg p-2 transition border"
+                class="relative flex flex-col items-center rounded-lg p-2 transition border cursor-pointer"
                 :class="selectedColor === '{{ $colorName }}' ? 'border-4 border-green-600' : 'border border-gray-300'"
+                @click="selectedColor = '{{ $colorName }}'"
             >
-                {{-- Color Image --}}
+                {{-- Color Image (clicking image opens modal only) --}}
                 <img src="{{ $swatchImage }}" alt="{{ $colorName }}"
-                    class="w-[64px] h-[64px] rounded-[12px] bg-[#EDEDED] object-cover" />
-
-                {{-- Badge for total quantity of this color --}}
+                    class="w-[64px] h-[64px] rounded-[12px] bg-[#EDEDED] object-cover cursor-zoom-in"
+                    @click.prevent.stop="openSwatchModal = true; activeSlide = {{ $index }}">
+                
+                {{-- Badge for total quantity --}}
                 <template x-if="getColorQty('{{ $colorName }}') > 0">
                     <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
                         <span x-text="getColorQty('{{ $colorName }}')"></span>
@@ -320,9 +339,17 @@
                 @if (!$product->sizes)
                     <div class="flex items-center mt-2">
                         <div class="flex rounded-[12px] items-center py-1 w-[113px] bg-[#EDEDED] overflow-hidden">
-                            <button type="button" @click.stop="changeQty('N/A', -1)" class="px-3 py-1">-</button>
-                            <input type="number" min="0" :value="getCountForSize('N/A')" class="flex-grow w-full text-center mr-2 border-0 bg-[#EDEDED]" >
-                            <button type="button" @click.stop="changeQty('N/A', 1)" class="px-3 py-1">+</button>
+                            <button type="button"
+                                    @click.stop="changeQty('{{ $colorName }}', 'N/A', -1)"
+                                    class="px-3 py-1">-</button>
+
+                            <input type="number" min="0"
+                                    :value="getCount('{{ $colorName }}','N/A')"
+                                    class="flex-grow w-full text-center mr-2 border-0 bg-[#EDEDED]" readonly>
+
+                            <button type="button"
+                                    @click.stop="changeQty('{{ $colorName }}', 'N/A', 1)"
+                                    class="px-3 py-1">+</button>
                         </div>
                     </div>
                 @endif
@@ -343,16 +370,73 @@
 
                 <div class="flex items-center">
                     <div class="flex rounded-[12px] items-center py-1 w-[140px] bg-[#EDEDED] overflow-hidden ml-2"
-                         :class="{ 'opacity-50 pointer-events-none': !selectedColor }">
-                        <button type="button" @click="changeQty('{{ $size }}', -1)" class="px-3 py-1">-</button>
-                        <input type="number" min="0" :value="getCountForSize('{{ $size }}')" class="flex-grow w-full text-center mr-2 border-0 bg-[#EDEDED]" >
-                        <button type="button" @click="changeQty('{{ $size }}', 1)" class="px-3 py-1">+</button>
+                            :class="{ 'opacity-50 pointer-events-none': !selectedColor }">
+                        
+                        <button type="button" 
+                                @click="changeQty(selectedColor, '{{ $size }}', -1)" 
+                                class="px-3 py-1">-</button>
+                        
+                        <input type="number" min="0" 
+                                :value="getCount(selectedColor, '{{ $size }}')" 
+                                class="flex-grow w-full text-center mr-2 border-0 bg-[#EDEDED]" readonly>
+                        
+                        <button type="button" 
+                                @click="changeQty(selectedColor, '{{ $size }}', 1)" 
+                                class="px-3 py-1">+</button>
                     </div>
                 </div>
             </div>
         @endforeach
     @endif
+{{-- </div> --}}
+
+           <!-- Swatch Modal -->
+<div x-show="openSwatchModal"
+     x-transition
+     class="fixed inset-0 flex items-center justify-end ml-[15%] z-50">
+    
+    <div class="bg-white rounded-lg max-w-[30%] max-h-[80%] overflow-hidden relative">
+        
+        <!-- Close Button -->
+        <button @click="openSwatchModal = false"
+                class="absolute top-3 right-3 p-2 text-gray-700 hover:text-red-500 z-10">
+            ✕
+        </button>
+
+        <!-- Swiper -->
+        <div class="swiper swatchSwiper" x-ref="swatchSwiper">
+            <div class="swiper-wrapper">
+                @foreach ($product->colors as $index => $color)
+                    @php
+                        $colorName = $color['name'] ?? 'Unnamed';
+                        $swatchImage = isset($color['image'])
+                            ? asset('storage/' . $color['image'])
+                            : 'https://placehold.co/400x400/F0F0F0/ADADAD?text=N/A';
+                    @endphp
+
+                    <div class="swiper-slide flex flex-col items-center">
+                        <img src="{{ $swatchImage }}"
+                             class="max-w-full max-h-[70vh] rounded-lg" />
+                        <h2 class="text-[24px] font-bold text-center mt-2">
+                            {{ __('messages.color_name') }}: {{ $colorName }}
+                        </h2>
+                    </div>
+                @endforeach
+            </div>
+
+            <!-- Swiper navigation -->
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+        </div>
+    </div>
 </div>
+
+
+                             </div>
+                    
+
+
+
 
 
 
@@ -401,7 +485,7 @@
 
 
 
-                         <!-- Swatch Modal with Swiper -->
+                         {{-- <!-- Swatch Modal with Swiper -->
                          <div x-show="openSwatchModal" x-transition
                              class="fixed inset-0 items-center justify-end pl-[200px] flex z-50">
                              <div class="bg-white rounded-lg  max-w-[40%] max-h-[80%] overflow-hidden relative">
@@ -445,7 +529,7 @@
                                  </div>
 
                              </div>
-                         </div>
+                         </div> --}}
 
                      </div>
 
@@ -667,3 +751,31 @@
      </div>
 
  </div>
+<script>
+    let swiper;
+
+    function openSwiper(imgElement) {
+        const index = imgElement.getAttribute("data-index");
+
+        // Show modal
+        document.getElementById("swiperModal").classList.remove("hidden");
+
+        // Init Swiper (if not already)
+        if (!swiper) {
+            swiper = new Swiper(".mySwiper", {
+                navigation: {
+                    nextEl: ".swiper-button-next",
+                    prevEl: ".swiper-button-prev",
+                },
+                loop: true,
+            });
+        }
+
+        // Slide to clicked image
+        swiper.slideToLoop(parseInt(index));
+    }
+
+    function closeSwiper() {
+        document.getElementById("swiperModal").classList.add("hidden");
+    }
+</script>

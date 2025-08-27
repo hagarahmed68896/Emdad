@@ -18,7 +18,7 @@
         class="absolute left-0 mt-3 w-80 sm:w-96 bg-white shadow-xl rounded-lg z-20 overflow-hidden border border-gray-200">
 
         {{-- عنوان --}}
-        <h3 class="text-lg font-bold text-gray-900 px-4 py-3 border-b">{{ __('عربة التسوق') }}</h3>
+        <h3 class="text-lg font-bold text-gray-900 px-4 py-3 border-b">{{__('messages.Cart') }}</h3>
 
         {{-- محتوى الكارت --}}
         <div class="max-h-[60vh] overflow-y-auto px-4 py-3">
@@ -28,11 +28,10 @@
                          alt="No cart items illustration"
                          class="w-[120px] h-[120px] mb-6">
                     <p class="text-gray-500 text-sm text-center">
-                        لم تقم بإضافة أي منتج إلى عربة التسوق بعد.
-                    </p>
+{{__('messages.no_items_in_cart')}}                    </p>
                     <a href="{{ route('products.index') }}"
                         class="px-4 py-2 bg-green-700 text-white rounded-lg mt-3 hover:bg-green-800 text-sm">
-                        {{ __('تصفح المنتجات') }}
+                        {{__('messages.browse_products')}}
                     </a>
                 </div>
             @else
@@ -52,11 +51,18 @@
                                     {{ $item->product->name }}
                                 </p>
                                 <p class="text-xs text-gray-600">الكمية: {{ $item->quantity }}</p>
-                                @if ($item->options)
-                                    @foreach ($item->options as $key => $value)
-                                        <p class="text-xs text-gray-500">{{ ucfirst($key) }}: {{ $value }}</p>
-                                    @endforeach
-                                @endif
+                         @if (!empty($item->options['variants']) && is_array($item->options['variants']))
+    @php
+        $colors = [];
+        foreach ($item->options['variants'] as $variantKey => $qty) {
+            $colors[] = ucfirst(explode('|', $variantKey)[0]);
+        }
+    @endphp
+    <p class="text-xs text-gray-500">
+        {{__('messages.Colors')}}: {{ implode(', ', $colors) }}
+    </p>
+@endif
+
                             </div>
                             {{-- السعر --}}
                             <p class="text-sm font-bold text-gray-900">

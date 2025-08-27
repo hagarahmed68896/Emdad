@@ -476,8 +476,19 @@ return [
     'order_details' => 'Order Details',
     'sizes' => 'Sizes',
 
-    'insufficient_quantity' => 'Sorry, the requested quantity is not fully available. Available: :available pieces. 
-You can continue the order by submitting a special request, and it will be prioritized once the stock is available.',
+    'insufficient_quantity_1' => 'Sorry, the requested quantity is not fully available.',
+    'insufficient_quantity_2' => 'Available: :available pieces.',
+    'insufficient_quantity_3'=>'You can continue the order by submitting a special request, and it will be prioritized once the stock is available.',
+
+    'payment_details' => 'Payment Details',
+    'order_completed' => 'Order Completed',
+    'select_all_products' => 'Select all products',
+    'no_items_in_cart' => 'You have not added any products to the cart yet.',
+    'browse_products' => 'Browse Products',
+    'Colors' => 'Colors',
+
+    'delete_warning' => 'Are you sure you want to delete this item from the cart?',
+    'delete_selected' => 'Delete Selected',
 
 
     

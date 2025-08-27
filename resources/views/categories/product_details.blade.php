@@ -524,7 +524,7 @@ $defaultSelectedColorName = $productColors[0]['name'] ?? null;
                 @if (!Auth::check() || Auth::user()->account_type !== 'supplier')
                     {{-- Action Buttons --}}
                     <div class="flex gap-4">
-                        <button onclick="window.location.href='{{ route('order.index') }}'"
+                        <button 
                             class="flex-1 bg-[#185D31] text-white py-3 rounded-[12px] font-semibold transition duration-300 shadow-md flex items-center justify-center gap-2">
                             {{ __('messages.place_order') }}
                         </button>

@@ -52,7 +52,8 @@
                         
                         <li>
                             <a class="dropdown-item pb-4 block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
-                                href="{{ route('profile.show') }}#myOrdersSection">{{ __('messages.MyOrders') }}</a>
+                                href="{{ route('profile.show', ['section' => 'myOrdersSection']) }}#myOrdersSection">
+                                {{ __('messages.MyOrders') }}</a>
                         </li>
 
                         <li>

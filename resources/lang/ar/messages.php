@@ -463,6 +463,16 @@ return [
     'insufficient_quantity_2' => 'الكمية المتاحة: :available قطع.',
     'insufficient_quantity_13' => 'يمكنك متابعة الطلب من خلال تقديم طلب خاص، وسيتم تنفيذه بأولوية فور توفر الكمية.',
 
+    'payment_details' => 'تفاصيل الدفع',
+    'order_completed' => 'الطلب مكتمل',
+    'select_all_products' => 'حدد جميع المنتجات',
+    'no_items_in_cart' => 'لم تقم بإضافة أي منتج إلى عربة التسوق بعد.',
+    'browse_products' => 'تصفح المنتجات',
+    'Colors' => 'الألوان',
+
+   'delete_warning' => 'هل أنت متأكد أنك تريد ازالة هذا المنتج؟.',
+   'delete_selected' => 'إزالة المحدد',
+    
 
 
     

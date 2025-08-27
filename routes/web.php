@@ -32,6 +32,7 @@ use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Supplier\SupplierProductController;
 use App\Http\Controllers\Supplier\OfferController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\CheckoutController;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -76,8 +77,19 @@ Route::middleware('web')->group(function () {
                Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
                Route::get('/cart/last/{product_id}', [CartController::class, 'getLastOrder']);
 
+
+
+               Route::delete('/cart/remove-item/{id}', [CartController::class, 'removeItem'])->name('cart.removeItem');
+               Route::patch('/cart/{id}/update-variant', [CartController::class, 'updateVariant'])->name('cart.updateVariant');
+               Route::delete('/cart/{id}/remove-variant', [CartController::class, 'removeVariant'])->name('cart.removeVariant');
+               Route::delete('/cart/bulk-delete', [CartController::class, 'bulkDelete'])->name('cart.bulkRemove');
+
+               Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
+               Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
+
                //orders
                Route::get('/order', [OrderController::class, 'index'])->name('order.index');
+               Route::delete('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 
 
           // Admin-specific routes

@@ -172,6 +172,12 @@ public function show(Request $request)
             ->toArray()
         : [];
 
+    $orders = Auth::user()
+    ->orders()
+    ->with(['orderItems.product.subCategory'])
+    ->latest()
+    ->get();
+
     return view('profile.account', compact(
         'user',
         'favorites',
@@ -185,8 +191,9 @@ public function show(Request $request)
         'businessData',
         'categories',
         'userSelectedCategories',
-        'availableSpecifications', // Added
-        'colorHexMap' // Added
+        'availableSpecifications', 
+        'colorHexMap' ,
+        'orders'
     ));
 }
 
