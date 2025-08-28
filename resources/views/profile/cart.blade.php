@@ -448,7 +448,7 @@ function cartManager() {
 
             <!-- Buttons -->
             <div class="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <a href="{{ route('order.index') }}"
+                <a href="{{ route('profile.show', ['section' => 'myOrdersSection']) }}#myOrdersSection"
                    class="px-6 py-2 bg-[#185D31] text-white rounded-lg hover:bg-[#154a2a]">
                    {{ __('messages.view_orders') }}
                 </a>

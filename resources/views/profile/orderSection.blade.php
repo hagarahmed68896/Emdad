@@ -47,9 +47,10 @@
                 @foreach ($orders as $order)
                     <template x-if="activeTab === 'all' || activeTab === '{{ $order->status }}'">
                         @foreach ($order->orderItems as $item)
-                        <tr class="border">
+                        <tr class="border cursor-pointer hover:bg-gray-50 transition-colors duration-200"
+                        onclick="window.location='{{ route('order.show', $order->id) }}'">
                             <td class="p-3 border">#{{ $order->order_number }}</td>
-                            <td class="p-3 border flex items-center gap-2">
+                            <td class="p-3 flex items-center gap-2">
                                 <img src="{{ Storage::url($item->product->image ?? '') }}"
                                      onerror="this.onerror=null;this.src='https://via.placeholder.com/80x80?text=Image+Error';"
                                      class="w-12 h-12 object-contain">

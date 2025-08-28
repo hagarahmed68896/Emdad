@@ -14,7 +14,7 @@ public function index(Request $request)
     // إحصائيات عامة
     $totalOrders = Order::count();
     $completedOrders = Order::where('status', 'completed')->count();
-    $processingOrders = Order::where('status', 'processing')->count();
+    $processingOrders = Order::where('status', 'pending')->count();
     $cancelledOrders = Order::where('status', 'cancelled')->count();
 
     // بناء الاستعلام
@@ -143,7 +143,7 @@ public function exportCsv(Request $request)
                 $order->payment_way ?? '-',
                 match($order->status) {
                     'completed' => 'مكتمل',
-                    'processing' => 'جاري',
+                    'pending' => 'جاري',
                     'cancelled' => 'ملغي',
                     'returned' => 'ارجاع',
                     default => 'غير معروف',

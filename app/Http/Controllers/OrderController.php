@@ -13,31 +13,46 @@ class OrderController extends Controller
      */
     public function index()
     {
-        return view('partials.order_tracking');
+                $orders = Auth::user()->orders()->with('orderItems.product.subCategory.category')->get();
+        return view('partials.order_tracking', compact('orders'));
     }
 
-    public function cancel(Order $order)
+//     public function cancel(Order $order)
+// {
+//     if ($order->user_id !== Auth::user()->id) {
+//         abort(403, 'غير مصرح لك بإلغاء هذا الطلب');
+//     }
+
+//     // Only cancel if not already shipped/delivered
+//     if ($order->status !== 'pending') {
+//         return back()->with('error', 'لا يمكن إلغاء الطلب بعد معالجته');
+//     }
+
+//     $order->update(['status' => 'cancelled']);
+
+//     return back()->with('success', 'تم إلغاء الطلب بنجاح');
+// }
+// OrderController.php
+public function cancel(Order $order)
 {
-    if ($order->user_id !== Auth::user()->id) {
-        abort(403, 'غير مصرح لك بإلغاء هذا الطلب');
+    // Prevent cancel if already shipped/delivered
+    if (in_array($order->status, ['shipped', 'delivered'])) {
+        return back()->with('error', 'لا يمكن إلغاء هذا الطلب بعد شحنه أو تسليمه.');
     }
 
-    // Only cancel if not already shipped/delivered
-    if ($order->status !== 'processing') {
-        return back()->with('error', 'لا يمكن إلغاء الطلب بعد معالجته');
-    }
+    $order->status = 'cancelled'; // must match your stepMap spelling
+    $order->save();
 
-    $order->update(['status' => 'cancelled']);
-
-    return back()->with('success', 'تم إلغاء الطلب بنجاح');
+    return redirect()->route('order.show')->with('success', 'تم إلغاء الطلب بنجاح.');
 }
+
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+ public function show(Order $order)
     {
-        //
+        return view('partials.order_tracking', compact('order'));
     }
 
     /**
@@ -48,13 +63,7 @@ class OrderController extends Controller
         //
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+    
 
     /**
      * Show the form for editing the specified resource.
