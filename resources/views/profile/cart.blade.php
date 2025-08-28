@@ -289,115 +289,117 @@ function cartManager() {
 }
 </script>
 
-                    <div x-show="activeStep === 2" class="p-4 rounded-lg">
-                        <h3 class="text-xl font-bold mb-4">معلومات الاتصال</h3>
+                 <div x-show="activeStep === 2" class="p-4 rounded-lg">
+    <h3 class="text-xl font-bold mb-4">{{ __('messages.contact_info') }}</h3>
 
-       <form id="checkout-form"
-              action="{{ route('checkout.process') }}"
-              method="POST"
-              class="space-y-4">
-            @csrf
+    <form id="checkout-form"
+          action="{{ route('checkout.process') }}"
+          method="POST"
+          class="space-y-4">
+        @csrf
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                             <div>
-    <label class="block text-sm font-semibold mb-1">الاسم الأول</label>
-    <input type="text" name="first_name" value="{{ Auth::user()->first_name }}" class="w-full border rounded-lg px-3 py-2" required>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-semibold mb-1">{{ __('messages.first_name') }}</label>
+                <input type="text" name="first_name" value="{{ Auth::user()->first_name }}" class="w-full border rounded-lg px-3 py-2" required>
+            </div>
+            <div>
+                <label class="block text-sm font-semibold mb-1">{{ __('messages.last_name') }}</label>
+                <input type="text" name="last_name" value="{{ Auth::user()->last_name }}" class="w-full border rounded-lg px-3 py-2">
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-sm font-semibold mb-1">{{ __('messages.phone') }}</label>
+            <input type="tel" name="phone" value="{{ Auth::user()->phone_number }}" class="w-full border rounded-lg px-3 py-2" required>
+        </div>
+        <div>
+            <label class="block text-sm font-semibold mb-1">{{ __('messages.email') }}</label>
+            <input type="email" name="email" value="{{ Auth::user()->email }}" class="w-full border rounded-lg px-3 py-2" required>
+        </div>
+        <div>
+            <label class="block text-sm font-semibold mb-1">{{ __('messages.address') }}</label>
+            <input type="text" name="address" value="{{ Auth::user()->address }}" class="w-full border rounded-lg px-3 py-2" required>
+        </div>
+
+        <hr class="my-4">
+
+        <h3 class="text-xxl font-bold mb-4">{{ __('messages.payment_method') }}</h3>
+
+        <div class="flex items-center gap-4 mb-4">
+            <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="payment_method" value="card" class="hidden peer" required
+                        onchange="togglePaymentFields('card')">
+                <div class="flex flex-col md:flex-row px-4 font-bold py-2 border rounded-lg peer-checked:border-blue-500 peer-checked:bg-blue-50">
+                    {{ __('messages.card_payment') }} <img class="mx-2" src="{{asset('/images/logo.svg')}}" alt="">
+                </div>
+            </label>
+
+            <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="payment_method" value="paypal" class="hidden peer" required
+                        onchange="togglePaymentFields('paypal')">
+                <div class="flex flex-col md:flex-row font-bold px-4 py-2 border rounded-lg peer-checked:border-blue-500 peer-checked:bg-blue-50">
+                    {{ __('messages.paypal') }} <img class="mx-2" src="{{asset('/images/paypal.svg')}}" alt="">
+                </div>
+            </label>
+        </div>
+
+        <div id="paypal-fields" style="display:none;" class="space-y-4 border rounded-lg p-4 bg-white">
+            <div>
+                <label class="block text-sm font-semibold mb-1">{{ __('messages.paypal_email') }}</label>
+                <input type="email" name="paypal_email" id="paypal_email"
+                        class="w-full border rounded-lg px-3 py-2">
+            </div>
+        </div>
+
+        <div id="card-fields" style="display:none;" class="space-y-4 border rounded-lg p-4 bg-white">
+            <div>
+                <label class="block text-sm font-semibold mb-1">{{ __('messages.card_number') }}</label>
+                <input type="text" name="card_number" id="card_number" maxlength="16"
+                        class="w-full border rounded-lg px-3 py-2">
+            </div>
+            <div>
+                <label class="block text-sm font-semibold mb-1">{{ __('messages.card_name') }}</label>
+                <input type="text" name="card_name" id="card_name"
+                        class="w-full border rounded-lg px-3 py-2">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold mb-1">{{ __('messages.expiry_date') }}</label>
+                    <input type="text" name="expiry_date" id="expiry_date" placeholder="MM/YY"
+                            class="w-full border rounded-lg px-3 py-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">{{ __('messages.cvc') }}</label>
+                    <input type="text" name="cvc" id="cvc" maxlength="4"
+                            class="w-full border rounded-lg px-3 py-2">
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-between mt-6">
+            <button type="submit"
+                class="px-6 py-2 bg-green-600 text-white rounded-full hover:bg-green-700">
+                {{ __('messages.complete_payment') }}
+            </button>
+        </div>
+    </form>
 </div>
-<div>
-    <label class="block text-sm font-semibold mb-1">الاسم الأخير</label>
-    <input type="text" name="last_name" value="{{ Auth::user()->last_name }}" class="w-full border rounded-lg px-3 py-2">
-</div>
-                            </div>
 
-                     <div>
-    <label class="block text-sm font-semibold mb-1">رقم الهاتف</label>
-    <input type="tel" name="phone" value="{{ Auth::user()->phone_number }}" class="w-full border rounded-lg px-3 py-2" required>
-</div>
-<div>
-    <label class="block text-sm font-semibold mb-1">البريد الإلكتروني</label>
-    <input type="email" name="email" value="{{ Auth::user()->email }}" class="w-full border rounded-lg px-3 py-2" required>
-</div>
-<div>
-    <label class="block text-sm font-semibold mb-1">العنوان</label>
-    <input type="text" name="address" value="{{ Auth::user()->address }}" class="w-full border rounded-lg px-3 py-2" required>
-</div>
-
-                            <hr class="my-4">
-
-                            <h3 class="text-xxl font-bold mb-4">طريقة الدفع</h3>
-
-                            <div class="flex items-center gap-4 mb-4">
-                                <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="radio" name="payment_method" value="card" class="hidden peer" required
-                                            onchange="togglePaymentFields('card')">
-                                    <div class="flex flex-col md:flex-row px-4 font-bold py-2 border rounded-lg peer-checked:border-blue-500 peer-checked:bg-blue-50">
-                                        بطاقة بنكية <img class="mx-2" src="{{asset('/images/logo.svg')}}" alt="">
-                                    </div>
-                                </label>
-
-                                <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="radio" name="payment_method" value="paypal" class="hidden peer" required
-                                            onchange="togglePaymentFields('paypal')">
-                                    <div class="flex flex-col md:flex-row font-bold px-4 py-2 border rounded-lg peer-checked:border-blue-500 peer-checked:bg-blue-50">
-                                        Paypal <img class="mx-2" src="{{asset('/images/paypal.svg')}}" alt="">
-                                    </div>
-                                </label>
-                            </div>
-
-                            <div id="paypal-fields" style="display:none;" class="space-y-4 border rounded-lg p-4 bg-white">
-                                <div>
-                                    <label class="block text-sm font-semibold mb-1">بريد PayPal</label>
-                                    <input type="email" name="paypal_email" id="paypal_email"
-                                            class="w-full border rounded-lg px-3 py-2">
-                                </div>
-                            </div>
-
-                            <div id="card-fields" style="display:none;" class="space-y-4 border rounded-lg p-4 bg-white">
-                                <div>
-                                    <label class="block text-sm font-semibold mb-1">رقم البطاقة</label>
-                                    <input type="text" name="card_number" id="card_number" maxlength="16"
-                                            class="w-full border rounded-lg px-3 py-2">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-semibold mb-1">اسم البطاقة</label>
-                                    <input type="text" name="card_name" id="card_name"
-                                            class="w-full border rounded-lg px-3 py-2">
-                                </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-sm font-semibold mb-1">تاريخ الانتهاء</label>
-                                        <input type="text" name="expiry_date" id="expiry_date" placeholder="MM/YY"
-                                                class="w-full border rounded-lg px-3 py-2">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-semibold mb-1">CVC</label>
-                                        <input type="text" name="cvc" id="cvc" maxlength="4"
-                                                class="w-full border rounded-lg px-3 py-2">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flex justify-between mt-6">
-                                <button type="submit"
-                                    class="px-6 py-2 bg-green-600 text-white rounded-full hover:bg-green-700">إتمام الدفع</button>
-                            </div>
-                        </form>
-                    </div>
 
 <div x-data="{ showCancelModal: false }">
     <div x-show="activeStep === 3" class="p-6 rounded-3xl bg-white shadow-md text-center max-w-2xl mx-auto">
-        @if(session('success') === 'تم إلغاء الطلب بنجاح')
+        @if(session('success') === __('messages.order_cancel_success'))
             <!-- Order Canceled Message -->
-            <h3 class="text-2xl font-bold mb-6 text-red-600">تم إلغاء الطلب</h3>
-            <p class="text-gray-600">لقد قمت بإلغاء هذا الطلب. لا يمكن استرجاعه.</p>
+            <h3 class="text-2xl font-bold mb-6 text-red-600">{{ __('messages.order_cancelled') }}</h3>
+            <p class="text-gray-600">{{ __('messages.order_cancelled_note') }}</p>
         @elseif($order)
             @if ($order->status !== 'cancelled')
-            <h3 class="text-2xl font-bold mb-6 text-[#185D31]">تم استلام طلبك بنجاح</h3>
+            <h3 class="text-2xl font-bold mb-6 text-[#185D31]">{{ __('messages.order_received') }}</h3>
 
             <!-- Order Items -->
             <div class="flex-row gap-6 mb-6 place-items-center">
                 @foreach($order->orderItems as $item)
-
                     <div class="relative flex flex-col md:flex-row justify-center items-center">
                         <!-- Image wrapper -->
                         <div class="w-20 h-20 bg-gray-50 rounded-md flex items-center justify-center overflow-hidden">
@@ -418,17 +420,17 @@ function cartManager() {
             <!-- Order Info -->
             <div class="border-t rounded-xl p-4 grid grid-cols-1 gap-3">
                 <p class="flex justify-between">
-                    <strong>رقم الطلب:</strong>
+                    <strong>{{ __('messages.order_number') }}</strong>
                     <span class="text-gray-700">#{{ $order->order_number }}</span>
                 </p>
                 <p class="flex justify-between">
-                    <strong>التاريخ:</strong>
+                    <strong>{{ __('messages.order_date') }}</strong>
                     <span class="text-gray-700">
                         {{ \Carbon\Carbon::parse($order->created_at)->translatedFormat('d F Y') }}
                     </span>
                 </p>
                 <p class="flex justify-between">
-                    <strong>الإجمالي:</strong>
+                    <strong>{{ __('messages.order_total') }}</strong>
                     <span class="flex items-center gap-1">
                         <span class="text-lg font-bold text-gray-800">
                             {{ number_format($order->total_amount, 2) }}
@@ -439,7 +441,7 @@ function cartManager() {
                     </span>
                 </p>
                 <p class="flex justify-between">
-                    <strong>طريقة الدفع:</strong>
+                    <strong>{{ __('messages.payment_method') }}</strong>
                     <span class="text-gray-700">{{ $order->payment_way }}</span>
                 </p>
             </div>
@@ -448,12 +450,12 @@ function cartManager() {
             <div class="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
                 <a href="{{ route('order.index') }}"
                    class="px-6 py-2 bg-[#185D31] text-white rounded-lg hover:bg-[#154a2a]">
-                   عرض سجل الطلبات
+                   {{ __('messages.view_orders') }}
                 </a>
                 <button type="button"
                         @click="showCancelModal = true"
                         class="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">
-                    إلغاء الطلب
+                    {{ __('messages.cancel_order') }}
                 </button>
             </div>
 
@@ -461,30 +463,30 @@ function cartManager() {
             <div x-show="showCancelModal" 
                  class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
                 <div class="bg-white p-6 rounded-lg shadow-lg w-96 text-center">
-                    <h2 class="text-lg font-bold mb-4">تأكيد الإلغاء</h2>
-                    <p class="mb-6">هل أنت متأكد أنك تريد إلغاء هذا الطلب؟</p>
+                    <h2 class="text-lg font-bold mb-4">{{ __('messages.cancel_confirm_title') }}</h2>
+                    <p class="mb-6">{{ __('messages.cancel_confirm_text') }}</p>
 
                     <div class="flex justify-center gap-4">
                         <button @click="showCancelModal = false"
                                 class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">
-                            لا
+                            {{ __('messages.no') }}
                         </button>
                         <form action="{{ route('orders.cancel', $order->id) }}" method="POST">
                             @csrf
                             @method('DELETE')
                             <button type="submit"
                                     class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
-                                نعم، إلغاء
+                                {{ __('messages.yes_cancel') }}
                             </button>
                         </form>
                     </div>
                 </div>
             </div>
             @else
-                <h3 class="text-2xl font-bold mb-6 text-red-600">تم إلغاء الطلب</h3>
+                <h3 class="text-2xl font-bold mb-6 text-red-600">{{ __('messages.order_cancelled') }}</h3>
             @endif
         @else
-            <p class="text-red-500">لم يتم العثور على بيانات الطلب.</p>
+            <p class="text-red-500">{{ __('messages.order_not_found') }}</p>
         @endif
     </div>
 </div>
@@ -494,60 +496,60 @@ function cartManager() {
 
 
 
+
                 </div>
 
-                <div class="w-full lg:w-1/3 bg-white p-6 rounded-3xl shadow-lg">
-                    <h3 class="text-2xl font-bold text-[#212121] mb-6">ملخص الطلب</h3>
-                    <div class="flex flex-col gap-4">
-                        <div class="flex justify-between items-center text-gray-600">
-                            <span>إجمالي العناصر</span>
-                            <span class="font-semibold text-[#212121] text-lg" id="subtotal">0.00 ريال</span>
-                        </div>
-                        <div class="flex justify-between items-center text-gray-600">
-                            <span>رسوم الشحن</span>
-                            <span class="font-semibold text-[#212121] text-lg">14.94 ريال</span>
-                        </div>
-                        <div class="flex justify-between items-center text-red-500">
-                            <span>خصم الشحن</span>
-                            <span class="font-semibold text-red-500 text-lg">- 20.00 ريال</span>
-                        </div>
-                        <div class="w-full h-px bg-gray-300 my-4"></div>
-                        <div class="flex justify-between items-center font-bold text-lg">
-                            <span>الإجمالي</span>
-                            <span class="text-2xl text-[#185D31]" id="grand-total">0.00 ريال</span>
-                        </div>
-                        <button @click="activeStep = 2"
-                            class="w-full py-4 bg-[#185D31] text-white rounded-xl text-lg font-bold mt-4 hover:bg-[#154a2a] transition-colors">
-                            الدفع
-                            <i class="fas fa-credit-card mr-2"></i>
-                        </button>
-                    </div>
+          <div class="w-full lg:w-1/3 bg-white p-6 rounded-3xl shadow-lg">
+    <h3 class="text-2xl font-bold text-[#212121] mb-6">{{ __('messages.order_summary') }}</h3>
+    <div class="flex flex-col gap-4">
+        <div class="flex justify-between items-center text-gray-600">
+            <span>{{ __('messages.items_total') }}</span>
+            <span class="font-semibold text-[#212121] text-lg" id="subtotal">0.00 {{ __('messages.currency') }}</span>
+        </div>
+        <div class="flex justify-between items-center text-gray-600">
+            <span>{{ __('messages.shipping_fee') }}</span>
+            <span class="font-semibold text-[#212121] text-lg">14.94 {{ __('messages.currency') }}</span>
+        </div>
+        <div class="flex justify-between items-center text-red-500">
+            <span>{{ __('messages.shipping_discount') }}</span>
+            <span class="font-semibold text-red-500 text-lg">- 20.00 {{ __('messages.currency') }}</span>
+        </div>
+        <div class="w-full h-px bg-gray-300 my-4"></div>
+        <div class="flex justify-between items-center font-bold text-lg">
+            <span>{{ __('messages.total') }}</span>
+            <span class="text-2xl text-[#185D31]" id="grand-total">0.00 {{ __('messages.currency') }}</span>
+        </div>
+        <button @click="activeStep = 2"
+            class="w-full py-4 bg-[#185D31] text-white rounded-xl text-lg font-bold mt-4 hover:bg-[#154a2a] transition-colors">
+            {{ __('messages.checkout') }}
+            <i class="fas fa-credit-card mr-2"></i>
+        </button>
+    </div>
 
-                    <div class="mt-8 flex flex-col items-center">
-                        <p class="text-sm font-semibold text-gray-700 mb-4">أنت آمن</p>
-                        <div class="flex items-center justify-center gap-2 mb-4">
-                            <img src="https://placehold.co/40x25/ffffff/212121?text=Visa" alt="Visa" class="h-6">
-                            <img src="https://placehold.co/40x25/ffffff/212121?text=Mastercard" alt="Mastercard"
-                                class="h-6">
-                            <img src="https://placehold.co/40x25/ffffff/212121?text=Maestro" alt="Maestro" class="h-6">
-                            <img src="https://placehold.co/40x25/ffffff/212121?text=Mada" alt="Mada" class="h-6">
-                            <img src="https://placehold.co/40x25/ffffff/212121?text=ApplePay" alt="Apple Pay"
-                                class="h-6">
-                        </div>
-                        <div class="flex items-center text-gray-500 text-sm mb-2">
-                            <i class="fas fa-shield-alt mr-2"></i>
-                            <span>الدفع الآمن</span>
-                        </div>
-                        <div class="flex items-center text-gray-500 text-sm mb-2">
-                            <i class="fas fa-undo-alt mr-2"></i>
-                            <span>استرجاع الأموال والمرتجعات</span>
-                        </div>
-                        <div class="flex items-center text-gray-500 text-sm">
-                            <i class="fas fa-truck mr-2"></i>
-                            <span>التمهيد بواسطة لوجستيات لشركه امداد</span>
-                        </div>
-                    </div>
-                </div>
+    <div class="mt-8 flex flex-col items-center">
+        <p class="text-sm font-semibold text-gray-700 mb-4">{{ __('messages.you_are_safe') }}</p>
+        <div class="flex items-center justify-center gap-2 mb-4">
+            <img src="https://placehold.co/40x25/ffffff/212121?text=Visa" alt="Visa" class="h-6">
+            <img src="https://placehold.co/40x25/ffffff/212121?text=Mastercard" alt="Mastercard" class="h-6">
+            <img src="https://placehold.co/40x25/ffffff/212121?text=Maestro" alt="Maestro" class="h-6">
+            <img src="https://placehold.co/40x25/ffffff/212121?text=Mada" alt="Mada" class="h-6">
+            <img src="https://placehold.co/40x25/ffffff/212121?text=ApplePay" alt="Apple Pay" class="h-6">
+        </div>
+        <div class="flex items-center text-gray-500 text-sm mb-2">
+            <i class="fas fa-shield-alt mr-2"></i>
+            <span>{{ __('messages.secure_payment') }}</span>
+        </div>
+        <div class="flex items-center text-gray-500 text-sm mb-2">
+            <i class="fas fa-undo-alt mr-2"></i>
+            <span>{{ __('messages.refund_policy') }}</span>
+        </div>
+        <div class="flex items-center text-gray-500 text-sm">
+            <i class="fas fa-truck mr-2"></i>
+            <span>{{ __('messages.shipping_by_provider') }}</span>
+        </div>
+    </div>
+</div>
+
 
             </div>
         @endif

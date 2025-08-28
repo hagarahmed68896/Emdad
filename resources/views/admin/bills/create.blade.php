@@ -1,13 +1,13 @@
 @extends('layouts.admin')
 
-@section('page_title', 'إضافة فاتورة')
+@section('page_title', __('messages.add_invoice'))
 
 @section('content')
 <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
     <div class="bg-white rounded-xl shadow p-6 mx-auto" x-data="invoiceForm()">
-        <h2 class="text-[24px] font-bold text-[#212121] mb-6">إضافة فاتورة</h2>
+        <h2 class="text-[24px] font-bold text-[#212121] mb-6">{{ __('messages.add_invoice') }}</h2>
 
-        {{-- ✅ هنا ستظهر رسائل الأخطاء --}}
+        {{-- ✅ رسائل الأخطاء --}}
         <template x-if="errorMessages.length">
             <div class="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
                 <ul class="list-disc list-inside">
@@ -18,7 +18,7 @@
             </div>
         </template>
 
-        {{-- ✅ هنا رسالة النجاح --}}
+        {{-- ✅ رسالة النجاح --}}
         <template x-if="successMessage">
             <div class="mb-4 p-4 bg-green-100 text-green-700 rounded-lg" x-text="successMessage"></div>
         </template>
@@ -28,13 +28,17 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label for="customer_name" class="block font-bold text-[20px] text-[#212121]">اسم العميل</label>
+                    <label for="customer_name" class="block font-bold text-[20px] text-[#212121]">
+                        {{ __('messages.customer_name') }}
+                    </label>
                     <input type="text" x-model="form.customer_name" name="customer_name" id="customer_name"
                         required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 rounded-xl">
                 </div>
 
                 <div>
-                    <label for="order_number" class="block font-bold text-[20px] text-[#212121]">رقم الطلب</label>
+                    <label for="order_number" class="block font-bold text-[20px] text-[#212121]">
+                        {{ __('messages.order_number') }}
+                    </label>
                     <input type="text" x-model="form.order_number" name="order_number" id="order_number"
                         required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 rounded-xl">
                 </div>
@@ -42,36 +46,42 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label for="total_price" class="block font-bold text-[20px] text-[#212121]">القيمة</label>
+                    <label for="total_price" class="block font-bold text-[20px] text-[#212121]">
+                        {{ __('messages.total_price') }}
+                    </label>
                     <input type="number" x-model="form.total_price" name="total_price" id="total_price"
                         required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 rounded-xl">
                 </div>
 
                 <div>
-                    <label for="payment_way" class="block font-bold text-[20px] text-[#212121]">طريقة الدفع</label>
+                    <label for="payment_way" class="block font-bold text-[20px] text-[#212121]">
+                        {{ __('messages.payment_method') }}
+                    </label>
                     <select x-model="form.payment_way" name="payment_way" id="payment_way"
                         required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 rounded-xl">
-                        <option value="">اختر</option>
-                        <option value="cash">نقداً</option>
-                        <option value="bank_transfer">تحويل بنكي</option>
-                        <option value="credit_card">بطاقة ائتمان</option>
+                        <option value="">{{ __('messages.select') }}</option>
+                        <option value="cash">{{ __('messages.cash') }}</option>
+                        <option value="bank_transfer">{{ __('messages.bank_transfer') }}</option>
+                        <option value="credit_card">{{ __('messages.credit_card') }}</option>
                     </select>
                 </div>
             </div>
 
             <div>
-                <label for="status" class="block font-bold text-[20px] text-[#212121]">حالة الفاتورة</label>
+                <label for="status" class="block font-bold text-[20px] text-[#212121]">
+                    {{ __('messages.invoice_status') }}
+                </label>
                 <select x-model="form.status" name="status" id="status"
                     required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 rounded-xl">
-                    <option value="payment">مدفوعة</option>
-                    <option value="not payment">غير مدفوعة</option>
-                    <option value="pending">مراجعة</option>
+                    <option value="payment">{{ __('messages.paid') }}</option>
+                    <option value="not payment">{{ __('messages.unpaid') }}</option>
+                    <option value="pending">{{ __('messages.pending') }}</option>
                 </select>
             </div>
 
             <button type="submit"
                 class="px-4 py-2 border ml-2 border-transparent rounded-[16px] shadow-sm text-sm font-medium text-white bg-[#185D31]">
-                إضافة فاتورة
+                {{ __('messages.add_invoice') }}
             </button>
         </form>
     </div>
@@ -120,7 +130,7 @@
                 } else if (data.message) {
                     this.errorMessages.push(data.message);
                 } else {
-                    this.errorMessages.push('حدث خطأ غير متوقع.');
+                    this.errorMessages.push('{{ __('messages.unexpected_error') }}');
                 }
             }
         }

@@ -1,4 +1,3 @@
-
 <table class="min-w-full divide-y divide-gray-200">
     <thead class="bg-gray-50">
         <tr>
@@ -10,13 +9,13 @@
 
             {{-- Other Headers --}}
             <th scope="col" class="px-6 py-3 rtl:text-right text-[18px] font-bold text-[#212121] uppercase">#</th>
-            <th scope="col" class="px-6 py-3 rtl:text-right text-[18px] font-bold text-[#212121] uppercase">الصورة</th>
-            <th scope="col" class="px-6 py-3 rtl:text-right text-[18px] font-bold text-[#212121] uppercase">اسم الفئة</th>
-            <th scope="col" class="px-6 py-3 rtl:text-right text-[18px] font-bold text-[#212121] uppercase">الوصف</th>
-            <th scope="col" class="px-6 py-3 rtl:text-right text-[18px] font-bold text-[#212121] uppercase">نوع الفئة</th>
-            <th scope="col" class="px-6 py-3 rtl:text-right text-[18px] font-bold text-[#212121] uppercase">تابعة لـ</th>
-            <th scope="col" class="px-6 py-3 rtl:text-right text-[18px] font-bold text-[#212121] uppercase">عدد المنتجات</th>
-            <th scope="col" class="px-6 py-3 rtl:text-right text-[18px] font-bold text-[#212121] uppercase">الإجراءات</th>
+            <th scope="col" class="px-6 py-3 rtl:text-right text-[18px] font-bold text-[#212121] uppercase">{{ __('messages.image') }}</th>
+            <th scope="col" class="px-6 py-3 rtl:text-right text-[18px] font-bold text-[#212121] uppercase">{{ __('messages.category_name') }}</th>
+            <th scope="col" class="px-6 py-3 rtl:text-right text-[18px] font-bold text-[#212121] uppercase">{{ __('messages.description') }}</th>
+            <th scope="col" class="px-6 py-3 rtl:text-right text-[18px] font-bold text-[#212121] uppercase">{{ __('messages.category_type') }}</th>
+            <th scope="col" class="px-6 py-3 rtl:text-right text-[18px] font-bold text-[#212121] uppercase">{{ __('messages.parent') }}</th>
+            <th scope="col" class="px-6 py-3 rtl:text-right text-[18px] font-bold text-[#212121] uppercase">{{ __('messages.products_count') }}</th>
+            <th scope="col" class="px-6 py-3 rtl:text-right text-[18px] font-bold text-[#212121] uppercase">{{ __('messages.actions') }}</th>
         </tr>
     </thead>
 
@@ -48,7 +47,7 @@
                 {{-- الصورة --}}
                 <td class="px-6 py-4">
                     @if ($item->iconUrl)
-                        <img src="{{ asset('storage/' . $item->iconUrl) }}" alt="Icon"
+                        <img src="{{ asset('storage/' . $item->iconUrl) }}" alt="{{ __('messages.image') }}"
                             class="w-12 h-12 rounded-md object-cover">
                     @else
                         <span class="text-gray-400">-</span>
@@ -63,7 +62,7 @@
 
                 {{-- نوع الفئة --}}
                 <td class="px-6 py-4">
-                    {{ $item->type === 'category' ? 'عامة' : 'فرعية' }}
+                    {{ $item->type === 'category' ? __('messages.general') : __('messages.sub') }}
                 </td>
 
                 {{-- تابعة لـ --}}
@@ -75,14 +74,13 @@
                 {{-- الإجراءات --}}
                 <td class="px-6 py-4">
                     {{-- زر التعديل --}}
-<a class="text-[#185D31] mx-4"
-   href="{{ $item->type === 'category'
-       ? route('admin.categories.edit', $item->id)
-       : route('admin.sub-categories.edit', $item->id)
-   }}">
-   <i class="fas fa-edit"></i>
-</a>
-
+                    <a class="text-[#185D31] mx-4"
+                       href="{{ $item->type === 'category'
+                           ? route('admin.categories.edit', $item->id)
+                           : route('admin.sub-categories.edit', $item->id)
+                       }}">
+                       <i class="fas fa-edit"></i>
+                    </a>
 
                     {{-- زر الحذف --}}
                     <div x-data="{ open: false }" class="inline-block">
@@ -95,8 +93,8 @@
                             <div @click.away="open = false"
                                 class="bg-white rounded-xl shadow-lg p-6 w-full max-w-sm text-center">
 
-                                <h2 class="text-lg font-bold mb-4">تأكيد الحذف</h2>
-                                <p class="text-gray-600 mb-6">هل أنت متأكد أنك تريد حذف هذه الفئة؟</p>
+                                <h2 class="text-lg font-bold mb-4">{{ __('messages.delete_confirm_title') }}</h2>
+                                <p class="text-gray-600 mb-6">{{ __('messages.delete_confirm_message') }}</p>
 
                                 <form action="{{ route('admin.categories.destroy', $item->id) }}" method="POST"
                                     class="flex justify-center gap-4">
@@ -104,11 +102,11 @@
                                     @method('DELETE')
                                     <button type="submit"
                                         class="px-4 py-2 rounded-xl bg-red-600 text-white hover:bg-red-700">
-                                        تأكيد الحذف
+                                        {{ __('messages.confirm_delete') }}
                                     </button>
                                     <button type="button" @click="open = false"
                                         class="px-4 py-2 rounded-xl bg-gray-300 text-gray-800 hover:bg-gray-400">
-                                        إلغاء
+                                        {{ __('messages.cancel') }}
                                     </button>
                                 </form>
                             </div>
@@ -118,7 +116,7 @@
             </tr>
         @empty
             <tr>
-                <td colspan="9" class="text-center text-gray-500 py-4">لا توجد بيانات.</td>
+                <td colspan="9" class="text-center text-gray-500 py-4">{{ __('messages.no_data') }}</td>
             </tr>
         @endforelse
     </tbody>

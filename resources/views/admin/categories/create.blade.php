@@ -1,11 +1,11 @@
 @extends('layouts.admin')
 
-@section('page_title', 'إضافة فئة')
+@section('page_title', __('messages.add_category'))
 
 @section('content')
 
 <div class="p-6 bg-white rounded-xl shadow overflow-y-auto" x-data="categoryForm()" x-init="console.log('Alpine Loaded')">
-    <h1 class="text-2xl font-bold mb-6">إضافة فئة</h1>
+    <h1 class="text-2xl font-bold mb-6">{{ __('messages.add_category') }}</h1>
 
     <!-- ✅ رسائل الأخطاء -->
     <template x-if="errorMessages.length">
@@ -28,13 +28,13 @@
 
         <!-- صورة -->
         <div class="mb-6">
-            <label class="block mb-2 font-bold">صورة الفئة</label>
-              <p class="text-sm text-gray-500 mb-2">مسموح: JPG و PNG</p>
+            <label class="block mb-2 font-bold">{{ __('messages.category_image') }}</label>
+            <p class="text-sm text-gray-500 mb-2">{{ __('messages.allowed_file_types') }}</p>
             <div @click="$refs.iconUrl.click()" class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-xl cursor-pointer">
                 <template x-if="!preview">
                      <div class="flex flex-col items-center justify-center">
                         <img src="{{ asset('images/Frame 3508.svg') }}" class="w-8 h-8 mb-2" alt="">
-                        <p class="text-sm text-gray-500">اسحب صورة أو اضغط للرفع</p>
+                        <p class="text-sm text-gray-500">{{ __('messages.drag_or_click_upload') }}</p>
                     </div>
                 </template>
                 <template x-if="preview">
@@ -46,34 +46,36 @@
                 <p class="text-red-600 text-sm mt-1" x-text="errors.iconUrl"></p>
             </template>
         </div>
-     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- اسم -->
-        <div class="mb-4">
-            <label class="block mb-1 font-bold">اسم الفئة</label>
-            <input type="text" x-model="form.name" placeholder="أدخل اسم الفئة" class="border w-full px-3 py-3 rounded-xl">
-            <template x-if="errors.name">
-                <p class="text-red-600 text-sm" x-text="errors.name"></p>
-            </template>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- اسم -->
+            <div class="mb-4">
+                <label class="block mb-1 font-bold">{{ __('messages.category_name') }}</label>
+                <input type="text" x-model="form.name" placeholder="{{ __('messages.enter_category_name') }}" class="border w-full px-3 py-3 rounded-xl">
+                <template x-if="errors.name">
+                    <p class="text-red-600 text-sm" x-text="errors.name"></p>
+                </template>
+            </div>
+
+            <!-- نوع -->
+            <div class="mb-4">
+                <label class="block mb-1 font-bold">{{ __('messages.category_type') }}</label>
+                <select x-model="form.type" class="border w-full px-3 py-2 rounded-xl">
+                    <option value="" class="text-[#9EA2AE]">{{ __('messages.select_category_type') }}</option>
+                    <option value="category">{{ __('messages.general') }}</option>
+                    <option value="sub_category">{{ __('messages.sub') }}</option>
+                </select>
+                <template x-if="errors.type">
+                    <p class="text-red-600 text-sm" x-text="errors.type"></p>
+                </template>
+            </div>
         </div>
 
-        <!-- نوع -->
-        <div class="mb-4">
-            <label class="block mb-1 font-bold">نوع الفئة</label>
-            <select x-model="form.type" class="border w-full px-3 py-2 rounded-xl">
-                <option value="" class="text-[#9EA2AE]">حدد نوع الفئة</option>
-                <option value="category">عامة</option>
-                <option value="sub_category">فرعية</option>
-            </select>
-            <template x-if="errors.type">
-                <p class="text-red-600 text-sm" x-text="errors.type"></p>
-            </template>
-        </div>
-     </div>
         <!-- فئة أم -->
         <div class="mb-4" x-show="form.type === 'sub_category'">
-            <label class="block mb-1 font-bold">  تابعة لـ</label>
+            <label class="block mb-1 font-bold">{{ __('messages.parent') }}</label>
             <select x-model="form.category_id" class="border w-full px-3 py-2 rounded-xl">
-                <option value="">حدد نوع الفئة</option>
+                <option value="">{{ __('messages.select_category_type') }}</option>
                 @foreach($categories as $cat)
                     <option value="{{ $cat->id }}">{{ $cat->name }}</option>
                 @endforeach
@@ -85,11 +87,11 @@
 
         <!-- وصف -->
         <div class="mb-4" x-show="form.type != 'sub_category'">
-            <label class="block mb-1 font-bold">الوصف</label>
+            <label class="block mb-1 font-bold">{{ __('messages.description') }}</label>
             <textarea x-model="form.description" class="border w-full px-3 py-2 rounded-xl"></textarea>
         </div>
 
-        <button type="submit" class="px-5 py-2 bg-[#185D31] text-white rounded-xl">اضافة فئة</button>
+        <button type="submit" class="px-5 py-2 bg-[#185D31] text-white rounded-xl">{{ __('messages.add_category') }}</button>
     </form>
 </div>
 
@@ -114,12 +116,11 @@ document.addEventListener('alpine:init', () => {
             if (file && ['image/jpeg', 'image/png'].includes(file.type)) {
                 this.preview = URL.createObjectURL(file);
             } else {
-                this.errors.iconUrl = 'امتداد الصورة غير مسموح.';
+                this.errors.iconUrl = '{{ __("messages.invalid_image_extension") }}';
                 e.target.value = '';
             }
         },
         async submitForm() {
-            console.log('Submitting...'); // تأكيد أن الدالة تعمل
             this.errors = {};
             this.errorMessages = [];
             const formData = new FormData();
@@ -148,10 +149,10 @@ document.addEventListener('alpine:init', () => {
                     this.errors = data.errors;
                     this.errorMessages = Object.values(data.errors).flat();
                 } else {
-                    this.errorMessages = ['حدث خطأ غير معروف.'];
+                    this.errorMessages = ['{{ __("messages.unknown_error") }}'];
                 }
             } else {
-                this.successMessage = 'تمت الإضافة بنجاح.';
+                this.successMessage = '{{ __("messages.added_successfully") }}';
                 window.location.href = '{{ route('admin.categories.index') }}';
             }
         }

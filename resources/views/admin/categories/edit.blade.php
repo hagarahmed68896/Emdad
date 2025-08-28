@@ -1,13 +1,13 @@
 @extends('layouts.admin')
 
-@section('page_title', 'تعديل الفئة')
+@section('page_title', __('messages.edit_category'))
 
 @section('content')
 <div class="p-6 bg-white rounded-xl shadow overflow-y-auto"
      x-data="categoryForm()"
      x-init="init({{ $category->toJson() }})">
 
-    <h1 class="text-2xl font-bold mb-6">تعديل الفئة</h1>
+    <h1 class="text-2xl font-bold mb-6">{{ __('messages.edit_category') }}</h1>
 
     <!-- رسائل الأخطاء -->
     <template x-if="errorMessages.length">
@@ -26,7 +26,7 @@
 
         <!-- صورة الفئة -->
         <div class="mb-6">
-            <label class="block mb-2 font-bold">صورة الفئة</label>
+            <label class="block mb-2 font-bold">{{ __('messages.category_image') }}</label>
             <div @click="$refs.iconUrl.click()"
                  class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-xl cursor-pointer">
                 <template x-if="!preview">
@@ -46,28 +46,28 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- اسم الفئة -->
             <div class="mb-4">
-                <label class="block mb-1 font-bold">اسم الفئة</label>
+                <label class="block mb-1 font-bold">{{ __('messages.category_name') }}</label>
                 <input type="text" x-model="form.name" class="border w-full px-3 py-3 rounded-xl">
                 <template x-if="errors.name">
                     <p class="text-red-600 text-sm" x-text="errors.name"></p>
                 </template>
             </div>
 
-            <!-- نوع الفئة (قابل للتجربة) -->
+            <!-- نوع الفئة -->
             <div class="mb-4">
-                <label class="block mb-1 font-bold">نوع الفئة</label>
+                <label class="block mb-1 font-bold">{{ __('messages.category_type') }}</label>
                 <select x-model="form.type" class="border w-full px-3 py-3 rounded-xl bg-gray-100">
-                    <option value="category">عامة</option>
-                    <option value="sub_category">فرعية</option>
+                    <option value="category">{{ __('messages.general') }}</option>
+                    <option value="sub_category">{{ __('messages.sub') }}</option>
                 </select>
             </div>
         </div>
 
         <!-- فئة الأم إذا كانت فرعية -->
         <div class="mb-4" x-show="form.type === 'sub_category'">
-            <label class="block mb-1 font-bold">تابعة لـ</label>
+            <label class="block mb-1 font-bold">{{ __('messages.parent') }}</label>
             <select x-model="form.category_id" class="border w-full px-3 py-2 rounded-xl">
-                <option value="">حدد الفئة الأم</option>
+                <option value="">{{ __('messages.select_parent_category') }}</option>
                 @foreach($categories as $cat)
                     <option value="{{ $cat->id }}">{{ $cat->name }}</option>
                 @endforeach
@@ -79,14 +79,14 @@
 
         <!-- الوصف إذا كانت عامة -->
         <div class="mb-4" x-show="form.type === 'category'">
-            <label class="block mb-1 font-bold">الوصف</label>
+            <label class="block mb-1 font-bold">{{ __('messages.description') }}</label>
             <textarea x-model="form.description" class="border w-full px-3 py-2 rounded-xl"></textarea>
             <template x-if="errors.description">
                 <p class="text-red-600 text-sm" x-text="errors.description"></p>
             </template>
         </div>
 
-        <button type="submit" class="px-5 py-2 bg-[#185D31] text-white rounded-xl">تحديث الفئة</button>
+        <button type="submit" class="px-5 py-2 bg-[#185D31] text-white rounded-xl">{{ __('messages.update_category') }}</button>
     </form>
 </div>
 
@@ -121,7 +121,7 @@ document.addEventListener('alpine:init', () => {
             if (file && ['image/jpeg', 'image/png'].includes(file.type)) {
                 this.preview = URL.createObjectURL(file);
             } else {
-                this.errors.iconUrl = 'امتداد الصورة غير مسموح.';
+                this.errors.iconUrl = '{{ __("messages.invalid_image_extension") }}';
                 e.target.value = '';
             }
         },
@@ -154,7 +154,7 @@ document.addEventListener('alpine:init', () => {
                     this.errors = data.errors;
                     this.errorMessages = Object.values(data.errors).flat();
                 } else {
-                    this.errorMessages = ['حدث خطأ غير معروف.'];
+                    this.errorMessages = ['{{ __("messages.unknown_error") }}'];
                 }
             } else {
                 window.location.href = '{{ route('admin.categories.index') }}';
