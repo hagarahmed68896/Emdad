@@ -34,6 +34,8 @@ use App\Http\Controllers\Supplier\OfferController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\ConversationController;
+use App\Http\Controllers\supplierrController;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -93,9 +95,13 @@ Route::middleware('web')->group(function () {
                Route::get('/order/{order}', [OrderController::class, 'show'])->name('order.show');
                Route::delete('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 
-               Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
-               Route::get('/messages/{conversation}', [MessageController::class, 'show'])->name('messages.show');
-               Route::post('/messages/{conversation}', [MessageController::class, 'store'])->name('messages.store');
+             Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+             Route::get('/messages/{conversation}', [MessageController::class, 'show'])->name('messages.show');
+             Route::post('/messages/{conversation}', [MessageController::class, 'store'])->name('messages.store');
+             Route::delete('/conversations/{id}', [ConversationController::class, 'destroy']);
+             Route::post('/suppliers/{id}/report', [supplierrController::class, 'report']);
+             Route::post('/suppliers/{id}/ban', [supplierrController::class, 'ban']);
+
 
           // Admin-specific routes
           Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {

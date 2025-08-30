@@ -529,10 +529,12 @@ $defaultSelectedColorName = $productColors[0]['name'] ?? null;
                             {{ __('messages.place_order') }}
                         </button>
 
-                        <button
-                            class="flex-1 bg-[#EDEDED] text-[#696969] py-3 rounded-[12px] font-semibold transition duration-300 shadow-md flex items-center justify-center gap-2">
-                            {{ __('messages.contact_supplier') }}
-                        </button>
+                 <a href="{{ route('messages.index', ['product_id' => $product->id]) }}"
+   class="flex-1 bg-[#EDEDED] text-[#696969] py-3 rounded-[12px] font-semibold transition duration-300 shadow-md flex items-center justify-center gap-2">
+    {{ __('messages.contact_supplier') }}
+</a>
+
+
                     </div>
 
                     {{-- 4 Interest-Free Payments (Conditional Logic) --}}
