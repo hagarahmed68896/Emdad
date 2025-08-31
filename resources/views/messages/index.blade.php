@@ -147,61 +147,92 @@ x-text="product?.shipping_days
         </div>
 
         {{-- Chat box --}}
-        <div class="flex-1 p-4 overflow-y-auto space-y-3" id="chat-box">
-            <template x-if="!currentConversation">
-                <div class="flex flex-1 w-full flex-col items-center justify-center text-[#696969] py-[20%]">
-                    <img src="{{ asset('/images/Illustrations (5).svg') }}" alt="" class="mb-4 max-w-[200px]">
-                    <p class="text-lg">ابدأ بالتواصل لعرض الرسائل هنا.</p>
-                </div>
-            </template>
+<div id="chat-box" class="flex-1 overflow-y-auto p-4 flex flex-col space-y-4 bg-gray-50">
+    <template x-if="!currentConversation">
+        <div class="flex flex-1 w-full flex-col items-center justify-center text-[#696969] py-[20%]">
+            <img src="{{ asset('/images/Illustrations (5).svg') }}" alt="" class="mb-4 max-w-[200px]">
+            <p class="text-lg">ابدأ بالتواصل لعرض الرسائل هنا.</p>
+        </div>
+    </template>
 
-            <template x-if="currentConversation">
-                <div>
-                    <div class="flex justify-end">
-                        <div class="bg-gray-100 text-right text-gray-800 px-4 py-3 rounded-2xl shadow max-w-lg">
-                            <p class="mb-3 font-medium">
-                                أهلًا بك! 👋 تقدر تسأل عن المنتج، الشحن، الدفع أو أي تفاصيل مهمة بالنسبة لك.<br>
-                                اختر من الأسئلة التالية أو اكتب سؤالك مباشرة:
-                            </p>
-                            <div class="space-y-2 mb-1">
-                                <template x-for="qr in quickReplies" :key="qr.id">
-                                    <button @click="sendQuickReply(qr)"
-                                            class="w-full text-right bg-white border border-gray-300 px-4 py-2 rounded-xl hover:bg-[#185D31] transition">
-                                        <span x-text="qr.text"></span>
-                                    </button>
-                                </template>
-                            </div>
-                        </div>
+    <template x-if="currentConversation">
+        <div>
+            <div class="flex justify-start mb-2">
+                <div class="bg-gray-100 text-right text-gray-800 px-4 py-3 rounded-2xl shadow max-w-lg">
+                    <p class="mb-3 font-medium">
+                        أهلًا بك! 👋 تقدر تسأل عن المنتج، الشحن، الدفع أو أي تفاصيل مهمة بالنسبة لك.<br>
+                        اختر من الأسئلة التالية أو اكتب سؤالك مباشرة:
+                    </p>
+                    <div class="space-y-2 mb-1">
+                        <template x-for="qr in quickReplies" :key="qr.id">
+                            <button @click="sendQuickReply(qr)" class="w-full text-right bg-white border border-gray-300 px-4 py-2 rounded-xl hover:bg-[#185D31] transition">
+                                <span x-text="qr.text"></span>
+                            </button>
+                        </template>
                     </div>
-<template x-for="msg in messages" :key="msg.id">
-    <div class="flex items-end mb-3" :class="msg.sender_id === currentUserId ? 'justify-start' : 'justify-end'">
+                </div>
+            </div>
 
-        <template x-if="msg.sender_id === currentUserId">
-            <img src="{{ auth()->user()->profile_picture ? asset('storage/' . auth()->user()->profile_picture) : '/default.png' }}"
-                 class="w-10 h-10 rounded-full ml-2">
+            <template x-for="msg in messages" :key="msg.id">
+                <div class="flex items-end mb-3" :class="msg.sender_id === currentUserId ? 'justify-start' : 'justify-end'">
+
+               
+
+                          <template x-if="msg.sender_id === currentUserId">
+                        <img src="{{ auth()->user()->profile_picture ? asset('storage/' . auth()->user()->profile_picture) : '/default.png' }}" class="w-10 h-10 rounded-full ml-2">
+                    </template>
+
+                    <div class="max-w-[70%] p-2 mb-1 rounded-lg shadow"
+                         :class="msg.sender_id === currentUserId
+                             ? 'bg-[#185D31] text-white text-right rounded-tl-none'
+                             : 'bg-white text-black text-left rounded-tr-none'">
+
+                    <template x-if="msg.attachment">
+    <div>
+        <!-- Image attachments -->
+        <template x-if="msg.attachment.startsWith('blob:') || msg.attachment.match(/\.(jpg|jpeg|png|gif|webp)$/i)">
+            <img 
+                :src="msg.attachment.startsWith('blob:') ? msg.attachment : '/storage/' + msg.attachment" 
+                alt="Attachment" 
+                class="max-w-xs h-auto rounded-lg mb-2 cursor-pointer"
+            >
         </template>
 
-        <div class="max-w-[70%] p-2 mb-1 rounded-lg shadow"
-             :class="msg.sender_id === currentUserId
-                 ? 'bg-[#185D31] text-white text-left rounded-tl-none'
-                 : 'bg-gray-200 text-black text-right rounded-tr-none'">
-            <p x-html="highlightText(msg.message)" class="break-words"></p>
-            <span class="text-xs block mt-1"
-                  :class="msg.sender_id === currentUserId ? 'text-[#EDEDED]' : 'text-gray-600'"
-                  x-text="formatDate(msg.created_at)"></span>
-        </div>
-
-        <template x-if="msg.sender_id !== currentUserId">
-            <img :src="product?.supplier?.user?.profile_picture
-                         ? '/storage/' + product.supplier.user.profile_picture
-                         : '/default.png'"
-                 class="w-10 h-10 rounded-full ml-2">
+        <!-- Other file types -->
+        <template x-if="!msg.attachment.startsWith('blob:') && !msg.attachment.match(/\.(jpg|jpeg|png|gif|webp)$/i)">
+            <a 
+                :href="'/storage/' + msg.attachment" 
+                target="_blank" 
+                class="flex items-center gap-2 text-sm" 
+                :class="msg.sender_id === currentUserId ? 'text-gray-100 hover:text-white' : 'text-blue-500 hover:underline'"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.125a3.75 3.75 0 0 0-7.5 0v2.125m10.5-5.625a3.75 3.75 0 0 1-7.5 0m7.5 0a3.75 3.75 0 0 0-7.5 0M18 12.75a6 6 0 0 1-12 0v-2.125a6 6 0 0 1 12 0v2.125Z" />
+                </svg>
+                <span x-text="msg.attachment.split('/').pop()"></span>
+            </a>
         </template>
     </div>
 </template>
+
+
+                        <template x-if="msg.message">
+                            <p x-html="highlightText(msg.message)" class="break-words"></p>
+                        </template>
+
+                        <span class="text-xs block mt-1"
+                              :class="msg.sender_id === currentUserId ? 'text-[#EDEDED]' : 'text-gray-600'"
+                              x-text="formatDate(msg.created_at)"></span>
+                    </div>
+     <template x-if="msg.sender_id !== currentUserId">
+                        <img :src="product?.supplier?.user?.profile_picture ? '/storage/' + product.supplier.user.profile_picture : '/default.png'" class="w-10 h-10 rounded-full mr-2">
+                    </template>
+              
                 </div>
             </template>
         </div>
+    </template>
+</div>
 
         {{-- Input (only if conversation exists) --}}
 <template x-if="currentConversation">
@@ -227,11 +258,12 @@ x-text="product?.shipping_days
             {{-- Attachments and Emoji buttons --}}
             <div class="relative flex items-center">
                 <button type="button" @click="$refs.attachmentInput.click()" class="p-2 text-gray-500 hover:bg-gray-100 rounded-full transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.75c-.381.18-.814.285-1.25.285-.92 0-1.74-.484-2.22-1.21-.482-.725-.65-1.55-.49-2.317.16-.767.592-1.42 1.15-1.957.558-.538.995-.918 1.455-1.34.46-.422.84-.93 1.09-1.503.25-.573.34-1.21.25-1.85-.09-.64-.32-1.25-.67-1.76-.35-.51-.81-.92-1.35-1.22-.54-.3-1.12-.45-1.69-.45-.57 0-1.14.15-1.68.45-.54.3-.99.71-1.34 1.22-.35.51-.58.99-.67 1.55-.09.64-.09 1.28.09 1.95.18.67.5 1.3.89 1.83.39.53.64 1.14.73 1.8.09.66-.03 1.32-.34 1.93-.31.61-.79 1.14-1.37 1.59-1.34 1.02-2.92.21-3.69-.74-.77-.95-1.12-2.14-1.05-3.32.07-1.18.42-2.34 1.05-3.32.63-1.02 1.48-1.84 2.45-2.45.97-.61 2.06-.97 3.19-.97 1.13 0 2.22.36 3.19.97.97.61 1.82 1.43 2.45 2.45.63.98.98 2.14 1.05 3.32.07 1.18-.28 2.37-1.05 3.32-.77.95-2.35 1.76-3.69.74" />
-                    </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13" />
+</svg>
+
                 </button>
-                <input type="file" x-ref="attachmentInput" accept="image/*,video/*,application/pdf" class="hidden" @change="uploadAttachment($event, 'file')">
+<input type="file" x-ref="attachmentInput" accept="image/*,video/*,application/pdf" class="hidden" @change="handleAttachmentChange($event)">
 
                 <button type="button" @click="showEmojiPicker = !showEmojiPicker" class="p-2 text-gray-500 hover:bg-gray-100 rounded-full transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -319,6 +351,8 @@ function chatApp(initialConversations, initialQuickReplies, initialConversationI
         showEmojiPicker: false,
         newMessage: '',
         banMessage: '',
+        attachmentFile: null, // New: Holds the file object
+        attachmentName: '',   // New: Holds the file name for display
 
         init() {
             if (initialConversationId) {
@@ -361,11 +395,8 @@ function chatApp(initialConversations, initialQuickReplies, initialConversationI
             .then(data => {
                 if (data.success) {
                     this.product.supplier.user.status = data.status;
-
                     this.banMessage = data.status === 'banned' ? 'تم حظر المورد بنجاح' : 'تم إلغاء الحظر بنجاح';
-
                     setTimeout(() => this.banMessage = '', 3000);
-
                     console.log('User status updated to:', data.status);
                 } else {
                     console.error('Toggle failed:', data);
@@ -400,29 +431,116 @@ function chatApp(initialConversations, initialQuickReplies, initialConversationI
             .catch(e => console.error(e));
         },
 
-uploadAttachment(event, type) {
+        // This function now only STAGES the attachment, it does not send it.
+        // This function only stages the file, it does not send it.
+        handleAttachmentChange(event) {
+            let file = event.target.files[0];
+            if (!file) return;
+            this.attachmentFile = file;
+            this.attachmentName = file.name;
+        },
+
+        // This is the function called on form submit. It decides what to send.
+    
+       sendMessage() {
+    if (!this.newMessage && !this.attachmentFile) return;
+    if (!this.currentConversation) return;
+
+    // Prepare a temporary local message
+    const tempMessage = {
+        id: 'local-' + Date.now(),
+        message: this.newMessage || '',
+        attachment: this.attachmentFile ? URL.createObjectURL(this.attachmentFile) : null,
+        sender_id: this.currentUserId,
+        created_at: new Date().toISOString()
+    };
+
+    // Optimistically add it to the chat
+    this.messages.push(tempMessage);
+
+    // Save message content and attachment
+    const messageText = this.newMessage;
+    const attachmentFile = this.attachmentFile;
+
+    // Clear input fields immediately
+    this.newMessage = '';
+    this.attachmentFile = null;
+    this.attachmentName = '';
+    if (this.$refs.attachmentInput) this.$refs.attachmentInput.value = '';
+
+    this.scrollToBottom();
+    this.updateConversationPreviewFromMessages();
+
+    // Send to server
+    const formData = new FormData();
+    formData.append('conversation_id', this.currentConversation);
+    if (messageText) formData.append('message', messageText);
+    if (attachmentFile) formData.append('attachment', attachmentFile);
+
+    axios.post(`/messages/${this.currentConversation}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    .then(res => {
+        // Replace temporary message with server-saved message
+        const idx = this.messages.findIndex(m => m.id === tempMessage.id);
+        if (idx !== -1 && res.data.message) this.messages.splice(idx, 1, res.data.message);
+        this.scrollToBottom();
+    })
+    .catch(err => {
+        console.error('Error sending message:', err);
+        // Remove temporary message if failed
+        this.messages = this.messages.filter(m => m.id !== tempMessage.id);
+        this.scrollToBottom();
+    });
+},
+
+
+        // This function sends only the text message
+// This function sends only the text message
+sendTextMessage() {
+    axios.post(`/messages/${this.currentConversation}`, {
+        message: this.newMessage
+    })
+    .then(res => {
+            console.log(res.data); // check what you actually receive
+
+        // Corrected: Reassign the entire array to force a re-render
+        this.messages = [...this.messages, res.data.message];
+        this.newMessage = '';
+        this.updateConversationPreviewFromMessages();
+        this.scrollToBottom();
+    })
+    .catch(err => {
+        console.error(err);
+    });
+},
+
+        handleAttachmentChange(event) {
     let file = event.target.files[0];
-    if (!file || !this.currentConversation) return;
+    if (!file) return;
 
     this.attachmentFile = file;
     this.attachmentName = file.name;
+},
 
+        // This function sends the attachment (and optional text)
+    // This function sends the attachment (and optional text)
+uploadAttachment() {
     let formData = new FormData();
-    formData.append('attachment', file);
+    formData.append('attachment', this.attachmentFile);
     formData.append('conversation_id', this.currentConversation);
-    // Ensure `message` is an empty string if it's currently empty
     formData.append('message', this.newMessage || '');
 
     axios.post(`/messages/${this.currentConversation}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
     })
     .then(res => {
-        this.messages.push(res.data.message); // Updated to push the correct data
+        // Corrected: Reassign the entire array to force a re-render
+        this.messages = [...this.messages, res.data.message];
         this.attachmentFile = null;
         this.attachmentName = '';
         this.newMessage = '';
         if (this.$refs.attachmentInput) this.$refs.attachmentInput.value = '';
-        if (this.$refs.cameraInput) this.$refs.cameraInput.value = '';
         this.updateConversationPreviewFromMessages();
         this.scrollToBottom();
     })
@@ -435,7 +553,6 @@ uploadAttachment(event, type) {
             this.attachmentFile = null;
             this.attachmentName = '';
             if (this.$refs.attachmentInput) this.$refs.attachmentInput.value = '';
-            if (this.$refs.cameraInput) this.$refs.cameraInput.value = '';
         },
 
         insertEmoji(emoji) {
@@ -489,40 +606,6 @@ uploadAttachment(event, type) {
                 this.scrollToBottom();
             })
             .catch(err => console.error('Error sending quick reply message:', err));
-        },
-
-        sendMessage() {
-            if (!this.newMessage || !this.currentConversation) return;
-            const messageText = this.newMessage;
-
-            const tempMessage = {
-                id: 'local-' + Date.now(),
-                message: messageText,
-                sender_id: this.currentUserId,
-                created_at: new Date().toISOString()
-            };
-
-            this.messages.push(tempMessage);
-            this.newMessage = '';
-            this.scrollToBottom();
-            this.updateConversationPreviewFromMessages();
-
-            fetch(`/messages/${this.currentConversation}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                body: JSON.stringify({ message: messageText })
-            })
-            .then(res => res.json())
-            .then(data => {
-                const idx = this.messages.findIndex(m => m.id === tempMessage.id);
-                if (idx !== -1 && data.message) this.messages.splice(idx, 1, data.message);
-                this.scrollToBottom();
-            })
-            .catch(err => {
-                console.error('Error sending message:', err);
-                this.messages = this.messages.filter(m => m.id !== tempMessage.id);
-                this.scrollToBottom();
-            });
         },
 
         scrollToBottom() {

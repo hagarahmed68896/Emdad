@@ -60,9 +60,10 @@ class MessageController extends Controller
 {
     // Validate the request to ensure a message is present and a quick reply ID can be sent
     $request->validate([
-        'message' => 'required|string',
+        'message' => 'required_without:attachment|nullable|string',
         'quick_reply_id' => 'nullable|exists:quick_replies,id',
-        'attachment' => 'nullable|file|max:10240', // 10MB
+        'attachment' => 'required_without:message|nullable|file|max:10240',
+
 
     ]);
 
