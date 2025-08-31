@@ -100,7 +100,12 @@ Route::middleware('web')->group(function () {
              Route::post('/messages/{conversation}', [MessageController::class, 'store'])->name('messages.store');
              Route::delete('/conversations/{id}', [ConversationController::class, 'destroy']);
              Route::post('/suppliers/{id}/report', [supplierrController::class, 'report']);
-             Route::post('/suppliers/{id}/ban', [supplierrController::class, 'ban']);
+             // routes/web.php or routes/api.php
+
+Route::post('/suppliers/{user}/toggle-status', [supplierrController::class, 'toggleBan'])
+     ->name('suppliers.toggleStatus');
+
+             Route::post('/messages/upload-attachment', [MessageController::class,'uploadAttachment'])->name('messages.upload-attachment');
 
 
           // Admin-specific routes

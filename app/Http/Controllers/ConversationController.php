@@ -17,9 +17,10 @@ class ConversationController extends Controller
     $conversation->messages()->delete();
 
     // ✅ احذف المحادثة نفسها
-    $conversation->delete();
+$conversation->forceDelete();
 
     return response()->json(['message' => 'تم حذف المحادثة 🗑️']);
 }
+
 
 }

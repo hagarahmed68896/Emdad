@@ -113,4 +113,31 @@ class MessageController extends Controller
         $conv = Conversation::find($conversationId);
         return $conv->product?->business_data_id ?? null;
     }
+
+    public function uploadAttachment(Request $request)
+{
+    // Validate the file
+    $request->validate([
+        'attachment' => 'required|file|mimes:jpeg,png,jpg,gif,svg,pdf,mp4|max:20480', // Max 20MB
+        'conversation_id' => 'required|exists:conversations,id',
+    ]);
+
+    $conversation = Conversation::findOrFail($request->conversation_id);
+    $senderId = Auth::id();
+    $file = $request->file('attachment');
+
+    // Store the file in a storage disk and get its path
+    $path = $file->store('chat_attachments', 'public');
+
+    // Create a new message with the attachment path
+    $message = Message::create([
+        'conversation_id' => $conversation->id,
+        'sender_id' => $senderId,
+        'message' => $path, // Save the file path as the message content
+        'type' => 'attachment', // Add a 'type' to distinguish it from text messages
+    ]);
+
+    // Return the created message to the frontend
+    return response()->json(['message' => $message->load('sender')]);
+}
 }

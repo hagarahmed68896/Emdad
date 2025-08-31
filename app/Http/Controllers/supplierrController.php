@@ -27,16 +27,25 @@ class supplierrController extends Controller
     }
 
     // POST /suppliers/{id}/ban
-    public function ban($id)
-    {
-        $supplier = User::findOrFail($id);
 
-        $supplier->update([
-            'status' => 'banned'
-        ]);
 
-        return response()->json([
-            'message' => 'تم حظر المورد 🚫'
-        ]);
+public function toggleBan(User $user)
+{
+    if ($user->status === 'banned') {
+        // Unban user
+        $user->status = 'active'; // أو status سابق إذا عندك تخزين له
+    } else {
+        // Ban user
+        $user->status = 'banned';
     }
+    $user->save();
+
+    return redirect()->back()->with('success', 'تم تحديث حالة المستخدم.');
+}
+
+
+
+
+
+
 }
