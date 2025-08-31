@@ -62,15 +62,21 @@ class MessageController extends Controller
     $request->validate([
         'message' => 'required|string',
         'quick_reply_id' => 'nullable|exists:quick_replies,id',
+        'attachment' => 'nullable|file|max:10240', // 10MB
+
     ]);
 
+        $path = null;
+    if ($request->hasFile('attachment')) {
+        $path = $request->file('attachment')->store('attachments', 'public');
+    }
     // Save the user's message first
     $userMessage = Message::create([
         'conversation_id' => $conversation->id,
         'sender_id' => Auth::id(),
         'message' => $request->message,
-        'type' => 'text',
-    ]);
+        'attachment' => $path,
+        'type' => $path ? 'attachment' : 'text',    ]);
 
     // Check for a quick reply and its answer to create an automated response
     if ($request->filled('quick_reply_id')) {
@@ -114,30 +120,22 @@ class MessageController extends Controller
         return $conv->product?->business_data_id ?? null;
     }
 
-    public function uploadAttachment(Request $request)
+public function uploadAttachment(Request $request)
 {
-    // Validate the file
     $request->validate([
-        'attachment' => 'required|file|mimes:jpeg,png,jpg,gif,svg,pdf,mp4|max:20480', // Max 20MB
-        'conversation_id' => 'required|exists:conversations,id',
+        'attachment' => 'required|file|max:10240', // max 10 MB
+        'conversation_id' => 'required|exists:conversations,id'
     ]);
 
-    $conversation = Conversation::findOrFail($request->conversation_id);
-    $senderId = Auth::id();
-    $file = $request->file('attachment');
+    $path = $request->file('attachment')->store('attachments', 'public');
 
-    // Store the file in a storage disk and get its path
-    $path = $file->store('chat_attachments', 'public');
-
-    // Create a new message with the attachment path
     $message = Message::create([
-        'conversation_id' => $conversation->id,
-        'sender_id' => $senderId,
-        'message' => $path, // Save the file path as the message content
-        'type' => 'attachment', // Add a 'type' to distinguish it from text messages
+        'conversation_id' => $request->conversation_id,
+        'user_id' => Auth::id(),
+        'attachment' => $path,
     ]);
 
-    // Return the created message to the frontend
-    return response()->json(['message' => $message->load('sender')]);
+    return response()->json($message);
 }
+
 }

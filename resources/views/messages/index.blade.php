@@ -3,12 +3,13 @@
 @section('content')
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
-<div class="flex h-screen px-[64px]"
+<div class="flex h-screen px-4 md:px-[64px] flex-col md:flex-row"
      x-data="chatApp({{ $conversations->toJson() }}, {{ $quickReplies->toJson() }}, {{ $openConversationId ?? 'null' }})"
      x-init="init()">
 
     {{-- Sidebar --}}
-    <div class="w-1/3 border-l border-gray-200 py-6 overflow-y-auto">
+    <div class="w-full md:w-1/3 border-b md:border-b-0 md:border-l border-gray-200 py-6 overflow-y-auto"
+         :class="{'hidden md:block': currentConversation}">
         <p class="mb-4 text-[24px] font-bold flex gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-7">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
@@ -46,18 +47,24 @@
                 <p class="text-[20px] text-[#696969] mb-1">لم تبدأ أي محادثة بعد</p>
                 <p class="text-[20px] text-[#696969] mb-3">تصفح المنتجات وتواصل مع الموردين.</p>
                 <a href="{{ route('products.index') }}"
-                 class="bg-[#185D31] p-3 text-white rounded-lg">تصفح المنتجات</a>
+                   class="bg-[#185D31] p-3 text-white rounded-lg">تصفح المنتجات</a>
             </div>
         </template>
     </div>
 
     {{-- Main area --}}
-    <div class="w-2/3 flex flex-col relative">
+    <div class="w-full h-full md:w-2/3 flex flex-col relative"
+         :class="{'hidden md:flex': !currentConversation}">
 
         {{-- Header (only if conversation is open) --}}
         <template x-if="currentConversation">
             <div class="p-4 border-b flex items-center justify-between relative" x-show="!isSearching && product" x-cloak>
                 <div class="flex items-center gap-4">
+                    <button type="button" @click="currentConversation = null" class="md:hidden">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                        </svg>
+                    </button>
                     <img :src="product?.image ? '{{ asset('storage') }}/' + product.image : '/placeholder.png'"
                          class="w-20 h-20 rounded-lg border bg-[#EDEDED] object-cover" />
                     <div>
@@ -67,14 +74,14 @@
                             <span x-show="product ? product.price : ''">ريال</span>
                             | الحد الأدني للطلب
                             <span x-text="product ? product.min_order_quantity : ''"></span> قطعة
-                        </p>  
+                        </p>
 <p class="text-[#007405]"
-  x-text="product?.shipping_days 
-          ? `التوصيل بحلول ${new Date(Date.now() + product.shipping_days * 24*60*60*1000)
-              .toLocaleDateString('ar-EG', { day: 'numeric', month: 'long' })}` 
-          : ''">
+x-text="product?.shipping_days
+? `التوصيل بحلول ${new Date(Date.now() + product.shipping_days * 24*60*60*1000)
+.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long' })}`
+: ''">
 </p>
-                </div>
+                    </div>
                 </div>
                 {{-- Dropdown --}}
                 <div class="relative" x-data="{ open: false }">
@@ -104,7 +111,7 @@
                             </svg>
                             <span x-text="product?.supplier?.user?.status === 'banned' ? 'إلغاء الحظر' : 'حظر المورد'"></span>
                         </button>
-                    
+
 
                         <button @click="openModal('report')"
                                 class="flex gap-2 items-center w-full px-4 py-2 text-right hover:bg-[#185D31] hover:text-white">
@@ -156,7 +163,7 @@
                                 أهلًا بك! 👋 تقدر تسأل عن المنتج، الشحن، الدفع أو أي تفاصيل مهمة بالنسبة لك.<br>
                                 اختر من الأسئلة التالية أو اكتب سؤالك مباشرة:
                             </p>
-                            <div class="space-y-2">
+                            <div class="space-y-2 mb-1">
                                 <template x-for="qr in quickReplies" :key="qr.id">
                                     <button @click="sendQuickReply(qr)"
                                             class="w-full text-right bg-white border border-gray-300 px-4 py-2 rounded-xl hover:bg-[#185D31] transition">
@@ -166,73 +173,116 @@
                             </div>
                         </div>
                     </div>
+<template x-for="msg in messages" :key="msg.id">
+    <div class="flex items-end mb-3" :class="msg.sender_id === currentUserId ? 'justify-start' : 'justify-end'">
 
-                    <template x-for="msg in messages" :key="msg.id">
-                        <div class="flex items-end" :class="msg.sender_id === currentUserId ? 'justify-start' : 'justify-end'">
+        <template x-if="msg.sender_id === currentUserId">
+            <img src="{{ auth()->user()->profile_picture ? asset('storage/' . auth()->user()->profile_picture) : '/default.png' }}"
+                 class="w-10 h-10 rounded-full ml-2">
+        </template>
 
-                            <template x-if="msg.sender_id === currentUserId">
-                                <img src="{{ auth()->user()->profile_picture ? asset('storage/' . auth()->user()->profile_picture) : '/default.png' }}"
-                                     class="w-10 h-10 rounded-full ml-2">
-                            </template>
+        <div class="max-w-[70%] p-2 mb-1 rounded-lg shadow"
+             :class="msg.sender_id === currentUserId
+                 ? 'bg-[#185D31] text-white text-left rounded-tl-none'
+                 : 'bg-gray-200 text-black text-right rounded-tr-none'">
+            <p x-html="highlightText(msg.message)" class="break-words"></p>
+            <span class="text-xs block mt-1"
+                  :class="msg.sender_id === currentUserId ? 'text-[#EDEDED]' : 'text-gray-600'"
+                  x-text="formatDate(msg.created_at)"></span>
+        </div>
 
-                            <div class="max-w-[70%] p-2 mb-1 rounded-lg shadow"
-                                 :class="msg.sender_id === currentUserId
-                                     ? 'bg-[#185D31] text-white text-left rounded-tl-none'
-                                     : 'bg-gray-200 text-black text-right rounded-tr-none'">
-                                <p x-html="highlightText(msg.message)" class="break-words"></p>
-                                <span class="text-xs block mt-1"
-                                      :class="msg.sender_id === currentUserId ? 'text-[#EDEDED]' : 'text-gray-600'"
-                                      x-text="formatDate(msg.created_at)"></span>
-                            </div>
-
-                            <template x-if="msg.sender_id !== currentUserId">
-                                <img :src="product?.supplier?.user?.profile_picture
-                                                ? '/storage/' + product.supplier.user.profile_picture
-                                                : '/default.png'"
-                                     class="w-10 h-10 rounded-full ml-2">
-                            </template>
-                        </div>
-                    </template>
+        <template x-if="msg.sender_id !== currentUserId">
+            <img :src="product?.supplier?.user?.profile_picture
+                         ? '/storage/' + product.supplier.user.profile_picture
+                         : '/default.png'"
+                 class="w-10 h-10 rounded-full ml-2">
+        </template>
+    </div>
+</template>
                 </div>
             </template>
         </div>
 
         {{-- Input (only if conversation exists) --}}
-        <template x-if="currentConversation">
-            <form @submit.prevent="sendMessage" class="p-4 flex border-t relative">
-                <button type="button" @click="showEmojiPicker = !showEmojiPicker" class="px-3 py-2 text-xl">😀</button>
+<template x-if="currentConversation">
+    <form @submit.prevent="sendMessage" class="p-4 flex flex-col border-t relative gap-2 bg-white">
 
-                <button type="button" @click="$refs.cameraInput.click()" class="px-3 py-2 text-xl">📷</button>
-                <input type="file" x-ref="cameraInput" accept="image/*" capture="camera" class="hidden"
-                       @change="uploadAttachment($event, 'camera')">
+        {{-- Attachment preview --}}
+        <div x-show="attachmentName" class="flex items-center justify-between gap-2 text-sm text-gray-600 border p-2 rounded-lg bg-gray-50">
+            <span class="flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.75c-.381.18-.814.285-1.25.285-.92 0-1.74-.484-2.22-1.21-.482-.725-.65-1.55-.49-2.317.16-.767.592-1.42 1.15-1.957.558-.538.995-.918 1.455-1.34.46-.422.84-.93 1.09-1.503.25-.573.34-1.21.25-1.85-.09-.64-.32-1.25-.67-1.76-.35-.51-.81-.92-1.35-1.22-.54-.3-1.12-.45-1.69-.45-.57 0-1.14.15-1.68.45-.54.3-.99.71-1.34 1.22-.35.51-.58.99-.67 1.55-.09.64-.09 1.28.09 1.95.18.67.5 1.3.89 1.83.39.53.64 1.14.73 1.8.09.66-.03 1.32-.34 1.93-.31.61-.79 1.14-1.37 1.59-1.34 1.02-2.92.21-3.69-.74-.77-.95-1.12-2.14-1.05-3.32.07-1.18.42-2.34 1.05-3.32.63-1.02 1.48-1.84 2.45-2.45.97-.61 2.06-.97 3.19-.97 1.13 0 2.22.36 3.19.97.97.61 1.82 1.43 2.45 2.45.63.98.98 2.14 1.05 3.32.07 1.18-.28 2.37-1.05 3.32-.77.95-2.35 1.76-3.69.74" />
+                </svg>
+                <span x-text="attachmentName"></span>
+            </span>
+            <button type="button" @click="removeAttachment" class="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-100 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
 
-                <button type="button" @click="$refs.attachmentInput.click()" class="px-3 py-2 text-xl">📎</button>
-                <input type="file" x-ref="attachmentInput" accept="image/*,video/*,application/pdf" class="hidden"
-                       @change="uploadAttachment($event, 'file')">
+        {{-- Main input area --}}
+        <div class="flex items-center gap-2">
+            {{-- Attachments and Emoji buttons --}}
+            <div class="relative flex items-center">
+                <button type="button" @click="$refs.attachmentInput.click()" class="p-2 text-gray-500 hover:bg-gray-100 rounded-full transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.75c-.381.18-.814.285-1.25.285-.92 0-1.74-.484-2.22-1.21-.482-.725-.65-1.55-.49-2.317.16-.767.592-1.42 1.15-1.957.558-.538.995-.918 1.455-1.34.46-.422.84-.93 1.09-1.503.25-.573.34-1.21.25-1.85-.09-.64-.32-1.25-.67-1.76-.35-.51-.81-.92-1.35-1.22-.54-.3-1.12-.45-1.69-.45-.57 0-1.14.15-1.68.45-.54.3-.99.71-1.34 1.22-.35.51-.58.99-.67 1.55-.09.64-.09 1.28.09 1.95.18.67.5 1.3.89 1.83.39.53.64 1.14.73 1.8.09.66-.03 1.32-.34 1.93-.31.61-.79 1.14-1.37 1.59-1.34 1.02-2.92.21-3.69-.74-.77-.95-1.12-2.14-1.05-3.32.07-1.18.42-2.34 1.05-3.32.63-1.02 1.48-1.84 2.45-2.45.97-.61 2.06-.97 3.19-.97 1.13 0 2.22.36 3.19.97.97.61 1.82 1.43 2.45 2.45.63.98.98 2.14 1.05 3.32.07 1.18-.28 2.37-1.05 3.32-.77.95-2.35 1.76-3.69.74" />
+                    </svg>
+                </button>
+                <input type="file" x-ref="attachmentInput" accept="image/*,video/*,application/pdf" class="hidden" @change="uploadAttachment($event, 'file')">
 
-                <input type="text" x-model="newMessage" x-ref="textInput" placeholder="اكتب رسالتك"
-                       class="flex-1 p-2 border border-gray-300 rounded-l-none rounded-r-lg">
-                <button type="submit" class="bg-[#185D31] text-white px-4 rounded-r-none rounded-l-lg">أرسل</button>
+                <button type="button" @click="showEmojiPicker = !showEmojiPicker" class="p-2 text-gray-500 hover:bg-gray-100 rounded-full transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M15.182 15.182a4.5 4.5 0 0 1-6.364 0M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Z" />
+</svg>
 
+                </button>
+
+                {{-- Emoji Picker --}}
                 <div x-show="showEmojiPicker" @click.away="showEmojiPicker = false"
-                     class="absolute bottom-16 right-0 bg-white border rounded shadow-lg p-2 z-10">
+                     x-transition:enter="transition ease-out duration-100"
+                     x-transition:enter-start="opacity-0 scale-95"
+                     x-transition:enter-end="opacity-100 scale-100"
+                     x-transition:leave="transition ease-in duration-75"
+                     x-transition:leave-start="opacity-100 scale-100"
+                     x-transition:leave-end="opacity-0 scale-95"
+                     class="absolute bottom-full right-0 mb-2 bg-white border border-gray-200 rounded-lg shadow-xl p-2 z-10 w-64">
                     <div class="grid grid-cols-8 gap-1">
-                        <template x-for="emoji in ['😀','😂','😍','👍','🙏','❤️','🔥','🎉']">
-                            <button type="button" @click="insertEmoji(emoji)" class="text-xl p-1 hover:bg-gray-200 rounded-md">
+                        <template x-for="emoji in ['😀','😂','😍','👍','🙏','❤️','🔥','🎉', '👀', '💯', '🤔', '😊', '😭', '🤯', '🥳', '😎']">
+                            <button type="button" @click="insertEmoji(emoji)" class="text-xl p-1 hover:bg-gray-200 rounded-md transition-colors">
                                 <span x-text="emoji"></span>
                             </button>
                         </template>
                     </div>
                 </div>
-            </form>
-        </template>
+            </div>
+
+            {{-- Text Input Field --}}
+            <input type="text" x-model="newMessage" x-ref="textInput" placeholder="اكتب رسالتك"
+                   class="flex-1 p-3 border border-gray-300 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-[#185D31]/50 transition-all">
+
+            {{-- Send Button --}}
+     <button type="submit" class="bg-[#185D31] text-white p-3 rounded-full hover:bg-[#154a2a] transition-colors">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+         class="size-6" style="transform: scaleX(-1);">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.768 59.768 0 0 1 21.485 12 59.77 59.77 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+    </svg>
+</button>
+
+        </div>
+
+    </form>
+</template>
+
 
     </div>
 
     {{-- Modal --}}
     <template x-if="modalType">
         <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div class="bg-white rounded-xl shadow-lg p-6 w-96">
+            <div class="bg-white rounded-xl shadow-lg p-6 w-11/12 max-w-lg">
                 <h2 class="text-xl font-bold mb-4 text-center">
                     <span x-show="modalType==='delete'">تأكيد حذف المحادثة؟</span>
                     <span x-show="modalType==='ban'">تأكيد حظر المورد؟</span>
@@ -271,7 +321,12 @@ function chatApp(initialConversations, initialQuickReplies, initialConversationI
         banMessage: '',
 
         init() {
-            if (initialConversationId) this.loadConversation(initialConversationId);
+            if (initialConversationId) {
+                this.loadConversation(initialConversationId);
+            } else if (this.conversations.length > 0) {
+                // If no specific conversation is requested, load the first one
+                this.loadConversation(this.conversations[0].id);
+            }
         },
 
         startSearch() { this.isSearching = true; },
@@ -308,9 +363,9 @@ function chatApp(initialConversations, initialQuickReplies, initialConversationI
                     this.product.supplier.user.status = data.status;
 
                     this.banMessage = data.status === 'banned' ? 'تم حظر المورد بنجاح' : 'تم إلغاء الحظر بنجاح';
-                    
+
                     setTimeout(() => this.banMessage = '', 3000);
-                    
+
                     console.log('User status updated to:', data.status);
                 } else {
                     console.error('Toggle failed:', data);
@@ -345,27 +400,42 @@ function chatApp(initialConversations, initialQuickReplies, initialConversationI
             .catch(e => console.error(e));
         },
 
-        uploadAttachment(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const formData = new FormData();
-            formData.append('attachment', file);
-            formData.append('conversation_id', this.currentConversation);
+uploadAttachment(event, type) {
+    let file = event.target.files[0];
+    if (!file || !this.currentConversation) return;
 
-            fetch('/messages/upload-attachment', {
-                method: 'POST',
-                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                body: formData,
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.message) {
-                    this.messages.push(data.message);
-                    this.scrollToBottom();
-                    this.updateConversationPreviewFromMessages();
-                }
-            })
-            .catch(err => console.error('Error uploading file:', err));
+    this.attachmentFile = file;
+    this.attachmentName = file.name;
+
+    let formData = new FormData();
+    formData.append('attachment', file);
+    formData.append('conversation_id', this.currentConversation);
+    // Ensure `message` is an empty string if it's currently empty
+    formData.append('message', this.newMessage || '');
+
+    axios.post(`/messages/${this.currentConversation}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    .then(res => {
+        this.messages.push(res.data.message); // Updated to push the correct data
+        this.attachmentFile = null;
+        this.attachmentName = '';
+        this.newMessage = '';
+        if (this.$refs.attachmentInput) this.$refs.attachmentInput.value = '';
+        if (this.$refs.cameraInput) this.$refs.cameraInput.value = '';
+        this.updateConversationPreviewFromMessages();
+        this.scrollToBottom();
+    })
+    .catch(err => {
+        console.error(err);
+    });
+},
+
+        removeAttachment() {
+            this.attachmentFile = null;
+            this.attachmentName = '';
+            if (this.$refs.attachmentInput) this.$refs.attachmentInput.value = '';
+            if (this.$refs.cameraInput) this.$refs.cameraInput.value = '';
         },
 
         insertEmoji(emoji) {

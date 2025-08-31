@@ -106,6 +106,7 @@ Route::post('/suppliers/{user}/toggle-status', [supplierrController::class, 'tog
      ->name('suppliers.toggleStatus');
 
              Route::post('/messages/upload-attachment', [MessageController::class,'uploadAttachment'])->name('messages.upload-attachment');
+             
 
 
           // Admin-specific routes
