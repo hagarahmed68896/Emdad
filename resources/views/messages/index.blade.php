@@ -8,49 +8,68 @@
      x-init="init()">
 
     {{-- Sidebar --}}
-    <div class="w-full md:w-1/3 border-b md:border-b-0 md:border-l border-gray-200 py-6 overflow-y-auto"
-         :class="{'hidden md:block': currentConversation}">
+  <div class="w-full md:w-1/3 border-b md:border-b-0 md:border-l border-gray-200 py-6 overflow-y-auto"
+     :class="{'hidden md:block': currentConversation}" 
+     >
+    <div class="flex justify-between items-center px-2">
         <p class="mb-4 text-[24px] font-bold flex gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-7">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
             </svg>
             الرسائل
         </p>
+    </div>
+    <input type="text" placeholder="بحث" x-model="searchTerm"
+     class="w-full p-2 border bg-[#EDEDED] rounded mb-4">
 
-        <input type="text" placeholder="بحث" class="w-full p-2 border bg-[#EDEDED] rounded mb-4">
 
-        <template x-if="conversations.length > 0">
-            <template x-for="conv in conversations" :key="conv.id">
-                <div class="flex items-center justify-between p-2 cursor-pointer hover:bg-gray-100"
-                     @click="loadConversation(conv.id)">
-                    <div class="flex items-center">
-                        <img :src="conv.product?.supplier?.user?.profile_picture
-                                        ? '/storage/' + conv.product.supplier.user.profile_picture
-                                        : '/default.png'"
-                             class="w-10 h-10 rounded-full ml-2">
-                        <div>
-                            <p class="font-bold" x-text="conv.product.supplier.user.full_name"></p>
-                            <span class="text-gray-500" x-text="conv.product.supplier.company_name"></span>
-                            <p class="text-sm text-gray-500 truncate"
-                               x-text="conv.last_message_text ?? ((conv.messages?.length ? conv.messages[conv.messages.length - 1]?.message : ''))"></p>
-                        </div>
+    <template x-if="conversations.length > 0">
+        <template x-for="conv in filteredConversations()" :key="conv.id">
+            <div class="flex items-center justify-between p-2 cursor-pointer hover:bg-gray-100"
+                 :class="{'bg-gray-200': conv.id === currentConversation}"
+                 @click="loadConversation(conv.id)">
+                <div class="flex items-center">
+                    <img :src="conv.product?.supplier?.user?.profile_picture
+                                    ? '/storage/' + conv.product.supplier.user.profile_picture
+                                    : '/default.png'"
+                         class="w-10 h-10 rounded-full ml-2">
+                    <div>
+                        <p class="font-bold" x-text="conv.product.supplier.user.full_name"></p>
+                        <span class="text-gray-500" x-text="conv.product.supplier.company_name"></span>
+                        <p class="text-sm text-gray-500 truncate"
+                           x-text="conv.last_message_text ?? ((conv.messages?.length ? conv.messages[conv.messages.length - 1]?.message : ''))"></p>
                     </div>
-                    <span class="text-xs text-gray-400"
-                          x-text="formatDate(conv.updated_at || (conv.messages?.length ? conv.messages[conv.messages.length - 1]?.created_at : null))"></span>
                 </div>
-            </template>
-        </template>
+                <div x-show="conv.id === currentConversation" class="flex items-center gap-2">
+                    <button @click.stop="toggleFix(conv.id)" class="text-gray-500 hover:text-gray-700">
+                      <svg x-bind:class="{'text-[#185D31]': fixedConversations.includes(conv.id)}"
+                      xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pin-fill" viewBox="0 0 16 16">
+  <path d="M4.146.146A.5.5 0 0 1 4.5 0h7a.5.5 0 0 1 .5.5c0 .68-.342 1.174-.646 1.479-.126.125-.25.224-.354.298v4.431l.078.048c.203.127.476.314.751.555C12.36 7.775 13 8.527 13 9.5a.5.5 0 0 1-.5.5h-4v4.5c0 .276-.224 1.5-.5 1.5s-.5-1.224-.5-1.5V10h-4a.5.5 0 0 1-.5-.5c0-.973.64-1.725 1.17-2.189A6 6 0 0 1 5 6.708V2.277a3 3 0 0 1-.354-.298C4.342 1.674 4 1.179 4 .5a.5.5 0 0 1 .146-.354"/>
+</svg>
+                    </button>
+                    <button @click.stop="toggleMute(conv.id)" class="text-gray-500 hover:text-gray-700">
+                     <svg x-bind:class="{'text-[#185D31]': mutedConversations.includes(conv.id)}"
+                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M9.143 17.082a24.248 24.248 0 0 0 3.844.148m-3.844-.148a23.856 23.856 0 0 1-5.455-1.31 8.964 8.964 0 0 0 2.3-5.542m3.155 6.852a3 3 0 0 0 5.667 1.97m1.965-2.277L21 21m-4.225-4.225a23.81 23.81 0 0 0 3.536-1.003A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6.53 6.53m10.245 10.245L6.53 6.53M3 3l3.53 3.53" />
+</svg>
 
-        <template x-if="conversations.length === 0">
-            <div class="flex flex-1 flex-col items-center justify-center text-gray-400 py-20">
-                <img src="{{ asset('/images/Illustrations (5).svg') }}" alt="" class="mb-4 max-w-[200px]">
-                <p class="text-[20px] text-[#696969] mb-1">لم تبدأ أي محادثة بعد</p>
-                <p class="text-[20px] text-[#696969] mb-3">تصفح المنتجات وتواصل مع الموردين.</p>
-                <a href="{{ route('products.index') }}"
-                   class="bg-[#185D31] p-3 text-white rounded-lg">تصفح المنتجات</a>
+                    </button>
+                </div>
+                <span class="text-xs text-gray-400" x-show="conv.id != currentConversation"
+                      x-text="formatDate(conv.updated_at || (conv.messages?.length ? conv.messages[conv.messages.length - 1]?.created_at : null))"></span>
             </div>
         </template>
-    </div>
+    </template>
+    <template x-if="conversations.length === 0">
+        <div class="flex flex-1 flex-col items-center justify-center text-gray-400 py-20">
+            <img src="{{ asset('/images/Illustrations (5).svg') }}" alt="" class="mb-4 max-w-[200px]">
+            <p class="text-[20px] text-[#696969] mb-1">لم تبدأ أي محادثة بعد</p>
+            <p class="text-[20px] text-[#696969] mb-3">تصفح المنتجات وتواصل مع الموردين.</p>
+            <a href="{{ route('products.index') }}"
+               class="bg-[#185D31] p-3 text-white rounded-lg">تصفح المنتجات</a>
+        </div>
+    </template>
+</div>
 
     {{-- Main area --}}
     <div class="w-full h-full md:w-2/3 flex flex-col relative"
@@ -93,7 +112,7 @@ x-text="product?.shipping_days
                         </svg>
                     </button>
 
-                    <div x-show="open" @click.away="open = false"
+                    <div x-cloak x-show="open" @click.away="open = false"
                          class="absolute left-0 mt-2 py-2 w-64 bg-white border rounded-lg shadow-lg z-50">
                         <button @click="startSearch"
                                 class="flex gap-2 items-center w-full px-4 py-2 text-right hover:bg-[#185D31] hover:text-white">
@@ -103,23 +122,200 @@ x-text="product?.shipping_days
                             بحث في المحادثة
                         </button>
 
-                        <button @click="toggleStatus(product?.supplier?.user?.id)"
-                                class="flex gap-2 items-center w-full px-4 py-2 text-right hover:bg-[#185D31] hover:text-white">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                <path x-show="product?.supplier?.user?.status === 'banned'" d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75m-9 11.25H2.25a2.25 2.25 0 0 1-2.25-2.25v-10.5a2.25 2.25 0 0 1 2.25-2.25h11.25a2.25 2.25 0 0 1 2.25 2.25v10.5a2.25 2.25 0 0 1-2.25 2.25Z" />
-                                <path x-show="product?.supplier?.user?.status !== 'banned'" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
-                            </svg>
-                            <span x-text="product?.supplier?.user?.status === 'banned' ? 'إلغاء الحظر' : 'حظر المورد'"></span>
-                        </button>
+<button 
+  @click="
+        let index = conversations.findIndex(c => c.id === currentConversation);
+        if (index !== -1) {
+            let conv = conversations[index];
+            fetch(`/suppliers/${conv.product.supplier.user.id}/toggle-ban`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // ✅ Update status directly in the conversations array
+                    conversations[index].product.supplier.user.status = data.status;
+
+                    // ✅ Force Alpine to react
+                    conversations = [...conversations];
+                } else {
+                    alert('حدث خطأ أثناء تحديث الحالة');
+                }
+            })
+            .catch(err => console.error(err));
+        }
+    "
+    class="flex gap-2 items-center w-full px-4 py-2 text-right hover:bg-[#185D31] hover:text-white"
+>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+        <path x-show="conversations.find(c => c.id === currentConversation)?.product?.supplier?.user?.status === 'banned'" 
+              d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75m-9 11.25H2.25a2.25 2.25 0 0 1-2.25-2.25v-10.5a2.25 2.25 0 0 1 2.25-2.25h11.25a2.25 2.25 0 0 1 2.25 2.25v10.5a2.25 2.25 0 0 1-2.25 2.25Z" />
+        <path x-show="conversations.find(c => c.id === currentConversation)?.product?.supplier?.user?.status !== 'banned'" 
+              d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
+    </svg>
+    <span x-text="conversations.find(c => c.id === currentConversation)?.product?.supplier?.user?.status === 'banned' ? 'إلغاء الحظر' : 'حظر المورد'"></span>
+</button>
 
 
-                        <button @click="openModal('report')"
-                                class="flex gap-2 items-center w-full px-4 py-2 text-right hover:bg-[#185D31] hover:text-white">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
-                            </svg>
-                            الإبلاغ عن المورد
-                        </button>
+
+                  <!-- report button -->
+<div x-data="reportModal()">
+
+    <!-- The button -->
+    <button 
+    @click="
+        let conv = conversations.find(c => c.id === currentConversation);
+            console.log('Conversation object:', conv); // 👈 هيطبع كل الداتا
+
+        if (conv?.product?.supplier?.user?.id) {
+            console.log('userId:', conv.product.supplier.user.id);
+            selectedUserId   = conv.product.supplier.user.id;
+            selectedUserName = conv.product.supplier.user.full_name ?? 'مورد غير معروف';
+    selectedUserImage = conv.product.supplier.user.profile_picture
+            ? '{{ asset('storage') }}/' + conv.product.supplier.user.profile_picture
+            : '/images/default.png';            openReportModal = true;
+        } else {
+            console.error('No supplier user found for this conversation');
+        }
+    "      
+      class="flex gap-2 items-center w-full px-4 py-2 text-right hover:bg-[#185D31] hover:text-white">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" 
+             stroke-width="1.5" stroke="currentColor" class="size-6">
+            <path stroke-linecap="round" stroke-linejoin="round" 
+                  d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 
+                  1.948 3.374h14.71c1.73 0 2.813-1.874 
+                  1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 
+                  0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+        </svg>
+        الإبلاغ عن المورد
+    </button>
+
+    <!-- Modal -->
+    <div 
+        x-show="openReportModal" 
+        class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+        x-cloak
+    >
+        <div class="bg-white rounded-xl shadow-lg p-6 w-11/12 max-w-lg relative">
+
+            <!-- Close button -->
+            <button @click="closeModal" class="absolute top-3 right-3 text-gray-600 hover:text-black">&times;</button>
+
+            <!-- Supplier Info -->
+            <p class="text-[20px] font-bold">المستخدم</p>
+            <div class="flex items-center py-2 mb-4 mt-4 bg-[#EDEDED]">
+<img 
+    :src="selectedUserImage || '{{ Storage::url('images/default.png') }}'" 
+    alt="Supplier Image" 
+    class="w-[55px] h-[55px] mx-3 rounded-full object-cover">
+                <h3 class="text-lg font-semibold" x-text="selectedUserName"></h3>
+            </div>
+
+            <h2 class="text-xl font-bold mb-4 text-center">تقديم بلاغ</h2>
+
+            <!-- Success message -->
+            <template x-if="successMessage">
+                <div class="bg-green-100 text-green-700 p-2 rounded mb-3" x-text="successMessage"></div>
+            </template>
+
+            <!-- Error message -->
+            <template x-if="errorMessage">
+                <div class="bg-red-100 text-red-700 p-2 rounded mb-3" x-text="errorMessage"></div>
+            </template>
+
+            <form @submit.prevent="submitReport">
+
+                <!-- نوع البلاغ -->
+                <label class="block mb-2 font-semibold">نوع البلاغ</label>
+                <select x-model="form.report_type" class="w-full border p-2 rounded mb-4">
+                    <option value="">حدد نوع البلاغ</option>
+                    <option value="استخدام لغة غير لائقة">استخدام لغة غير لائقة</option>
+                    <option value="سلوك غير مهني">سلوك غير مهني</option>
+                    <option value="معلومات غير صحيحة">معلومات غير صحيحة</option>
+                    <option value="أخرى">أخرى</option>
+                </select>
+
+                <!-- سبب البلاغ -->
+                <label class="block mb-2 font-semibold">سبب البلاغ</label>
+                <textarea x-model="form.reason" placeholder="يرجى توضيح سبب البلاغ"
+                          class="w-full border p-2 rounded mb-4"></textarea>
+
+                <button type="submit" 
+                        class="w-full bg-[#185D31] text-white py-2 rounded hover:bg-[#154a2a]">
+                    إرسال
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function reportModal() {
+        return {
+            openReportModal: false,
+            selectedUserId: null,
+            selectedUserName: '',
+            selectedUserImage: '',
+            successMessage: '',
+            errorMessage: '',
+            form: {
+                report_type: '',
+                reason: ''
+            },
+
+            closeModal() {
+                this.openReportModal = false;
+                this.successMessage = '';
+                this.errorMessage = '';
+                this.form.reason = '';
+                this.form.report_type = '';
+                this.selectedUserId = null;
+                this.selectedUserName = '';
+                this.selectedUserImage = '';
+            },
+
+            submitReport() {
+                if (!this.form.report_type) {
+                    this.errorMessage = 'يجب اختيار نوع البلاغ';
+                    return;
+                }
+                if (!this.form.reason) {
+                    this.errorMessage = 'يرجى كتابة تفاصيل البلاغ';
+                    return;
+                }
+
+                fetch(`/reports/${this.selectedUserId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        reason: this.form.reason,
+                        report_type: this.form.report_type
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    this.successMessage = data.message || 'تم إرسال البلاغ بنجاح 🚨';
+                    this.errorMessage = '';
+                    setTimeout(() => this.closeModal(), 1500);
+                })
+                .catch(err => {
+                    console.error(err);
+                    this.errorMessage = 'حدث خطأ أثناء إرسال البلاغ';
+                });
+            }
+        }
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+
 
                         <button @click="openModal('delete')"
                                 class="flex gap-2 items-center w-full px-4 py-2 text-right text-red-600 hover:bg-[#185D31] hover:text-white">
@@ -190,13 +386,14 @@ x-text="product?.shipping_days
                     <template x-if="msg.attachment">
     <div>
         <!-- Image attachments -->
-        <template x-if="msg.attachment.startsWith('blob:') || msg.attachment.match(/\.(jpg|jpeg|png|gif|webp)$/i)">
-            <img 
-                :src="msg.attachment.startsWith('blob:') ? msg.attachment : '/storage/' + msg.attachment" 
-                alt="Attachment" 
-                class="max-w-xs h-auto rounded-lg mb-2 cursor-pointer"
-            >
-        </template>
+ <template x-if="msg.attachment.startsWith('blob:') || msg.attachment.match(/\.(jpg|jpeg|png|gif|webp)$/i)">
+    <img 
+        :src="msg.attachment.startsWith('blob:') ? msg.attachment : '/storage/' + msg.attachment" 
+        alt="Attachment" 
+        class="max-w-full h-auto rounded-lg mb-2 cursor-pointer object-contain"
+    >
+</template>
+
 
         <!-- Other file types -->
         <template x-if="!msg.attachment.startsWith('blob:') && !msg.attachment.match(/\.(jpg|jpeg|png|gif|webp)$/i)">
@@ -224,9 +421,13 @@ x-text="product?.shipping_days
                               :class="msg.sender_id === currentUserId ? 'text-[#EDEDED]' : 'text-gray-600'"
                               x-text="formatDate(msg.created_at)"></span>
                     </div>
-     <template x-if="msg.sender_id !== currentUserId">
-                        <img :src="product?.supplier?.user?.profile_picture ? '/storage/' + product.supplier.user.profile_picture : '/default.png'" class="w-10 h-10 rounded-full mr-2">
-                    </template>
+<template x-if="msg.sender_id !== currentUserId">
+    <img 
+        :src="currentConversation?.product?.supplier?.user?.profile_picture 
+            ? '/storage/' + currentConversation.product.supplier.user.profile_picture 
+            : '/images/default.png'" 
+        class="w-10 h-10 rounded-full mr-2">
+</template>
               
                 </div>
             </template>
@@ -236,7 +437,13 @@ x-text="product?.shipping_days
 
         {{-- Input (only if conversation exists) --}}
 <template x-if="currentConversation">
-    <form @submit.prevent="sendMessage" class="p-4 flex flex-col border-t relative gap-2 bg-white">
+      {{-- <div x-show="currentConversation?.product?.supplier?.user?.status === 'banned'"
+         class="p-4 bg-gray-200 text-center text-red-700 font-bold rounded-b-lg">
+        <span>لا يمكنك إرسال رسائل. هذا المورد محظور.</span>
+      </div> --}}
+    <form @submit.prevent="sendMessage"
+    
+     class="p-4 flex flex-col border-t relative gap-2 bg-white">
 
         {{-- Attachment preview --}}
         <div x-show="attachmentName" class="flex items-center justify-between gap-2 text-sm text-gray-600 border p-2 rounded-lg bg-gray-50">
@@ -311,29 +518,30 @@ x-text="product?.shipping_days
 
     </div>
 
-    {{-- Modal --}}
-    <template x-if="modalType">
-        <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div class="bg-white rounded-xl shadow-lg p-6 w-11/12 max-w-lg">
-                <h2 class="text-xl font-bold mb-4 text-center">
-                    <span x-show="modalType==='delete'">تأكيد حذف المحادثة؟</span>
-                    <span x-show="modalType==='ban'">تأكيد حظر المورد؟</span>
-                    <span x-show="modalType==='report'">سبب الإبلاغ عن المورد</span>
-                </h2>
+<!-- Modal -->
+<div x-cloak x-show="modalType" 
+     class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+     x-transition>
+    <div class="bg-white rounded-xl shadow-lg p-6 w-11/12 max-w-lg">
+        <h2 class="text-xl font-bold mb-4 text-center">
+            <span x-show="modalType==='delete'">تأكيد حذف المحادثة؟</span>
+        </h2>
 
-                <template x-if="modalType==='report'">
-                    <textarea x-model="reportReason" class="w-full border rounded p-2" placeholder="اكتب السبب..."></textarea>
-                </template>
-
-                <div class="flex justify-center gap-4 mt-6">
-                    <button @click="closeModal" class="px-4 py-2 bg-gray-300 rounded">إلغاء</button>
-                    <button @click="confirmModal" class="px-4 py-2 bg-red-600 text-white rounded">تأكيد</button>
-                </div>
-            </div>
+        <div x-show="modalType==='report'">
+            <textarea x-model="reportReason" class="w-full border rounded p-2" placeholder="اكتب السبب..."></textarea>
         </div>
-    </template>
+
+        <div class="flex justify-center gap-4 mt-6">
+            <button @click="closeModal" class="px-4 py-2 bg-gray-300 rounded">إلغاء</button>
+            <button @click="confirmModal" class="px-4 py-2 bg-red-600 text-white rounded">تأكيد</button>
+        </div>
+    </div>
+</div>
+
 
 </div>
+
+
 
 <script>
 function chatApp(initialConversations, initialQuickReplies, initialConversationId = null) {
@@ -353,6 +561,11 @@ function chatApp(initialConversations, initialQuickReplies, initialConversationI
         banMessage: '',
         attachmentFile: null, // New: Holds the file object
         attachmentName: '',   // New: Holds the file name for display
+        fixedConversations: [], // To store IDs of fixed conversations
+        mutedConversations: [], // To store IDs of muted conversations
+        modalId: null, // New variable to store the ID
+
+
 
         init() {
             if (initialConversationId) {
@@ -362,58 +575,90 @@ function chatApp(initialConversations, initialQuickReplies, initialConversationI
                 this.loadConversation(this.conversations[0].id);
             }
         },
+        filteredConversations() {
+    if (!this.searchTerm) return this.conversations;
+    return this.conversations.filter(c => 
+        c.product?.supplier?.user?.full_name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        c.product?.supplier?.company_name?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        c.last_message_text?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        (c.messages?.length && c.messages[c.messages.length - 1].message.toLowerCase().includes(this.searchTerm.toLowerCase()))
+    );
+}
+,
+  // New computed property to handle sorting
+        get sortedConversations() {
+            const fixed = this.conversations.filter(c => this.fixedConversations.includes(c.id));
+            const nonFixed = this.conversations.filter(c => !this.fixedConversations.includes(c.id));
 
+            nonFixed.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+
+            return [...fixed, ...nonFixed];
+        },
+        
+        // New methods for fixing/muting
+        toggleFix(conversationId) {
+            const index = this.fixedConversations.indexOf(conversationId);
+            if (index > -1) {
+                this.fixedConversations.splice(index, 1);
+            } else {
+                this.fixedConversations.push(conversationId);
+            }
+        },
+
+        toggleMute(conversationId) {
+            const index = this.mutedConversations.indexOf(conversationId);
+            if (index > -1) {
+                this.mutedConversations.splice(index, 1);
+            } else {
+                this.mutedConversations.push(conversationId);
+            }
+        },
         startSearch() { this.isSearching = true; },
 
         highlightText(text) {
             if (!this.searchTerm) return text;
             const safe = this.searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            return text.replace(new RegExp(`(${safe})`, 'gi'), '<mark class="bg-yellow-300">$1</mark>');
+            return text.
+            replace(new RegExp(`(${safe})`, 'gi'), '<mark class="bg-yellow-300">$1</mark>');
         },
 
-        openModal(type) { this.modalType = type; },
+openModal(type, id = null) {
+    this.modalType = type;
+    this.modalId = id; // Store the ID here
+},
         closeModal() { this.modalType = null; this.reportReason = ''; },
-        confirmModal() {
-            if (this.modalType === 'delete') this.deleteConversation();
-            else if (this.modalType === 'ban') this.toggleStatus(this.product?.supplier?.user?.id);
-            else if (this.modalType === 'report') this.reportSupplier();
-            this.closeModal();
-        },
+  confirmModal() {
+    if (this.modalType === 'delete') {
+        this.deleteConversation();
+    }
+    this.closeModal();
+},
 
-        toggleStatus(id) {
-            if (!id) return;
 
-            fetch(`/suppliers/${id}/toggle-status`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
-                },
-                body: JSON.stringify({})
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    this.product.supplier.user.status = data.status;
-                    this.banMessage = data.status === 'banned' ? 'تم حظر المورد بنجاح' : 'تم إلغاء الحظر بنجاح';
-                    setTimeout(() => this.banMessage = '', 3000);
-                    console.log('User status updated to:', data.status);
-                } else {
-                    console.error('Toggle failed:', data);
-                }
-            })
-            .catch(err => {
-                console.error('Error:', err);
-            });
+reportSupplier(id) {
+    // Access the ID from the state variable
+    if (!id) {
+        console.error('❌ Cannot report: Supplier ID is missing.');
+        return;
+    }
+
+    fetch(`/suppliers/${id}/report`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
         },
-        reportSupplier() {
-            if (!this.product) return;
-            fetch(`/suppliers/${this.product.supplier_user_id}/report`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                body: JSON.stringify({ reason: this.reportReason })
-            }).then(() => console.log('تم إرسال البلاغ 🚨'));
-        },
+        body: JSON.stringify({ reason: this.reportReason })
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log('✅ تم إرسال البلاغ:', data);
+    })
+    .catch(err => {
+        console.error('❌ خطأ في البلاغ:', err);
+    });
+}
+,
 
         deleteConversation() {
             if (!this.currentConversation) return;
@@ -431,17 +676,6 @@ function chatApp(initialConversations, initialQuickReplies, initialConversationI
             .catch(e => console.error(e));
         },
 
-        // This function now only STAGES the attachment, it does not send it.
-        // This function only stages the file, it does not send it.
-        handleAttachmentChange(event) {
-            let file = event.target.files[0];
-            if (!file) return;
-            this.attachmentFile = file;
-            this.attachmentName = file.name;
-        },
-
-        // This is the function called on form submit. It decides what to send.
-    
        sendMessage() {
     if (!this.newMessage && !this.attachmentFile) return;
     if (!this.currentConversation) return;
@@ -615,12 +849,45 @@ uploadAttachment() {
             });
         },
 
-        formatDate(dt) {
-            try { return new Date(dt).toLocaleString(); }
-            catch { return dt; }
-        }
+ formatDate(date) {
+    if (!date) return '';
+    const d = new Date(date);
+    let hours = d.getHours();
+    const minutes = d.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    return `${hours}:${minutes} ${ampm}`;
+}
+
+
+        ,
+        // ...inside chatApp return object
+toggleFix(conversationId) {
+    const index = this.fixedConversations.indexOf(conversationId);
+    if (index > -1) {
+        this.fixedConversations.splice(index, 1);
+    } else {
+        this.fixedConversations.push(conversationId);
+    }
+    // Optional: Persist this state to the server
+    // fetch('/conversations/' + conversationId + '/toggle-fix', { method: 'POST', ... });
+},
+
+toggleMute(conversationId) {
+    const index = this.mutedConversations.indexOf(conversationId);
+    if (index > -1) {
+        this.mutedConversations.splice(index, 1);
+    } else {
+        this.mutedConversations.push(conversationId);
+    }
+    // Optional: Persist this state to the server
+    // fetch('/conversations/' + conversationId + '/toggle-mute', { method: 'POST', ... });
+},
+// ...
     };
 }
 </script>
+<script src="//unpkg.com/alpinejs" defer></script>
 
 @endsection

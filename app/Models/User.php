@@ -125,5 +125,15 @@ public function offers()
     return $this->hasMany(Offer::class);
 }
 
+//reports relationship
+public function reportsMade()
+{
+    return $this->morphMany(Report::class, 'reporter');
+}
+
+public function reportsReceived()
+{
+    return $this->morphMany(Report::class, 'reported');
+}
 
 }

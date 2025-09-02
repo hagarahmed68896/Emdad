@@ -36,6 +36,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\supplierrController;
+use App\Http\Controllers\ReportController;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -99,11 +100,16 @@ Route::middleware('web')->group(function () {
              Route::get('/messages/{conversation}', [MessageController::class, 'show'])->name('messages.show');
              Route::post('/messages/{conversation}', [MessageController::class, 'store'])->name('messages.store');
              Route::delete('/conversations/{id}', [ConversationController::class, 'destroy']);
-             Route::post('/suppliers/{id}/report', [supplierrController::class, 'report']);
+// routes/web.php
+Route::post('/reports/{user}', [ReportController::class, 'reportSupplier'])
+     ->name('reports.supplier');
+     
+             Route::post('/users/{user}/report', [ReportController::class, 'reportUser']);
              // routes/web.php or routes/api.php
 
-Route::post('/suppliers/{user}/toggle-status', [supplierrController::class, 'toggleBan'])
-     ->name('suppliers.toggleStatus');
+Route::post('/suppliers/{user}/toggle-ban', [MessageController::class, 'toggleBan'])->name('suppliers.toggleBan');
+Route::post('/suppliers/{user}/ban', [MessageController::class, 'ban'])->name('suppliers.ban');
+Route::post('/suppliers/{user}/unban', [MessageController::class, 'unban'])->name('suppliers.unban');
 
              Route::post('/messages/upload-attachment', [MessageController::class,'uploadAttachment'])->name('messages.upload-attachment');
              

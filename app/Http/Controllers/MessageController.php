@@ -8,6 +8,7 @@ use App\Models\Conversation;
 use App\Models\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class MessageController extends Controller
 {
@@ -139,4 +140,45 @@ public function uploadAttachment(Request $request)
     return response()->json($message);
 }
 
+    // -----------------------------
+    // 🔹 Ban / Unban Supplier Methods
+    // -----------------------------
+
+    public function toggleBan(User $user)
+    {
+        $user->status = $user->status === 'banned' ? 'active' : 'banned';
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'status' => $user->status,
+            'message' => $user->status === 'banned'
+                ? 'تم حظر المورد بنجاح'
+                : 'تم إلغاء الحظر عن المورد'
+        ]);
+    }
+
+    public function ban(User $user)
+    {
+        $user->status = 'banned';
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'status' => 'banned',
+            'message' => 'تم حظر المورد بنجاح'
+        ]);
+    }
+
+    public function unban(User $user)
+    {
+        $user->status = 'active';
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'status' => 'active',
+            'message' => 'تم إلغاء الحظر عن المورد'
+        ]);
+    }
 }
