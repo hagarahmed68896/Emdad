@@ -110,6 +110,8 @@ Route::post('/reports/{user}', [ReportController::class, 'reportSupplier'])
 Route::post('/suppliers/{user}/toggle-ban', [MessageController::class, 'toggleBan'])->name('suppliers.toggleBan');
 Route::post('/suppliers/{user}/ban', [MessageController::class, 'ban'])->name('suppliers.ban');
 Route::post('/suppliers/{user}/unban', [MessageController::class, 'unban'])->name('suppliers.unban');
+Route::post('/conversations/{id}/mark-read', [MessageController::class, 'markAsRead']);
+
 
              Route::post('/messages/upload-attachment', [MessageController::class,'uploadAttachment'])->name('messages.upload-attachment');
              

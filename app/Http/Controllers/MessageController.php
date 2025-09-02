@@ -181,4 +181,15 @@ public function uploadAttachment(Request $request)
             'message' => 'تم إلغاء الحظر عن المورد'
         ]);
     }
+
+    public function markAsRead($id)
+{
+    Message::where('conversation_id', $id)
+        ->where('sender_id', '!=', Auth::id())
+        ->where('is_read', false)
+        ->update(['is_read' => true]);
+
+    return response()->json(['status' => 'ok']);
+}
+
 }
