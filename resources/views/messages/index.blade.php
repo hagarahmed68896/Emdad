@@ -4,7 +4,7 @@
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
 <div class="flex h-screen px-4 md:px-[64px] flex-col md:flex-row"
-     x-data="chatApp({{ $conversations->toJson() }}, {{ $quickReplies->toJson() }}, {{ $openConversationId ?? 'null' }})"
+     x-data="chatApp({{ $conversations->toJson() }}, {{ $quickReplies->toJson() }}, {{ $openConversationId ?? 'null' }}, '{{ auth()->user()->account_type }},  isBlocked: false, otherUserIsSupplier: false')"
      x-init="init()">
 
     {{-- Sidebar --}}
@@ -30,14 +30,12 @@
      @click="loadConversation(conv.id)">
     <!-- Left: avatar + info -->
     <div class="flex items-center">
-        <img :src="conv.product?.supplier?.user?.profile_picture
-                        ? '/storage/' + conv.product.supplier.user.profile_picture
-                        : '/default.png'"
-             class="w-10 h-10 rounded-full ml-2">
+   <img :src="conv.profile_picture ? '/storage/' + conv.profile_picture : '/default.png'"
+     class="w-10 h-10 rounded-full ml-2">
         <div>
-            <p class="font-bold" x-text="conv.product.supplier.user.full_name"></p>
-            <span class="text-gray-500" x-text="conv.product.supplier.company_name"></span>
-            <p class="text-sm text-gray-500 truncate"
+<p class="font-bold" x-text="conv.full_name"></p>
+<span class="text-gray-500" x-text="conv.company_name"></span>
+     <p class="text-sm text-gray-500 truncate"
                x-text="conv.last_message_text ?? ((conv.messages?.length ? conv.messages[conv.messages.length - 1]?.message : ''))"></p>
         </div>
     </div>
@@ -147,46 +145,78 @@
                             {{ __('messages.search_in_conversation') }}
                         </button>
 
-                        <button
-                            @click="
-                                let index = conversations.findIndex(c => c.id === currentConversation);
-                                if (index !== -1) {
-                                    let conv = conversations[index];
-                                    fetch(`/suppliers/${conv.product.supplier.user.id}/toggle-ban`, {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                        }
-                                    })
-                                    .then(res => res.json())
-                                    .then(data => {
-                                        if (data.success) {
-                                            conversations[index].product.supplier.user.status = data.status;
-                                            conversations = [...conversations];
-                                        } else {
-                                            alert('{{ __('messages.status_update_error') }}');
-                                        }
-                                    })
-                                    .catch(err => console.error(err));
-                                }
-                            "
-                            class="flex gap-2 items-center w-full px-4 py-2 text-right hover:bg-[#185D31] hover:text-white"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                <path x-show="conversations.find(c => c.id === currentConversation)?.product?.supplier?.user?.status === 'banned'"
-                              stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
 
-                             <path  x-show="conversations.find(c => c.id === currentConversation)?.product?.supplier?.user?.status !== 'banned'"
-  stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
+                        <meta name="csrf-token" content="{{ csrf_token() }}">
 
-                                    </svg>
- 
+<button
+    type="button"
+    x-data="{ isBlocked: false, label: 'حظر' }"
+    x-init="
+        $watch('currentConversation', (newId) => {
+            if (newId) {
+                let conv = conversations.find(c => c.id === newId);
+                if (conv) {
+                    isBlocked = conv.is_blocked_by_me;
+                    label = isBlocked ? 'إلغاء الحظر' : 'حظر';
+                }
+            }
+        });
+    "
+    @click="
+        let conv = conversations.find(c => c.id === currentConversation);
+        if (!conv) {
+            console.error('Conversation not found');
+            return;
+        }
 
-                            <span x-text="conversations.find(c => c.id === currentConversation)?.product?.supplier?.user?.status === 'banned' ? '{{ __('messages.unban_supplier') }}' : '{{ __('messages.ban_supplier') }}'"></span>
-                        </button>
+        let accountType = '{{ Auth::user()->account_type }}';
+        let targetId;
 
+        if (accountType === 'supplier') {
+            targetId = conv.user?.id;
+        } else {
+            targetId = conv.product?.id;
+        }
 
+        if (!targetId) {
+            console.error('No valid ID to block');
+            return;
+        }
+
+        fetch(`/users/${targetId}/toggle-block`, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(r => r.json())
+        .then(d => {
+            if (d.success) {
+                // Update the local state
+                isBlocked = d.action === 'blocked';
+                label = isBlocked ? 'إلغاء الحظر' : 'حظر';
+
+                // Update the conversation object in the main data array
+                conv.is_blocked_by_me = isBlocked;
+            }
+            console.log('response', d);
+        })
+        .catch(e => console.error('error', e));
+    "
+    class="flex gap-1 hover:bg-[#185D31] w-full text-end hover:text-white px-4 py-2 rounded"
+>
+    <svg x-show="!isBlocked" xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M18.364 5.636l-12.728 12.728" />
+        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1"/>
+    </svg>
+    <svg x-show="isBlocked" xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M5 13l4 4L19 7" />
+    </svg>
+
+    <span x-text="label"></span>
+</button>
 
                         <div x-data="reportModal()">
 
@@ -361,96 +391,115 @@
         </div>
 
         {{-- Chat box --}}
-        <div id="chat-box" class="flex-1 overflow-y-auto p-4 flex flex-col space-y-4 bg-gray-50">
-            <template x-if="!currentConversation">
-                <div class="flex flex-1 w-full flex-col items-center justify-center text-[#696969] py-[20%]">
-                    <img src="{{ asset('/images/Illustrations (5).svg') }}" alt="" class="mb-4 max-w-[200px]">
-                    <p class="text-lg">{{ __('messages.start_conversation_to_view_messages') }}</p>
-                </div>
-            </template>
+      {{-- Chat box --}}
+<div id="chat-box" class="flex-1 overflow-y-auto p-4 flex flex-col space-y-4 bg-gray-50">
+    <template x-if="!currentConversation">
+        <div class="flex flex-1 w-full flex-col items-center justify-center text-[#696969] py-[20%]">
+            <img src="{{ asset('/images/Illustrations (5).svg') }}" alt="" class="mb-4 max-w-[200px]">
+            <p class="text-lg">{{ __('messages.start_conversation_to_view_messages') }}</p>
+        </div>
+    </template>
 
-            <template x-if="currentConversation">
-                <div>
-                    <div class="flex justify-start mb-2">
-                        <div class="bg-gray-100 text-right text-gray-800 px-4 py-3 rounded-2xl shadow max-w-lg">
-                            <p class="mb-3 font-medium">
-                                {{ __('messages.welcome_message') }}<br>
-                                {{ __('messages.quick_replies_instruction') }}
-                            </p>
-                            <div class="space-y-2 mb-1">
-                                <template x-for="qr in quickReplies" :key="qr.id">
-                                    <button @click="sendQuickReply(qr)" class="w-full text-right bg-white border border-gray-300 px-4 py-2 rounded-xl hover:bg-[#185D31] transition">
-                                        <span x-text="qr.text"></span>
-                                    </button>
+    <template x-if="currentConversation">
+        <div>
+            <div class="flex justify-start mb-2">
+                <div class="bg-gray-100 text-right text-gray-800 px-4 py-3 rounded-2xl shadow max-w-lg">
+                    <p class="mb-3 font-medium">
+                        {{ __('messages.welcome_message') }}<br>
+                        {{ __('messages.quick_replies_instruction') }}
+                    </p>
+
+                    {{-- Quick Replies only for buyers --}}
+                    @if (Auth::user()->account_type !== 'supplier')
+                        <div class="space-y-2 mb-1">
+                            <template x-for="qr in quickReplies" :key="qr.id">
+                                <button @click="sendQuickReply(qr)"
+                                        class="w-full text-right bg-white border border-gray-300 px-4 py-2 rounded-xl hover:bg-[#185D31] transition">
+                                    <span x-text="qr.text"></span>
+                                </button>
+                            </template>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <template x-for="msg in messages" :key="msg.id">
+                <div class="flex items-end mb-3"
+                     :class="msg.sender_id === currentUserId ? 'justify-start' : 'justify-end'">
+
+                    {{-- Sender image (auth user) --}}
+                    <template x-if="msg.sender_id === currentUserId">
+                        <img src="{{ auth()->user()->profile_picture ? asset('storage/' . auth()->user()->profile_picture) : '/images/default.png' }}"
+                             class="w-10 h-10 rounded-full ml-2">
+                    </template>
+
+                    <div class="max-w-[70%] p-2 mb-1 rounded-lg shadow"
+                         :class="msg.sender_id === currentUserId
+                             ? 'bg-[#185D31] text-white text-right rounded-tl-none'
+                             : 'bg-white text-black text-left rounded-tr-none'">
+
+                        {{-- Attachment --}}
+                        <template x-if="msg.attachment">
+                            <div>
+                                {{-- Image attachments --}}
+                                <template x-if="msg.attachment.startsWith('blob:') || msg.attachment.match(/\.(jpg|jpeg|png|gif|webp)$/i)">
+                                    <img
+                                        :src="msg.attachment.startsWith('blob:') ? msg.attachment : '/storage/' + msg.attachment"
+                                        alt="{{ __('messages.attachment') }}"
+                                        class="max-w-full h-auto rounded-lg mb-2 cursor-pointer object-contain">
+                                </template>
+
+                                {{-- File attachments --}}
+                                <template x-if="!msg.attachment.startsWith('blob:') && !msg.attachment.match(/\.(jpg|jpeg|png|gif|webp)$/i)">
+                                    <a :href="'/storage/' + msg.attachment"
+                                       target="_blank"
+                                       class="flex items-center gap-2 text-sm"
+                                       :class="msg.sender_id === currentUserId ? 'text-gray-100 hover:text-white' : 'text-blue-500 hover:underline'">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                             stroke-width="1.5" stroke="currentColor" class="size-5">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                  d="M19.5 14.25v-2.125a3.75 3.75 0 0 0-7.5 0v2.125m10.5-5.625a3.75 3.75 0 0 1-7.5 0m7.5 0a3.75 3.75 0 0 0-7.5 0M18 12.75a6 6 0 0 1-12 0v-2.125a6 6 0 0 1 12 0v2.125Z"/>
+                                        </svg>
+                                        <span x-text="msg.attachment.split('/').pop()"></span>
+                                    </a>
                                 </template>
                             </div>
-                        </div>
+                        </template>
+
+                        {{-- Message text --}}
+                        <template x-if="msg.message">
+                            <p x-html="highlightText(msg.message)" class="break-words"></p>
+                        </template>
+
+                        {{-- Timestamp --}}
+                        <span class="text-xs block mt-1"
+                              :class="msg.sender_id === currentUserId ? 'text-[#EDEDED]' : 'text-gray-600'"
+                              x-text="formatDate(msg.created_at)"></span>
                     </div>
 
-                    <template x-for="msg in messages" :key="msg.id">
-                        <div class="flex items-end mb-3" :class="msg.sender_id === currentUserId ? 'justify-start' : 'justify-end'">
+                    {{-- Receiver image (other user) --}}
+                    <template x-if="msg.sender_id !== currentUserId">
+                        <img
+                            :src="(() => {
+                                let conv = conversations.find(c => c.id === currentConversation);
+                                if (!conv) return '/images/default.png';
 
-
-
-                            <template x-if="msg.sender_id === currentUserId">
-                                <img src="{{ auth()->user()->profile_picture ? asset('storage/' . auth()->user()->profile_picture) : '/default.png' }}" class="w-10 h-10 rounded-full ml-2">
-                            </template>
-
-                            <div class="max-w-[70%] p-2 mb-1 rounded-lg shadow"
-                                 :class="msg.sender_id === currentUserId
-                                     ? 'bg-[#185D31] text-white text-right rounded-tl-none'
-                                     : 'bg-white text-black text-left rounded-tr-none'">
-
-                                <template x-if="msg.attachment">
-                                    <div>
-                                        <template x-if="msg.attachment.startsWith('blob:') || msg.attachment.match(/\.(jpg|jpeg|png|gif|webp)$/i)">
-                                            <img
-                                                :src="msg.attachment.startsWith('blob:') ? msg.attachment : '/storage/' + msg.attachment"
-                                                alt="{{ __('messages.attachment') }}"
-                                                class="max-w-full h-auto rounded-lg mb-2 cursor-pointer object-contain"
-                                            >
-                                        </template>
-
-
-                                        <template x-if="!msg.attachment.startsWith('blob:') && !msg.attachment.match(/\.(jpg|jpeg|png|gif|webp)$/i)">
-                                            <a
-                                                :href="'/storage/' + msg.attachment"
-                                                target="_blank"
-                                                class="flex items-center gap-2 text-sm"
-                                                :class="msg.sender_id === currentUserId ? 'text-gray-100 hover:text-white' : 'text-blue-500 hover:underline'"
-                                            >
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.125a3.75 3.75 0 0 0-7.5 0v2.125m10.5-5.625a3.75 3.75 0 0 1-7.5 0m7.5 0a3.75 3.75 0 0 0-7.5 0M18 12.75a6 6 0 0 1-12 0v-2.125a6 6 0 0 1 12 0v2.125Z" />
-                                                </svg>
-                                                <span x-text="msg.attachment.split('/').pop()"></span>
-                                            </a>
-                                        </template>
-                                    </div>
-                                </template>
-
-
-                                <template x-if="msg.message">
-                                    <p x-html="highlightText(msg.message)" class="break-words"></p>
-                                </template>
-
-                                <span class="text-xs block mt-1"
-                                      :class="msg.sender_id === currentUserId ? 'text-[#EDEDED]' : 'text-gray-600'"
-                                      x-text="formatDate(msg.created_at)"></span>
-                            </div>
-                            <template x-if="msg.sender_id !== currentUserId">
-                                <img
-                                    :src="conversations.find(c => c.id === currentConversation)?.product?.supplier?.user?.profile_picture
-                                    ? '/storage/' + conversations.find(c => c.id === currentConversation).product.supplier.user.profile_picture
-                                    : '/images/default.png'"
-                                    class="w-10 h-10 rounded-full mr-2">
-
-                            </template>
-
-                        </div>
+                                if ('{{ Auth::user()->account_type }}' === 'supplier') {
+                                    // Supplier is chatting with buyer
+                                    return conv.user?.profile_picture ? '/storage/' + conv.user.profile_picture : '/images/default.png';
+                                } else {
+                                    // Buyer is chatting with supplier
+                                    return conv.product?.supplier?.user?.profile_picture ? '/storage/' + conv.product.supplier.user.profile_picture : '/images/default.png';
+                                }
+                            })()"
+                            class="w-10 h-10 rounded-full mr-2">
                     </template>
                 </div>
             </template>
         </div>
+    </template>
+</div>
+
 
 
 
@@ -459,14 +508,17 @@
         {{-- Input (only if conversation exists) --}}
         <template x-if="activeConversation">
             <div>
-        <div x-show="activeConversation?.product?.supplier?.user?.status === 'banned'"
-class="p-4 bg-gray-200 text-center text-red-700 font-bold rounded-b-lg">
-<span>{{ __('messages.cannot_send_messages') }}</span>
-</div>
-            <form @submit.prevent="sendMessage"
-x-show="activeConversation?.product?.supplier?.user?.status !== 'banned'"
-                  class="p-4 flex flex-col border-t relative gap-2 bg-white">
-
+  {{-- Warning when conversation is blocked --}}
+        <div id="blocked-warning"
+             x-show="activeConversation?.is_blocked_by_me"
+             class="p-4 bg-gray-200 text-center text-red-700 font-bold rounded-b-lg">
+            <span>{{ __('messages.cannot_send_messages') }}</span>
+        </div>
+       {{-- Chat form (hidden if blocked) --}}
+<form @submit.prevent="sendMessage"
+              id="chat-form"
+              x-show="!activeConversation?.is_blocked_by_me"
+              class="p-4 flex flex-col border-t relative gap-2 bg-white">
                 {{-- Attachment preview --}}
                 <div x-show="attachmentName" class="flex items-center justify-between gap-2 text-sm text-gray-600 border p-2 rounded-lg bg-gray-50">
                     <span class="flex items-center gap-1">

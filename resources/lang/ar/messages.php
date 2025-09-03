@@ -610,7 +610,7 @@ return [
     'type_your_message' => 'اكتب رسالتك',
     'confirm_delete_conversation' => 'تأكيد حذف المحادثة؟',
     'write_reason' => 'اكتب السبب...',
-    'cannot_send_messages' =>'تم حظر هذا المورد ولا يمكنك إرسال رسائل له.',
+    'cannot_send_messages' =>'تم حظر هذا المستخدم ولا يمكنك إرسال رسائل له.',
  
 
 

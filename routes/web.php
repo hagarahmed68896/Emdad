@@ -111,7 +111,8 @@ Route::post('/suppliers/{user}/toggle-ban', [MessageController::class, 'toggleBa
 Route::post('/suppliers/{user}/ban', [MessageController::class, 'ban'])->name('suppliers.ban');
 Route::post('/suppliers/{user}/unban', [MessageController::class, 'unban'])->name('suppliers.unban');
 Route::post('/conversations/{id}/mark-read', [MessageController::class, 'markAsRead']);
-
+// Route for a POST request to toggle the block status of a user
+Route::post('/users/{user}/toggle-block', [MessageController::class, 'toggleBlock']);
 
              Route::post('/messages/upload-attachment', [MessageController::class,'uploadAttachment'])->name('messages.upload-attachment');
              

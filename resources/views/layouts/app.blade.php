@@ -90,21 +90,39 @@
 @if (!request()->routeIs('messages.index'))
 
     <!-- Floating Message Button -->
-<a href="{{ route('messages.index') }}" 
-   class="fixed top-[40%] rtl:left-0 flex-col gap-1 z-50 border rounded-sm px-2 py-4 shadow-lg hover:bg-[#185D31] hover:text-white transition">
-   <!-- Icon -->
-<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="size-6">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
-</svg>
-<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="size-6">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
-</svg>
-<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="size-6">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" />
-</svg>
+<div class="fixed top-[40%] rtl:left-0 flex-col gap-1 z-50 border rounded-sm px-2 py-2 shadow-lg">
+
+    {{-- Message Button --}}
+    <a href="{{ route('messages.index') }}" class="group hover:bg-[#185D31] hover:text-white transition-colors duration-300 flex items-center justify-center p-2 rounded">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="size-6 group-hover:text-white">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+        </svg>
+    </a>
+
+    {{-- Horizontal Line (Optional, but helps with separation) --}}
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="size-10 text-gray-400">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
+    </svg>
+
+    {{-- Scroll to Top Button --}}
+    <a href="#" id="scrollToTopBtn" class="group hover:bg-[#185D31] hover:text-white transition-colors duration-300 flex items-center justify-center p-2 rounded">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 group-hover:text-white">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" />
+        </svg>
+    </a>
+
+</div>
+<script>
+document.getElementById('scrollToTopBtn').addEventListener('click', function(e) {
+    e.preventDefault(); // Prevents the default jump behavior
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth' // Adds a smooth scrolling animation
+    });
+});
+</script>
 
 
-</a>
 @endif
 
     {{-- Scripts --}}

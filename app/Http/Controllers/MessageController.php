@@ -9,37 +9,83 @@ use App\Models\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class MessageController extends Controller
 {
-    public function index(Request $request)
-    {
+// app/Http/Controllers/MessageController.php
+
+// app/Http/Controllers/MessageController.php
+
+public function index(Request $request)
+{
+    $user = Auth::user();
+
+    if ($user->account_type === 'supplier') {
         $conversations = Conversation::with([
-            'user',
+            'user', 
             'messages' => function($q) { $q->latest(); },
             'product.supplier.user'
-        ])->get();
+        ])->whereHas('product.supplier.user', function($query) use ($user) {
+            $query->where('id', $user->id);
+        })->get();
 
-        $quickReplies  = QuickReply::all();
+        // Map supplier conversations
+        $conversations = $conversations->map(function ($conversation) use ($user) {
+            $conversation->full_name = $conversation->user->full_name;
+            $conversation->profile_picture = $conversation->user->profile_picture;
+            $conversation->company_name = $conversation->user->company_name;
 
-        $openConversationId = null;
+            // Buyer is the "other user" for supplier
+            $otherUserId = $conversation->user_id;
 
-        if ($request->has('product_id')) {
-            $product = Product::with('supplier')->findOrFail($request->get('product_id'));
+            $conversation->is_blocked_by_me = DB::table('user_blocks')
+                ->where('blocker_id', $user->id)
+                ->where('blocked_id', $otherUserId)
+                ->exists();
 
-            // check if conversation exists or create it
-            $conversation = Conversation::firstOrCreate(
-                [
-                    'user_id'    => Auth::id(),
-                    'product_id' => $product->id,
-                ]
-            );
+            return $conversation;
+        });
 
-            $openConversationId = $conversation->id;
-        }
+    } else { // customer
+        $conversations = Conversation::with([
+            'user', 
+            'messages' => function($q) { $q->latest(); },
+            'product.supplier.user'
+        ])->where('user_id', $user->id)->get();
 
-        return view('messages.index', compact('conversations', 'quickReplies', 'openConversationId'));
+        // Map customer conversations
+        $conversations = $conversations->map(function ($conversation) use ($user) {
+            $conversation->full_name = $conversation->product->supplier->user->full_name;
+            $conversation->profile_picture = $conversation->product->supplier->user->profile_picture;
+            $conversation->company_name = $conversation->product->supplier->company_name;
+
+            // Supplier is the "other user" for customer
+            $otherUserId = optional($conversation->product?->supplier?->user)->id;
+
+            $conversation->is_blocked_by_me = DB::table('user_blocks')
+                ->where('blocker_id', $user->id)
+                ->where('blocked_id', $otherUserId)
+                ->exists();
+
+            return $conversation;
+        });
     }
+
+    $quickReplies = QuickReply::all();
+    $openConversationId = null;
+
+    if ($request->has('product_id')) {
+        $product = Product::with('supplier')->findOrFail($request->get('product_id'));
+        $conversation = Conversation::firstOrCreate(
+            ['user_id' => Auth::id(), 'product_id' => $product->id]
+        );
+        $openConversationId = $conversation->id;
+    }
+
+    return view('messages.index', compact('conversations', 'quickReplies', 'openConversationId'));
+}
+
 
     public function show(Conversation $conversation)
     {
@@ -57,38 +103,56 @@ class MessageController extends Controller
         ]);
     }
 
-  public function store(Request $request, Conversation $conversation)
+public function store(Request $request, Conversation $conversation)
 {
-    // Validate the request to ensure a message is present and a quick reply ID can be sent
     $request->validate([
         'message' => 'required_without:attachment|nullable|string',
         'quick_reply_id' => 'nullable|exists:quick_replies,id',
         'attachment' => 'required_without:message|nullable|file|max:10240',
-
-
     ]);
 
-        $path = null;
+    $senderId = Auth::id();
+    $receiverId = $this->getOtherUserIdInConversation($conversation, $senderId);
+
+    // Check if the sender has blocked the receiver, or if the receiver has blocked the sender.
+    $isBlockedBySender = DB::table('user_blocks')
+        ->where('blocker_id', $senderId)
+        ->where('blocked_id', $receiverId)
+        ->exists();
+
+    $isBlockedByReceiver = DB::table('user_blocks')
+        ->where('blocker_id', $receiverId)
+        ->where('blocked_id', $senderId)
+        ->exists();
+
+    if ($isBlockedBySender || $isBlockedByReceiver) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Cannot send messages to a blocked user.'
+        ], 403); // Forbidden
+    }
+
+    $path = null;
     if ($request->hasFile('attachment')) {
         $path = $request->file('attachment')->store('attachments', 'public');
     }
-    // Save the user's message first
-    $userMessage = Message::create([
+
+    // Save the user's message
+    Message::create([
         'conversation_id' => $conversation->id,
-        'sender_id' => Auth::id(),
+        'sender_id' => $senderId,
         'message' => $request->message,
         'attachment' => $path,
-        'type' => $path ? 'attachment' : 'text',    ]);
+        'type' => $path ? 'attachment' : 'text',
+    ]);
 
-    // Check for a quick reply and its answer to create an automated response
+    // Handle quick reply logic...
     if ($request->filled('quick_reply_id')) {
         $quickReply = QuickReply::find($request->quick_reply_id);
         if ($quickReply && $quickReply->answer) {
-            // Find the supplier's user ID associated with this conversation's product
             $supplierUserId = $conversation->product->supplier->user->id ?? null;
-
             if ($supplierUserId) {
-                // Save the automated reply with the correct sender ID
+                // Save the automated reply
                 Message::create([
                     'conversation_id' => $conversation->id,
                     'sender_id' => $supplierUserId,
@@ -99,21 +163,35 @@ class MessageController extends Controller
         }
     }
 
-    // After creating both messages (if applicable),
-    // get the full, updated list of messages for the conversation
-    // and send it back to the front end to update the UI
-    $messages = $conversation
-        ->messages()
-        ->with('sender')
-        ->orderBy('created_at')
-        ->get();
-
+    // Return the updated list of messages
+    $messages = $conversation->messages()->with('sender')->orderBy('created_at')->get();
     $product = $conversation->product ? $conversation->product->load('supplier') : null;
 
     return response()->json([
         'messages' => $messages,
         'product' => $product,
+        'success' => true
     ]);
+}
+
+/**
+ * Helper method to get the ID of the other user in the conversation.
+ *
+ * @param \App\Models\Conversation $conversation
+ * @param int $currentUserId
+ * @return int|null
+ */
+private function getOtherUserIdInConversation($conversation, $currentUserId)
+{
+    $otherUserId = null;
+    if ($conversation->user_id === $currentUserId) {
+        // Current user is the customer, other is the supplier
+        $otherUserId = optional($conversation->product?->supplier?->user)->id;
+    } else {
+        // Current user is the supplier, other is the customer
+        $otherUserId = $conversation->user_id;
+    }
+    return $otherUserId;
 }
 
     private function getSupplierId($conversationId)
@@ -144,43 +222,102 @@ public function uploadAttachment(Request $request)
     // 🔹 Ban / Unban Supplier Methods
     // -----------------------------
 
-    public function toggleBan(User $user)
-    {
-        $user->status = $user->status === 'banned' ? 'active' : 'banned';
-        $user->save();
+    // public function toggleBan(User $user)
+    // {
+    //     $user->status = $user->status === 'banned' ? 'active' : 'banned';
+    //     $user->save();
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'status' => $user->status,
+    //         'message' => $user->status === 'banned'
+    //             ? 'تم حظر المورد بنجاح'
+    //             : 'تم إلغاء الحظر عن المورد'
+    //     ]);
+    // }
+
+    // public function ban(User $user)
+    // {
+    //     $user->status = 'banned';
+    //     $user->save();
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'status' => 'banned',
+    //         'message' => 'تم حظر المورد بنجاح'
+    //     ]);
+    // }
+
+    // public function unban(User $user)
+    // {
+    //     $user->status = 'active';
+    //     $user->save();
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'status' => 'active',
+    //         'message' => 'تم إلغاء الحظر عن المورد'
+    //     ]);
+    // }
+
+public function toggleBlock($id)
+{
+    $blocker = Auth::user();
+    if (!$blocker) {
+        return response()->json(['success' => false, 'message' => 'User not authenticated'], 401);
+    }
+
+    // Decide blocked_id based on blocker account_type
+    if ($blocker->account_type === 'supplier') {
+        // Supplier blocks the buyer (id is buyer user_id)
+        $blockedId = (int) $id;
+    } else {
+        // Normal user blocks supplier (id is product_id)
+        $product = Product::with('supplier.user')->find($id);
+
+        if (!$product || !$product->supplier || !$product->supplier->user) {
+            return response()->json(['success' => false, 'message' => 'Supplier not found for this product'], 404);
+        }
+
+        $blockedId = $product->supplier->user->id;
+    }
+
+    // Check if already blocked
+    $isBlocked = DB::table('user_blocks')
+        ->where('blocker_id', $blocker->id)
+        ->where('blocked_id', $blockedId)
+        ->exists();
+
+    if ($isBlocked) {
+        DB::table('user_blocks')
+            ->where('blocker_id', $blocker->id)
+            ->where('blocked_id', $blockedId)
+            ->delete();
 
         return response()->json([
             'success' => true,
-            'status' => $user->status,
-            'message' => $user->status === 'banned'
-                ? 'تم حظر المورد بنجاح'
-                : 'تم إلغاء الحظر عن المورد'
+            'action' => 'unblocked',
+            'message' => 'تم إلغاء الحظر عن المستخدم بنجاح'
         ]);
-    }
-
-    public function ban(User $user)
-    {
-        $user->status = 'banned';
-        $user->save();
+    } else {
+        DB::table('user_blocks')->insert([
+            'blocker_id' => $blocker->id,
+            'blocked_id' => $blockedId,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
         return response()->json([
             'success' => true,
-            'status' => 'banned',
-            'message' => 'تم حظر المورد بنجاح'
+            'action' => 'blocked',
+            'message' => 'تم حظر المستخدم بنجاح'
         ]);
     }
+}
 
-    public function unban(User $user)
-    {
-        $user->status = 'active';
-        $user->save();
 
-        return response()->json([
-            'success' => true,
-            'status' => 'active',
-            'message' => 'تم إلغاء الحظر عن المورد'
-        ]);
-    }
+
+
 
     public function markAsRead($id)
 {
