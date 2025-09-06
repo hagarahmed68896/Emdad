@@ -1,6 +1,6 @@
 {{-- supplier section --}}
 <template x-if="userType === 'supplier'">
-    <form method="POST" action="{{ route('register.supplier') }}" x-show="userType === 'supplier'"
+    <form method="POST" action="{{ route('sendOtp') }}" x-show="userType === 'supplier'"
         enctype="multipart/form-data"
         @submit.prevent="submitForm" {{-- Prevent default form submission and call Alpine's submitForm --}}
     >

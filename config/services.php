@@ -41,4 +41,10 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    'taqnyat' => [
+    'bearer_token' => env('TAQNYAT_BEARER_TOKEN'),
+    'sender' => env('TAQNYAT_SENDER'),
+],
+
+
 ];

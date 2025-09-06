@@ -3,265 +3,198 @@
 namespace App\Http\Controllers;
 
 use App\Models\Otp;
-use App\Models\User; // Assuming your User model is here
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail; // For sending email
-use Illuminate\Support\Facades\Cache; // For rate limiting
+use Illuminate\Support\Facades\Cache;
+use App\Services\TaqnyatOTP;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Models\BusinessData;
+use App\Models\Document;
+
+
 
 class OtpController extends Controller
 {
     /**
-     * Show the OTP verification form.
+     * Step 1: Send OTP for login/register/register_supplier
      */
-    public function showVerificationForm(Request $request)
-    {
-        // 1. Determine the user we're trying to verify
-        $userId = Auth::id() ?? session('pending_verification_user_id');
 
-        // If no user ID is found, they shouldn't be on this page.
-        if (!$userId) {
-            return redirect('/login')->with('error', 'Authentication required for OTP verification.');
-        }
+public function sendOtp(Request $request)
+{
+    $authMethod = $request->auth_method;
 
-        $user = User::find($userId);
-
-        if (!$user) {
-            // User not found in DB, something is wrong with the session ID.
-            Auth::logout(); // Clear any partial auth state
-            session()->forget('pending_verification_user_id');
-            return redirect('/login')->with('error', 'User information not found. Please try again.');
-        }
-
-        // 2. Determine the identifier type (email/phone) and the actual identifier value
-        $identifierType = session('otp_identifier_type', 'email'); // Default to 'email' if not set
-        $identifier = null; // Initialize $identifier to null
-
-        // Priority: If a phone number is available and the method is 'phone', use it.
-        // Otherwise, or if phone is not available, default to email.
-        if ($identifierType === 'phone' && !empty($user->phone_number)) {
-            $identifier = $user->phone_number;
-        } else {
-            // Default to email or fallback to email if phone was chosen but missing
-            $identifierType = 'email'; // Ensure identifierType is 'email'
-            $identifier = $user->email;
-            // Update the session if we had to fallback from phone to email
-            if (session('otp_identifier_type') !== 'email') {
-                session(['otp_identifier_type' => 'email']);
-                session()->flash('warning', 'No phone number found. Sending OTP to your email instead.');
-            }
-        }
-
-        // Ensure $identifier is not null at this point.
-        if (is_null($identifier)) {
-            // This case should ideally not happen with the logic above,
-            // but as a failsafe, redirect to login.
-            Auth::logout();
-            session()->forget('pending_verification_user_id');
-            return redirect('/login')->with('error', 'Could not determine verification identifier. Please log in again.');
-        }
-
-        // 3. Logic to send/resend OTP if necessary
-        $cooldownKey = 'otp_cooldown_' . $userId . '_' . $identifierType;
-        $canSend = !Cache::has($cooldownKey); // Check if cooldown is active
-
-        $latestActiveOtp = Otp::where('user_id', $user->id)
-                               ->where('identifier_type', $identifierType)
-                               ->where('expires_at', '>', Carbon::now())
-                               ->latest()
-                               ->first();
-
-        // Condition to send a new OTP on load:
-        // - No active OTP
-        // - OR an explicit resend request ($request->has('resend'))
-        // - OR method switch request ($request->has('switch_method'))
-        $shouldSendNewOtp = !$latestActiveOtp || $request->has('resend') || $request->has('switch_method');
-
-        if ($shouldSendNewOtp && $canSend) {
-            $this->sendOtp($user, $identifierType, $identifier);
-            Cache::put($cooldownKey, true, 30); // 30 seconds cooldown
-        } elseif ($shouldSendNewOtp && !$canSend) {
-            // If they tried to resend/switch but are still on cooldown, flash a message
-            session()->flash('info', 'Please wait before resending the OTP.');
-        }
-
-        // 4. Pass the $identifier and $identifierType to the view
-        return view('partials.otp', compact('identifier', 'identifierType'));
-    }
-
-    /**
-     * Send OTP to the user.
-     */
-    public function sendOtp(User $user, string $identifierType, string $identifier)
-    {
-        // Generate a 4-digit OTP
-        $otpCode = str_pad(random_int(0, 9999), 4, '0', STR_PAD_LEFT);
-        $expiresAt = Carbon::now()->addMinutes(5); // OTP valid for 5 minutes
-
-        // Delete any existing active OTPs for this user and identifier type
-        Otp::where('user_id', $user->id)
-            ->where('identifier_type', $identifierType)
-            ->where('expires_at', '>', Carbon::now())
-            ->delete();
-
-        // Store the new OTP (store hashed code for security)
-        Otp::create([
-            'user_id' => $user->id,
-            'code' => Hash::make($otpCode), // Hash the OTP
-            'identifier_type' => $identifierType,
-            'identifier' => $identifier,
-            'expires_at' => $expiresAt,
+    if ($authMethod === 'login') {
+        // Login validation
+        $request->validate([
+            'phone_number' => 'required|digits:9|exists:users,phone_number',
+        ], [
+            'phone.required' => __('messages.phoneMSG'),
+            'phone.exists'   => __('messages.phone_failed'),
         ]);
-
-        // Send OTP based on identifier type
-        if ($identifierType === 'email') {
-            // In a real application, you'd use a Mail notification or queue this.
-            // Example: Mail::to($identifier)->send(new OtpMail($otpCode));
-            logger()->info("Sending OTP via email to $identifier: $otpCode"); // For debugging
-            session()->flash('success', "OTP sent to your email: {$identifier}");
-        } elseif ($identifierType === 'phone') {
-            // In a real application, integrate with an SMS gateway (e.g., Twilio, Nexmo)
-            logger()->info("Sending OTP via SMS to $identifier: $otpCode"); // For debugging
-            session()->flash('success', "OTP sent to your phone: {$identifier}");
-        }
+    } elseif ($authMethod === 'register') {
+        // Normal user registration validation
+        $request->validate([
+            'full_name'      => 'required|string|max:255',
+            'email'          => 'required|email|unique:users,email',
+            'password'       => 'required|string|min:8|confirmed|regex:/[A-Z]/|regex:/[0-9]/',
+            'phone_number'   => 'required|digits:9|unique:users,phone_number',
+            'terms'          => 'accepted',
+            'account_type'   => 'required|in:supplier,customer',
+        ],
+            [
+            'full_name.required' => __('messages.nameError'),
+            'email.required' => __('messages.emailError'),
+            'email.email' => __('messages.emailValid'),
+            'email.unique' => __('messages.emailUnique'),
+            'password.min' => __('messages.passwordMin'),
+            'password.string' => __('messages.passwordString'),
+            'password.regex'=> __('messages.passwordRegex'),
+            'password.confirmed' => __('messages.passwordConfirm'),
+            'phone_number.required' => __('messages.phoneMSG'),
+            'phone_number.unique'=> __('messages.phone_number_Unique'),
+            'phone_number.digits' => __('messages.phone_number_max'),
+            'terms.accepted' => __('messages.acceptTermsError'),
+        ]);
+    } elseif ($authMethod === 'register_supplier') {
+        // Supplier registration validation
+        $request->validate([
+            'full_name' => 'required|string|max:255',
+            'company_name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'phone_number' => 'required|string|digits:9|unique:users,phone_number',
+            'password' => 'required|string|min:8|confirmed',
+            'national_id' => 'required|string|max:255',
+            'commercial_registration' => 'required|string|max:255',
+            'national_address' => 'required|string|max:255',
+            'iban' => 'required|string|max:255',
+            'tax_certificate' => 'required|string|max:255',
+            'terms' => 'accepted',
+            'account_type' => 'required|in:supplier',
+        ]);
     }
 
+    //  ✅ Ensure phone number is in the correct 9-digit format before sending
+    $clean_phone_number = preg_replace('/\D/', '', $request->phone_number);
+    if (str_starts_with($clean_phone_number, '966')) {
+        $clean_phone_number = substr($clean_phone_number, 3);
+    }
+    
+    // Generate OTP
+    $otp = rand(1000, 9999);
+
+    // Save OTP + request data in session
+    session([
+        'otp' => $otp,
+        'otp_expires_at' => now()->addMinutes(5),
+        'otp_phone' => $clean_phone_number,
+        'otp_auth_method' => $authMethod,
+        'pending_registration' => in_array($authMethod, ['register', 'register_supplier']) ? $request->all() : null,
+    ]);
+    Log::info('OtpController reached');
+
+    // ✅ Send OTP via SMS with the full international number
+    $taqnyatService = new TaqnyatOTP();
+    $taqnyatService->sendOTP('+966' . $clean_phone_number, $otp);
+
+    return response()->json([
+        'success'  => true,
+        'status' => true,
+        'message' => 'OTP sent successfully',
+        'show_otp' => true,
+        'otp' => $otp, // ⚠️ Note: remove this line for production
+    ]);
+}
+
     /**
-     * Verify the OTP submitted by the user.
+     * Step 2: Verify OTP and login/register
      */
     public function verifyOtp(Request $request)
     {
         $request->validate([
-            'otp_code' => ['required', 'string', 'digits:6'],
+            'otp' => 'required|digits:4',
         ]);
 
-        $userId = Auth::id() ?? session('pending_verification_user_id');
-        $user = User::find($userId);
-
-        if (!$user) {
-            return back()->withErrors(['otp_code' => 'Verification failed. Please try again.']);
+        if (session('otp') != $request->otp || now()->gt(session('otp_expires_at'))) {
+            return response()->json(['success' => false, 'message' => 'Invalid or expired OTP'], 422);
         }
 
-        $enteredOtp = $request->input('otp_code');
-        $identifierType = session('otp_identifier_type', 'email');
+        $authMethod = session('otp_auth_method');
+        $phone = session('otp_phone');
 
-        // Find the latest active OTP for the user and identifier type
-        $otp = Otp::where('user_id', $user->id)
-                  ->where('identifier_type', $identifierType)
-                  ->where('expires_at', '>', Carbon::now())
-                  ->latest()
-                  ->first();
-
-        if (!$otp || !Hash::check($enteredOtp, $otp->code)) {
-            // Increment failed attempts for rate limiting or account lockout
-            // Cache::increment('failed_otp_attempts_' . $user->id);
-            return back()->withErrors(['otp_code' => 'Invalid or expired OTP.']);
-        }
-
-        // OTP is valid! Delete it to prevent reuse.
-        $otp->delete();
-
-        // Log the user in if they weren't already (e.g., during registration flow)
-        if (!Auth::check()) {
+        if ($authMethod === 'login') {
+            $user = User::where('phone_number', $phone)->firstOrFail();
             Auth::login($user);
-            session()->forget('pending_verification_user_id'); // Clear session if used
-        }
 
-        // Redirect to dashboard or intended page
-        return redirect('/dashboard')->with('status', 'OTP verified successfully!');
-    }
+        } elseif ($authMethod === 'register') {
+            $data = session('pending_registration');
+            $user = User::create([
+                'full_name'    => $data['full_name'],
+                'email'        => $data['email'],
+                'password'     => Hash::make($data['password']),
+                'phone_number' => $data['phone_number'],
+                'account_type' => $data['account_type'],
+            ]);
+            Auth::login($user);
 
-    /**
-     * Handle resending OTP.
-     */
-    public function resendOtp(Request $request)
-    {
-        $userId = Auth::id() ?? session('pending_verification_user_id');
-        $user = User::find($userId);
+        } elseif ($authMethod === 'register_supplier') {
+            $data = session('pending_registration');
 
-        if (!$user) {
-            return back()->with('error', 'User not found for OTP resend.');
-        }
+            DB::beginTransaction();
+            try {
+                $user = User::create([
+                    'full_name'    => $data['full_name'],
+                    'email'        => $data['email'],
+                    'phone_number' => $data['phone_number'],
+                    'password'     => Hash::make($data['password']),
+                    'account_type' => $data['account_type'],
+                ]);
 
-        $identifierType = session('otp_identifier_type', 'email');
-        $identifier = $identifierType === 'email' ? $user->email : $user->phone_number;
+                $businessData = BusinessData::create([
+                    'user_id' => $user->id,
+                    'company_name' => $data['company_name'],
+                    'national_id' => $data['national_id'],
+                    'commercial_registration' => $data['commercial_registration'],
+                    'national_address' => $data['national_address'],
+                    'iban' => $data['iban'],
+                    'tax_certificate' => $data['tax_certificate'],
+                ]);
 
-        // Add a check here for phone_number if identifierType is 'phone' and it's empty
-        if ($identifierType === 'phone' && empty($identifier)) {
-            session(['otp_identifier_type' => 'email']); // Fallback to email
-            $identifier = $user->email;
-            session()->flash('warning', 'No phone number found. Resending OTP to your email instead.');
-        }
+                // Handle documents if uploaded
+                $documentsMap = [
+                    'national_id_attach' => 'National ID',
+                    'commercial_registration_attach' => 'Commercial Registration',
+                    'national_address_attach' => 'National Address',
+                    'iban_attach' => 'IBAN',
+                    'tax_certificate_attach' => 'Tax Certificate',
+                ];
 
+                foreach ($documentsMap as $field => $name) {
+                    if (isset($data[$field])) {
+                        Document::create([
+                            'document_name' => $name,
+                            'supplier_id'   => $user->id,
+                            'file_path'     => $data[$field], // You might store temp path before OTP
+                            'notes'         => null,
+                        ]);
+                    }
+                }
 
-        $cooldownKey = 'otp_cooldown_' . $userId . '_' . $identifierType;
-        if (Cache::has($cooldownKey)) {
-            return back()->with('info', 'Please wait before resending the OTP.');
-        }
+                DB::commit();
+                Auth::login($user);
 
-        $this->sendOtp($user, $identifierType, $identifier);
-        Cache::put($cooldownKey, true, 30); // 30 seconds cooldown
-
-        return back();
-    }
-
-    /**
-     * Handle switching OTP delivery method.
-     */
-    public function switchOtpMethod(Request $request)
-    {
-        $request->validate([
-            'method' => ['required', 'in:email,phone'],
-        ]);
-
-        $userId = Auth::id() ?? session('pending_verification_user_id');
-        $user = User::find($userId);
-
-        if (!$user) {
-            return back()->with('error', 'User not found.');
-        }
-
-        $newMethod = $request->input('method');
-        $identifier = null; // Initialize identifier for the new method
-
-        if ($newMethod === 'email') {
-            $identifier = $user->email;
-        } elseif ($newMethod === 'phone') {
-            $identifier = $user->phone_number;
-            if (empty($identifier)) {
-                // If the user tries to switch to phone but has no phone number,
-                // don't proceed with phone OTP, flash an error, and stay on current method/page.
-                session()->flash('error', 'No phone number registered for this account. Cannot switch to phone OTP.');
-                return redirect()->route('otp.verify.show'); // Redirect back to show the existing OTP screen
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
             }
         }
 
-        // Set the new identifier type in the session for subsequent requests
-        session(['otp_identifier_type' => $newMethod]);
+        // Clear OTP from session
+        session()->forget(['otp', 'otp_expires_at', 'otp_phone', 'otp_auth_method', 'pending_registration']);
 
-        $cooldownKey = 'otp_cooldown_' . $userId . '_' . $newMethod;
-        if (Cache::has($cooldownKey)) {
-             return redirect()->route('otp.verify.show')->with('info', 'Switched method. Please wait before requesting a new OTP.');
-        }
-
-        // Send OTP via the new method
-        $this->sendOtp($user, $newMethod, $identifier); // Pass the correct identifier
-
-        Cache::put($cooldownKey, true, 30); // 30 seconds cooldown
-
-        // Redirect back to the OTP verification form, which will now display the updated identifier
-        return redirect()->route('otp.verify.show');
-    }
-
-    // Helper method to set the user for pending verification after initial login/registration
-    // You would call this after a successful login attempt where you want to enforce OTP
-    public static function setPendingVerification(User $user, string $identifierType = 'email')
-    {
-        session([
-            'pending_verification_user_id' => $user->id,
-            'otp_identifier_type' => $identifierType,
-        ]);
+        return response()->json(['success' => true, 'redirect' => route('home')]);
     }
 }

@@ -87,6 +87,7 @@
 
     </div>
 
+    @auth
 @if (!request()->routeIs('messages.index'))
 
     <!-- Floating Message Button -->
@@ -124,7 +125,10 @@ document.getElementById('scrollToTopBtn').addEventListener('click', function(e) 
 
 
 @endif
+@endauth
 
+    {{-- OTP Modal --}}
+    
     {{-- Scripts --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="/resources/js/header.js"></script>

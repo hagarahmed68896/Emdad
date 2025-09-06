@@ -116,10 +116,14 @@ Route::post('/users/{user}/toggle-block', [MessageController::class, 'toggleBloc
 
              Route::post('/messages/upload-attachment', [MessageController::class,'uploadAttachment'])->name('messages.upload-attachment');
              
+// routes/web.php or api.php
+Route::post('/send-otp', [OtpController::class, 'sendOtp'])->name('sendOtp');
+Route::post('/verify-otp', [OtpController::class, 'verifyOtp'])->name('verifyOtp');
 
 
           // Admin-specific routes
           Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
+               
 
                // ✅ لوحة التحكم => فقط احصائيات عامة
                Route::get('/dashboard', [AdminDashboardController::class, 'index'])

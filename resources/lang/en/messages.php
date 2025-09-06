@@ -59,6 +59,7 @@ return [
     'passwordNumber'          => 'Password should contain letters and numbers',
     'passwordRegex'           => 'The password must contain at least one uppercase letter, one lowercase letter, one number.',
     'phone_number_max'        => 'Phone number must be 9 numbers',
+    'phone_failed'           => 'Phone number is not registered',
     'nameError'               => 'Name is required',
     'failed_email'            => 'Email is not exists',
     'incorrect_password'      => 'Incorrect Password',
@@ -630,6 +631,7 @@ return [
     'confirm_delete_conversation' => 'Confirm conversation deletion?',
     'write_reason' => 'Write reason...',
     'cannot_send_messages' => 'You cannot send messages to this user.',
+    'send_confirmation_code' => 'Send Confirmation Code',
 
 
 

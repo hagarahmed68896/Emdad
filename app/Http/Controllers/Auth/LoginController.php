@@ -20,42 +20,46 @@ class LoginController extends Controller
         return view('partials.login');
     }
 
- public function login(Request $request)
+    public function login(Request $request)
     {
-        // 1. Manually validate the request for basic required fields
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ]);
+        // 1. Validate phone number with custom messages
+        $messages = [
+            'phone_number.required' => __('messages.phoneMSG'),
+            'phone_number.digits'   => __('messages.phone_number_max'),
+            'phone_number.exists'   => __('messages.phone_failed'),
+        ];
 
-        // If basic validation fails (e.g., empty email, invalid email format), return general validation errors
+        $validator = Validator::make($request->all(), [
+            'phone_number' => 'required|string|digits:9|exists:users,phone_number',
+        ], $messages);
+
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $credentials = $request->only('email', 'password');
-        $remember = $request->has('remember');
+        $phone = $request->phone_number;
 
-        // Check if the email exists in the database first
-        $user = User::where('email', $credentials['email'])->first();
+        // 2. Find the user by their phone number
+        $user = User::where('phone_number', $phone)->first();
 
-        // If user not found, send 'email' specific error
-        if (!$user) {
-            return response()->json(['errors' => ['email' => __('messages.failed_email')]], 422);
-            // For example: 'failed_email' => 'No account found with that email address.',
-        }
+        // 3. Generate a 4-digit OTP and store it in the session
+        $otp = rand(1000, 9999);
+        session([
+            'otp_user_id' => $user->id,
+            'otp_code' => $otp,
+            'otp_expires_at' => now()->addMinutes(5), // OTP is valid for 5 minutes
+        ]);
+        
+        // At this point, you would send the OTP via SMS or another service.
+        // For example:
+        // OtpService::send($phone, $otp);
 
-        // If user exists, attempt to authenticate
-        if (Auth::attempt($credentials, $remember)) {
-            $request->session()->regenerate();
-            return response()->json(['redirect' => route('home')], 200);
-        }
-
-        // If authentication fails at this point, it means the email was correct but the password was not
-        return response()->json(['errors' => ['password' => __('messages.incorrect_password')]], 422);
-        // For example: 'password' => 'The provided password is incorrect.',
+        // 4. Return the JSON response to show the OTP modal on the front end
+        return response()->json([
+            'show_otp' => true,
+            'phone' => $phone,
+        ], 200);
     }
-
 
     public function logout(Request $request)
     {

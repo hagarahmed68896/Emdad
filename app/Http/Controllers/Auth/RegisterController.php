@@ -45,7 +45,7 @@ class RegisterController extends Controller
             'account_type' => $request->account_type,
         ]);
 
-        Auth::login($user); // User is logged in on the server
+        // Auth::login($user); // User is logged in on the server
 
            // Only send redirect for supplier
     // $redirectUrl = null;

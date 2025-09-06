@@ -116,6 +116,7 @@ return [
     'phone_number' => 'رقم الهاتف',
     'phone_number_Unique' => 'رقم الهاتف مستخدم بالفعل',
     'phone_number_max' => 'رقم الهاتف يحب أن يكون 9 ارقام',
+    'phone_failed' => 'رقم الهاتف غير مسجل',
     'previous' => 'السابق',
     'privacy_policy' => 'سياسة الخصوصية',
     'profile_image' => 'إدارة صورة الملف الشخصي',
@@ -611,6 +612,7 @@ return [
     'confirm_delete_conversation' => 'تأكيد حذف المحادثة؟',
     'write_reason' => 'اكتب السبب...',
     'cannot_send_messages' =>'تم حظر هذا المستخدم ولا يمكنك إرسال رسائل له.',
+    'send_confirmation_code' => 'إرسال كود التحقق ',
  
 
 

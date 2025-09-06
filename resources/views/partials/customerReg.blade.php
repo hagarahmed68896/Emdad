@@ -4,7 +4,9 @@
 
     {{-- This div acts as the overall modal container, allowing its content (the white form) to dictate height --}}
     <div
-        class="relative w-full max-w-xl rounded-lg shadow-lg overflow-hidden flex flex-col"
+           class="relative bg-cover bg-center flex flex-col justify-center items-center p-[24px] no-repeat overflow-visible rounded-lg shadow-lg
+               w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl 
+               h-auto sm:h-auto md:h-auto mx-auto my-auto"
         style="background-image: url('{{ asset('images/4d2a165c129977b25a433b916ddfa33f089dcf9f.jpg') }}'); background-size: cover; background-position: center;">
 
         <button @click="showRegister = false"
@@ -48,7 +50,12 @@
                     this.errors = {}; // Clear previous errors
              const submitData = new FormData();
                // ✅ الحقول النصية
-            submitData.append('full_name', this.formData.full_name);
+// Decide auth_method based on account type
+    if (this.formData.account_type === 'supplier') {
+        submitData.append('auth_method', 'register_supplier');
+    } else {
+        submitData.append('auth_method', 'register');
+    }            submitData.append('full_name', this.formData.full_name);
             submitData.append('email', this.formData.email);
             submitData.append('phone_number', this.formData.phone_number);
             submitData.append('password', this.formData.password);
@@ -90,9 +97,9 @@
                     .then(response => {
                         this.loading = false;
                         if (response.data.success) {
-                            console.log('Registration successful! Setting showRegister to false and showOTP to true.');
-                            this.$dispatch('set-show-otp', true);
-                            this.$dispatch('set-show-register', false);
+        window.dispatchEvent(new CustomEvent('open-otp')); // ✅ always bubbles
+    // 🔔 tell root to switch modals
+
 
                             this.formData = {
                                 full_name: '', email: '', phone_number: '',
@@ -123,7 +130,9 @@
                         }
                     });
                 }
-            }" @set-show-otp.window="showOTP = $event.detail" @set-show-register.window="showRegister = $event.detail"
+            }" @set-show-otp.window="showOTP = $event.detail"
+             @set-show-register.window="showRegister = $event.detail"
+@open-otp.window="showOTP = true; showLogin = false; showRegister = false"             
         >
 
             <p class="text-2xl sm:text-3xl text-[#212121] font-bold">{{ __('messages.register') }}</p>
@@ -142,7 +151,7 @@
 
             {{-- customer section --}}
             <div x-show="formData.account_type === 'customer'" class="mb-4">
-                <form method="POST" action="{{ route('register') }}" x-cloak @submit.prevent="submitForm">
+                <form method="POST" action="{{ route('sendOtp') }}" x-cloak @submit.prevent="submitForm">
 
                     @csrf
                     <p class="text-xl sm:text-2xl font-bold mb-4 mt-3"> {{ __('messages.account_data') }}</p>
