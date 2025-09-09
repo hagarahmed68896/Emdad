@@ -19,6 +19,11 @@ class Offer extends Model
         'offer_end'
     ];
 
+       protected $casts = [
+        'offer_start' => 'datetime',
+        'offer_end'   => 'datetime',
+    ];
+
       protected static function booted()
     {
         static::creating(function ($offer) {

@@ -12,6 +12,7 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Session;
 use App\Models\Cart;
 use App\Models\Category;
+use App\Models\Order;
 
 use App\Models\BusinessData;
 use App\Models\Document;
@@ -28,7 +29,7 @@ class ProfileController extends Controller
 public function show(Request $request)
 {
     Paginator::useTailwind();
-
+// $user = Auth::user();
     $user = Auth::user()->load('business.documents');
     $names = preg_split('/\s+/', trim($user->full_name), -1, PREG_SPLIT_NO_EMPTY);
     $user->first_name = $names[0] ?? '';
@@ -66,7 +67,7 @@ public function show(Request $request)
     $businessData = null;
     $offers = collect();
     $favorites = collect();
-    $notificationSettings = $user->notification_settings ?? $this->getDefaultNotificationSettings();
+    $notificationSettings = $user->notification_settings ?? $this->getDefaultNotificationSettings($user);
 
     // Prepare variables for the view
     $availableSpecifications = [];
@@ -172,11 +173,24 @@ public function show(Request $request)
             ->toArray()
         : [];
 
-    $orders = Auth::user()
-    ->orders()
-    ->with(['orderItems.product.subCategory'])
-    ->latest()
-    ->get();
+      if (Auth::check()) {
+            // Check if the authenticated user is a supplier
+            if (Auth::user()->account_type === 'supplier') {
+                // Fetch orders that contain at least one product published by the supplier
+                $supplierBusinessId = Auth::user()->business->id;
+
+                $orders = Order::whereHas('orderItems.product', function ($query) use ($supplierBusinessId) {
+                    $query->where('business_data_id', $supplierBusinessId);
+                })
+                ->with(['orderItems.product.subCategory.category', 'orderItems.product.supplier'])
+                ->latest()
+                ->get();
+
+            } else {
+                // If not a supplier, fetch the customer's own orders
+                $orders = Auth::user()->orders()->with(['orderItems.product.subCategory.category'])->latest()->get();
+            }
+        }
 
     return view('profile.account', compact(
         'user',
@@ -458,48 +472,83 @@ foreach ($request->file('documents') as $key => $file) {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function updateNotifications(Request $request)
-    {
-        $user = Auth::user();
+public function updateNotifications(Request $request)
+{
+    $user = Auth::user();
 
-        try {
-            $validatedData = $request->validate([
-                'receive_in_app' => 'boolean',
-                'receive_chat' => 'boolean',
-                'order_status_updates' => 'boolean',
-                'offers_discounts' => 'boolean',
-                'viewed_products_offers' => 'boolean',
+    try {
+        // Validation based on role
+        $rules = [
+            'receive_in_app' => 'sometimes|boolean',
+            'receive_chat' => 'sometimes|boolean',
+        ];
+
+        if ($user->account_type === 'supplier') {
+            $rules = array_merge($rules, [
+                'receive_new_order' => 'sometimes|boolean',
+                'receive_new_review' => 'sometimes|boolean',
+                // 'receive_complain' => 'sometimes|boolean',
             ]);
-
-            $currentSettings = $user->notification_settings ?? $this->getDefaultNotificationSettings();
-            $newSettings = array_merge($currentSettings, $validatedData);
-
-            $user->notification_settings = $newSettings;
-            $user->save();
-
-            return response()->json(['message' => __('messages.notifications_updated_success'), 'settings' => $user->notification_settings]);
-        } catch (ValidationException $e) {
-            return response()->json(['errors' => $e->errors()], 422);
-        } catch (\Exception $e) {
-            \Log::error('Error updating notification settings: ' . $e->getMessage());
-            return response()->json(['message' => __('messages.notifications_updated_error')], 500);
+        } else {
+            $rules = array_merge($rules, [
+                'order_status_updates' => 'sometimes|boolean',
+                'offers_discounts' => 'sometimes|boolean',
+                // 'viewed_products_offers' => 'sometimes|boolean',
+            ]);
         }
-    }
 
-    /**
-     * Define default notification settings.
-     * This is useful if a user doesn't have any settings saved yet.
-     *
-     * @return array
-     */
-    protected function getDefaultNotificationSettings(): array
-    {
+        $validatedData = $request->validate($rules);
+
+        // Load current settings or role-specific defaults
+        $currentSettings = $user->notification_settings ?? $this->getDefaultNotificationSettings($user);
+
+        // Merge old settings with new ones
+        $newSettings = array_merge($currentSettings, $validatedData);
+
+        // Save back to DB
+        $user->notification_settings = $newSettings;
+        $user->save();
+
+        return response()->json([
+            'message' => __('messages.notifications_updated_success'),
+            'settings' => $user->notification_settings
+        ]);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json(['errors' => $e->errors()], 422);
+    } catch (\Exception $e) {
+        \Log::error('Error updating notification settings: ' . $e->getMessage());
+        return response()->json(['message' => __('messages.notifications_updated_error')], 500);
+    }
+}
+
+
+/**
+ * Define default notification settings.
+ * Different defaults for customer vs supplier.
+ *
+ * @param \App\Models\User $user
+ * @return array
+ */
+protected function getDefaultNotificationSettings($user): array
+{
+    if ($user->account_type === 'supplier') {
         return [
-            'receive_in_app' => false,
-            'receive_chat' => false,
-            'order_status_updates' => false,
-            'offers_discounts' => false,
-            'viewed_products_offers' => false,
+            'receive_in_app' => true,   // suppliers should see app notifications
+            'receive_chat' => true,     // important to chat with customers
+            'receive_new_order' => false,
+            'receive_new_review' => false,
+            // 'receive_complain' => false,
         ];
     }
+
+    // Default for customers
+    return [
+        'receive_in_app' => true,
+        'receive_chat' => true,
+        'order_status_updates' => false,  // customers want order updates
+        'offers_discounts' => false,      // customers want discounts
+        // 'viewed_products_offers' => false,
+    ];
+}
+
 }

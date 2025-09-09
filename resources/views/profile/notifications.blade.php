@@ -48,6 +48,8 @@
                     </label>
                 </div>
 
+            @if(auth()->user()->account_type === 'customer')
+
                 <div class="flex items-center justify-between py-2 border-b border-gray-200">
                     <label for="order_status_updates" class="text-gray-700">{{ __('messages.order_status_updates') }}</label>
                     <label class="toggle-switch">
@@ -64,13 +66,36 @@
                     </label>
                 </div>
 
-                <div class="flex items-center justify-between py-2">
+                {{-- <div class="flex items-center justify-between py-2">
                     <label for="viewed_products_offers" class="text-gray-700">{{ __('messages.viewed_products_offers') }}</label>
                     <label class="toggle-switch">
                         <input type="checkbox" id="viewed_products_offers" name="viewed_products_offers" x-model="formData.viewed_products_offers">
                         <span class="slider"></span>
                     </label>
+                </div> --}}
+            @else 
+            <div class="flex items-center justify-between py-2 border-b border-gray-200">
+                    <label for="receive_new_order" class="text-gray-700">{{ __('messages.receive_new_order') }}</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="receive_new_order" name="receive_new_order" x-model="formData.receive_new_order">
+                        <span class="slider"></span>
+                    </label>
                 </div>
+                <div class="flex items-center justify-between py-2 border-b border-gray-200">
+                    <label for="receive_new_review" class="text-gray-700">{{ __('messages.receive_new_review') }}</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="receive_new_review" name="receive_new_review" x-model="formData.receive_new_review">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                {{-- <div class="flex items-center justify-between py-2 border-b border-gray-200">
+                    <label for="receive_complain" class="text-gray-700">{{ __('messages.receive_complain') }}</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="receive_complain" name="receive_complain" x-model="formData.receive_complain">
+                        <span class="slider"></span>
+                    </label>
+                </div> --}}
+                @endif
             </div>
             
             <div class="flex justify-start gap-4 mt-8">

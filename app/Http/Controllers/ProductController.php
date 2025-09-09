@@ -299,6 +299,31 @@ public function offers()
         return view('categories.product_details', compact('product', 'category', 'subCategory', 'productName','relatedProducts'));
     }
 
+    public function show_notify(Product $product)
+{
+    // Eager load category + subcategory
+    $product->load('subCategory.category');
+
+    $category = $product->subCategory->category ?? null;
+    $subCategory = $product->subCategory ?? null;
+    $productName = $product->name;
+
+    $relatedProducts = Product::where('sub_category_id', $product->sub_category_id)
+        ->where('business_data_id', $product->supplier->id)
+        ->where('id', '!=', $product->id)
+        ->inRandomOrder()
+        ->paginate(4);
+
+    return view('categories.product_details', compact(
+        'product',
+        'category',
+        'subCategory',
+        'productName',
+        'relatedProducts'
+    ));
+}
+
+
     /**
      * Display a listing of featured products.
      *

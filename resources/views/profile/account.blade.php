@@ -152,7 +152,7 @@
                                 {{ __('messages.MyAccount') }}
                             </a>
                         </li>
-                             @if (!Auth::check() || Auth::user()->account_type !== 'supplier')
+                             {{-- @if (!Auth::check() || Auth::user()->account_type !== 'supplier') --}}
 
                                   <li>
                                                        <a href="{{ route('profile.show', ['section' => 'myOrders']) }}" id="myOrdersLink" class="flex items-center p-3 text-lg rounded-lg transition-colors duration-200 {{ $section === 'myOrders' ? 'text-white bg-[#185D31]' : 'text-gray-700 hover:text-white hover:bg-[#185D31]' }}">
@@ -161,10 +161,27 @@
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                                 </svg>
+                                @if (!Auth::check() || Auth::user()->account_type !== 'supplier')
                                 {{ __('messages.MyOrders') }}
+                                @else
+                                {{__('messages.orders')}}
+                                @endif
                             </a>
                         </li>
-                        @endif
+                        {{-- @endif --}}
+                                           {{-- @if (!Auth::check() || Auth::user()->account_type === 'supplier')
+
+                                  <li>
+                                                       <a href="{{ route('profile.show', ['section' => 'myOrders']) }}" id="myOrdersLink" class="flex items-center p-3 text-lg rounded-lg transition-colors duration-200 {{ $section === 'myOrders' ? 'text-white bg-[#185D31]' : 'text-gray-700 hover:text-white hover:bg-[#185D31]' }}">
+<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-3" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                                </svg>
+                                {{ __('messages.orders') }}
+                            </a>
+                        </li>
+                        @endif --}}
                              @if (!Auth::check() || Auth::user()->account_type == 'supplier')
 
                         <li>
@@ -178,7 +195,7 @@
                             </a>
                         </li>
                         @endif
-                        <li>
+                        {{-- <li>
                             <a href="#" id="messagesLink"
                                 class="flex items-center p-3 text-lg text-gray-700 rounded-lg  hover:text-white hover:bg-[#185D31] transition-colors duration-200">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-3" fill="none"
@@ -188,7 +205,7 @@
                                 </svg>
                                 {{ __('messages.messages') }}
                             </a>
-                        </li>
+                        </li> --}}
                              @if (!Auth::check() || Auth::user()->account_type !== 'supplier')
 
                         <li>
@@ -254,9 +271,13 @@
 
 
 {{--my orders section--}}
-     @if (!Auth::check() || Auth::user()->account_type === 'customer')
+     {{-- @if (!Auth::check() || Auth::user()->account_type === 'customer') --}}
         @include('profile.orderSection', ['section' => $section])
-        @endif
+        {{-- @endif --}}
+
+    {{-- @if (!Auth::check() || Auth::user()->account_type === 'supplier')
+        @include('profile.supplierOrderSection', ['section' => $section])
+    @endif --}}
 
                 {{-- Notifications Section (New!) --}}
 @include('profile.notifications', ['section' => $section])
@@ -795,7 +816,10 @@ window.accountDetailsForm = accountDetailsForm;
                 receive_chat: initialSettings.receive_chat || false,
                 order_status_updates: initialSettings.order_status_updates || false,
                 offers_discounts: initialSettings.offers_discounts || false,
-                viewed_products_offers: initialSettings.viewed_products_offers || false,
+                // viewed_products_offers: initialSettings.viewed_products_offers || false,
+                receive_new_orders: initialSettings.receive_new_orders || false,
+                receive_new_review: initialSettings.receive_new_review || false,
+                // receive_complain: initialSettings.receive_complain || false,
             },
             success: '',
             errors: {},

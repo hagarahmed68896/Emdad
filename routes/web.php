@@ -95,6 +95,8 @@ Route::middleware('web')->group(function () {
                Route::get('/order', [OrderController::class, 'index'])->name('order.index');
                Route::get('/order/{order}', [OrderController::class, 'show'])->name('order.show');
                Route::delete('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+               Route::put('/orders/{order}/update-status', [OrderController::class, 'updateStatus'])
+                ->name('orders.update-status');
 
              Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
              Route::get('/messages/{conversation}', [MessageController::class, 'show'])->name('messages.show');
@@ -311,6 +313,9 @@ Route::post('/verify-otp', [OtpController::class, 'verifyOtp'])->name('verifyOtp
           Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
           Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
           Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+          Route::get('/notifications/all', [NotificationController::class, 'getAll'])
+          ->name('notifications.all');
+
 
           Route::post('/reviews/{review}/like', [ReviewController::class, 'toggleLike'])->name('reviews.like');
           Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
@@ -346,6 +351,8 @@ Route::post('/verify-otp', [OtpController::class, 'verifyOtp'])->name('verifyOtp
      Route::get('/offers', [ProductController::class, 'offers'])->name('offers.index');
      Route::get('/products/featured', [ProductController::class, 'showFeaturedProducts'])->name('products.featured');
      Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
+    Route::get('/products/{product}', [ProductController::class, 'show_notify'])->name('product.show');
+
      Route::get('/categories/{slug}', [CategoryController::class, 'filterByCategory'])->name('categories.show');
      Route::get('/sub_categories/{slug}', [CategoryController::class, 'userSubCategoriesWithProducts'])->name('sub_categories.show');
      // Route::get('/products/suggestions', [ProductSuggestionController::class, 'getSuggestions']);

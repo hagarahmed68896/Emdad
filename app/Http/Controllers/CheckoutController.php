@@ -37,25 +37,22 @@ class CheckoutController extends Controller
         }
 
         $validated = $request->validate($rules);
-        $paymentStatus = 'success';
-
-        if ($paymentStatus !== 'success') {
-            return response()->json(['success' => false, 'message' => 'فشل في معالجة الدفع.'], 400);
-        }
-
         $user = Auth::user();
         $userId = $user->id;
 
         $cart = Cart::where('user_id', $userId)->first();
 
         if (!$cart || $cart->items->isEmpty()) {
-            return response()->json(['success' => false, 'message' => 'السلة فارغة، لا يمكن إتمام الطلب.'], 400);
+            return response()->json([
+                'success' => false, 
+                'message' => 'السلة فارغة، لا يمكن إتمام الطلب.'
+            ], 400);
         }
 
         DB::beginTransaction();
 
-        // try {
-            // Step 1: Create a new Order record with a zero total
+        try {
+            // Step 1: Create a new Order with temporary total
             $order = Order::create([
                 'user_id' => $userId,
                 'first_name' => $validated['first_name'] ?? $user->first_name,
@@ -63,50 +60,69 @@ class CheckoutController extends Controller
                 'phone_number' => $validated['phone'] ?? $user->phone, 
                 'email' => $validated['email'] ?? $user->email,
                 'address' => $validated['address'] ?? $user->address,
-                'total_amount' => 0, // Set to 0 temporarily
+                'total_amount' => 0,
                 'payment_way' => $validated['payment_method'],
-                'status' => 'processing', 
+                'status' => 'processing',
             ]);
 
-            // Step 2: Loop through the CartItem records and create the OrderItem records
+            // **Set order_number immediately**
+            $order->order_number = str_pad($order->id, 6, '0', STR_PAD_LEFT);
+            $order->save();
+
+            // Step 2: Add OrderItems
             foreach ($cart->items as $cartItem) {
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $cartItem->product_id,
                     'product_name' => $cartItem->product->name,
                     'quantity' => $cartItem->quantity,
-                    'unit_price' => $cartItem->price_at_addition, 
+                    'unit_price' => $cartItem->price_at_addition,
                 ]);
             }
-            
-            // Step 3: Recalculate and update the final total
-            $finalTotal = OrderItem::where('order_id', $order->id)->sum(DB::raw('quantity * unit_price'));
-            
-            // Step 4: Update the order with the final total
+
+            // Step 3: Recalculate total amount
+            $finalTotal = OrderItem::where('order_id', $order->id)
+                ->sum(DB::raw('quantity * unit_price'));
             $order->total_amount = $finalTotal;
             $order->save();
 
-            // Delete the Cart and its associated CartItems
+            // Step 4: Notify suppliers after order_number & total_amount are set
+            $order->load('orderItems.product.supplier.user'); // preload relations
+
+            foreach ($order->orderItems as $orderItem) {
+                $product = $orderItem->product;
+
+                if ($product->supplier && $product->supplier->user) {
+                    $supplier = $product->supplier->user;
+                    $settings = $supplier->notification_settings ?? [];
+
+                    if (
+                        ($settings['receive_in_app'] ?? false) &&
+                        ($settings['receive_new_order'] ?? false)
+                    ) {
+                        $supplier->notify(new \App\Notifications\NewOrderNotification($order));
+                    }
+                }
+            }
+
+            // Step 5: Clear the cart
             $cart->items()->delete();
             $cart->delete();
 
             DB::commit();
 
-            // Return a JSON response with the order data
-            $order->load('orderItems'); // Make sure the orderItems relationship is defined on your Order model
-return redirect()->route('cart.index', [
-    'step' => 3,
-    'order_id' => $order->id
-]);
+            return redirect()->route('cart.index', [
+                'step' => 3,
+                'order_id' => $order->id
+            ]);
 
-
-        // } catch (\Exception $e) {
-        //     DB::rollBack();
-        //     return response()->json([
-        //         'success' => false, 
-        //         'message' => 'An error occurred during checkout. Please try again.', 
-        //         'error' => $e->getMessage()
-        //     ], 500);
-        // }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء إتمام الطلب، يرجى المحاولة مرة أخرى.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

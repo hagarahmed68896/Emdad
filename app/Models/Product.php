@@ -53,6 +53,12 @@ class Product extends Model
         'offer_end' => 'date',
     ];
 
+public function getRouteKeyName()
+{
+    return 'slug';
+}
+
+
     public function subCategory()
     {
         return $this->belongsTo(SubCategory::class, 'sub_category_id');
@@ -77,4 +83,12 @@ class Product extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+
+    public function favorites()
+{
+    return $this->hasMany(\App\Models\Favorite::class, 'product_id');
+}
+
+
+    
 }

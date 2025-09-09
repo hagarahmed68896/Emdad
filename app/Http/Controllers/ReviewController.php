@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Review;
 use Illuminate\Support\Facades\Auth;
+use App\Notifications\NewReviewNotification;
+use App\Models\Product;
+
 
 class ReviewController extends Controller
 {
@@ -44,21 +47,34 @@ public function store(Request $request)
         'comment' => 'nullable|string|max:1000',
     ]);
 
-    $review = new \App\Models\Review();
-    $review->product_id = $request->product_id;
     $user = Auth::user();
     if (!$user) {
         return response()->json(['message' => 'Unauthorized'], 401);
     }
-    $review->user_id = $user->id;
-    $review->user_id = $user->id;
 
-    $review->rating = $request->rating;
-    $review->comment = $request->comment;
-    $review->save();
+    $review = \App\Models\Review::create([
+        'product_id' => $request->product_id,
+        'user_id' => $user->id,
+        'rating' => $request->rating,
+        'comment' => $request->comment,
+    ]);
+
+    $product = \App\Models\Product::with('supplier.user')->findOrFail($request->product_id);
+
+    if ($product->supplier && $product->supplier->user) {
+        $supplier = $product->supplier->user;
+
+        $settings = $supplier->notification_settings ?? [];
+
+        if (($settings['receive_in_app'] ?? true) &&
+            ($settings['receive_new_review'] ?? true)) {
+            $supplier->notify(new \App\Notifications\NewReviewNotification($review));
+        }
+    }
 
     return response()->json(['success' => true]);
 }
+
 
 public function edit(Review $review)
 {

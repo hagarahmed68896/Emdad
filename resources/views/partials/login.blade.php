@@ -131,7 +131,7 @@ bussnissdata: false,
         </span>
     </button>
 
-    <div class="flex items-center justify-center my-4">
+    {{-- <div class="flex items-center justify-center my-4">
         <hr class="flex-grow border-gray-400">
         <span class="text-sm text-gray-500 font-medium mx-4">{{ __('messages.or') }}</span>
         <hr class="flex-grow border-gray-400">
@@ -148,7 +148,7 @@ bussnissdata: false,
             <img src="{{ asset('images/Facebook.svg') }}" class="mr-2" alt="">
             <span class="text-[#212121] text-base">{{ __('messages.login_with_facebook') }}</span>
         </a>
-    </div>
+    </div> --}}
 
     <div class="text-center mt-4">
         <p class="text-sm text-[#212121]">

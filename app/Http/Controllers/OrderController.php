@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
-
+use App\Notifications\OrderStatusUpdatedNotification;
 class OrderController extends Controller
 {
     /**
@@ -16,6 +16,52 @@ class OrderController extends Controller
                 $orders = Auth::user()->orders()->with('orderItems.product.subCategory.category')->get();
         return view('partials.order_tracking', compact('orders'));
     }
+
+
+public function updateStatus(Request $request, Order $order)
+{
+    // Ensure the user is a supplier
+    if (Auth::user()->account_type !== 'supplier') {
+        abort(403, 'Unauthorized action.');
+    }
+
+    // Get the supplier's business
+    $business = Auth::user()->business;
+    if (!$business) {
+        abort(403, 'You are not a registered supplier.');
+    }
+
+    // Get all products for this supplier
+    $supplierProductIds = $business->products()->pluck('id')->toArray();
+    $orderProductIds = $order->orderItems->pluck('product_id')->toArray();
+
+    // Check if this order contains any of the supplier's products
+    if (!array_intersect($supplierProductIds, $orderProductIds)) {
+        abort(403, 'You cannot update this order.');
+    }
+
+    // Validate status
+    $request->validate([
+        'status' => 'required|in:processing,shipped,delivered',
+    ]);
+
+    // Update order status
+    $order->status = $request->input('status');
+    $order->save();
+
+    // Notify the customer
+    $customer = $order->user;
+    $settings = $customer->notification_settings ?? [];
+
+    if (
+        isset($settings['receive_in_app']) && $settings['receive_in_app'] &&
+        isset($settings['order_status_updates']) && $settings['order_status_updates']
+    ) {
+        $customer->notify(new \App\Notifications\OrderStatusUpdatedNotification($order));
+    }
+
+    return back()->with('success', 'Order status updated successfully.');
+}
 
 //     public function cancel(Order $order)
 // {

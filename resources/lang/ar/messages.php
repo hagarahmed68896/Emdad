@@ -613,6 +613,14 @@ return [
     'write_reason' => 'اكتب السبب...',
     'cannot_send_messages' =>'تم حظر هذا المستخدم ولا يمكنك إرسال رسائل له.',
     'send_confirmation_code' => 'إرسال كود التحقق ',
+    'receive_new_order' => 'استلام طلبات جديدة',
+    'receive_new_review' => 'استلام تقييمات جديدة',
+    'receive_complain' => 'استلام شكاوي العملاء',
+    'report_type' => 'نوع البلاغ',
+    'orders' => 'الطلبات',
+    'mark_as_processing' => 'تم التحضير',
+    'mark_as_shipped' => 'تم الشحن',
+    'mark_as_delivered' => ' تم التوصيل'
  
 
 

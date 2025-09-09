@@ -28,8 +28,9 @@ class OfferController extends Controller
     // Store new offer
 public function store(Request $request)
 {
+    // Validate input
     $validated = $request->validate([
-        'name'       => 'required|string|max:255',
+        'name'             => 'required|string|max:255',
         'product_id'       => 'required|exists:products,id',
         'image'            => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         'offer_start'      => 'required|date',
@@ -39,8 +40,9 @@ public function store(Request $request)
         'product_status'   => 'nullable|string'
     ]);
 
+    // Create offer
     $offer = new Offer();
-    $offer->name       = $validated['name'];
+    $offer->name             = $validated['name'];
     $offer->product_id       = $validated['product_id'];
     $offer->offer_start      = $validated['offer_start'];
     $offer->offer_end        = $validated['offer_end'];
@@ -53,14 +55,31 @@ public function store(Request $request)
     }
 
     $offer->save();
-    if ($offer->product) {
+
+    // Update product status if provided
+    if ($offer->product && isset($validated['product_status'])) {
         $offer->product->update([
             'product_status' => $validated['product_status']
         ]);
-    
     }
-        return response()->json(['success' => 'تم اضافة العرض بنجاح']);
+
+    // Notify customers who favorited this product
+    $favoritedUsers = $offer->product->favorites()->with('user')->get()->pluck('user');
+
+    foreach ($favoritedUsers as $customer) {
+        $settings = $customer->notification_settings ?? [];
+
+        if (
+            isset($settings['receive_in_app'] ) &&  $settings['receive_in_app'] &&
+            isset($settings['offers_discounts']) && $settings['offers_discounts']
+        ) {
+            $customer->notify(new \App\Notifications\NewOfferNotification($offer));
+        }
+    }
+
+    return response()->json(['success' => 'تم اضافة العرض بنجاح']);
 }
+
 
 
     // Show edit form

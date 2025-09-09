@@ -632,7 +632,14 @@ return [
     'write_reason' => 'Write reason...',
     'cannot_send_messages' => 'You cannot send messages to this user.',
     'send_confirmation_code' => 'Send Confirmation Code',
-
+    'receive_new_order' => 'Receive notifications for new orders',
+    'receive_new_review' => 'Receive notifications for new reviews',
+    'receive_complain' => 'Receive notifications for complaints',
+    'report_type' => 'Report type',
+    'orders' => 'Orders',
+    'mark_as_processing' => 'Processed',
+    'mark_as_shipped' => 'Shipped',
+    'mark_as_delivered' => 'Delivered',
 
 
 
