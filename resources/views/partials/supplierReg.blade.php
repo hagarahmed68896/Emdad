@@ -1,5 +1,5 @@
 {{-- supplier section --}}
-<template x-if="userType === 'supplier'">
+<div x-show="formData.account_type === 'supplier'">
     <form method="POST" action="{{ route('sendOtp') }}" x-show="userType === 'supplier'"
         enctype="multipart/form-data"
         @submit.prevent="submitForm" {{-- Prevent default form submission and call Alpine's submitForm --}}
@@ -470,4 +470,4 @@
             </button>
         </div>
     </form>
-</template>
+</div>

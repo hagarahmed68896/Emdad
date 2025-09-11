@@ -53,10 +53,10 @@ class Product extends Model
         'offer_end' => 'date',
     ];
 
-public function getRouteKeyName()
-{
-    return 'slug';
-}
+// public function getRouteKeyName()
+// {
+//     return 'slug';
+// }
 
 
     public function subCategory()

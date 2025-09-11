@@ -49,6 +49,14 @@
                                 {{ __('messages.MyAccount') }}
                             </a>
                         </li>
+
+                           <li>
+                            <a class="dropdown-item block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"
+                                href="{{ route('profile.show', parameters: ['section' => 'bankAccountSection']) }}#bankAccountSection">
+                                {{ __('messages.bankAccount') }}
+                            </a>
+                        </li>
+
                         <li>
                           
                             <a class="dropdown-item block text-gray-700 hover:bg-gray-100 px-3 py-2 rounded"

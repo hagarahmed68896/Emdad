@@ -83,7 +83,20 @@ public function index(Request $request)
         $openConversationId = $conversation->id;
     }
 
-    return view('messages.index', compact('conversations', 'quickReplies', 'openConversationId'));
+     $unreadMessageCount = 0;
+    if (Auth::check()) {
+        $unreadMessageCount = Message::whereHas('conversation', function ($query) {
+            $query->where('user_id', Auth::id())
+                ->orWhereHas('product.supplier', function ($query) {
+                    $query->where('user_id', Auth::id());
+                });
+        })
+        ->where('sender_id', '!=', Auth::id())
+        ->where('is_read', false)
+        ->count();
+    }
+
+    return view('messages.index', compact('conversations', 'quickReplies', 'openConversationId','unreadMessageCount'));
 }
 
 

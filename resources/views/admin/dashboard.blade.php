@@ -3,107 +3,121 @@
 @section('page_title', 'لوحة التحكم')
 
 @section('content')
-    @include('admin.total_numbers')
+<main class="flex-1 overflow-x-hidden overflow-y-auto p-4 space-y-6">
 
-<div class="container-fluid">
-    <div class="row">
-
-        {{-- إجمالي المستخدمين --}}
-        <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h6 class="card-title">إجمالي المستخدمين</h6>
-                    <canvas id="usersChart"></canvas>
-                </div>
+    <!-- Metrics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Total Users -->
+        <div class="bg-white rounded-xl shadow p-6 flex items-center justify-between">
+            <div>
+                <p class="text-3xl font-bold text-gray-800">{{ $totalUsers }}</p>
+                <p class="text-gray-500 text-sm">إجمالي المستخدمين</p>
             </div>
+            <i class="fas fa-users text-4xl text-[#185D31] opacity-20"></i>
         </div>
 
-        {{-- ملخص الطلبات والإيرادات --}}
-        <div class="col-md-6 col-lg-8 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h6 class="card-title">ملخص الطلبات والإيرادات</h6>
-                    <canvas id="ordersRevenueChart"></canvas>
-                </div>
+        <!-- Total Customers -->
+        <div class="bg-white rounded-xl shadow p-6 flex items-center justify-between">
+            <div>
+                <p class="text-3xl font-bold text-gray-800">{{ $totalCustomers }}</p>
+                <p class="text-gray-500 text-sm">عدد العملاء</p>
             </div>
+            <i class="fas fa-user-friends text-4xl text-[#185D31] opacity-20"></i>
         </div>
 
-        {{-- إجمالي المنتجات حسب الفئات --}}
-        <div class="col-md-6 col-lg-6 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h6 class="card-title">إجمالي المنتجات حسب الفئات</h6>
-                    <canvas id="categoriesChart"></canvas>
-                </div>
+        <!-- Total Suppliers -->
+        <div class="bg-white rounded-xl shadow p-6 flex items-center justify-between">
+            <div>
+                <p class="text-3xl font-bold text-gray-800">{{ $totalSuppliers }}</p>
+                <p class="text-gray-500 text-sm">عدد الموردين</p>
             </div>
+            <i class="fas fa-store text-4xl text-[#185D31] opacity-20"></i>
         </div>
 
-        {{-- إجمالي الطلبات --}}
-        <div class="col-md-6 col-lg-6 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h6 class="card-title">إجمالي الطلبات</h6>
-                    <canvas id="ordersPieChart"></canvas>
-                </div>
+        <!-- Total Documents -->
+        <div class="bg-white rounded-xl shadow p-6 flex items-center justify-between">
+            <div>
+                <p class="text-3xl font-bold text-gray-800">{{ $totalDocuments }}</p>
+                <p class="text-gray-500 text-sm">عدد الوثائق</p>
             </div>
+            <i class="fas fa-file-alt text-4xl text-[#185D31] opacity-20"></i>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Users Chart -->
+        <div class="bg-white rounded-xl shadow p-6">
+            <h6 class="font-semibold mb-2">إجمالي المستخدمين</h6>
+            <canvas id="usersChart" class="w-full h-64"></canvas>
         </div>
 
-        {{-- أعلى المنتجات مبيعاً --}}
-        <div class="col-md-12 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h6 class="card-title mb-3">📊 أعلى المنتجات مبيعاً</h6>
+        <!-- Orders & Revenue Chart -->
+        <div class="bg-white rounded-xl shadow p-6">
+            <h6 class="font-semibold mb-2">ملخص الطلبات والإيرادات</h6>
+            <canvas id="ordersRevenueChart" class="w-full h-64"></canvas>
+        </div>
+<div>
+        <!-- Products by Category -->
+        <div class="bg-white rounded-xl shadow p-6">
+            <h6 class="font-semibold mb-2">إجمالي المنتجات حسب الفئات</h6>
+            <canvas id="categoriesChart" class="w-full h-64"></canvas>
+        </div>
+            <!-- Top Products -->
+    <div class="bg-white rounded-xl shadow p-6 mt-1">
+        <h6 class="font-semibold mb-4">📊 أعلى المنتجات مبيعاً</h6>
 
-                    {{-- Toggle buttons --}}
-                    <div class="flex gap-3 mb-4">
-                        <button id="showOrders" class="px-4 py-2 rounded bg-blue-500 text-white">الطلبات</button>
-                        <button id="showRevenue" class="px-4 py-2 rounded bg-gray-200 text-gray-700">الإيرادات</button>
-                    </div>
-
-                    <canvas id="topProductsChart" height="120"></canvas>
-                </div>
-            </div>
+        <div class="flex gap-3 mb-4">
+            <button id="showOrders" class="px-4 py-2 rounded bg-blue-500 text-white">الطلبات</button>
+            <button id="showRevenue" class="px-4 py-2 rounded bg-gray-200 text-gray-700">الإيرادات</button>
         </div>
 
-        {{-- أحدث المعاملات --}}
-        <div class="col-md-12 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h6 class="card-title">أحدث المعاملات</h6>
-                    <table class="table table-bordered text-center">
-                        <thead>
-                            <tr>
-                                <th>المستخدم</th>
-                                <th>التفاصيل</th>
-                                <th>القيمة</th>
-                                <th>طريقة الدفع</th>
-                                <th>التاريخ</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($latestOrders as $order)
-                                <tr>
-                                    <td>{{ $order->user->name ?? '---' }}</td>
-                                    <td>{{ $order->details ?? '---' }}</td>
-                                    <td>{{ $order->total_amount }}</td>
-                                    <td>{{ $order->payment_method }}</td>
-                                    <td>{{ $order->created_at->format('d M Y') }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
+        <canvas id="topProductsChart" class="w-full h-64"></canvas>
     </div>
 </div>
-@endsection
+        <!-- Orders Pie Chart -->
+        <div class="bg-white rounded-xl shadow p-6">
+            <h6 class="font-semibold mb-2">إجمالي الطلبات</h6>
+            <canvas id="ordersPieChart" class="w-full h-64"></canvas>
+        </div>
+    </div>
 
-@section('scripts')
+
+
+    <!-- Latest Orders Table -->
+    <div class="bg-white rounded-xl shadow p-6 overflow-x-auto">
+        <h6 class="font-semibold mb-4">أحدث المعاملات</h6>
+        <table class="min-w-full table-auto text-center border-collapse border border-gray-200">
+            <thead>
+                <tr class="bg-gray-100">
+                    <th class="border px-4 py-2">المستخدم</th>
+                    <th class="border px-4 py-2">التفاصيل</th>
+                    <th class="border px-4 py-2">القيمة</th>
+                    <th class="border px-4 py-2">طريقة الدفع</th>
+                    <th class="border px-4 py-2">التاريخ</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($latestOrders as $order)
+                    <tr class="hover:bg-gray-50">
+                        <td class="border px-4 py-2">{{ $order->user->full_name ?? '---' }}</td>
+                        <td class="border px-4 py-2">{{ $order->status ?? '---' }}</td>
+                        <td class="border px-4 py-2">{{ $order->total_amount }}</td>
+                        <td class="border px-4 py-2">{{ $order->payment_way }}</td>
+                        <td class="border px-4 py-2">{{ $order->created_at->format('d M Y') }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+
+</main>
+
+<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // 📊 المستخدمين لكل أسبوع
+document.addEventListener('DOMContentLoaded', function () {
+    // Users Chart
     new Chart(document.getElementById('usersChart'), {
         type: 'line',
         data: {
@@ -111,12 +125,15 @@
             datasets: [{
                 label: 'المستخدمين',
                 data: {!! json_encode($usersPerWeek->values()) !!},
-                borderColor: 'green'
+                borderColor: 'green',
+                fill: false,
+                tension: 0.4
             }]
-        }
+        },
+        options: { responsive: true }
     });
 
-    // 📊 الطلبات والإيرادات
+    // Orders & Revenue Chart
     new Chart(document.getElementById('ordersRevenueChart'), {
         type: 'line',
         data: {
@@ -125,31 +142,47 @@
                 {
                     label: 'الطلبات',
                     data: {!! json_encode($ordersRevenue->pluck('orders')) !!},
-                    borderColor: 'blue'
+                    borderColor: 'blue',
+                    fill: false,
+                    tension: 0.4
                 },
                 {
                     label: 'الإيرادات',
                     data: {!! json_encode($ordersRevenue->pluck('revenue')) !!},
-                    borderColor: 'green'
+                    borderColor: 'green',
+                    fill: false,
+                    tension: 0.4
                 }
             ]
-        }
+        },
+        options: { responsive: true }
     });
 
-    // 📊 المنتجات حسب الفئات
+    // Products by Category
+ 
+    // Products by Category
     new Chart(document.getElementById('categoriesChart'), {
         type: 'bar',
         data: {
+            // These methods now correctly grab the keys (names) and values (counts)
             labels: {!! json_encode($productsByCategory->keys()) !!},
             datasets: [{
                 label: 'عدد المنتجات',
                 data: {!! json_encode($productsByCategory->values()) !!},
                 backgroundColor: 'green'
             }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
         }
     });
 
-    // 📊 الطلبات حسب الحالة
+    // Orders Pie Chart
     new Chart(document.getElementById('ordersPieChart'), {
         type: 'pie',
         data: {
@@ -158,64 +191,60 @@
                 data: {!! json_encode($ordersByStatus->values()) !!},
                 backgroundColor: ['green','orange','red','gray']
             }]
-        }
+        },
+        options: { responsive: true }
     });
 
-    // 📊 أعلى المنتجات (Toggle Orders/Revenue)
+    // Top Products Chart
     const topProducts = @json($topProducts);
     const ctx = document.getElementById('topProductsChart').getContext('2d');
-
-    let chartData = {
-        labels: topProducts.map(p => p.name),
-        datasets: [{
-            label: 'الطلبات',
-            data: topProducts.map(p => p.order_items_count),
-            backgroundColor: [
-                'rgba(59, 130, 246, 0.7)',
-                'rgba(16, 185, 129, 0.7)',
-                'rgba(245, 158, 11, 0.7)',
-                'rgba(239, 68, 68, 0.7)',
-                'rgba(139, 92, 246, 0.7)',
-            ],
-            borderRadius: 8,
-        }]
-    };
-
     const topProductsChart = new Chart(ctx, {
         type: 'bar',
-        data: chartData,
-        options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true } }
-        }
+        data: {
+            labels: topProducts.map(p => p.name),
+            datasets: [{
+                label: 'الطلبات',
+                data: topProducts.map(p => p.order_items_count),
+                backgroundColor: [
+                    'rgba(59, 130, 246, 0.7)',
+                    'rgba(16, 185, 129, 0.7)',
+                    'rgba(245, 158, 11, 0.7)',
+                    'rgba(239, 68, 68, 0.7)',
+                    'rgba(139, 92, 246, 0.7)'
+                ],
+                borderRadius: 8
+            }]
+        },
+        options: { responsive: true }
     });
 
-    // Toggle buttons
-    const btnOrders = document.getElementById('showOrders');
-    const btnRevenue = document.getElementById('showRevenue');
-
-    function setActive(button) {
-        [btnOrders, btnRevenue].forEach(b => {
-            b.classList.remove('bg-blue-500','text-white');
-            b.classList.add('bg-gray-200','text-gray-700');
-        });
-        button.classList.remove('bg-gray-200','text-gray-700');
-        button.classList.add('bg-blue-500','text-white');
-    }
-
-    btnOrders.addEventListener('click', () => {
-        setActive(btnOrders);
+    // Toggle Orders/Revenue
+    document.getElementById('showOrders').addEventListener('click', () => {
         topProductsChart.data.datasets[0].label = 'الطلبات';
         topProductsChart.data.datasets[0].data = topProducts.map(p => p.order_items_count);
         topProductsChart.update();
+        toggleActive('showOrders');
     });
-
-    btnRevenue.addEventListener('click', () => {
-        setActive(btnRevenue);
+    document.getElementById('showRevenue').addEventListener('click', () => {
         topProductsChart.data.datasets[0].label = 'الإيرادات';
         topProductsChart.data.datasets[0].data = topProducts.map(p => p.price * p.order_items_count);
         topProductsChart.update();
+        toggleActive('showRevenue');
     });
+
+    function toggleActive(activeId) {
+        const btns = ['showOrders','showRevenue'];
+        btns.forEach(id => {
+            const btn = document.getElementById(id);
+            if(id === activeId){
+                btn.classList.remove('bg-gray-200','text-gray-700');
+                btn.classList.add('bg-blue-500','text-white');
+            } else {
+                btn.classList.remove('bg-blue-500','text-white');
+                btn.classList.add('bg-gray-200','text-gray-700');
+            }
+        });
+    }
+});
 </script>
 @endsection

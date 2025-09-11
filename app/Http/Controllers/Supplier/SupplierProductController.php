@@ -165,6 +165,8 @@ $data['colors'] = $colors;
 
         $data['min_order_quantity'] = $data['min_order_quantity'] ?? 1;
 
+        $data['is_feature'] = true;
+
         $product = Product::create($data);
 
         // ✅ Offer

@@ -168,21 +168,18 @@
                                 @endif
                             </a>
                         </li>
-                        {{-- @endif --}}
-                                           {{-- @if (!Auth::check() || Auth::user()->account_type === 'supplier')
 
-                                  <li>
-                                                       <a href="{{ route('profile.show', ['section' => 'myOrders']) }}" id="myOrdersLink" class="flex items-center p-3 text-lg rounded-lg transition-colors duration-200 {{ $section === 'myOrders' ? 'text-white bg-[#185D31]' : 'text-gray-700 hover:text-white hover:bg-[#185D31]' }}">
+                             @if (!Auth::check() || Auth::user()->account_type == 'supplier')
+         <li>
+                                                        <a href="{{ route('profile.show', ['section' => 'bankAccount']) }}" id="bankAccountLink" class="flex items-center p-3 text-lg rounded-lg transition-colors duration-200 {{ $section === 'bankAccount' ? 'text-white bg-[#185D31]' : 'text-gray-700 hover:text-white hover:bg-[#185D31]' }}">
 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-3" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                                 </svg>
-                                {{ __('messages.orders') }}
+                                {{ __('messages.bankAccount') }}
                             </a>
                         </li>
-                        @endif --}}
-                             @if (!Auth::check() || Auth::user()->account_type == 'supplier')
 
                         <li>
                                                         <a href="{{ route('profile.show', ['section' => 'myProducts']) }}" id="myProductsLink" class="flex items-center p-3 text-lg rounded-lg transition-colors duration-200 {{ $section === 'myProducts' ? 'text-white bg-[#185D31]' : 'text-gray-700 hover:text-white hover:bg-[#185D31]' }}">
@@ -258,6 +255,7 @@
     @include('profile.accountSection', ['section' => $section])
 
      @if (!Auth::check() || Auth::user()->account_type == 'supplier')
+       @include('profile.bankAccountSection', ['section' => $section])
         @include('profile.productSection', ['section' => $section])
      @endif
 
@@ -366,6 +364,8 @@
             'notificationsSection': document.getElementById('notificationsSection'),
             'myProductsSection': document.getElementById('myProductsSection'),
             'myOrdersSection': document.getElementById('myOrdersSection'),
+            'bankAccountSection': document.getElementById('bankAccountSection'),
+
         };
 
         const navLinks = {
@@ -375,6 +375,7 @@
             'myProductsLink': document.getElementById('myProductsLink'),
             'myOrdersLink': document.getElementById('myOrdersLink'),
             'messagesLink': document.getElementById('messagesLink'),
+            'bankAccountLink': document.getElementById('bankAccountLink')
         };
         
         const mainContentTitle = document.getElementById('mainContentTitle');
@@ -389,6 +390,7 @@
             myProducts: "{{__('messages.myProducts')}}",
             MyOrders: "{{ __('messages.MyOrders') }}",
             messages: "{{ __('messages.messages') }}",
+            bankAccount: "{{__('messages.bankAccount')}}"
         };
 
         // Function to manage active link styling
@@ -436,7 +438,8 @@
             'notificationsLink': { section: 'notificationsSection', title: 'settings_notifications' },
             'myProductsLink': { section: 'myProductsSection', title: 'myProducts' },
             'myOrdersLink': { section: 'myOrdersSection', title: 'MyOrders' },
-            'messagesLink': { section: 'messagesSection', title: 'messages' }, // Added messages
+            'messagesLink': { section: 'messagesSection', title: 'messages' }, 
+            'bankAccountLink': {section: 'bankAccountSection', title: 'bankAccount'}
         };
         
         // Determine initial section from URL query string

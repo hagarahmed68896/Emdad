@@ -62,7 +62,8 @@ class SearchController extends Controller
             return $item['type'] . '-' . (isset($item['data']->id) ? $item['data']->id : '');
         });
 
-    
+    // dd($query, $results);
+
 
         return view('search.results', [
             'results' => $results,

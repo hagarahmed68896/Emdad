@@ -67,13 +67,13 @@
 
             {{-- ✅ اسم العميل --}}
             <td class="px-6 py-4 text-right">
-                {{ $order->user->name ?? '-' }}
+                {{ $order->user->full_name ?? '-' }}
             </td>
 
-            {{-- ✅ اسم المنتج (عرض أسماء المنتجات مفصولة بفاصلة) --}}
-            <td class="px-6 py-4 text-right">
-                {{ $order->orderItems->pluck('product_name')->join('/ ') }}
-            </td>
+        {{-- ✅ اسم المنتج (عرض أسماء المنتجات مفصولة بفاصلة) --}}
+<td class="px-6 py-4 text-right">
+    {{ $order->orderItems->pluck('product.name')->join(' / ') }}
+</td>
 
             {{-- ✅ عدد المنتجات --}}
             <td class="px-6 py-4 text-right">
@@ -82,7 +82,7 @@
 
             {{-- ✅ اجمالي السعر --}}
             <td class="px-6 py-4 text-right">
-                {{ number_format($order->calculateTotalAmount(), 2) }} ر.س
+                {{ number_format($order->total_amount, 2) }} ر.س
             </td>
 
             {{-- ✅ وسيلة الدفع --}}

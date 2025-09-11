@@ -37,6 +37,10 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\supplierrController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\supplier\SupplierDashboardController;
+use App\Http\Controllers\Admin\FinancialSettlementController;
+
+
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -68,10 +72,13 @@ Route::middleware('web')->group(function () {
      // These routes also need session management, so they should be inside the 'web' group
      Route::match(['get', 'post'], '/supplier', [SupplierController::class, 'register'])->name('register.supplier');
      Route::match(['get', 'post'], '/register', [RegisterController::class, 'register'])->name('register');
-     Route::get('/verify-otp', [OtpController::class, 'showVerificationForm'])->name('otp.verify.show');
-     Route::post('/verify-otp', [OtpController::class, 'verifyOtp'])->name('otp.verify.submit');
-     Route::post('/resend-otp', [OtpController::class, 'resendOtp'])->name('otp.resend');
-     Route::post('/switch-otp-method', [OtpController::class, 'switchOtpMethod'])->name('otp.switch.method');
+     // Route::get('/verify-otp', [OtpController::class, 'showVerificationForm'])->name('otp.verify.show');
+     // Route::post('/verify-otp', [OtpController::class, 'verifyOtp'])->name('otp.verify.submit');
+     // Route::post('/resend-otp', [OtpController::class, 'resendOtp'])->name('otp.resend');
+     // Route::post('/switch-otp-method', [OtpController::class, 'switchOtpMethod'])->name('otp.switch.method');
+// routes/web.php or api.php
+Route::post('/send-otp', [OtpController::class, 'sendOtp'])->name('sendOtp');
+Route::post('/verify-otp', [OtpController::class, 'verifyOtp'])->name('verifyOtp');
 
      // Authenticated routes
      Route::middleware('auth')->group(function () {
@@ -118,9 +125,6 @@ Route::post('/users/{user}/toggle-block', [MessageController::class, 'toggleBloc
 
              Route::post('/messages/upload-attachment', [MessageController::class,'uploadAttachment'])->name('messages.upload-attachment');
              
-// routes/web.php or api.php
-Route::post('/send-otp', [OtpController::class, 'sendOtp'])->name('sendOtp');
-Route::post('/verify-otp', [OtpController::class, 'verifyOtp'])->name('verifyOtp');
 
 
           // Admin-specific routes
@@ -270,7 +274,9 @@ Route::post('/verify-otp', [OtpController::class, 'verifyOtp'])->name('verifyOtp
 
                Route::put('/profile/update', [SettingsController::class, 'updateProfile'])->name('profile.update');
           
-          
+               Route::resource('settlements', FinancialSettlementController::class);
+    Route::get('settlements-download', [FinancialSettlementController::class, 'download'])
+         ->name('settlements.download');
              
           });
 
@@ -294,6 +300,7 @@ Route::post('/verify-otp', [OtpController::class, 'verifyOtp'])->name('verifyOtp
           Route::put('/{offer}', [OfferController::class, 'update'])->name('offers.update'); // Update offer
           Route::delete('/{offer}', [OfferController::class, 'destroy'])->name('offers.destroy'); // Delete offer
 
+    Route::get('/supplier/dashboard', [SupplierDashboardController::class, 'index'])->name('supplier.dashboard');
 
           // General user logout (if you have a separate logout for normal users)
           Route::post('logout', [LoginController::class, 'logout'])->name('logout');
@@ -303,6 +310,7 @@ Route::post('/verify-otp', [OtpController::class, 'verifyOtp'])->name('verifyOtp
           Route::post('/profile/update-password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
           Route::post('/profile/update-profile-picture', [ProfileController::class, 'updateProfilePicture'])->name('profile.updateProfilePicture');
           Route::post('/profile/remove-profile-picture', [ProfileController::class, 'removeProfilePicture'])->name('profile.removeProfilePicture');
+          Route::put('/business/bank', [ProfileController::class, 'updateBankDetails'])->name('business.bank.update');
 
           Route::post('/products/{product}/toggle-favorite', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
           Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');

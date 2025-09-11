@@ -512,7 +512,7 @@ public function offers()
             'supplier_confirmed' => $validatedData['supplier_confirmed'] ?? false,
             'min_order_quantity' => $validatedData['min_order_quantity'],
             'rating' => $validatedData['rating'] ?? null,
-            'is_featured' => $validatedData['is_featured'] ?? false,
+            'is_featured' => $validatedData['is_featured'] ?? true,
             'is_main_featured' => $validatedData['is_main_featured'] ?? false,
             'model_number' => $validatedData['model_number'] ?? null,
             'quality' => $validatedData['quality'] ?? null,

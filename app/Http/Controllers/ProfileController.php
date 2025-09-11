@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Session;
 use App\Models\Cart;
 use App\Models\Category;
 use App\Models\Order;
+use App\Models\Offer;
 
 use App\Models\BusinessData;
 use App\Models\Document;
@@ -76,10 +77,18 @@ public function show(Request $request)
     if (Auth::check()) {
         $favorites = Auth::user()->favorites()->with('product.subCategory.category')->get();
 
-        $offers = Auth::user()
-            ->offers()
-            ->with(['product.offer', 'product.subCategory.category'])
-            ->paginate(20);
+   $business = Auth::user()->business;
+
+$offers = collect(); // default empty
+
+if ($business) {
+    $offers = Offer::whereHas('product', function ($q) use ($business) {
+        $q->where('business_data_id', $business->id);
+    })
+    ->with(['product.subCategory.category'])
+    ->paginate(20);
+}
+
 
         if ($user->account_type === 'supplier') {
             $businessData = $user->business;
@@ -550,5 +559,40 @@ protected function getDefaultNotificationSettings($user): array
         // 'viewed_products_offers' => false,
     ];
 }
+
+public function updateBankDetails(Request $request)
+{
+    try {
+        $validated = $request->validate([
+            'bank_name'     => 'required|string|max:255',
+            'account_name'  => 'required|string|max:255',
+            'bank_address'  => 'nullable|string|max:255',
+            'swift_code'    => 'nullable|string|max:50',
+            'iban'          => 'required|string|max:34',
+        ]);
+
+        $businessData = Auth::user()->business; // relation from User
+        $businessData->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم حفظ بيانات الحساب البنكي بنجاح'
+        ]);
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'success' => false,
+            'errors'  => $e->errors(),
+        ], 422);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'حدث خطأ أثناء الحفظ. حاول مرة أخرى.'
+        ], 500);
+    }
+}
+
+
 
 }

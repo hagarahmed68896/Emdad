@@ -86,8 +86,21 @@
 </section>
 
 
-@include('partials/categories_choosed')
-@include( 'partials/best_offers')
-@include('partials/Promotional_Offer')
-@include('partials/Featured_products')
+{{-- Categories --}}
+@if(isset($categories) && $categories->isNotEmpty())
+    @include('partials/categories_choosed')
+@endif
+
+{{-- Offers --}}
+@if(isset($onOfferProducts) && $onOfferProducts->count() > 0)
+    @include('partials.best_offers')
+@endif
+
+
+{{-- Promotional Offer --}}
+    @include('partials/Promotional_Offer')
+
+{{-- Featured Products --}}
+    @include('partials/Featured_products')
+
 {{-- @endsection --}}

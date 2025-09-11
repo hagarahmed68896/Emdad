@@ -8,9 +8,9 @@
             :class="activeTab === 'all' ? 'text-green-700 font-bold border-b-2 border-green-700 pb-2' : ''">
             {{ __('messages.all') }} {{ $orders->count() }}
         </button>
-        <button @click="activeTab = 'pending'" 
+        <button @click="activeTab = 'processing'" 
             :class="activeTab === 'pending' ? 'text-green-700 font-bold border-b-2 border-green-700 pb-2' : ''">
-            {{ __('messages.pending') }} {{ $orders->where('status', 'pending')->count() }}
+            {{ __('messages.processing') }} {{ $orders->where('status', 'processing')->count() }}
         </button>
         <button @click="activeTab = 'shipped'" 
             :class="activeTab === 'shipped' ? 'text-green-700 font-bold border-b-2 border-green-700 pb-2' : ''">
@@ -62,8 +62,8 @@
                             <td class="p-3 border">{{ $item->product->subCategory->category->name ?? '-' }}</td>
                             <td class="p-3 border">{{ $item->unit_price }} {{ __('messages.currency') }}</td>
                             <td class="p-3 border">
-                                @if($order->status === 'pending')
-                                    <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-600">{{ __('messages.pending') }}</span>
+                                @if($order->status === 'processing')
+                                    <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-600">{{ __('messages.processing') }}</span>
                                 @elseif($order->status === 'shipped')
                                     <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-600">{{ __('messages.shipped') }}</span>
                                 @elseif($order->status === 'delivered')

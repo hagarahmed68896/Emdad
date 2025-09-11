@@ -41,6 +41,10 @@
                     tax_certificate: '',
                     tax_certificate_attach: null,
                     terms: false,
+                    showLogin: false,
+showRegister: true,
+showOTP: false,
+
                 },
                 errors: {},
                 loading: false,

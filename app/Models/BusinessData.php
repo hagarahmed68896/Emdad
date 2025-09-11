@@ -16,7 +16,11 @@ class BusinessData extends Model
         'tax_certificate',
         'description',
         'experience_years',
-        'start_date'
+        'start_date',
+        'bank_name',
+        'account_name',
+        'bank_address',
+        'swift_code',
        
     ]; 
 

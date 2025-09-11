@@ -47,6 +47,13 @@
         background: #185D31 !important;
         /* Active dot color for image carousel */
     }
+    .ltr-timer {
+    direction: ltr; /* Forces left-to-right */
+    text-align: left; /* Optional: align numbers left */
+    justify-content: flex-start; /* Flexbox aligns items from left */
+    gap: 4px; /* Space between numbers and colons */
+}
+
 </style>
 
 <div class="bg-[#F8F9FA] w-full pt-5 px-[64px] py-3">
@@ -65,14 +72,15 @@
             </div>
 
             {{-- Countdown Timer Display --}}
-            <div
-                class="bg-[#EDEDED] flex mt-10 font-extrabold text-[#1F2B45] p-[16px] text-[20px] sm:text-[32px] h-[60px] sm:h-[78px] rounded-[12px]">
-                <span id="countdown-hours" class="countdown-digit">00</span>
-                <span class="mx-2">:</span>
-                <span id="countdown-minutes" class="countdown-digit">00</span>
-                <span class="mx-2">:</span>
-                <span id="countdown-seconds" class="countdown-digit">00</span>
-            </div>
+ <div class="countdown-timer ltr-timer bg-[#EDEDED] flex font-extrabold text-[#1F2B45] p-4 text-[20px] sm:text-[32px] h-[60px] sm:h-[78px] rounded-[12px]" 
+     data-last-offer-end="{{ $onOfferProducts->max(fn($p) => $p->offer?->offer_end) }}">
+    <span class="countdown-days">00</span><span class="mx-1">:</span>
+    <span class="countdown-hours">00</span><span class="mx-1">:</span>
+    <span class="countdown-minutes">00</span><span class="mx-1">:</span>
+    <span class="countdown-seconds">00</span>
+</div>
+
+
         </div>
     </div>
 
@@ -230,40 +238,40 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // JavaScript for the countdown timer
-        function updateCountdown() {
-            const now = new Date().getTime();
-            // Set a target date in the future (e.g., 24 hours from now)
-            const targetDate = new Date();
-            targetDate.setDate(targetDate.getDate() + 1); // Add 1 day
-            targetDate.setHours(targetDate.getHours() + 24); // Add 24 hours
-            targetDate.setMinutes(0);
-            targetDate.setSeconds(0);
-            const targetTime = targetDate.getTime();
+        const timer = document.querySelector('.countdown-timer');
+    if (!timer) return;
 
-            const countdownInterval = setInterval(function() {
-                const current = new Date().getTime();
-                const distance = targetTime - current;
+    const endDateStr = timer.dataset.lastOfferEnd;
+    if (!endDateStr) return;
 
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    const targetTime = new Date(endDateStr).getTime();
 
-                document.getElementById("countdown-hours").textContent = String(hours).padStart(2, '0');
-                document.getElementById("countdown-minutes").textContent = String(minutes).padStart(2,
-                    '0');
-                document.getElementById("countdown-seconds").textContent = String(seconds).padStart(2,
-                    '0');
+    function updateCountdown() {
+        const now = new Date().getTime();
+        const distance = targetTime - now;
 
-                if (distance < 0) {
-                    clearInterval(countdownInterval);
-                    document.getElementById("countdown-hours").textContent = "00";
-                    document.getElementById("countdown-minutes").textContent = "00";
-                    document.getElementById("countdown-seconds").textContent = "00";
-                }
-            }, 1000);
+        if (distance <= 0) {
+            timer.querySelector('.countdown-days').textContent = '00';
+            timer.querySelector('.countdown-hours').textContent = '00';
+            timer.querySelector('.countdown-minutes').textContent = '00';
+            timer.querySelector('.countdown-seconds').textContent = '00';
+            clearInterval(interval);
+            return;
         }
 
-        updateCountdown();
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        timer.querySelector('.countdown-days').textContent = String(days).padStart(2, '0');
+        timer.querySelector('.countdown-hours').textContent = String(hours).padStart(2, '0');
+        timer.querySelector('.countdown-minutes').textContent = String(minutes).padStart(2, '0');
+        timer.querySelector('.countdown-seconds').textContent = String(seconds).padStart(2, '0');
+    }
+
+    updateCountdown(); // initial call
+    const interval = setInterval(updateCountdown, 1000);
 
         // Initialize Swiper for the main product cards carousel
         const offerSwiper = new Swiper('.offerSwiper', {

@@ -101,6 +101,8 @@
                 </div>
             </section>
 
+            @isset($onOfferProducts)
+    @if($onOfferProducts->isNotEmpty())
             <section class=" py-8 font-inter px-[64px]">
                 <div class="flex sm:flex-row flex-col  justify-between mt-1">
                     <div class="flex flex-col justify-between mb-5  mt-3">
@@ -228,6 +230,8 @@
                     <div class="swiper-pagination offer-swiper-pagination mt-8"></div>
                 </div>
             </section>
+                @endif
+@endisset
 
     <section class=" px-[64px] py-4 font-inter">
     <div class="flex sm:flex-row flex-col  justify-between mt-1">

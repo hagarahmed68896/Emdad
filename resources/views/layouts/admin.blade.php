@@ -316,12 +316,16 @@
         </li>
 
         {{-- التسويات --}}
-        <li>
-            <a href="#"
-               class="flex items-center p-2 transition-colors duration-200">
-               التسويات
-            </a>
-        </li>
+     <li>
+    <a href="{{ route('settlements.index') }}"
+       class="flex items-center p-2 transition-colors duration-200
+       {{ Request::is('admin/settlements*') 
+            ? 'bg-[#185D31] text-white rounded-xl' 
+            : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
+        التسويات
+    </a>
+</li>
+
 
     </ul>
 </li>

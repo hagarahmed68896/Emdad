@@ -6,28 +6,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/alpinejs" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-{{-- <style>
-    .category-button {
-        display: inline;
-        padding: 8px 21px;
-        background-color: #EDEDED;
-        color: #212121;
-        border-radius: 12px;
-        text-decoration: none;
-        font-size: 14px;
-        font-weight: 500;
-        height: 40px;
-    }
 
-    .category-button:hover {
-        color: #212121;
-    }
-
-    .category-button.active {
-        background-color: #185D31;
-        color: white;
-    }
-</style> --}}
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 <script src="//unpkg.com/alpinejs" defer></script>
 <script>
@@ -363,38 +342,7 @@
         });
     });
 </script>
-{{-- <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const mainDropdownButton = document.getElementById('mainDropdownButton');
-        const mainDropdownMenu = document.getElementById('mainDropdownMenu');
 
-        if (!mainDropdownButton || !mainDropdownMenu) {
-            console.warn("Dropdown button or menu is missing.");
-            return;
-        }
-
-        // Toggle main dropdown
-        mainDropdownButton.addEventListener('click', function(event) {
-            event.stopPropagation();
-            mainDropdownMenu.classList.toggle('hidden');
-        });
-
-        // Close dropdown when clicking outside
-        window.addEventListener('click', function(event) {
-            if (!mainDropdownMenu.contains(event.target) &&
-                !mainDropdownButton.contains(event.target)) {
-                mainDropdownMenu.classList.add('hidden');
-            }
-        });
-
-        // Close dropdown when clicking any link inside it
-        mainDropdownMenu.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', function() {
-                mainDropdownMenu.classList.add('hidden');
-            });
-        });
-    });
-</script> --}}
 <style>
     [x-cloak] {
         display: none !important;
@@ -694,12 +642,22 @@
                         }, 300); // Debounce time
                     },
                 
-                    selectSuggestion(item) {
-                        this.searchText = item;
-                        this.showPopup = false;
-                        this.addRecentSearch(item);
-                        this.$el.closest('form').submit(); // Submit the form
-                    },
+                  selectSuggestion(item) {
+    // item might be a string OR an object (e.g. { id, name })
+    const value = (item && typeof item === 'object') ? item.name : item;
+
+    this.searchText = value;
+    this.showPopup = false;
+    this.addRecentSearch(value);
+
+    // update the actual input (uses x-ref to avoid selector/quote issues)
+    if (this.$refs && this.$refs.queryInput) {
+        this.$refs.queryInput.value = value;
+    }
+
+    this.$el.closest('form').submit();
+},
+
                 
                     addRecentSearch(query) {
                         if (query && query.trim() !== '') {
@@ -739,11 +697,17 @@
                     <div class="flex items-center border-[1px] bg-white rounded-[12px] overflow-hidden">
                         <img src="{{ asset('images/interface-search--glass-search-magnifying--Streamline-Core.svg') }}"
                             alt="Search Icon" class="h-[16px] w-[16px] object-cover text-[#767676] ml-2 mr-0 md:mr-6">
-                        <input type="text" x-model="searchText"
-                            @focus="showPopup = true; if (searchText.length === 0) fetchSuggestions(true); else fetchSuggestions();"
-                            @input="showPopup = true; fetchSuggestions()" @click.stop
-                            class="block w-full px-3 py-2 border-none focus:outline-none focus:ring-0 sm:text-sm"
-                            placeholder="{{ __('messages.Search') }}">
+                      <input
+  type="text"
+  name="query"
+  x-ref="queryInput"
+  x-model="searchText"
+  @focus="showPopup = true; if (searchText.length === 0) fetchSuggestions(true); else fetchSuggestions();"
+  @input="showPopup = true; fetchSuggestions()"
+  @click.stop
+  class="block w-full px-3 py-2 border-none focus:outline-none focus:ring-0 sm:text-sm"
+  placeholder="{{ __('messages.Search') }}">
+
                     </div>
 
                     {{-- Unified Popup for Suggestions and Recent Searches --}}
@@ -782,9 +746,9 @@
                                     <span class="text-[#696969] text-[12px]">{{ __('messages.delete') }}</span>
                                 </button>
                             </div>
-                            <template x-for="item in recentSearches" :key="'recent-' + item">
+                              <template x-for="product in productSuggestions" :key="product.id">
                                 <div class="flex justify-between items-center px-3 py-1 hover:bg-gray-100 cursor-pointer text-sm mb-2"
-                                    @click="selectSuggestion(item)">
+                                    @click="selectSuggestion(product.name)">
                                     <div class="flex items-center space-x-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                             strokeWidth={1.5} stroke="currentColor"
@@ -793,7 +757,7 @@
                                                 d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                         </svg>
 
-                                        <span x-text="item" class="text-[16px]"></span>
+                                        <span x-text="product.name" class="text-[16px]"></span>
                                     </div>
                                     <button type="button" @click.stop="removeRecentSearch(item)"
                                         class="text-gray-400 hover:text-gray-700 text-xs">
@@ -965,7 +929,14 @@
                 buttonRect = null; // Clear when hidden
             }
         })" class="relative inline-block"> {{-- This 'relative' is for positioning the popup relative to the icon on larger screens --}}
-    
+    <a href="{{ route('supplier.dashboard') }}"
+   class="inline-block px-3  rounded-lg  transition">
+   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
+</svg>
+
+</a>
+
 
         {{-- Notification Icon and Popup (only if user is logged in) --}}
     @include('partials.notifications_popup')
