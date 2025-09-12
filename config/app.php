@@ -212,5 +212,9 @@ return [
     //     'Excel' => Maatwebsite\Excel\Facades\Excel::class, // <-- ADD THIS LINE FOR LARAVEL EXCEL
     // ])->toArray(), // Don't forget toArray()
 
+// 'aliases' => [
+//     // ...
+//     'LaravelMpdf' => Meneses\LaravelMpdf\Facades\LaravelMpdf::class,
+// ],
 
    ];

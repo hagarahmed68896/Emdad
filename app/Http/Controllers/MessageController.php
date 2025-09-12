@@ -307,6 +307,9 @@ public function toggleBlock($id)
             ->where('blocked_id', $blockedId)
             ->delete();
 
+               // 🔹 Update user status back to active
+        User::where('id', $blockedId)->update(['status' => 'active']);
+
         return response()->json([
             'success' => true,
             'action' => 'unblocked',
@@ -319,6 +322,7 @@ public function toggleBlock($id)
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+    User::where('id', $blockedId)->update(['status' => 'banned']);
 
         return response()->json([
             'success' => true,

@@ -15,7 +15,14 @@ class ProductsController extends Controller
         $totalProducts = Product::count();
         $availableProducts = Product::where('is_available', true)->count();
         $unavailableProducts = Product::where('is_available', false)->count();
+// ✅ Percentages
+$availablePercentage = $totalProducts > 0 
+    ? round(($availableProducts / $totalProducts) * 100, 2) 
+    : 0;
 
+$unavailablePercentage = $totalProducts > 0 
+    ? round(($unavailableProducts / $totalProducts) * 100, 2) 
+    : 0;
         // ✅ Query with eager loading
         $query = Product::query()
             ->with(['supplier', 'subCategory.category']); 
@@ -64,6 +71,8 @@ class ProductsController extends Controller
             'totalProducts' => $totalProducts,
             'availableProducts' => $availableProducts,
             'unavailableProducts' => $unavailableProducts,
+            'availablePercentage' => $availablePercentage,
+            'unavailablePercentage' => $unavailablePercentage,
             'products' => $products,
             'statusFilter' => $request->input('status'),
             'sortFilter' => $request->input('sort'),

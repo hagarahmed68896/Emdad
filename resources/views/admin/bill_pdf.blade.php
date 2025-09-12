@@ -5,14 +5,13 @@
     <title>فاتورة</title>
     <style>
         body {
-            font-family: 'DejaVu Sans', sans-serif; /* أفضل خط PDF لدعم العربية */
-            direction: rtl;
+              font-family: 'Amiri', serif;
+    direction: rtl;
             text-align: right;
             padding: 20px;
             font-size: 14px;
             line-height: 1.6;
         }
-
         .invoice-box {
             max-width: 800px;
             margin: auto;
@@ -105,14 +104,14 @@
 
 @foreach($invoice->order->orderItems as $item)
             <tr class="item">
-                <td>{{ $item->product_name }}</td>
-                <td>{{ number_format($item->price, 2) }} ريال</td>
+                <td>{{ $item->product->name }}</td>
+                <td>{{ number_format($item->unit_price, 2) }} ريال</td>
             </tr>
             @endforeach
 
             <tr class="total">
                 <td></td>
-                <td>الإجمالي: {{ number_format($invoice->order->total, 2) }} ريال</td>
+                <td>الإجمالي: {{ number_format($invoice->order->total_amount, 2) }} ريال</td>
             </tr>
         </table>
     </div>

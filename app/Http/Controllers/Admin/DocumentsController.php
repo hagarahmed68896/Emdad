@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class DocumentsController extends Controller
 {
@@ -241,6 +242,20 @@ public function downloadPdf($id)
 
     //     return $pdf->stream('فاتورة-' . $invoice->bill_number . '.pdf');
     // }
+
+public function showFile(Document $document)
+{
+    $filePath = storage_path('app/private/' . $document->file_path);
+
+    if (!file_exists($filePath)) {
+        abort(404, "File not found on server");
+    }
+
+    return response()->file($filePath); // open in browser
+    // or use download:
+    // return response()->download($filePath, basename($filePath));
+}
+
 
 
 

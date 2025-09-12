@@ -39,6 +39,7 @@ use App\Http\Controllers\supplierrController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\supplier\SupplierDashboardController;
 use App\Http\Controllers\Admin\FinancialSettlementController;
+use App\Http\Controllers\Admin\UserBlocksController;
 
 
 use App\Models\Product;
@@ -83,6 +84,8 @@ Route::post('/verify-otp', [OtpController::class, 'verifyOtp'])->name('verifyOtp
      // Authenticated routes
      Route::middleware('auth')->group(function () {
 
+          Route::post('/user/save-location', [RegisterController::class, 'saveLocation'])
+    ->name('user.saveLocation');
                //cart
                Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
                Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
@@ -177,7 +180,11 @@ Route::post('/users/{user}/toggle-block', [MessageController::class, 'toggleBloc
 
                Route::patch('/admin/suppliers/{supplier}/toggle-ban', [AdminSupplierController::class, 'toggleBan'])->name('admin.suppliers.toggle-ban');
 
-               Route::get('/banned-users', [BannedUserController::class, 'index'])->name('admin.banned.index');
+               // Route::get('/banned-users', [BannedUserController::class, 'index'])->name('admin.banned.index');
+
+               Route::get('/banned-users', [UserBlocksController::class, 'index'])->name('admin.banned.index');
+    Route::post('/banned-users/{id}/ban', [UserBlocksController::class, 'ban'])->name('banned.ban');
+    Route::delete('/banned-users/{id}/unban', [UserBlocksController::class, 'unban'])->name('banned.unban');
 
                //account details
                Route::get('/users/{user}', [UserController::class, 'show'])->name('admin.users.show');
@@ -214,6 +221,8 @@ Route::post('/users/{user}/toggle-block', [MessageController::class, 'toggleBloc
                Route::get('documents/{id}/edit', [DocumentsController::class, 'edit'])->name('admin.documents.edit');
 
                Route::put('documents/{id}', [DocumentsController::class, 'update'])->name('admin.documents.update');
+
+               Route::get('/documents/{document}', [DocumentsController::class, 'showFile'])->name('documents.show');
 
                Route::delete('/documents/bulk-delete', [DocumentsController::class, 'bulkDelete'])->name('admin.documents.bulk_delete');
 
@@ -274,10 +283,19 @@ Route::post('/users/{user}/toggle-block', [MessageController::class, 'toggleBloc
 
                Route::put('/profile/update', [SettingsController::class, 'updateProfile'])->name('profile.update');
           
-               Route::resource('settlements', FinancialSettlementController::class);
-    Route::get('settlements-download', [FinancialSettlementController::class, 'download'])
-         ->name('settlements.download');
-             
+               Route::get('settlements', [FinancialSettlementController::class, 'index'])->name('settlements.index');
+               Route::get('settlements/create', [FinancialSettlementController::class, 'create'])->name('settlements.create');
+               Route::post('settlements', [FinancialSettlementController::class, 'store'])->name('settlements.store');
+               Route::get('settlements/{settlement}/edit', [FinancialSettlementController::class, 'edit'])->name('settlements.edit');
+               Route::put('settlements/{settlement}', [FinancialSettlementController::class, 'update'])->name('settlements.update');
+               Route::delete('settlements/{settlement}', [FinancialSettlementController::class, 'destroy'])->name('settlements.destroy');    
+               Route::get('settlements-download', [FinancialSettlementController::class, 'download'])
+                                   ->name('settlements.download');
+               Route::patch('settlements/{settlement}/transfer', [FinancialSettlementController::class, 'transfer'])
+               ->name('settlements.transfer');
+              Route::post('/settlements/bulk-transfer', [FinancialSettlementController::class, 'bulkTransfer'])->name('settlements.bulkTransfer');
+
+                         
           });
 
 

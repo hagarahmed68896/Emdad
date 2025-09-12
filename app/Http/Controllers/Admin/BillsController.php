@@ -18,7 +18,9 @@ class BillsController extends Controller
     $totalInvoices = Bill::count();
     $paidInvoices = Bill::where('status', 'payment')->count();
     $unpaidInvoices = Bill::where('status', 'not payment')->count();
-
+// ✅ حساب النسب المئوية مع تجنب القسمة على صفر
+$paidPercentage = $totalInvoices > 0 ? round(($paidInvoices / $totalInvoices) * 100, 2) : 0;
+$unpaidPercentage = $totalInvoices > 0 ? round(($unpaidInvoices / $totalInvoices) * 100, 2) : 0;
     $query = Bill::query()->with('user');
 
     // ✅ البحث
@@ -66,6 +68,8 @@ class BillsController extends Controller
         'totalInvoices' => $totalInvoices,
         'paidInvoices' => $paidInvoices,
         'unpaidInvoices' => $unpaidInvoices,
+        'unpaidPercentage' => $unpaidPercentage,
+        'paidPercentage' => $paidPercentage,
         'invoices'     => $invoices,
         'statusFilter' => $request->input('status'),
         'sortFilter'   => $request->input('sort'),
@@ -164,11 +168,6 @@ public function update(Request $request, Bill $invoice)
     return response()->json(['message' => 'تم تحديث الفاتورة بنجاح!']);
 }
 
-
-
-
-
-
     
     public function bulkDelete(Request $request)
     {
@@ -183,9 +182,10 @@ public function update(Request $request, Bill $invoice)
             ->with('success', 'تم حذف الفواتير المحددة بنجاح.');
     }
 
-    public function downloadPdf($id)
-    {
-        $invoice = Bill::with('user', 'order.orderItems')->findOrFail($id);
+
+public function downloadPdf($id)
+{
+    $invoice = Bill::with('user', 'order.orderItems')->findOrFail($id);
 
         $pdf = Pdf::loadView('admin.bill_pdf', compact('invoice'))
             ->setOptions([

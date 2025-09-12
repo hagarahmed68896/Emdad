@@ -4,13 +4,13 @@
                 <div class="bg-white rounded-xl shadow p-6 flex items-center justify-between">
                     <div>
                         <p class="text-3xl font-bold text-gray-800">{{ $totalOrders }}</p>
-                        <p class="text-gray-500 text-sm"> إجمالي الطلبات</p>
+                        <p class="text-gray-500 text-sm">  {{__('messages.total_orders')}}</p>
                         <p class="text-[#185D31] text-sm flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
                         </svg>
 
-                            0.43%
+                            100%
                         </p>
                     </div>
                     <img src="{{asset('images/Growth.svg')}}" alt="">
@@ -19,13 +19,13 @@
                     <div>
                         <p class="text-3xl font-bold text-gray-800">{{$completedOrders}}</p>
 
-                        <p class="text-gray-500 text-sm"> الطلبات المكتملة</p>
+                        <p class="text-gray-500 text-sm"> {{__('messages.completed_orders')}}</p>
                         <p class="text-[#185D31] text-sm flex items-center">
                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
                         </svg>
 
-                            0.43%
+                            {{$completedPercentage}}%
                         </p>
                     </div>
                     <img src="{{asset('images/Growth.svg')}}" alt="">
@@ -34,14 +34,14 @@
                     <div>
                         <p class="text-3xl font-bold text-gray-800">{{ $processingOrders }}</p>
 
-                        <p class="text-gray-500 text-sm"> الطلبات  الجارية </p>
-                        <p class="text-[#C62525] text-sm flex items-center">
-<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6 9 12.75l4.286-4.286a11.948 11.948 0 0 1 4.306 6.43l.776 2.898m0 0 3.182-5.511m-3.182 5.51-5.511-3.181" />
-</svg>
+                        <p class="text-gray-500 text-sm">  {{__('messages.processing_orders')}}</p>
+             <p class="text-[#185D31] text-sm flex items-center">
+                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
+                        </svg>
 
 
-                            0.43%
+                            {{$processingPercentage}}%
                         </p>
                     </div>
                                         <img src="{{asset('images/Yes.svg')}}" alt="">
@@ -51,14 +51,14 @@
                     <div>
                         <p class="text-3xl font-bold text-gray-800">{{ $cancelledOrders }}</p>
 
-                        <p class="text-gray-500 text-sm"> الطلبات الملغاه </p>
+                        <p class="text-gray-500 text-sm">  {{__('messages.cancelled_orders')}}</p>
                         <p class="text-[#C62525] text-sm flex items-center">
 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
   <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6 9 12.75l4.286-4.286a11.948 11.948 0 0 1 4.306 6.43l.776 2.898m0 0 3.182-5.511m-3.182 5.51-5.511-3.181" />
 </svg>
 
 
-                            0.43%
+                            {{$cancelledPercentage}}%
                         </p>
                     </div>
                     <img src="{{asset('images/Growth (1).svg')}}" alt="">

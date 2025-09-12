@@ -19,6 +19,12 @@ class CategoriesController extends Controller
         $totalSubCategories = SubCategory::count();
         $availableProducts = Product::where('is_available', true)->count();
         $unavailableProducts = Product::where('is_available', false)->count();
+   $totalProducts = $availableProducts + $unavailableProducts;
+
+    // ✅ حساب النسب
+    $availablePercentage = $totalProducts > 0 ? round(($availableProducts / $totalProducts) * 100, 2) : 0;
+    $unavailablePercentage = $totalProducts > 0 ? round(($unavailableProducts / $totalProducts) * 100, 2) : 0;
+    $categoriesPercentage = $totalCategories > 0 ? round(($totalCategories / $totalCategories) * 100, 2) : 0;
 
         $categoriesQuery = Category::query();
         $subCategoriesQuery = SubCategory::with('category');
@@ -98,6 +104,9 @@ foreach ($subCategories as $subCategory) {
             'totalCategories' => $totalCategories,
             'totalSubCategories' => $totalSubCategories,
             'availableProducts' => $availableProducts,
+               'availablePercentage' => $availablePercentage,
+        'unavailablePercentage' => $unavailablePercentage,
+        'categoriesPercentage' => $categoriesPercentage,
             'unavailableProducts' => $unavailableProducts,
             'search' => $request->search,
             'selectedStatus' => $request->status ?? 'all',

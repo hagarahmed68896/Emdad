@@ -185,7 +185,7 @@
                                 </li>
                                 <li>
                                     <label class="flex items-center cursor-pointer">
-                                        <input type="radio" name="status" value="not_payment" {{-- Changed value to 'not_payment' to match PHP logic --}}
+                                        <input type="radio" name="status" value="not payment" {{-- Changed value to 'not_payment' to match PHP logic --}}
                                             x-model="selectedStatus"
                                             class="shrink-0 rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] focus:ring-[#185D31] appearance-none rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
                                         <span class=" text-gray-700">غير مدفوعة</span>
@@ -193,7 +193,7 @@
                                 </li>
                                 <li>
                                     <label class="flex items-center cursor-pointer">
-                                        <input type="radio" name="status" value="under_review" {{-- Added a value for 'مرتجعة' and matched it to a common backend term --}}
+                                        <input type="radio" name="status" value="review" {{-- Added a value for 'مرتجعة' and matched it to a common backend term --}}
                                             x-model="selectedStatus"
                                             class="shrink-0 rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] focus:ring-[#185D31] appearance-none rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
                                         <span class=" text-gray-700">مراجعة</span>
@@ -278,9 +278,9 @@
                                        :value="{{ $invoice->id }}" x-model="selectedInvoices">
                                 </td>
                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 rtl:text-right">{{ $loop->iteration + $invoices->firstItem() - 1 }}</td>
-                                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 rtl:text-right">{{ '#فاتورة–' . $invoice->bill_number }}</td>
+                                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 rtl:text-right">{{ '#'. $invoice->bill_number }}</td>
                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 rtl:text-right">{{ $invoice->user->full_name }}</td>
-                                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 rtl:text-right">{{ '#طلب–' . $invoice->order->order_number }}</td>
+                                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 rtl:text-right">{{ '#' . $invoice->order->order_number }}</td>
                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 rtl:text-right">{{ number_format($invoice->total_price, 2) }} ر.س</td>
                                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 rtl:text-right">
                                     @php
@@ -311,11 +311,11 @@
                                                 $statusClass = 'bg-green-100 text-green-800';
                                                 $statusText = 'مدفوعة';
                                                 break;
-                                            case 'not_payment': // Changed to 'not_payment' for consistency with filter
+                                            case 'not payment': // Changed to 'not_payment' for consistency with filter
                                                 $statusClass = 'bg-red-100 text-red-800';
                                                 $statusText = 'غير مدفوعة';
                                                 break;
-                                            case 'under_review': // New status for 'مرتجعة' to match filter
+                                            case 'review': // New status for 'مرتجعة' to match filter
                                                 $statusClass = 'bg-yellow-100 text-yellow-800';
                                                 $statusText = 'مراجعة';
                                                 break;

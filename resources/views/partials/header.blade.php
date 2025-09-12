@@ -1,36 +1,16 @@
 <!-- Tailwind + Alpine.js -->
 <script src="https://cdn.tailwindcss.com"></script>
 <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDUUMjGzzsoinenATBytoscF54qWQc_q0w&libraries=places">
-</script>
+{{-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDUUMjGzzsoinenATBytoscF54qWQc_q0w&libraries=places" async defer>
+</script> --}}
+{{-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDUUMjGzzsoinenATBytoscF54qWQc_q0w&libraries=places&callback=initMap" async defer></script> --}}
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/alpinejs" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-{{-- <style>
-    .category-button {
-        display: inline;
-        padding: 8px 21px;
-        background-color: #EDEDED;
-        color: #212121;
-        border-radius: 12px;
-        text-decoration: none;
-        font-size: 14px;
-        font-weight: 500;
-        height: 40px;
-    }
 
-    .category-button:hover {
-        color: #212121;
-    }
-
-    .category-button.active {
-        background-color: #185D31;
-        color: white;
-    }
-</style> --}}
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 <script src="//unpkg.com/alpinejs" defer></script>
-<script>
+{{-- <script>
     let map;
     let marker;
     let selectedLocation;
@@ -45,13 +25,37 @@
             document.getElementById('mapModal').classList.add('hidden');
         };
 
-        window.confirmLocation = function() {
-            if (selectedLocation) {
-                alert("{{ __('messages.selectedLocation') }}: " + selectedLocation.lat() + ", " +
-                    selectedLocation.lng());
-                closeMapModal();
-            }
-        };
+   window.confirmLocation = function() {
+    if (!selectedLocation) return;
+
+    // Get latitude and longitude
+    const lat = selectedLocation.lat();
+    const lng = selectedLocation.lng();
+
+    // Send via fetch to your Laravel route
+    fetch("{{ route('user.saveLocation') }}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': "{{ csrf_token() }}"
+        },
+        body: JSON.stringify({ lat: lat, lng: lng })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("{{ __('messages.locationSaved') }}");
+            closeMapModal();
+        } else {
+            alert("{{ __('messages.errorSavingLocation') }}");
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert("{{ __('messages.errorSavingLocation') }}");
+    });
+};
+
 
         window.initMap = function() {
             if (map) return;
@@ -89,7 +93,7 @@
             });
         };
     });
-</script>
+</script> --}}
 <!-- Alpine JS Logic -->
 <script>
     function imageUploadComponent() {
@@ -363,38 +367,7 @@
         });
     });
 </script>
-{{-- <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const mainDropdownButton = document.getElementById('mainDropdownButton');
-        const mainDropdownMenu = document.getElementById('mainDropdownMenu');
 
-        if (!mainDropdownButton || !mainDropdownMenu) {
-            console.warn("Dropdown button or menu is missing.");
-            return;
-        }
-
-        // Toggle main dropdown
-        mainDropdownButton.addEventListener('click', function(event) {
-            event.stopPropagation();
-            mainDropdownMenu.classList.toggle('hidden');
-        });
-
-        // Close dropdown when clicking outside
-        window.addEventListener('click', function(event) {
-            if (!mainDropdownMenu.contains(event.target) &&
-                !mainDropdownButton.contains(event.target)) {
-                mainDropdownMenu.classList.add('hidden');
-            }
-        });
-
-        // Close dropdown when clicking any link inside it
-        mainDropdownMenu.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', function() {
-                mainDropdownMenu.classList.add('hidden');
-            });
-        });
-    });
-</script> --}}
 <style>
     [x-cloak] {
         display: none !important;
@@ -541,79 +514,248 @@
         </a>
     </div>
 
+<!-- Google Maps API -->
+<!-- Google Maps API -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDUUMjGzzsoinenATBytoscF54qWQc_q0w&libraries=places&callback=initMap" async defer></script>
 
-    <div x-data="{ open: false }"
-        class="deliver relative inline-block text-[12px] tracking-[0%] w-auto max-w-[150px] lg:mx-4
-         sm:mx-1 md:w-[120px] md:h-[36px] shrink-0 order-2">
-        <div @click="open = !open"
-            class="flex items-center cursor-pointer p-1 hover:border font-normal rounded-[4px] space-x-1 h-full w-full justify-center">
-            <img src="{{ asset('images/Flag Pack.svg') }}" alt="" class="w-[24px] h-[24px] ml-2">
-            <span class="truncate">{{ __('messages.deliver') }}</span>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                stroke="currentColor" class="w-[12px] h-[12px] shrink-0">
-                <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-            </svg>
+<script>
+let map, marker, selectedLocation;
+
+// Pull saved location from backend (if any)
+let savedLocation = @json(Auth::user()->address ?? null);
+
+function initMap() {
+    if (map) return;
+
+    let center = { lat: 24.7136, lng: 46.6753 };
+
+    if (savedLocation && savedLocation.includes("(") && savedLocation.includes(")")) {
+        try {
+            const coords = savedLocation.match(/\(([^)]+)\)/)[1].split(",");
+            center = { lat: parseFloat(coords[0]), lng: parseFloat(coords[1]) };
+        } catch (e) {}
+    }
+
+    map = new google.maps.Map(document.getElementById('map'), {
+        center,
+        zoom: 10
+    });
+
+    marker = new google.maps.Marker({
+        position: center,
+        map,
+        draggable: true
+    });
+
+    selectedLocation = center;
+
+    marker.addListener('dragend', e => {
+        selectedLocation = e.latLng;
+    });
+
+    const input = document.getElementById('searchInput');
+    if (input) {
+        const autocomplete = new google.maps.places.Autocomplete(input);
+        autocomplete.bindTo('bounds', map);
+
+        autocomplete.addListener('place_changed', () => {
+            const place = autocomplete.getPlace();
+            if (place.geometry) {
+                map.setCenter(place.geometry.location);
+                marker.setPosition(place.geometry.location);
+                selectedLocation = place.geometry.location;
+            }
+        });
+    }
+}
+
+function deliveryDropdown() {
+    return {
+        open: false,
+        selectedLocationText: savedLocation ?? '{{ __("messages.chooseLocation") }}',
+        showMapModal: false,
+
+        toggleDropdown() {
+            this.open = !this.open;
+        },
+
+        openMapModal() {
+            this.showMapModal = true;
+            setTimeout(() => {
+                google.maps.event.trigger(map, "resize");
+                map.setCenter(marker.getPosition());
+            }, 300);
+        },
+
+        closeMapModal() {
+            this.showMapModal = false;
+        },
+
+        chooseCity(city) {
+            this.selectedLocationText = city;
+            this.open = false;
+
+            fetch("{{ route('user.saveLocation') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({ city })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) {
+                    alert("Failed to save city.");
+                }
+            });
+        },
+
+        saveLocation() {
+            if (!selectedLocation) {
+                this.closeMapModal();
+                return;
+            }
+
+            const lat = selectedLocation.lat ? selectedLocation.lat() : selectedLocation.lat;
+            const lng = selectedLocation.lng ? selectedLocation.lng() : selectedLocation.lng;
+
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+                let address = null;
+
+                if (status === "OK" && results[0]) {
+                    address = results[0].formatted_address;
+                }
+
+                // Fallback: if no address, just use lat/lng
+                if (!address) {
+                    address = `Lat: ${lat}, Lng: ${lng}`;
+                }
+
+                fetch("{{ route('user.saveLocation') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                    },
+                    body: JSON.stringify({ address, lat, lng })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        this.selectedLocationText = address;
+                    } else {
+                        alert("Failed to save location.");
+                    }
+                    this.closeMapModal();
+                })
+                .catch(() => this.closeMapModal());
+            });
+        }
+    }
+}
+</script>
+
+
+
+<!-- Dropdown + Modal -->
+<div x-data="deliveryDropdown()" class="relative inline-block text-[12px] max-w-[150px]">
+
+    <!-- Dropdown button -->
+    <div @click="toggleDropdown()"
+         class="flex items-center cursor-pointer p-1 hover:border font-normal rounded-[4px] space-x-1 justify-center">
+        <img src="{{ asset('images/Flag Pack.svg') }}" alt="" class="w-[24px] h-[24px] ml-2">
+        <span x-text="selectedLocationText"></span>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+             stroke="currentColor" class="w-[12px] h-[12px] shrink-0">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+        </svg>
+    </div>
+
+    <!-- Dropdown content -->
+    <div x-show="open" @click.away="open = false" x-cloak
+         class="absolute z-50 mt-2 w-[calc(100vw-32px)] left-0 sm:right-0 bg-white border border-gray-200 rounded-lg shadow-lg p-4
+                md:w-[350px] md:left-auto md:right-0 md:translate-x-0">
+
+        <div class="flex flex-col mb-4">
+            <p class="font-bold text-[20px] mb-2">{{ __('messages.deliverySite') }}</p>
+            <p class="text-gray-500 text-[14px]">{{ __('messages.deliverySiteMSG') }}</p>
         </div>
 
-        <div x-show="open" @click.away="open = false" x-transition x-cloak
-            class="absolute z-50 mt-2 w-[calc(100vw-32px)] left-0 sm:right-0  bg-white border border-gray-200 rounded-lg shadow-lg p-4
-                   md:w-[350px] md:left-auto md:right-0 md:translate-x-0">
-            <div class="flex flex-col mb-4">
-                <p class="font-cairo font-bold text-[20px] leading-[150%] tracking-[0%] text-right align-middle mb-3">
-                    {{ __('messages.deliverySite') }}</p>
-                <p class="font-cairo text-[14px] leading-[150%] tracking-[0%] text-right align-middle text-gray-500">
-                    {{ __('messages.deliverySiteMSG') }}</p>
+        <!-- Riyadh Cities Dropdown -->
+        <div x-data="{ cityOpen: false, selectedCity: '{{ __('messages.chooseCity') }}' }" class="relative mb-4">
+            <div @click="cityOpen = !cityOpen"
+                 class="w-full h-[40px] bg-white px-4 py-2 rounded-[12px] flex items-center justify-between border border-gray-400 text-gray-600 cursor-pointer">
+                <span x-text="selectedCity" class="flex-1"></span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                     stroke="currentColor" class="w-5 h-5 ml-2 shrink-0" :class="{ 'rotate-180': cityOpen }">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                </svg>
             </div>
-            <div>
-                @guest {{-- This block will only render if the user is NOT logged in --}}
-                    <a href="{{ route('login') }}"
-                        class="w-full h-[40px] bg-[#185D31] px-4 py-2 rounded-[12px] cursor-pointer text-[14px] text-white flex items-center justify-center">
-                        {{ __('messages.addLocation') }} {{-- E.g., "Login to Add Location" --}}
-                    </a>
-                @endguest
 
-                @auth {{-- This block will only render if the user IS logged in --}}
-                    <a onclick="openMapModal()"
-                        class="w-full h-[40px] bg-[#185D31] px-4 py-2 rounded-[12px] cursor-pointer text-[14px] text-white flex items-center justify-center">
-                        {{ __('messages.addLocationAuth') }} {{-- E.g., "Add Your Location" --}}
-                    </a>
-                @endauth
+            <div x-show="cityOpen" @click.away="cityOpen = false" x-cloak
+                 class="absolute z-10 w-full mt-1 bg-white rounded-[12px] shadow-lg border border-gray-300 overflow-hidden max-h-[200px] overflow-y-auto">
+                <ul class="py-1">
+                    <li><a href="#" @click.prevent="chooseCity('الرياض')" class="block px-4 py-2 hover:bg-gray-100">الرياض</a></li>
+                    <li><a href="#" @click.prevent="chooseCity('الدرعية')" class="block px-4 py-2 hover:bg-gray-100">الدرعية</a></li>
+                    <li><a href="#" @click.prevent="chooseCity('الخرج')" class="block px-4 py-2 hover:bg-gray-100">الخرج</a></li>
+                    <li><a href="#" @click.prevent="chooseCity('المجمعة')" class="block px-4 py-2 hover:bg-gray-100">المجمعة</a></li>
+                    <li><a href="#" @click.prevent="chooseCity('الزلفي')" class="block px-4 py-2 hover:bg-gray-100">الزلفي</a></li>
+                    <li><a href="#" @click.prevent="chooseCity('شقراء')" class="block px-4 py-2 hover:bg-gray-100">شقراء</a></li>
+                    <li><a href="#" @click.prevent="chooseCity('وادي الدواسر')" class="block px-4 py-2 hover:bg-gray-100">وادي الدواسر</a></li>
+                    <li><a href="#" @click.prevent="chooseCity('حوطة بني تميم')" class="block px-4 py-2 hover:bg-gray-100">حوطة بني تميم</a></li>
+                    <li><a href="#" @click.prevent="chooseCity('الأفلاج')" class="block px-4 py-2 hover:bg-gray-100">الأفلاج</a></li>
+                    <li><a href="#" @click.prevent="chooseCity('عفيف')" class="block px-4 py-2 hover:bg-gray-100">عفيف</a></li>
+                </ul>
             </div>
-            <div class="flex items-center justify-center my-4 text-gray-300">
-                <hr class="flex-grow border-t border-gray-300">
-                <span class="text-sm text-gray-500 font-medium mx-4">{{ __('messages.or') }}</span>
-                <hr class="flex-grow border-t border-gray-300">
-            </div>
-            <div x-data="{ open: false, selectedCity: '{{ __('messages.chooseCity') }}' }" class="relative">
-                <div @click="open = !open"
-                    class="dropdown w-full h-[40px] bg-white px-4 py-2 rounded-[12px] flex items-center justify-between border border-gray-400 text-gray-600 font-normal text-[16px] cursor-pointer">
-                    <a href="javascript:void(0)" x-text="selectedCity" class="flex-1 text-gray-600"></a>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor" class="w-5 h-5 ml-2 shrink-0" :class="{ 'rotate-180': open }">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                    </svg>
-                </div>
+        </div>
 
-                <div x-show="open" @click.away="open = false" x-cloak
-                    class="absolute z-10 w-full mt-1 bg-white rounded-[12px] shadow-lg border border-gray-300 overflow-hidden">
-                    <ul class="py-1">
-                        <li>
-                            <a href="#" @click.prevent="selectedCity = 'مدينة 1'; open = false"
-                                class="block px-4 py-2 text-gray-800 hover:bg-gray-100">مدينة 1</a>
-                        </li>
-                        <li>
-                            <a href="#" @click.prevent="selectedCity = 'مدينة 2'; open = false"
-                                class="block px-4 py-2 text-gray-800 hover:bg-gray-100">مدينة 2</a>
-                        </li>
-                        <li>
-                            <a href="#" @click.prevent="selectedCity = 'مدينة 3'; open = false"
-                                class="block px-4 py-2 text-gray-800 hover:bg-gray-100">مدينة 3</a>
-                        </li>
-                    </ul>
-                </div>
+        <!-- Map Option -->
+        @auth
+        <button @click="openMapModal()"
+                class="w-full h-[40px] bg-[#185D31] text-white rounded-[12px] flex items-center justify-center">
+            {{ __('messages.addLocationAuth') }}
+        </button>
+        @endauth
+
+        @guest
+        <a href="{{ route('login') }}"
+           class="w-full h-[40px] bg-[#185D31] text-white rounded-[12px] flex items-center justify-center">
+            {{ __('messages.addLocation') }}
+        </a>
+        @endguest
+    </div>
+
+    <!-- Map Modal -->
+    <div id="mapModal" x-show="showMapModal" x-cloak
+         class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="bg-white w-full max-w-4xl rounded-lg shadow-lg relative mx-4 md:mx-auto">
+            <!-- Search + Close -->
+            <div class="p-4 border-b flex items-center gap-2">
+                <input id="searchInput" type="text" placeholder="{{ __('messages.Search') }}"
+                       class="w-full p-2 border rounded">
+                <button @click="closeMapModal()" class="px-4 py-2 border rounded">{{ __('messages.return') }}</button>
+            </div>
+
+            <!-- Map -->
+            <div id="map" class="w-full h-[300px] md:h-[500px]"></div>
+
+            <!-- Confirm Button -->
+            <div class="flex justify-end p-4 border-t">
+                <button @click="saveLocation()"
+                        class="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800">
+                    {{ __('messages.confirmLocation') }}
+                </button>
             </div>
         </div>
     </div>
+</div>
+
+
+
+
+
 
 
 
@@ -1437,7 +1579,7 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
 
 
 
-<div id="mapModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+{{-- <div id="mapModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
     <div class="bg-white w-full max-w-4xl rounded-lg shadow-lg relative mx-4 md:mx-auto">
         <div class="p-4 border-b">
             <div class="flex items-center mt-2 border-[1px] border-[#767676] rounded-[12px] overflow-hidden">
@@ -1456,5 +1598,5 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
                 class="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800">{{ __('messages.confirmLocation') }}</button>
         </div>
     </div>
-</div>
+</div> --}}
 </div>

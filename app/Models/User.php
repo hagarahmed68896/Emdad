@@ -136,4 +136,15 @@ public function reportsReceived()
     return $this->morphMany(Report::class, 'reported');
 }
 
+    public function blocks()
+    {
+        return $this->hasMany(UserBlock::class, 'blocker_id');
+    }
+
+    // Users that blocked this user
+    public function blockedBy()
+    {
+        return $this->hasMany(UserBlock::class, 'blocked_id');
+    }
+
 }

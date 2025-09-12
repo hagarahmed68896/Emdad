@@ -5,60 +5,89 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
-use App\Models\Document;
+use App\Models\UserBlock;
+use App\Models\Product;
+use App\Models\Category;
+use Illuminate\Support\Facades\Auth;
 
 class BannedUserController extends Controller
 {
-       public function index(Request $request)
+  public function index(Request $request)
     {
-        $query = User::query();
-        $query->where('status', 'banned'); 
+        // ✅ Counts
+        $totalUsers = User::count();
+        $totalCustomers = User::where('account_type', 'customer')->count();
+        $totalSuppliers = User::where('account_type', 'supplier')->count();
+        $totalCategories = Category::count();
+        $totalProducts = Product::count();
 
-    
+        // ✅ Banned counts
+        $totalBannedUsers = UserBlock::count();
+        $totalBannedCustomers = UserBlock::whereHas('blocked', function ($q) {
+            $q->where('account_type', 'customer');
+        })->count();
+        $totalBannedSuppliers = UserBlock::whereHas('blocked', function ($q) {
+            $q->where('account_type', 'supplier');
+        })->count();
 
-        // Apply search filter
+        // ✅ Query banned users with relationships
+        $query = User::whereIn('id', UserBlock::pluck('blocked_id'))
+            ->with(['blocks', 'blockedBy']); 
+
+        // ✅ Search
         if ($request->filled('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('full_name', 'like', '%' . $request->search . '%')
-                  ->orWhere('email', 'like', '%' . $request->search . '%');
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('full_name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('phone_number', 'like', "%{$search}%");
             });
         }
 
-        // Apply sorting logic
-        // if ($request->filled('sort')) {
-        //     switch ($request->sort) {
-        //         case 'full_name_asc':
-        //             $query->orderBy('full_name', 'asc');
-        //             break;
-        //         case 'full_name_desc':
-        //             $query->orderBy('full_name', 'desc');
-        //             break;
-        //         case 'latest':
-        //             $query->orderBy('created_at', 'desc');
-        //             break;
-        //         case 'oldest':
-        //             $query->orderBy('created_at', 'asc');
-        //             break;
-        //         // No default case needed if you want no specific order when 'all' or empty
-        //     }
-        // } else {
-        //     // Default sorting if no sort is specified, e.g., by latest creation date
-        //     $query->orderBy('created_at', 'desc');
-        // }
+        // ✅ Filter (customer/supplier)
+        if ($request->has('account_type')) {
+            $query->where('account_type', $request->input('account_type'));
+        }
 
+        // ✅ Pagination
         $perPage = $request->input('per_page', 10);
         $users = $query->paginate($perPage);
-   $totalBannedUsers = User::where('status', 'banned')->count();
-$totalBannedSuppliers = User::where('status', 'banned')->where('account_type', 'supplier')->count();
-$totalBannedCustomers = User::where('status', 'banned')->where('account_type', 'customer')->count();
 
         return view('admin.banned_users', [
             'users' => $users,
-            'search' => $request->search,
-            'perPage' => $perPage,
+            'totalUsers' => $totalUsers,
+            'totalCustomers' => $totalCustomers,
+            'totalSuppliers' => $totalSuppliers,
+            'totalCategories' => $totalCategories,
+            'totalProducts' => $totalProducts,
             'totalBannedUsers' => $totalBannedUsers,
-            'totalBannedSuppliers' => $totalBannedSuppliers,
             'totalBannedCustomers' => $totalBannedCustomers,
+            'totalBannedSuppliers' => $totalBannedSuppliers,
+            'perPage' => $perPage,
+            'search' => $request->input('search'),
         ]);
+    }
+
+    // ✅ Ban a user
+    public function ban($id)
+    {
+        $adminId = Auth::id(); // the blocker (admin)
+        UserBlock::firstOrCreate([
+            'blocker_id' => $adminId,
+            'blocked_id' => $id,
+        ]);
+
+        return back()->with('success', 'تم حظر المستخدم بنجاح.');
+    }
+
+    // ✅ Unban a user
+    public function unban($id)
+    {
+        $adminId = Auth::id();
+        UserBlock::where('blocker_id', $adminId)
+            ->where('blocked_id', $id)
+            ->delete();
+
+        return back()->with('success', 'تم إلغاء حظر المستخدم بنجاح.');
     }
 }

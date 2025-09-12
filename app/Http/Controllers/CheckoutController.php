@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Cart;
+use App\Models\Bill;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -85,6 +86,16 @@ class CheckoutController extends Controller
                 ->sum(DB::raw('quantity * unit_price'));
             $order->total_amount = $finalTotal;
             $order->save();
+
+              // ✅ Step 3.5: Create Bill (Invoice)
+            $bill = Bill::create([
+                'user_id'     => $userId,
+                'order_id'    => $order->id,
+                'bill_number' => 'BILL-' . str_pad($order->id, 6, '0', STR_PAD_LEFT),
+                'payment_way' => $validated['payment_method'] === 'paypal' ? 'credit_card' : $validated['payment_method'],
+                'total_price' => $finalTotal,
+                'status'      => 'not payment', // default
+            ]);
 
             // Step 4: Notify suppliers after order_number & total_amount are set
             $order->load('orderItems.product.supplier.user'); // preload relations

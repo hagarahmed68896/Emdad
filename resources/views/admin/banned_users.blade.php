@@ -145,24 +145,35 @@
                 <h2 class="text-lg font-bold mb-4">تأكيد الحظر</h2>
                 <p class="text-gray-600 mb-6">هل أنت متأكد أنك تريد حظر هذا المستخدم؟</p>
             @endif
+<form action="{{ $user->status === 'banned' 
+        ? route('banned.unban', $user->id) 
+        : route('banned.ban', $user->id) }}" 
+      method="POST" class="flex justify-center gap-4">
+    @csrf
 
-            <form action="{{ route('admin.users.toggle-ban', $user->id) }}" method="POST" class="flex justify-center gap-4">
-                @csrf
-                @method('PATCH')
-                <button type="submit"
-                        class="px-4 py-2 rounded-xl bg-yellow-600 text-white hover:bg-yellow-700">
-                    @if ($user->status === 'banned')
-                        تأكيد إلغاء الحظر
-                    @else
-                        تأكيد الحظر
-                    @endif
-                </button>
-                <button type="button"
-                        @click="openBan = false"
-                        class="px-4 py-2 rounded-xl bg-gray-300 text-gray-800 hover:bg-gray-400">
-                    إلغاء
-                </button>
-            </form>
+    @if ($user->status === 'banned')
+        {{-- Unban uses DELETE --}}
+        @method('DELETE')
+        <button type="submit"
+                class="px-4 py-2 rounded-xl bg-yellow-600 text-white hover:bg-yellow-700">
+            تأكيد إلغاء الحظر
+        </button>
+    @else
+        {{-- Ban uses plain POST, no @method needed --}}
+        <button type="submit"
+                class="px-4 py-2 rounded-xl bg-yellow-600 text-white hover:bg-yellow-700">
+            تأكيد الحظر
+        </button>
+    @endif
+
+    <button type="button"
+            @click="openBan = false"
+            class="px-4 py-2 rounded-xl bg-gray-300 text-gray-800 hover:bg-gray-400">
+        إلغاء
+    </button>
+</form>
+
+
         </div>
     </div>
 </div>

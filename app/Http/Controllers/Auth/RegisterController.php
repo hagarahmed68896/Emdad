@@ -60,4 +60,49 @@ class RegisterController extends Controller
             // 'user' => $user->only(['id', 'full_name', 'email', 'account_type']),
         ], 200);
     }
+
+// Controller (Laravel)
+public function saveLocation(Request $request)
+{
+    $user = Auth::user();
+
+    try {
+        // prefer filled() so empty strings are rejected
+        if ($request->filled('city')) {
+            $user->address = $request->input('city');
+        } elseif ($request->filled('address') && $request->filled('lat') && $request->filled('lng')) {
+            $address = $request->input('address');
+            $lat = $request->input('lat');
+            $lng = $request->input('lng');
+
+            // ensure numeric lat/lng (extra safety server-side)
+            $lat = is_numeric($lat) ? $lat : null;
+            $lng = is_numeric($lng) ? $lng : null;
+
+            if ($lat === null || $lng === null) {
+                return response()->json(['success' => false, 'message' => 'Invalid coordinates'], 400);
+            }
+
+            $user->address = $address . " (" . $lat . "," . $lng . ")";
+        } else {
+            return response()->json(['success' => false, 'message' => 'Invalid data'], 400);
+        }
+
+        $user->save();
+
+        return response()->json(['success' => true]);
+    } catch (\Exception $e) {
+        // log details to help debugging
+        Log::error('saveLocation error: '.$e->getMessage(), [
+            'trace' => $e->getTraceAsString(),
+            'payload' => $request->all(),
+            'user_id' => optional($user)->id,
+        ]);
+
+        return response()->json(['success' => false, 'message' => 'Server error'], 500);
+    }}
+
+
+
+
 }

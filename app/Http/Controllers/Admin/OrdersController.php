@@ -14,8 +14,11 @@ public function index(Request $request)
     // إحصائيات عامة
     $totalOrders = Order::count();
     $completedOrders = Order::where('status', 'completed')->count();
-    $processingOrders = Order::where('status', 'pending')->count();
+    $processingOrders = Order::where('status', 'processing')->count();
     $cancelledOrders = Order::where('status', 'cancelled')->count();
+$completedPercentage = $totalOrders > 0 ? round(($completedOrders / $totalOrders) * 100, 2) : 0;
+$processingPercentage = $totalOrders > 0 ? round(($processingOrders / $totalOrders) * 100, 2) : 0;
+$cancelledPercentage = $totalOrders > 0 ? round(($cancelledOrders / $totalOrders) * 100, 2) : 0;
 
     // بناء الاستعلام
     $query = Order::query()->with(['user', 'orderItems']);
@@ -64,6 +67,9 @@ public function index(Request $request)
         'completedOrders' => $completedOrders,
         'processingOrders' => $processingOrders,
         'cancelledOrders' => $cancelledOrders,
+        'cancelledPercentage' => $cancelledPercentage,
+        'processingPercentage' => $processingPercentage,
+        'completedPercentage' => $completedPercentage,
         'statusFilter' => $request->input('status'),
         'sortFilter' => $request->input('sort'),
         'search' => $request->input('search'),
