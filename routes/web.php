@@ -40,6 +40,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\supplier\SupplierDashboardController;
 use App\Http\Controllers\Admin\FinancialSettlementController;
 use App\Http\Controllers\Admin\UserBlocksController;
+use App\Http\Controllers\Admin\MessagesController;
 
 
 use App\Models\Product;
@@ -113,11 +114,9 @@ Route::post('/verify-otp', [OtpController::class, 'verifyOtp'])->name('verifyOtp
              Route::post('/messages/{conversation}', [MessageController::class, 'store'])->name('messages.store');
              Route::delete('/conversations/{id}', [ConversationController::class, 'destroy']);
 // routes/web.php
-Route::post('/reports/{user}', [ReportController::class, 'reportSupplier'])
-     ->name('reports.supplier');
-     
-             Route::post('/users/{user}/report', [ReportController::class, 'reportUser']);
-             // routes/web.php or routes/api.php
+// Only use one of these, not both. This is the better, more RESTful option.
+Route::post('/users/{user}/report', [ReportController::class, 'reportUser'])->name('reports.user');
+
 
 Route::post('/suppliers/{user}/toggle-ban', [MessageController::class, 'toggleBan'])->name('suppliers.toggleBan');
 Route::post('/suppliers/{user}/ban', [MessageController::class, 'ban'])->name('suppliers.ban');
@@ -295,7 +294,15 @@ Route::post('/users/{user}/toggle-block', [MessageController::class, 'toggleBloc
                ->name('settlements.transfer');
               Route::post('/settlements/bulk-transfer', [FinancialSettlementController::class, 'bulkTransfer'])->name('settlements.bulkTransfer');
 
-                         
+              //messages
+                  Route::get('/messages', [MessagesController::class, 'index'])->name('admin.messages.index');
+    Route::get('/messages/{conversation}', [MessagesController::class, 'show'])->name('admin.messages.show');
+    Route::delete('/messages/{conversation}', [MessagesController::class, 'destroy'])->name('admin.messages.destroy');
+    Route::post('/messages/{conversation}/close', [MessagesController::class, 'close'])->name('admin.messages.close');
+Route::post('/conversations/{conversation}/action', [MessagesController::class, 'action'])
+     ->name('admin.conversations.action');
+        Route::patch('/admin/conversations/{id}/update-status', [MessagesController::class, 'updateStatus'])->name('admin.conversations.updateStatus');
+                 
           });
 
 

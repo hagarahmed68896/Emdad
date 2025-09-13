@@ -695,6 +695,7 @@ return [
     'edit_settlement' => 'تعديل بيانات التسوية المالية',
     'search_placeholder'  => 'بحث عن تسوية',
     'settlement_number' => 'رقم التسوية',
+    'report' =>'الابلاغ'
 
  
 

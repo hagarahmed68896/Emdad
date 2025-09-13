@@ -220,34 +220,45 @@
 
                         <div x-data="reportModal()">
 
-                            <button
-                                @click="
-                                    let conv = conversations.find(c => c.id === currentConversation);
-                                    console.log('Conversation object:', conv);
+                       <button
+    @click="
+        let conv = conversations.find(c => c.id === currentConversation);
+        
+        if (!conv || !conv.user || !conv.product || !conv.product.supplier) {
+            console.error('Conversation data is incomplete.');
+            return;
+        }
 
-                                    if (conv?.product?.supplier?.user?.id) {
-                                        console.log('userId:', conv.product.supplier.user.id);
-                                        selectedUserId  = conv.product.supplier.user.id;
-                                        selectedUserName = conv.product.supplier.user.full_name ?? '{{ __('messages.unknown_supplier') }}';
-                                        selectedUserImage = conv.product.supplier.user.profile_picture
-                                            ? '{{ asset('storage') }}/' + conv.product.supplier.user.profile_picture
-                                            : '/images/default.png';
-                                        openReportModal = true;
-                                    } else {
-                                        console.error('{{ __('messages.no_supplier_found') }}');
-                                    }
-                                "
-                                class="flex gap-2 items-center w-full px-4 py-2 text-right hover:bg-[#185D31] hover:text-white">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                     stroke-width="1.5" stroke="currentColor" class="size-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                          d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374
-                                          1.948 3.374h14.71c1.73 0 2.813-1.874
-                                          1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898
-                                          0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
-                                </svg>
-                                {{ __('messages.report_supplier') }}
-                            </button>
+        const authUserId = {{ auth()->user()->id }};
+        let userToReport = null;
+
+        // Check if the authenticated user is the supplier
+        if (conv.product.supplier.user.id === authUserId) {
+            userToReport = conv.user; // The buyer is the one to report
+        } 
+        // Check if the authenticated user is the buyer
+        else if (conv.user.id === authUserId) {
+            userToReport = conv.product.supplier.user; // The supplier is the one to report
+        } else {
+            console.error('{{ __('messages.no_user_found_to_report') }}');
+            return;
+        }
+
+        selectedUserId = userToReport.id;
+        selectedUserName = userToReport.full_name ?? '{{ __('messages.unknown_user') }}';
+        selectedUserImage = userToReport.profile_picture
+            ? '{{ asset('storage') }}/' + userToReport.profile_picture
+            : '/images/default.png';
+
+        openReportModal = true;
+    "
+    class="flex gap-2 items-center w-full px-4 py-2 text-right hover:bg-[#185D31] hover:text-white"
+>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+    </svg>
+    {{ __('messages.report') }}
+</button>
 
                             <div
                                 x-show="openReportModal"
@@ -336,7 +347,7 @@
                                             return;
                                         }
 
-                                        fetch(`/reports/${this.selectedUserId}`, {
+                                        fetch(`/users/${this.selectedUserId}/report`, {
                                             method: 'POST',
                                             headers: {
                                                 'Content-Type': 'application/json',
@@ -514,10 +525,30 @@
              class="p-4 bg-gray-200 text-center text-red-700 font-bold rounded-b-lg">
             <span>{{ __('messages.cannot_send_messages') }}</span>
         </div>
+          
+          {{-- Warning if conversation is closed or under review --}}
+        <div 
+            x-show="
+                activeConversation.status === 'closed' || 
+                (activeConversation.status === 'under_review' && activeConversation.block_until && new Date(activeConversation.block_until) > new Date())
+            "
+            class="p-4 bg-gray-200 text-center text-red-700 font-bold rounded-b-lg"
+        >
+            <template x-if="activeConversation.status === 'closed'">
+                <span>تم إغلاق المحادثة، لا يمكن إرسال رسائل.</span>
+            </template>
+
+            <template x-if="activeConversation.status === 'under_review'">
+                <span>
+                    تم وضع المحادثة تحت المراجعة، لا يمكن إرسال رسائل حتى 
+                    <span x-text="new Date(activeConversation.block_until).toLocaleString()"></span>
+                </span>
+            </template>
+        </div>
        {{-- Chat form (hidden if blocked) --}}
 <form @submit.prevent="sendMessage"
               id="chat-form"
-              x-show="!activeConversation?.is_blocked_by_me"
+              x-show="!activeConversation?.is_blocked_by_me && activeConversation.status === 'open'"
               class="p-4 flex flex-col border-t relative gap-2 bg-white">
                 {{-- Attachment preview --}}
                 <div x-show="attachmentName" class="flex items-center justify-between gap-2 text-sm text-gray-600 border p-2 rounded-lg bg-gray-50">
@@ -589,6 +620,8 @@
             </form>
             </div>
         </template>
+
+
 
 
     </div>

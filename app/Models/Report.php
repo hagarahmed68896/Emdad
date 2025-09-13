@@ -13,6 +13,7 @@ class Report extends Model
         'reported_type',
         'reason',
         'report_type',
+        'conversation_id'
     ];
 
     // Reporter (who made the report)

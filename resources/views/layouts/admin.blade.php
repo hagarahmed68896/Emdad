@@ -330,9 +330,11 @@
     </ul>
 </li>
                 <li class="mb-2">
-                    <a href="#"
-                        class="sidebar-link flex items-center p-3 text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl transition-colors duration-200">
-                        <i class="fas fa-comments ml-3 text-gray-500"></i>
+                    <a href="{{route('admin.messages.index')}}"
+ class="flex items-center p-2 transition-colors duration-200
+       {{ Request::is('admin/settlements*') 
+            ? 'bg-[#185D31] text-white rounded-xl' 
+            : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">                        <i class="fas fa-comments ml-3 text-gray-500"></i>
                         <span class="sidebar-text">إدارة المحادثات</span>
                     </a>
                 </li>

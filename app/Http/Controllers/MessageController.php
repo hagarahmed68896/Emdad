@@ -78,7 +78,9 @@ public function index(Request $request)
     if ($request->has('product_id')) {
         $product = Product::with('supplier')->findOrFail($request->get('product_id'));
         $conversation = Conversation::firstOrCreate(
-            ['user_id' => Auth::id(), 'product_id' => $product->id]
+            ['user_id' => Auth::id(), 'product_id' => $product->id],
+                ['status' => 'open'] // ✅ new conversations start as open
+
         );
         $openConversationId = $conversation->id;
     }
@@ -307,8 +309,14 @@ public function toggleBlock($id)
             ->where('blocked_id', $blockedId)
             ->delete();
 
-               // 🔹 Update user status back to active
-        User::where('id', $blockedId)->update(['status' => 'active']);
+// 🔹 إعادة تفعيل المحادثات عند إلغاء الحظر
+Conversation::where(function ($q) use ($blocker, $blockedId) {
+        $q->where('user_id', $blocker->id)
+          ->orWhere('user_id', $blockedId);
+    })
+    ->update(['status' => 'open']);
+
+
 
         return response()->json([
             'success' => true,
@@ -323,6 +331,15 @@ public function toggleBlock($id)
             'updated_at' => now(),
         ]);
     User::where('id', $blockedId)->update(['status' => 'banned']);
+
+       // 🔹 غلق المحادثات عند الحظر
+Conversation::where(function ($q) use ($blocker, $blockedId) {
+        $q->where('user_id', $blocker->id)
+          ->orWhere('user_id', $blockedId);
+    })
+    ->update(['status' => 'closed']);
+
+
 
         return response()->json([
             'success' => true,

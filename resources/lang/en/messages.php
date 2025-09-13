@@ -708,6 +708,7 @@ return [
     'totalTransferred' => 'Total Transferred Amounts',
     'edit_settlement' => 'Edit',
     'settlement_number' => 'Settlement number',
+    'report' => 'Report',
 
 
 
