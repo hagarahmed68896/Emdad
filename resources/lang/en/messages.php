@@ -709,6 +709,8 @@ return [
     'edit_settlement' => 'Edit',
     'settlement_number' => 'Settlement number',
     'report' => 'Report',
+    'otp_incorrect' => 'Invalid or expired OTP',
+    'not_active account' => 'Your account is not active. Please contact support.',
 
 
 

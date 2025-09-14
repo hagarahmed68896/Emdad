@@ -67,6 +67,12 @@ class UserController extends Controller
         $totalCustomers = User::where('account_type', 'customer')->count();
         $totalSuppliers = User::where('account_type', 'supplier')->count(); // Adjust 'supplier' if your type is different
         $totalDocuments = Document::count();
+
+        // ✅ Avoid division by zero
+$customerPercent   = $totalUsers > 0 ? round(($totalCustomers / $totalUsers) * 100, 2) : 0;
+$supplierPercent   = $totalUsers > 0 ? round(($totalSuppliers / $totalUsers) * 100, 2) : 0;
+$documentsPercent  = $totalUsers > 0 ? round(($totalDocuments / $totalUsers) * 100, 2) : 0;
+
         // --- End variable definitions ---
 
         return view('admin.customer', [
@@ -80,6 +86,9 @@ class UserController extends Controller
             'totalCustomers' => $totalCustomers,
             'totalSuppliers' => $totalSuppliers,
             'totalDocuments' => $totalDocuments,
+            'documentsPercent' => $documentsPercent,
+            'supplierPercent' => $supplierPercent,
+            'customerPercent' => $customerPercent,
             // --- End passing new variables ---
         ]);
     }
@@ -131,8 +140,10 @@ class UserController extends Controller
     $request->validate([
         'full_name' => ['required', 'string', 'max:255'],
         'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'phone_number' => 'required|digits:9|unique:users,phone_number',
-        'address' => ['nullable', 'string', 'max:255'],
+  'phone_number' => [
+        'required',
+        'digits:9',
+        Rule::unique('users', 'phone_number')->ignore($user->id)],        'address' => ['nullable', 'string', 'max:255'],
         'status' => ['required', Rule::in(['active', 'inactive', 'banned'])],
             'password' => 'nullable|string|min:8|confirmed|regex:/[A-Z]/|regex:/[0-9]/',
     ]);

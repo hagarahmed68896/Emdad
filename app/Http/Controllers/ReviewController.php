@@ -7,6 +7,10 @@ use App\Models\Review;
 use Illuminate\Support\Facades\Auth;
 use App\Notifications\NewReviewNotification;
 use App\Models\Product;
+use App\Models\Order;
+use App\Notifications\AdminActionNotification;
+use Illuminate\Support\Facades\Notification;
+
 
 
 class ReviewController extends Controller
@@ -41,39 +45,69 @@ public function toggleLike(Review $review)
 
 public function store(Request $request)
 {
-    $request->validate([
-        'product_id' => 'required|exists:products,id',
-        'rating' => 'required|integer|min:1|max:5',
-        'comment' => 'nullable|string|max:1000',
-    ]);
+    try {
+        $validated = $request->validate([
+            'product_id'   => 'nullable|exists:products,id',
+            'rating'       => 'required|integer|min:1|max:5',
+            'comment'      => 'nullable|string|max:1000',
+            'issue_type'   => 'nullable|in:product,order',
+            'order_id'   => 'nullable|exists:orders,id',
+        ]);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'success' => false,
+            'errors'  => $e->errors()
+        ], 422);
+    }
 
     $user = Auth::user();
     if (!$user) {
         return response()->json(['message' => 'Unauthorized'], 401);
     }
 
-    $review = \App\Models\Review::create([
-        'product_id' => $request->product_id,
-        'user_id' => $user->id,
-        'rating' => $request->rating,
-        'comment' => $request->comment,
+    $isComplaint = false;
+    if ($request->rating > 0 && $request->rating <= 3) {
+        $isComplaint = true;
+    }
+    if ($request->complaint === 'yes') {
+        $isComplaint = true;
+    }
+
+    $review = Review::create([
+        'user_id'      => $user->id,
+        'product_id'   => $request->product_id,
+        'rating'       => $request->rating,
+        'comment'      => $request->comment,
+        'issue_type'   => $request->issue_type,
+        'order_id' => $request->order_id,
+        'is_complaint' => $isComplaint,
+        'review_date'  => now(),
     ]);
 
-    $product = \App\Models\Product::with('supplier.user')->findOrFail($request->product_id);
+    // 🔔 Notifications
+    if ($request->filled('product_id')) {
+        $product = Product::with('supplier.user')->find($request->product_id);
+        if ($product && $product->supplier && $product->supplier->user) {
+            $supplier = $product->supplier->user;
+            $settings = $supplier->notification_settings ?? [];
 
-    if ($product->supplier && $product->supplier->user) {
-        $supplier = $product->supplier->user;
-
-        $settings = $supplier->notification_settings ?? [];
-
-        if (($settings['receive_in_app'] ?? true) &&
-            ($settings['receive_new_review'] ?? true)) {
-            $supplier->notify(new \App\Notifications\NewReviewNotification($review));
+            if (($settings['receive_in_app'] ?? true) &&
+                ($settings['receive_new_review'] ?? true)) {
+                $supplier->notify(new NewReviewNotification($review));
+            }
         }
+    } elseif ($request->filled('order_number')) {
+        $admins = \App\Models\User::where('account_type', 'admin')->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new \App\Notifications\NewOrderReviewNotification($review));
+        }
+        $user->notify(new \App\Notifications\NewOrderReviewNotification($review));
     }
 
     return response()->json(['success' => true]);
 }
+
+
 
 
 public function edit(Review $review)
@@ -107,6 +141,81 @@ public function destroy(Review $review)
 
     return redirect()->back()->with('success', __('messages.review_deleted'));
 }
+
+
+public function productsByOrder($orderId)
+{
+    $order = Order::with('orderItems.product')->findOrFail($orderId);
+
+    $products = $order->orderItems->map(function ($item) {
+        return [
+            'id' => $item->product->id,
+            'name' => $item->product->name,
+            'image' => $item->product->image ?? asset('images/default-product.png'),
+        ];
+    });
+
+    return response()->json($products);
+}
+
+// app/Http/Controllers/ReviewController.php
+
+public function close(Request $request, Review $review)
+{
+    $review->status = 'rejected';
+    $review->save();
+
+    return response()->json(['success' => true]);
+}
+
+
+public function takeAction(Request $request, Review $review)
+{
+    $targetUser = $review->product?->supplier?->user;
+
+    switch ($request->input('action')) {
+        case 'approved':
+            $review->update(['status' => 'approved']);
+
+            if ($targetUser) {
+                $targetUser->notify(new AdminActionNotification(
+                    'تم توجيه تحذير لك من قبل الإدارة.',
+                    $review->rating,
+                    $review->comment,
+                    $review->issue_type,
+                    $review->order_number,
+                    optional($review->product)->name
+                ));
+            }
+            break;
+
+            case 'pending':
+            $review->update(['status' => 'pending']);
+
+            // Set the user's account status to inactive
+            if ($targetUser) {
+                $targetUser->update(['status' => 'inactive']); // 👈 Add this line
+                // Optional: Notify the user about the temporary suspension
+                $targetUser->notify(new AdminActionNotification(
+                    'تم إيقاف حسابك مؤقتاً بسبب شكوى.',
+                    $review->rating,
+                    $review->comment,
+                    $review->issue_type,
+                    $review->order_number,
+                    optional($review->product)->name
+                ));
+            }
+            break;
+
+        case 'rejected':
+            $review->update(['status' => 'rejected']);
+            break;
+    }
+
+    return response()->json(['success' => true]);
+}
+
+
 
 
 

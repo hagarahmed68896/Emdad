@@ -127,6 +127,8 @@ Route::post('/users/{user}/toggle-block', [MessageController::class, 'toggleBloc
 
              Route::post('/messages/upload-attachment', [MessageController::class,'uploadAttachment'])->name('messages.upload-attachment');
              
+Route::get('/orders/{order}/products', [ReviewController::class, 'productsByOrder'])
+    ->name('orders.products');
 
 
           // Admin-specific routes
@@ -274,6 +276,10 @@ Route::post('/users/{user}/toggle-block', [MessageController::class, 'toggleBloc
                     ->name('admin.reviews.export.csv');
 
                Route::delete('reviews/bulk-delete', [ReviewsController::class, 'bulkDelete'])->name('admin.reviews.bulkDelete');
+// routes/web.php
+Route::post('/reviews/{review}/close', [ReviewController::class, 'close'])->name('admin.reviews.close');
+Route::post('/reviews/{review}/action', [ReviewController::class, 'takeAction'])
+    ->name('admin.reviews.action');
 
                // ادارة الاعدادات بالكامل
                Route::get('/settings/profile', [SettingsController::class, 'index'])->name('admin.profile.index');

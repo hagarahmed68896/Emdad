@@ -54,49 +54,54 @@
                 </div>
             </div>
 
-            {{-- كلمة المرور --}}
+            {{-- كلمة المرور
             <div>
                 <label class="block font-bold text-[20px] text-[#212121]">كلمة المرور</label>
                 <input type="password" x-model="form.password"
-                    placeholder="اتركها فارغة إذا لم ترغب في التغيير"
+                    placeholder="change"
                     class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 rounded-xl">
-            </div>
+            </div> --}}
 
             {{-- حالة الحساب --}}
-            <div x-data="{ open: false, selected: '{{ old('status', $user->status) }}' }" class="relative w-full">
-                <label class="block font-bold text-[20px] text-[#212121]">حالة الحساب</label>
-                <button type="button"
-                    @click="open = !open"
-                    class="w-full flex justify-between items-center border border-gray-300 rounded-xl shadow-sm py-3 px-4 focus:outline-none focus:ring-[#185D31] focus:border-[#185D31]">
-                    <span x-text="selected === 'active' ? 'نشط' : selected === 'inactive' ? 'غير نشط' : 'محظور'"></span>
-                    <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                </button>
+           <div x-data="{ 
+        open: false, 
+        selected: '{{ old('status', $user->status) }}' 
+    }" 
+    x-init="$watch('selected', value => form.status = value)" 
+    class="relative w-full">
+    
+    <label class="block font-bold text-[20px] text-[#212121]">حالة الحساب</label>
+    <button type="button"
+        @click="open = !open"
+        class="w-full flex justify-between items-center border border-gray-300 rounded-xl shadow-sm py-3 px-4 focus:outline-none focus:ring-[#185D31] focus:border-[#185D31]">
+        <span x-text="selected === 'active' ? 'نشط' : selected === 'inactive' ? 'غير نشط' : 'محظور'"></span>
+        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+    </button>
 
-                <div x-show="open" @click.away="open = false"
-                    class="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-xl shadow-lg py-2">
+    <div x-show="open" @click.away="open = false"
+        class="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-xl shadow-lg py-2">
+        <label class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
+            <input type="radio" value="active" x-model="selected"
+                class="shrink-0 appearance-none rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
+            <span class="ml-2">نشط</span>
+        </label>
+        <label class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
+            <input type="radio" value="inactive" x-model="selected"
+                class="shrink-0 appearance-none rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
+            <span class="ml-2">غير نشط</span>
+        </label>
+        <label class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
+            <input type="radio" value="banned" x-model="selected"
+                class="shrink-0 appearance-none rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
+            <span class="ml-2">محظور</span>
+        </label>
+    </div>
 
-                    <label class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                        <input type="radio" value="active" x-model="selected"
-                            class="shrink-0  appearance-none  rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
-                        <span class="ml-2">نشط</span>
-                    </label>
+    <input type="hidden" x-model="form.status">
+</div>
 
-                    <label class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                        <input type="radio" value="inactive" x-model="selected"
-                            class="shrink-0  appearance-none  rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
-                        <span class="ml-2">غير نشط</span>
-                    </label>
-
-                    <label class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                        <input type="radio" value="banned" x-model="selected"
-                            class="shrink-0  appearance-none  rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
-                        <span class="ml-2">محظور</span>
-                    </label>
-                </div>
-                <input type="hidden" x-model="form.status">
-            </div>
 
             {{-- أزرار الإجراء --}}
             <div class="flex space-x-4 mt-6">

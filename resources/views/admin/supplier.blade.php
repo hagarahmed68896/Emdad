@@ -258,7 +258,7 @@
                             <td class="px-6 py-4">{{ $supplier->email }}</td>
                             <td class="px-6 py-4">{{ $supplier->phone_number ?? 'N/A' }}</td>
                             <td class="px-6 py-4">{{ $supplier->address?? 'N/A' }}</td>
-                            <td class="px-6 py-4">—</td> {{-- عدد المنتجات (أضفها إذا لديك علاقة) --}}
+                            <td class="px-6 py-4">{{ $supplier->business?->products_count ?? 0 }}</td> {{-- عدد المنتجات (أضفها إذا لديك علاقة) --}}
                             <td class="px-6 py-4">
                                 @php
                                     $statusClass = match($supplier->status) {

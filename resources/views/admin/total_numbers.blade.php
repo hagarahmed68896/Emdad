@@ -10,8 +10,11 @@
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
   <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
 </svg>
-
-                            0.43%
+@if( $totalUsers ==0)
+                            0%
+                            @else
+                            100%
+                            @endif
                         </p>
                     </div>
                     <i class="fas fa-users text-4xl text-[#185D31] opacity-20"></i>
@@ -27,7 +30,7 @@
   <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
 </svg>
 
-                            0.43%
+                            {{ $customerPercent }}%
                         </p>
                     </div>
                     <i class="fas fa-user-friends text-4xl text-[#185D31] opacity-20"></i>
@@ -43,7 +46,7 @@
   <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
 </svg>
 
-                            0.43%
+                            {{ $supplierPercent }}%
                         </p>
                     </div>
                     <i class="fas fa-store text-4xl text-[#185D31] opacity-20"></i>
@@ -57,8 +60,11 @@
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
   <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
 </svg>
-
-                            0.43%
+@if($totalDocuments)
+                            100%
+                            @else
+                            0%
+                            @endif
                         </p>
                     </div>
                     <i class="fas fa-file-alt text-4xl text-[#185D31] opacity-20"></i>

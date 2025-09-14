@@ -20,7 +20,9 @@ public function index(Request $request)
     $sortFilter = $request->get('sort');
     $perPage = $request->get('per_page', 10);
 
-    $query = User::with('business')
+$query = User::with(['business' => function ($q) {
+    $q->withCount('products');
+}])
 ->where('account_type', 'supplier');
 
     if ($search) {
@@ -59,6 +61,12 @@ public function index(Request $request)
         $totalCustomers = User::where('account_type', 'customer')->count();
         $totalSuppliers = User::where('account_type', 'supplier')->count(); // Adjust 'supplier' if your type is different
         $totalDocuments = Document::count();
+
+        // ✅ Avoid division by zero
+$customerPercent   = $totalUsers > 0 ? round(($totalCustomers / $totalUsers) * 100, 2) : 0;
+$supplierPercent   = $totalUsers > 0 ? round(($totalSuppliers / $totalUsers) * 100, 2) : 0;
+$documentsPercent  = $totalUsers > 0 ? round(($totalDocuments / $totalUsers) * 100, 2) : 0;
+
 return view('admin.supplier', [
     'suppliers' => $suppliers,
     'search' => $search,
@@ -69,6 +77,9 @@ return view('admin.supplier', [
     'totalCustomers' => $totalCustomers,
     'totalSuppliers' => $totalSuppliers,
     'totalDocuments' => $totalDocuments,
+    'documentsPercent' => $documentsPercent,
+    'supplierPercent' => $supplierPercent,
+    'customerPercent' => $customerPercent,
 ]);
 
 }
@@ -140,8 +151,11 @@ public function update(Request $request, User $supplier)
     $request->validate([
         'full_name' => ['required', 'string', 'max:255'],
         'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($supplier->id)],
-            'phone_number' => 'required|digits:9|unique:users,phone_number',
-        'address' => ['nullable', 'string', 'max:255'],
+  'phone_number' => [
+        'required',
+        'digits:9',
+        Rule::unique('users', 'phone_number')->ignore($supplier->id)],
+                'address' => ['nullable', 'string', 'max:255'],
         'status' => ['required', Rule::in(['active', 'inactive', 'banned'])],
         'company_name' => ['nullable', 'string', 'max:255'],
                     'password' => 'nullable|string|min:8|confirmed|regex:/[A-Z]/|regex:/[0-9]/',

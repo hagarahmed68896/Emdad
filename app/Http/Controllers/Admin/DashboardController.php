@@ -62,6 +62,12 @@ $productsByCategory = Category::leftJoin('sub_categories', 'categories.id', '=',
         $totalSuppliers = User::where('role', 'supplier')->count();
         $totalDocuments = Order::count();
 
+        // ✅ Avoid division by zero
+$customerPercent   = $totalUsers > 0 ? round(($totalCustomers / $totalUsers) * 100, 2) : 0;
+$supplierPercent   = $totalUsers > 0 ? round(($totalSuppliers / $totalUsers) * 100, 2) : 0;
+$documentsPercent  = $totalUsers > 0 ? round(($totalDocuments / $totalUsers) * 100, 2) : 0;
+
+
         return view('admin.dashboard', compact(
             'usersPerWeek',
             'ordersRevenue',
@@ -72,7 +78,10 @@ $productsByCategory = Category::leftJoin('sub_categories', 'categories.id', '=',
             'totalUsers',
             'totalCustomers',
             'totalSuppliers',
-            'totalDocuments'
+            'totalDocuments',
+            'customerPercent',
+            'supplierPercent',
+            'documentsPercent'
         ));
     }
 }

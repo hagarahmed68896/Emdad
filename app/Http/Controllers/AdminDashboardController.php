@@ -19,6 +19,10 @@ class AdminDashboardController extends Controller
         $totalDocuments  = Document::count();
         $totalOrders     = Order::count();
         $totalRevenue    = Order::sum('total_amount');
+        $customerPercent   = $totalUsers > 0 ? round(($totalCustomers / $totalUsers) * 100, 2) : 0;
+        $supplierPercent   = $totalUsers > 0 ? round(($totalSuppliers / $totalUsers) * 100, 2) : 0;
+        $documentsPercent  = $totalUsers > 0 ? round(($totalDocuments / $totalUsers) * 100, 2) : 0;
+
 
         // المستخدمين حسب الأسابيع (آخر 6 أسابيع)
         $usersPerWeek = User::select(
@@ -73,7 +77,10 @@ class AdminDashboardController extends Controller
             'productsByCategory',
             'ordersByStatus',
             'topProducts',
-            'latestOrders'
+            'latestOrders',
+            'customerPercent',
+            'supplierPercent',
+            'documentsPercent'
         ));
     }
 }

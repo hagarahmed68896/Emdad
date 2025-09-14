@@ -293,7 +293,7 @@
                 <form @submit.prevent="submitForm" class="space-y-6">
                     {{-- Target Category --}}
                     <div>
-                        <label class="block font-semibold mb-2">الفئة المستهدفة</label>
+                        <label class="block font-bold mb-2">الفئة المستهدفة</label>
                         <div class="border rounded-xl overflow-hidden">
                             <label class="flex items-center justify-between px-4 py-2 cursor-pointer hover:bg-gray-100">
                                 <span>عميل</span>
@@ -309,7 +309,7 @@
 
                     {{-- Action --}}
                     <div>
-                        <label class="block font-semibold mb-2">الإجراء</label>
+                        <label class="block font-bold mb-2">الإجراء</label>
                         <div class="border rounded-xl overflow-hidden">
                             <label class="flex items-center justify-between px-4 py-2 cursor-pointer hover:bg-gray-100">
                                 <span>إغلاق المحادثة فقط</span>
@@ -328,7 +328,7 @@
 
                     {{-- Notes --}}
                     <div>
-                        <label class="block font-semibold mb-2">ملاحظات</label>
+                        <label class="block font-bold mb-2">ملاحظات</label>
                         <textarea x-model="form.notes" placeholder="أدخل الملاحظات" class="w-full border border-gray-300 rounded-xl p-3 resize-none"></textarea>
                     </div>
 

@@ -498,11 +498,12 @@
                     </div>
                 </div>
 
-
-                <button class="focus:outline-none">
+@include('admin.admin_notifications_popup')
+                {{-- <button class="focus:outline-none">
                     <img src="{{ asset('images/interface-alert-alarm-bell-2--alert-bell-ring-notification-alarm--Streamline-Core.svg') }}"
                         alt="Notification Icon">
-                </button>
+                </button> --}}
+
 
                 <div class="flex items-center rtl:mr-6 ltr:ml-6">
                     <img src="{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : asset('images/Unknown_person.jpg') }}"

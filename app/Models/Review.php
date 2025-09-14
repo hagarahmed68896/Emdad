@@ -12,30 +12,45 @@ class Review extends Model
     protected $fillable = [
         'user_id',
         'product_id',
+        'order_id',      // ⬅️ added
         'rating',
         'comment',
+        'issues',        // ⬅️ added
+        'issue_type',    // ⬅️ added
+        'status',        // ⬅️ added
         'review_date',
+        'is_complaint',
     ];
 
-    // Each review belongs to a user
+    protected $casts = [
+        'issues' => 'array',
+        'review_date' => 'datetime',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    // Each review belongs to a product
     public function product()
     {
         return $this->belongsTo(Product::class);
     }
+
+    public function order()
+{
+    return $this->belongsTo(Order::class);
+}
+
+
     public function likes()
-{
-    return $this->hasMany(ReviewLike::class);
+    {
+        return $this->hasMany(ReviewLike::class);
+    }
+
+    public function isLikedBy(User $user): bool
+    {
+        return $this->likes()->where('user_id', $user->id)->exists();
+    }
 }
 
-public function isLikedBy(User $user): bool
-{
-    return $this->likes()->where('user_id', $user->id)->exists();
-}
-
-}

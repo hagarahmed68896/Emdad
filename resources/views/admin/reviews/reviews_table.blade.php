@@ -85,16 +85,16 @@
                 @php
                     $statusClass = '';
                     $statusText = '';
-
-                    if ($review->rating >= 4) {
+                    if($review->is_complaint){
+                         $statusClass = 'bg-red-100 text-red-800';
+                         $statusText = 'شكوي';
+                    }
+                    elseif ($review->rating >= 4) {
                         $statusClass = 'bg-green-100 text-green-800';
                         $statusText = 'إيجابي';
                     } elseif ($review->rating >= 2) {
                         $statusClass = 'bg-yellow-100 text-yellow-800';
                         $statusText = 'سلبي';
-                    } else {
-                        $statusClass = 'bg-red-100 text-red-800';
-                        $statusText = 'شكوي';
                     }
                 @endphp
 

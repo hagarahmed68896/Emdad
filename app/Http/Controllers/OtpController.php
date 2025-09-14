@@ -137,7 +137,7 @@ class OtpController extends Controller
         ]);
 
         if (session('otp') != $request->otp || now()->gt(session('otp_expires_at'))) {
-            return response()->json(['success' => false, 'message' => 'Invalid or expired OTP'], 422);
+            return response()->json(['success' => false, 'message' => __('messages.otp_icorrect')], 422);
         }
 
         $authMethod = session('otp_auth_method');
@@ -145,6 +145,14 @@ class OtpController extends Controller
 
         if ($authMethod === 'login') {
             $user = User::where('phone_number', $phone)->firstOrFail();
+
+                 // Check if the user's account is active before logging in
+            if ($user->status !== 'active') {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('messages.not_active account'),
+                ], 403); // Use a 403 Forbidden status code
+            }
             Auth::login($user);
 
         } elseif ($authMethod === 'register') {

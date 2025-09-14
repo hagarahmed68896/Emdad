@@ -695,7 +695,9 @@ return [
     'edit_settlement' => 'تعديل بيانات التسوية المالية',
     'search_placeholder'  => 'بحث عن تسوية',
     'settlement_number' => 'رقم التسوية',
-    'report' =>'الابلاغ'
+    'report' =>'الابلاغ',
+    'otp_icorrect' => 'رمز تحقق غير صالح',
+    'not_active account' => 'حسابك غير نشط حاليا, يمكنك التواصل معنا'
 
  
 

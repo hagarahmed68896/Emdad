@@ -11,32 +11,42 @@ class ReviewsController extends Controller
 {
 public function index(Request $request)
 {
-    // إحصائيات عامة للمراجعات
+    // General statistics for the reviews
     $totalReviews = Review::count();
     $positiveRatedReviews = Review::where('rating', '>=', 4)->count();
     $negativeRatedReviews = Review::where('rating', '<', 4)->count();
 
-    // بناء الاستعلام
+    // Calculate percentages
+    $positivePercent = $totalReviews > 0 ? round(($positiveRatedReviews / $totalReviews) * 100, 2) : 0;
+    $negativePercent = $totalReviews > 0 ? round(($negativeRatedReviews / $totalReviews) * 100, 2) : 0;
+
+    // Build the query
     $query = Review::with(['user', 'product']);
 
-    // فلترة حسب التقييم
+    // Filter by rating
     if ($request->filled('ratingFilter')) {
-        switch ($request->ratingFilter) {
-            case 'positive':
-                $query->where('rating', '>=', 4);
-                break;
-            case 'negative':
-                $query->where('rating', '>=', 3);
-                break;
-            case 'complain':
-                $query->where('rating', '<', 2);
-                break;
-            default:
-                break;
+        $rating = $request->ratingFilter;
+
+        if (is_numeric($rating)) {
+            // If numeric, filter by exact star value
+            $query->where('rating', $rating);
+        } else {
+            // If string (positive/negative/complain), filter accordingly
+            switch ($rating) {
+                case 'positive':
+                    $query->where('rating', '>=', 4);
+                    break;
+                case 'negative':
+                    $query->where('rating', '<', 4);
+                    break;
+                case 'complain':
+                    $query->where('rating', '<', 2);
+                    break;
+            }
         }
     }
 
-    // فلترة بالبحث في التعليق أو اسم المستخدم
+    // Filter by search in comment or user name
     if ($request->filled('search')) {
         $query->where(function ($q) use ($request) {
             $q->where('comment', 'like', '%' . $request->search . '%')
@@ -46,7 +56,7 @@ public function index(Request $request)
         });
     }
 
-    // الترتيب
+    // Sorting
     if ($request->filled('sort')) {
         switch ($request->sort) {
             case 'highest_rating':
@@ -68,19 +78,23 @@ public function index(Request $request)
         $query->latest();
     }
 
-    // تنفيذ الاستعلام مع Pagination
-    $reviews = $query->paginate(10);
+    // Execute the query with pagination
+    $reviews = $query->paginate(10)->withQueryString();
 
     return view('admin.reviews.index', [
         'reviews' => $reviews,
         'totalReviews' => $totalReviews,
         'positiveRatedReviews' => $positiveRatedReviews,
         'negativeRatedReviews' => $negativeRatedReviews,
+        'negativePercent' => $negativePercent,
+        'positivePercent' => $positivePercent,
         'ratingFilter' => $request->input('ratingFilter'),
         'sortFilter' => $request->input('sort'),
         'search' => $request->input('search'),
     ]);
 }
+
+
 
 
 
