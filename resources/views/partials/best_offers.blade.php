@@ -57,32 +57,33 @@
 </style>
 
 <div class="bg-[#F8F9FA] w-full pt-5 px-[64px] py-3">
-    {{-- Best Offers Section --}}
-    <div class="flex justify-between mb-6 rounded-xl bg-[#F8F9FA]">
-        <div class="flex justify-between w-full mb-6 md:mb-0">
-            <div class="flex flex-col text-right md:text-right">
-                {{-- Translated: Limited Offers --}}
-                <p class="text-[#1F2B45] text-[16px] px-[16px] py-[8px] bg-white rounded-[40px] mb-4 w-[145px]">
-                    {{ __('messages.limited_offers') }}</p>
-                {{-- Translated: Best Offers --}}
-                <p class="text-3xl sm:text-4xl md:text-[40px] font-bold text-gray-900 mb-2 mt-2">
-                    {{ __('messages.best_offers') }}</p>
-                {{-- Translated: Description --}}
-                <p class="text-[#696969] text-[20px] sm:text-lg mt-2 ">{{ __('messages.best_offers_description') }}</p>
-            </div>
+  {{-- Best Offers Section --}}
+<div class="flex flex-col sm:flex-row items-start sm:items-center mb-6 rounded-xl bg-[#F8F9FA] p-4">
+    {{-- Left Text --}}
+    <div class="flex flex-col sm:text-right flex-1">
+        <p class="text-[#1F2B45] text-[16px] px-[16px] py-[8px] bg-white rounded-[40px] mb-4 w-fit md:mx-0">
+            {{ __('messages.limited_offers') }}
+        </p>
+        <p class="text-3xl sm:text-4xl md:text-[40px] font-bold text-gray-900 mb-2 mt-2">
+            {{ __('messages.best_offers') }}
+        </p>
+        <p class="text-[#696969] text-[20px] sm:text-lg mt-2">
+            {{ __('messages.best_offers_description') }}
+        </p>
+    </div>
 
-            {{-- Countdown Timer Display --}}
- <div class="countdown-timer ltr-timer bg-[#EDEDED] flex font-extrabold text-[#1F2B45] p-4 text-[20px] sm:text-[32px] h-[60px] sm:h-[78px] rounded-[12px]" 
-     data-last-offer-end="{{ $onOfferProducts->max(fn($p) => $p->offer?->offer_end) }}">
-    <span class="countdown-days">00</span><span class="mx-1">:</span>
-    <span class="countdown-hours">00</span><span class="mx-1">:</span>
-    <span class="countdown-minutes">00</span><span class="mx-1">:</span>
-    <span class="countdown-seconds">00</span>
+    {{-- Countdown Timer --}}
+    <div class="countdown-timer ltr-timer bg-[#EDEDED] flex font-extrabold text-[#1F2B45] 
+                p-2 sm:p-4 text-[20px] sm:text-[32px] h-[60px] sm:h-[78px] rounded-[12px] 
+                w-fit mx-auto sm:mx-0 mt-4 sm:mt-0 ml-auto"
+         data-last-offer-end="{{ $onOfferProducts->max(fn($p) => $p->offer?->offer_end) }}">
+        <span class="countdown-days">00</span><span class="mx-1">:</span>
+        <span class="countdown-hours">00</span><span class="mx-1">:</span>
+        <span class="countdown-minutes">00</span><span class="mx-1">:</span>
+        <span class="countdown-seconds">00</span>
+    </div>
 </div>
 
-
-        </div>
-    </div>
 
     {{-- Product Grid Section - Now a Swiper Container --}}
     <div class="swiper offerSwiper mb-4 bg-[#F8F9FA] px-[64px] py-8 ">

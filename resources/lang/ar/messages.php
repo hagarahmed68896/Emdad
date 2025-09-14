@@ -40,7 +40,7 @@ return [
     'customer' => 'عميل',
     'delete' => 'إزالة',
     'deliver' => ' توصيل إلى الرياض',
-
+    'chooseLocation' => 'حدد موقعك',
     'deliver to' => 'توصيل إلى',
     'deliverySite' => 'حدد موقعك.',
     'deliverySiteMSG' => 'تختلف خيارات الشحن والرسوم بناءً على موقعك.',

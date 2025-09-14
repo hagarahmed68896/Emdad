@@ -1,4 +1,4 @@
-<div class="search w-full md:flex-grow md:max-w-2xl px-2 md:mx-8 order-4">
+<div class=" w-full md:flex-grow md:max-w-2xl px-2 md:mx-8 order-4">
     <form action="{{ route('search') }}" method="GET" class="main-search-form">
         <div class="flex flex-nowrap border rounded-[12px] bg-[#F8F9FA] items-center py-1 px-2 relative gap-2">
 
@@ -18,7 +18,7 @@
                 }
             }">
                 <button type="button" @click="categoryOpen = !categoryOpen"
-                    class="flex items-center px-1 h-full w-[86px] sm:w-[100px] md:w-[163px] border-l text-[#767676] text-sm font-normal font-[Cairo] shrink-0">
+                    class="flex items-center px-1 h-full w-[100px] sm:w-[100px] md:w-[163px] border-l text-[#767676] text-sm font-normal font-[Cairo] shrink-0">
                     <div class="flex items-center justify-between px-2 h-full w-full">
                         <span class="text-sm truncate" x-text="buttonText"></span>
                         <svg class="size-4 transform" :class="{ 'rotate-180': categoryOpen }" fill="none"

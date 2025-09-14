@@ -44,6 +44,7 @@ accountData: true,
 bussnissdata: false,
         hasLoginErrors: {{ json_encode($errors->has('phone_number')) }}
     }"
+    @show-login-modal.window="showLogin = true"
     @open-otp.window="showOTP = true; showLogin = false; showRegister = false"
     @click.self="!hasLoginErrors && (showLogin = false)"
     @set-show-login.window="showLogin = $event.detail"
