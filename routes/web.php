@@ -41,7 +41,7 @@ use App\Http\Controllers\supplier\SupplierDashboardController;
 use App\Http\Controllers\Admin\FinancialSettlementController;
 use App\Http\Controllers\Admin\UserBlocksController;
 use App\Http\Controllers\Admin\MessagesController;
-
+use App\Http\Controllers\Admin\ReportsController;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -311,6 +311,10 @@ Route::post('/conversations/{conversation}/action', [MessagesController::class, 
      ->name('admin.conversations.action');
         Route::patch('/admin/conversations/{id}/update-status', [MessagesController::class, 'updateStatus'])->name('admin.conversations.updateStatus');
                  
+        //reports
+        Route::get('/reports', [ReportsController::class, 'index'])
+    ->name('admin.reports');
+
           });
 
 

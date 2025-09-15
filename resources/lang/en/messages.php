@@ -713,7 +713,10 @@ return [
     'not_active account' => 'Your account is not active. Please contact support.',
     'chooseLocation' => 'Choose location',
     'deliver_to' => 'Deliver to',
-    'download_attachment' => 'Download attachment'
+    'download_attachment' => 'Download attachment',
+    'completed' => 'Completed orders ',
+    'canceled' => 'Cancelled orders',
+
 
 
 

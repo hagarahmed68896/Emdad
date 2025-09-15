@@ -713,7 +713,7 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
     </div>
 
     {{-- ***************************************************************************************************** --}}
-   @include('partials.responsive_Search')
+   @include('partials.responsive_search')
    {{-- @include('search.search_bar') --}}
 
 

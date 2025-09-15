@@ -700,6 +700,9 @@ return [
     'not_active account' => 'حسابك غير نشط حاليا, يمكنك التواصل معنا',
     'deliver_to' => 'توصيل الي',
     'download_attachment' =>'تنزيل المرفق ',
+    'completed' => 'الطلبات المكتملة',
+    'canceled' => 'الطلبات الملغاة',
+    'in_progress' => 'الطلبات تحت التنفيذ',
 
  
 

@@ -341,14 +341,15 @@
                 <li class="mb-2">
                     <a  href="{{ route('admin.reviews.index') }}"
                   class="sidebar-link flex items-center p-3  transition-colors duration-200
-                  {{ Request::is(patterns: 'admin/reviews*') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">                           <i class="fas fa-star ml-3 text-gray-500"></i>
+                  {{ Request::is(patterns: 'admin/reviews*') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">   
+                                           <i class="fas fa-star ml-3 text-gray-500"></i>
                         <span class="sidebar-text">مراجعة التقييمات</span>
                     </a>
                 </li>
                 <li class="mb-2">
-                    <a href="#"
-                        class="sidebar-link flex items-center p-3 text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl transition-colors duration-200">
-                        <i class="fas fa-chart-line ml-3 text-gray-500"></i>
+                    <a href="{{ route('admin.reports') }}"
+                  class="sidebar-link flex items-center p-3  transition-colors duration-200
+                  {{ Request::is(patterns: 'admin/reports*') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">                          <i class="fas fa-chart-line ml-3 text-gray-500"></i>
                         <span class="sidebar-text">التقارير والإحصائيات</span>
                     </a>
                 </li>

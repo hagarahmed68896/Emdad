@@ -61,6 +61,9 @@ public function index(Request $request)
     $totalUsers = User::count();
     $totalCustomers = User::where('account_type', 'customer')->count();
     $totalSuppliers = User::where('account_type', 'supplier')->count();
+$customerPercent   = $totalUsers > 0 ? round(($totalCustomers / $totalUsers) * 100, 2) : 0;
+$supplierPercent   = $totalUsers > 0 ? round(($totalSuppliers / $totalUsers) * 100, 2) : 0;
+$documentsPercent  = $totalUsers > 0 ? round(($totalDocuments / $totalUsers) * 100, 2) : 0;
 
     return view('admin.documents.documents', [
         'documents' => $documents,
@@ -69,6 +72,9 @@ public function index(Request $request)
         'totalUsers' => $totalUsers,
         'totalCustomers' => $totalCustomers,
         'totalSuppliers' => $totalSuppliers,
+        'documentsPercent' => $documentsPercent,
+        'supplierPercent' => $supplierPercent,
+        'customerPercent' => $customerPercent,
         'search' => $request->input('search'),
         'documentName' => $request->input('document_name'), // أضفه هنا
 
