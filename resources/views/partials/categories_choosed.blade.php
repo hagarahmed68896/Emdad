@@ -7,8 +7,8 @@
     <div class="flex flex-col sm:flex-row justify-between ">
         <h2 class="sm:text-[40px] text-[30px] font-bold text-gray-800 mb-4 sm:mb-0">
             {{ __('messages.discover_categories') }} </h2>
-        <a href="#"
-            class="text-[#FFFFFF] bg-[#185D31] h-[48px] text-[16px] px-[20px] py-[12px] rounded-[12px]">{{ __('messages.show_more') }}</a>
+        {{-- <a href="#"
+            class="text-[#FFFFFF] bg-[#185D31] h-[48px] text-[16px] px-[20px] py-[12px] rounded-[12px]">{{ __('messages.show_more') }}</a> --}}
     </div>
 
     <p class="text-[#696969] text-[20px] mb-8  sm:text-right">

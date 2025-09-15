@@ -182,7 +182,7 @@ function deliveryDropdown() {
         <div x-data="{ cityOpen: false, selectedCity: '{{ __('messages.chooseCity') }}' }" class="relative mb-4">
             <div @click="cityOpen = !cityOpen"
                  class="w-full h-[40px] bg-white px-4 py-2 rounded-[12px] flex items-center justify-between border border-gray-400 text-gray-600 cursor-pointer">
-                <span x-text="selectedCity" class="flex-1"></span>
+               {{ __('messages.deliver_to') }} <span x-text="selectedCity" class="flex-1"></span>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                      stroke="currentColor" class="w-5 h-5 ml-2 shrink-0" :class="{ 'rotate-180': cityOpen }">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
@@ -322,8 +322,8 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
                             <img src="{{ asset('images/Illustrations.svg') }}" alt="No favorites illustration"
                                 class="w-[156px] h-[163px] mb-10 ">
                             <p class="text-[#696969] text-[20px] text-center">لم تقم باضافة أي منتج الي المفضلة بعد</p>
-                            <p class="px-[20px] py-[12px] bg-[#185D31] text-[white] rounded-[12px] mt-3">تصفح المنتجات
-                            </p>
+                            <a href="{{ route('products.index') }}" class="px-[20px] py-[12px] bg-[#185D31] text-[white] rounded-[12px] mt-3">تصفح المنتجات
+                            </a>
                         </div>
                     @else
                         <div class="grid grid-cols-1 gap-4 w-full" id="favorites-grid">
@@ -352,12 +352,13 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
 
                                         </div>
                                         <p class=" text-[#212121] flex font-bold">
-                                            <span class="flex text-[16px] font-bold text-gray-800">
-                                                {{ number_format($favorite->product->price * (1 - ($favorite->product->offer->discount_percent ?? 0) / 100), 2) }}
-                                                <img class="mx-1 w-[15px] h-[15px] mt-1"
-                                                    src="{{ asset('images/Vector (3).svg') }}"
-                                                    class="text-[#212121]">
-                                            </span>
+                                                   <span class="flex text-lg font-bold text-gray-800">
+    {{ number_format($favorite->product->price_range['min'], 2) }}
+    @if($favorite->product->price_range['min'] != $favorite->product->price_range['max'])
+        - {{ number_format($favorite->product->price_range['max'], 2) }}
+    @endif
+    <img class="mx-1 w-[20px] h-[21px]" src="{{ asset('images/Vector (3).svg') }}" alt="">
+</span>
                                         </p>
                                     </div>
                                 </div>

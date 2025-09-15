@@ -104,6 +104,18 @@
     <input type="hidden" x-model="form.status">
 </div>
             </div>
+          {{-- New: supplier_confirmed Checkbox --}}
+            <div>
+                <label class="flex items-center space-x-2 cursor-pointer">
+                    <input 
+                        type="checkbox" 
+                        x-model="form.supplier_confirmed" 
+                        class="form-checkbox ml-4 h-5 w-5 rounded 
+                               text-green-600 checked:bg-green-600 checked:border-green-600 focus:ring-green-600
+                               accent-green-600">
+                    <span class="text-[20px] font-bold text-[#212121]">المورد موثوق به</span>
+                </label>
+            </div>
 
             <div class="flex space-x-4 mt-6">
                 <button type="submit"
@@ -130,6 +142,8 @@
                 phone_number: @json($supplier->phone_number),
                 address: @json($supplier->address),
                 status: @json($supplier->status),
+                supplier_confirmed: @json(optional($supplier->business)->supplier_confirmed ?? false),
+
             },
             errors: {},
             success: '',

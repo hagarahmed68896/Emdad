@@ -60,7 +60,7 @@
                                 </div>
                             </td>
                             <td class="p-3 border">{{ $item->product->subCategory->category->name ?? '-' }}</td>
-                            <td class="p-3 border">{{ $item->unit_price }} {{ __('messages.currency') }}</td>
+                            <td class="p-3 border">{{ $order->total_amount }} {{ __('messages.currency') }}</td>
                             <td class="p-3 border">
                                 @if($order->status === 'processing')
                                     <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-600">{{ __('messages.processing') }}</span>

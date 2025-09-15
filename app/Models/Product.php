@@ -90,5 +90,29 @@ class Product extends Model
 }
 
 
+
+public function getPriceRangeAttribute()
+{
+    // Safe discount: either offer discount, product discount, or 0
+    $discount = $this->offer->discount_percent ?? $this->discount_percent ?? 0;
+
+    // Decode price tiers safely (may be null)
+    $tiers = $this->price_tiers ?? [];
+
+    // Collect all prices (base price + tiers)
+    $allPrices = collect($tiers)->pluck('price')->map(fn($p) => (float)$p);
+    $allPrices->push($this->price);
+
+    // Apply discount
+    $allPrices = $allPrices->map(fn($p) => $p * (1 - $discount / 100));
+
+    return [
+        'min' => $allPrices->min(),
+        'max' => $allPrices->max(),
+    ];
+}
+
+
+
     
 }

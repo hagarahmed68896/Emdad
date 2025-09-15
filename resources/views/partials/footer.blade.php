@@ -25,9 +25,9 @@
             <h4 class="font-bold text-lg mb-2 underline">{{__('messages.fast_links')}}</h4>
             <ul>
                 <li class="mb-2"><a href="#" class="hover:text-white transition-colors duration-300">{{__('messages.home')}}</a></li>
-                <li class="mb-2"><a href="#" class="hover:text-white transition-colors duration-300">{{__('messages.products')}}</a></li>
+                <li class="mb-2"><a href="{{ route('products.index') }}" class="hover:text-white transition-colors duration-300">{{__('messages.products')}}</a></li>
                 <li class="mb-2"><a href="#" class="hover:text-white transition-colors duration-300">{{__('messages.favorites')}}</a></li>
-                <li class="mb-2"><a href="#" class="hover:text-white transition-colors duration-300">{{__('messages.cart')}}</a></li>
+                <li class="mb-2"><a href="{{ route('cart.index') }}" class="hover:text-white transition-colors duration-300">{{__('messages.cart')}}</a></li>
             </ul>
         </div>
         <div class="text-center md:text-right">

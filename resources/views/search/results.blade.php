@@ -96,10 +96,14 @@
                                 </div>
 
                                 <div class="flex items-center mb-2">
-                                    <span class="flex text-lg font-bold text-gray-800">
-                                        {{ number_format(($item['data']->price ?? 0) * (1 - ($item['data']->discount_percent ?? 0) / 100), 2) }}
-                                        <img class="mx-1 w-[20px] h-[21px]" src="{{ asset('images/Vector (3).svg') }}" alt="">
-                                    </span>
+                                 <span class="flex text-lg font-bold text-gray-800">
+    {{ number_format($item['data']->price_range['min'] ?? 0, 2) }}
+    @if(($item['data']->price_range['min'] ?? 0) != ($item['data']->price_range['max'] ?? 0))
+        - {{ number_format($item['data']->price_range['max'] ?? 0, 2) }}
+    @endif
+    <img class="mx-1 w-[20px] h-[21px]" src="{{ asset('images/Vector (3).svg') }}" alt="">
+</span>
+
 
                                     @if (isset($item['data']->offer) && $item['data']->offer->is_offer && $item['data']->offer->discount_percent)
                                         <span class="flex text-sm text-gray-400 line-through mr-2 mr-1">

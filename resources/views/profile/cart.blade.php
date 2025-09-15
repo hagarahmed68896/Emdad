@@ -4,6 +4,27 @@
 <div class="cart-container p-[64px]" 
     x-data="checkoutWizard()"
      x-cloak>
+     @guest
+            <div class="flex flex-col justify-center items-center w-full py-10 text-gray-600">
+
+                <img src="{{ asset('images/Illustrations (2).svg') }}" alt="No cart items illustration"
+                    class="w-[156px] h-[163px] mb-10 ">
+
+                <p class="text-[#696969] text-[20px] text-center">
+                {{__('messages.no_items_in_cart')}}
+                </p>
+
+                <a href="{{ route('products.index') }}"
+                    class="px-[20px] py-[12px] bg-[#185D31] text-[white] rounded-[12px] mt-3">
+
+                    {{ __('messages.browse_products') }}
+
+                </a>
+
+            </div>
+     @endguest
+     @auth
+         
              @if (empty($cartItems))
             <div class="flex flex-col justify-center items-center w-full py-10 text-gray-600">
 
@@ -553,6 +574,8 @@ function cartManager() {
 
             </div>
         @endif
+             @endauth
+
     </div>
 
     <script>

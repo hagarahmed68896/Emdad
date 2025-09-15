@@ -711,7 +711,9 @@ return [
     'report' => 'Report',
     'otp_incorrect' => 'Invalid or expired OTP',
     'not_active account' => 'Your account is not active. Please contact support.',
-    'chooseLocation' => 'Choose location'
+    'chooseLocation' => 'Choose location',
+    'deliver_to' => 'Deliver to',
+    'download_attachment' => 'Download attachment'
 
 
 

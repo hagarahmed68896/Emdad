@@ -522,11 +522,14 @@
                                     </div>
                                 @endif
                                 <div class="flex items-center mb-2">
-                                    <span class=" flex text-lg font-bold text-gray-800">
-                                        {{ number_format($product->price * (1 - ($product->offer->discount_percent ?? 0) / 100), 2) }}
-                                        <img class="mx-1 w-[20px] h-[21px]" src="{{ asset('images/Vector (3).svg') }}"
-                                            alt="">
-                                    </span>
+                                   <span class="flex text-lg font-bold text-gray-800">
+    {{ number_format($product->price_range['min'], 2) }}
+    @if($product->price_range['min'] != $product->price_range['max'])
+        - {{ number_format($product->price_range['max'], 2) }}
+    @endif
+    <img class="mx-1 w-[20px] h-[21px]" src="{{ asset('images/Vector (3).svg') }}" alt="">
+</span>
+
                                     @php
                                         $offer = $product->offer; // Relationship: Product hasOne Offer
                                     @endphp

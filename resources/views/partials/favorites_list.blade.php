@@ -93,11 +93,14 @@
                         @endif
                     </div>
                     <div class="flex items-center mb-3">
-                        <span class=" flex text-lg font-bold text-gray-800">
-                            {{ number_format($favorite->product->price * (1 - ($favorite->product->offer->discount_percent ?? 0) / 100), 2) }}
-                            <img class="mx-1 w-[20px] h-[21px]" src="{{ asset('images/Vector (3).svg') }}"
-                                alt="">
-                        </span>
+                     <span class="flex text-lg font-bold text-gray-800">
+    {{ number_format($favorite->product->price_range['min'], 2) }}
+    @if($favorite->product->price_range['min'] != $favorite->product->price_range['max'])
+        - {{ number_format($favorite->product->price_range['max'], 2) }}
+    @endif
+    <img class="mx-1 w-[20px] h-[21px]" src="{{ asset('images/Vector (3).svg') }}" alt="">
+</span>
+
    @php
                                     $offer = $favorite->product->offer; // Relationship: Product hasOne Offer
                                 @endphp

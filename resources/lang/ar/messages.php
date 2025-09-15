@@ -697,7 +697,9 @@ return [
     'settlement_number' => 'رقم التسوية',
     'report' =>'الابلاغ',
     'otp_icorrect' => 'رمز تحقق غير صالح',
-    'not_active account' => 'حسابك غير نشط حاليا, يمكنك التواصل معنا'
+    'not_active account' => 'حسابك غير نشط حاليا, يمكنك التواصل معنا',
+    'deliver_to' => 'توصيل الي',
+    'download_attachment' =>'تنزيل المرفق ',
 
  
 

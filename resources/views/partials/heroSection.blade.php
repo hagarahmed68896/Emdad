@@ -14,7 +14,7 @@
             <p class="hero-description text-[#767676] text-base md:text-[20px] mb-2 leading-normal md:leading-[30px]">
                 {{ __('messages.heroDsecription') }}
             </p>
-            <a href="#" class="bg-[#185D31] text-[#FFFFFF] rounded-[12px] px-[20px] py-[12px] inline-block mt-2">
+            <a href="{{ route('products.index') }}" class="bg-[#185D31] text-[#FFFFFF] rounded-[12px] px-[20px] py-[12px] inline-block mt-2">
                 {{ __('messages.shopNow') }}
             </a>
         </div>
@@ -93,7 +93,9 @@
 
 {{-- Offers --}}
 @if(isset($onOfferProducts) && $onOfferProducts->count() > 0)
+<div id="offers-section">
     @include('partials.best_offers')
+    </div>
 @endif
 
 

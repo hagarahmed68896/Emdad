@@ -17,6 +17,7 @@ class BusinessData extends Model
         'description',
         'experience_years',
         'start_date',
+        'supplier_confirmed',
         'bank_name',
         'account_name',
         'bank_address',

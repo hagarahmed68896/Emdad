@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+
 
 
 class ProductController extends Controller
@@ -547,4 +549,29 @@ public function offers()
     }
 
     // You might have other methods like edit, update, destroy, etc., here.
+public function downloadAttachment(Product $product)
+{
+    // 1. Check if the product has an attachment path
+    if (empty($product->attachments)) {
+        abort(404, 'No attachment found for this product.');
+    }
+
+    // 2. Specify the 'public' disk. This tells Laravel to look inside storage/app/public.
+    $disk = 'public';
+    $path = $product->attachments;
+
+    // 3. Check if the file exists on the 'public' disk.
+    if (!Storage::disk($disk)->exists($path)) {
+        abort(404, 'File not found on server.');
+    }
+
+    // 4. Get the full, absolute path to the file.
+    $filePath = Storage::disk($disk)->path($path);
+
+    // 5. Get the original filename from the path.
+    $fileName = basename($path);
+
+    // 6. Return a download response.
+    return response()->download($filePath, $fileName);
+}
 }

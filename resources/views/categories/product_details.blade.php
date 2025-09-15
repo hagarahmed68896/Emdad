@@ -623,6 +623,20 @@ $defaultSelectedColorName = $productColors[0]['name'] ?? null;
                     </p>
                 </div>
 
+                {{-- Product Attachments --}}
+@if ($product->attachments)
+<div class="mt-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-3">{{ __('messages.attachments') }}</h3>
+    <div class="flex items-center space-x-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m-8-9h10a2 2 0 012 2v10a2 2 0 01-2 2h-10a2 2 0 01-2-2V6a2 2 0 012-2z" />
+        </svg>
+        <a href="{{ route('products.download.attachment', $product->id) }}" class="text-green-600 hover:underline">
+            {{ __('messages.download_attachment') }}
+        </a>
+    </div>
+</div>
+@endif
 
                 {{-- Specifications --}}
                 <div>
@@ -1136,11 +1150,14 @@ $defaultSelectedColorName = $productColors[0]['name'] ?? null;
                                         @endif
                                     </div>
                                     <div class="flex items-center mb-2">
-                                        <span class=" flex text-lg font-bold text-gray-800">
-                                            {{ number_format($product->price * (1 - ($product->offer->discount_percent ?? 0) / 100), 2) }}
-                                            <img class="mx-1 w-[20px] h-[21px]"
-                                                src="{{ asset('images/Vector (3).svg') }}" alt="">
-                                        </span>
+                                   <span class="flex text-lg font-bold text-gray-800">
+    {{ number_format($product->price_range['min'], 2) }}
+    @if($product->price_range['min'] != $product->price_range['max'])
+        - {{ number_format($product->price_range['max'], 2) }}
+    @endif
+    <img class="mx-1 w-[20px] h-[21px]" src="{{ asset('images/Vector (3).svg') }}" alt="">
+</span>
+
                                         @php
                                             $offer = $product->offer; // Relationship: Product hasOne Offer
                                         @endphp

@@ -102,6 +102,8 @@ public function store(Request $request)
         'password' => ['nullable', 'string', 'min:8'],
         'account_type' => ['required', 'string', 'in:supplier,customer,admin'],
         'company_name' => ['nullable', 'string', 'max:255'],
+        'supplier_confirmed' => ['nullable', 'boolean'], // <-- Add validation for the new field
+
     ]);
 
     $password = $request->password ?? 'Password123';
@@ -119,6 +121,8 @@ public function store(Request $request)
     if ($validated['account_type'] === 'supplier') {
         $user->business()->create([
             'company_name' => $validated['company_name'],
+             'supplier_confirmed' => $validated['supplier_confirmed'] ?? false, // <-- Add this line
+
         ]);
     }
 
@@ -159,6 +163,7 @@ public function update(Request $request, User $supplier)
         'status' => ['required', Rule::in(['active', 'inactive', 'banned'])],
         'company_name' => ['nullable', 'string', 'max:255'],
                     'password' => 'nullable|string|min:8|confirmed|regex:/[A-Z]/|regex:/[0-9]/',
+            'supplier_confirmed' => ['nullable', 'boolean'], // <-- Add this validation rule
 
     ]);
 
@@ -174,6 +179,8 @@ public function update(Request $request, User $supplier)
     if ($supplier->business) {
         $supplier->business->update([
             'company_name' => $request->company_name,
+            'supplier_confirmed' => $validated['supplier_confirmed'] ?? false,
+
         ]);
     } else {
         $supplier->business()->create([

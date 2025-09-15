@@ -82,6 +82,8 @@ Route::middleware('web')->group(function () {
 Route::post('/send-otp', [OtpController::class, 'sendOtp'])->name('sendOtp');
 Route::post('/verify-otp', [OtpController::class, 'verifyOtp'])->name('verifyOtp');
 
+// Route for downloading product attachments
+Route::get('/products/{product}/download-attachment', [ProductController::class, 'downloadAttachment'])->name('products.download.attachment');
      // Authenticated routes
      Route::middleware('auth')->group(function () {
 

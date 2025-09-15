@@ -104,6 +104,19 @@
                     </div>
                 </div>
             </div>
+            <div class="grid grid-cols-1">
+<label class="flex items-center space-x-2 cursor-pointer">
+    <input 
+        type="checkbox" 
+        x-model="form.supplier_confirmed" 
+        class="form-checkbox ml-4 h-5 w-5 rounded 
+               text-green-600 checked:bg-green-600 checked:border-green-600 focus:ring-green-600
+               accent-green-600"
+    >
+    <span class="text-[20px] font-bold text-[#212121]">المورد موثوق به</span>
+</label>
+</div>
+
 
             {{-- Buttons --}}
             <div class="flex space-x-4 mt-6">
@@ -132,6 +145,7 @@
                 address: '',
                 status: 'active',
                 account_type: 'supplier',
+                supplier_confirmed: false, // <-- Add this line
             },
             errors: {},
             success: '',
