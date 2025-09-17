@@ -344,7 +344,7 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
                                             {{ $favorite->product->name }}
                                         </p>
                                         <div class="flex items-center text-[16px] text-[#212121] mb-1">
-                                            @if($favorite->product->supplier->is_confirmed)
+                                            @if($favorite->product->supplier->supplier_confirmed)
                                             <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]"
                                                 src="{{ asset('images/Success.svg') }}" alt="Confirmed Supplier">
                                             @endif
@@ -400,86 +400,98 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
 {{-- category-bar --}}
 <nav
     class="categories bg-white w-full sm:flex sm:items-center sm:justify-between sm:px-[64px] pt-4 pb-3 space-y-3 sm:space-y-0 flex-col sm:flex-row relative">
-    <div class="relative inline-block ml-1 gap-1 w-full md:w-auto" x-data="{ mainDropdownOpen: false }"
-        @click.outside="mainDropdownOpen = false">
-        <a id="mainDropdownButton" @click="mainDropdownOpen = !mainDropdownOpen"
-            class="justify-between px-[21.5px] py-[8px] flex items-center rtl:ml-1 ltr:mr-1 cursor-pointer">
-            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
-                </path>
-            </svg>
-            <span class="dropdown-text ">{{ __('messages.All') }}</span>
-        </a>
+  <div class="relative inline-block ml-1 w-full md:w-auto" 
+     x-data="{ mainDropdownOpen: false, openCategory: null, openSubCategory: null }"
+     @click.outside="mainDropdownOpen = false; openCategory = null; openSubCategory = null">
 
-        <div id="mainDropdownMenu" x-show="mainDropdownOpen" x-transition.origin.top-left x-cloak
-            class="origin-top-right mt-3 absolute w-[314px] rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-[1001]">
-            <div class="py-1" role="none">
-                @if (isset($categories))
-                    @foreach ($categories as $index => $category)
-                        <div class="relative" x-data="{ openIndex: null }" @mouseenter="openIndex = {{ $index }}"
-                            @mouseleave="openIndex = null">
-                            <div class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg mx-1 my-0.5 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50"
-                                role="menuitem" aria-haspopup="true"
-                                :aria-expanded="(openIndex === {{ $index }}).toString()">
-                                <div class="flex items-center space-x-2 rtl:space-x-reverse">
-                                    @php
-                                        $icon = $category->iconUrl
-                                            ? asset('storage/' . $category->iconUrl)
-                                            : asset('images/default_avatar.png');
-                                    @endphp
-                                    <img src="{{ $icon }}" alt="{{ $category->name }}"
-                                        class="rounded-[12px] w-[56px] h-[56px] object-cover">
-                                    <span
-                                        class="text-[#1F2B45] text-[16px] font-semibold">{{ $category->name }}</span>
-                                </div>
-                                <svg class="h-5 w-5 text-gray-400 transition-transform duration-200"
-                                    :class="{ 'rotate-90': openIndex === {{ $index }} }"
-                                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                                    aria-hidden="true">
-                                    <path fill-rule="evenodd"
-                                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10l-3.293-3.293a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                            </div>
+    <!-- 🔽 زرار القائمة الرئيسية -->
+    <a @click="mainDropdownOpen = !mainDropdownOpen" id="mainDropdownButton"
+       class="justify-between px-3 py-2 flex items-center cursor-pointer rounded-lg hover:text-white">
+        <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        <span class="font-semibold ">{{ __('messages.All') }}</span>
+    </a>
 
-                            <div x-show="openIndex === {{ $index }}" x-transition x-cloak
-                                class="SideDropdown absolute top-0
-              responsive-dropdown          {{ app()->getLocale() === 'ar' ? 'align-right ml-1' : 'align-left mr-1' }}
-                        bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 w-[314px] z-[1002] overflow-hidden">
-                                {{-- New Header for the Side Dropdown, styled like the image --}}
-                                <div class=" text-black p-4 flex items-center space-x-3 rtl:space-x-reverse">
-                                    <span class="text-[18px] font-semibold">{{ $category->name }}</span>
-                                </div>
-
-                                <div class="py-2 px-3 space-y-2 max-h-[300px] overflow-y-auto" role="none">
-                                    {{-- Check if the category has products and it's not null --}}
-                                    @if ($category->products && $category->products->isNotEmpty())
-                                        @foreach ($category->products as $product)
-                                            <a href=""
-                                                class="flex items-center space-x-2 rtl:space-x-reverse px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded-lg">
-                                                @php
-                                                    $productIcon = $product->image
-                                                        ? asset('storage/' . $product->image)
-                                                        : asset('images/default_product.png');
-                                                @endphp
-                                                <img src="{{ $productIcon }}" alt="{{ $product->name }}"
-                                                    class="rounded-[8px] w-[60px] h-[60px] object-cover border border-gray-200">
-                                                <span>{{ $product->name }}</span>
-                                            </a>
-                                        @endforeach
-                                    @else
-                                        <div class="px-2 py-1 text-sm text-gray-500">لا توجد منتجات لهذه الفئة.</div>
-                                    @endif
-                                </div>
-                            </div>
+    <!-- 🔽 القائمة الرئيسية -->
+    <div x-show="mainDropdownOpen" x-transition x-cloak
+         class="absolute mt-3 w-[280px] rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-[1001]">
+        <div class="py-2" role="menu">
+            @foreach ($categories as $category)
+                <div>
+                    <!-- كاتيجوري -->
+                    <button @click="openCategory = (openCategory === {{ $category->id }} ? null : {{ $category->id }}); openSubCategory = null"
+                            class="w-full flex items-center justify-between px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <div class="flex items-center space-x-2 rtl:space-x-reverse">
+                            <img src="{{ $category->iconUrl ? asset('storage/'.$category->iconUrl) : asset('images/default_avatar.png') }}"
+                                 class="w-10 h-10 rounded-md object-cover">
+                            <span class="font-semibold">{{ $category->name }}</span>
                         </div>
-                    @endforeach
-                @endif
-            </div>
-        </div>
+                        <svg class="h-4 w-4 text-gray-400"
+                             :class="{ 'rotate-90': openCategory === {{ $category->id }} }"
+                             xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 
+                                  4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                  clip-rule="evenodd" />
+                        </svg>
+                    </button>
 
+                    <!-- 🔹 قائمة SubCategories -->
+                    <div x-show="openCategory === {{ $category->id }}" x-transition x-cloak
+                         class="absolute top-0 {{ app()->getLocale() === 'ar' ? 'right-full mr-2' : 'left-full ml-2' }}
+                                w-[280px] bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 z-[1002]">
+                        <div class="p-3 border-b font-semibold text-gray-800">{{ $category->name }}</div>
+                        <div class="max-h-[300px] overflow-y-auto">
+                            @if($category->subCategories && $category->subCategories->isNotEmpty())
+                                @foreach($category->subCategories as $subCategory)
+                                    <button @click="openSubCategory = (openSubCategory === {{ $subCategory->id }} ? null : {{ $subCategory->id }})"
+                                            class="w-full flex items-center justify-between px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <span>{{ $subCategory->name }}</span>
+                                        <svg class="h-4 w-4 text-gray-400"
+                                             :class="{ 'rotate-90': openSubCategory === {{ $subCategory->id }} }"
+                                             xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd"
+                                                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 
+                                                  111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 
+                                                  01-1.414 0z"
+                                                  clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+
+                                    <!-- 🔸 قائمة Products -->
+                                    <div x-show="openSubCategory === {{ $subCategory->id }}" x-transition x-cloak
+                                         class="absolute top-0 {{ app()->getLocale() === 'ar' ? 'right-full mr-2' : 'left-full ml-2' }}
+                                                w-[280px] bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 z-[1003]">
+                                        <div class="p-3 border-b font-semibold text-gray-800">{{ $subCategory->name }}</div>
+                                        <div class="max-h-[300px] overflow-y-auto p-2 space-y-2">
+                                            @if($subCategory->products && $subCategory->products->isNotEmpty())
+                                                @foreach($subCategory->products as $product)
+                                                    <a href="{{ route('products.show', $product->id) }}"
+                                                       class="flex items-center space-x-2 rtl:space-x-reverse px-2 py-1 hover:bg-gray-100 rounded">
+                                                        <img src="{{ $product->image ? asset('storage/'.$product->image) : asset('images/default_product.png') }}"
+                                                             class="w-12 h-12 rounded-md border object-cover">
+                                                        <span class="text-gray-700">{{ $product->name }}</span>
+                                                    </a>
+                                                @endforeach
+                                            @else
+                                                <div class="text-sm text-gray-500 px-2">لا توجد منتجات.</div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @else
+                                <div class="px-4 py-2 text-sm text-gray-500">لا توجد أقسام فرعية.</div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
     </div>
+</div>
+
 
 <div class="individualCategories flex flex-wrap gap-2 w-full justify-start">
     @foreach ($categories as $category)
@@ -651,64 +663,94 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
             <hr class="my-2 border-gray-100 dark:border-gray-600">
 
             {{-- Categories and Products Section --}}
-            @if (isset($categories))
-                @foreach ($categories as $index => $category)
-                    <li class="relative" x-data="{ openIndex: null }" @mouseenter="openIndex = {{ $index }}"
-                        @mouseleave="openIndex = null">
-                        <div class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg mx-1 my-0.5 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50"
-                            role="menuitem" aria-haspopup="true"
-                            :aria-expanded="(openIndex === {{ $index }}).toString()">
-                            <div class="flex items-center space-x-2 rtl:space-x-reverse">
-                                @php
-                                    $icon = $category->iconUrl
-                                        ? asset('storage/' . $category->iconUrl)
-                                        : asset('images/default_avatar.png');
-                                @endphp
-                                <img src="{{ $icon }}" alt="{{ $category->name }}"
-                                    class="rounded-[12px] w-[56px] h-[56px] object-cover">
-                                <span class="text-[#1F2B45] text-[16px] font-semibold">{{ $category->name }}</span>
-                            </div>
-                            <svg class="h-5 w-5 text-gray-400 transition-transform duration-200"
-                                :class="{ 'rotate-90': openIndex === {{ $index }} }"
-                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                                aria-hidden="true">
-                                <path fill-rule="evenodd"
-                                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10l-3.293-3.293a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                        </div>
+        @if (isset($categories))
+    <ul x-data="{ openCategory: null }">
+        @foreach ($categories as $cIndex => $category)
+            <li class="relative">
 
-                        <div x-show="openIndex === {{ $index }}" x-transition x-cloak
-                            class="SideDropdown absolute top-0
+                {{-- الفئة الرئيسية --}}
+                <div class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg mx-1 my-0.5 cursor-pointer"
+                    @click="openCategory === {{ $cIndex }} ? openCategory = null : openCategory = {{ $cIndex }}">
+                    <div class="flex items-center space-x-2 rtl:space-x-reverse">
+                        @php
+                            $icon = $category->iconUrl
+                                ? asset('storage/' . $category->iconUrl)
+                                : asset('images/default_avatar.png');
+                        @endphp
+                        <img src="{{ $icon }}" alt="{{ $category->name }}"
+                            class="rounded-[12px] w-[56px] h-[56px] object-cover">
+                        <span class="text-[#1F2B45] text-[16px] font-semibold">{{ $category->name }}</span>
+                    </div>
+                    <svg class="h-5 w-5 text-gray-400 transition-transform duration-200"
+                        :class="{ 'rotate-90': openCategory === {{ $cIndex }} }"
+                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                        fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M7.293 14.707a1 1 0 010-1.414L10.586 10l-3.293-3.293a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </div>
+
+                {{-- Subcategories --}}
+                <div x-show="openCategory === {{ $cIndex }}" x-transition x-cloak
+                    class="SideDropdown absolute top-0
                         {{ app()->getLocale() === 'ar' ? 'align-right ml-1' : 'align-left mr-1' }}
                         bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 w-[314px] z-[1002] overflow-hidden">
-                            <div class="text-black p-4 flex items-center space-x-3 rtl:space-x-reverse">
-                                <span class="text-[18px] font-semibold">{{ $category->name }}</span>
-                            </div>
 
-                            <div class="py-2 px-3 space-y-2 max-h-[300px] overflow-y-auto" role="none">
-                                @if ($category->products && $category->products->isNotEmpty())
-                                    @foreach ($category->products as $product)
-                                        <a href=""
-                                            class="flex items-center space-x-2 rtl:space-x-reverse px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded-lg">
-                                            @php
-                                                $productIcon = $product->image
-                                                    ? asset('storage/' . $product->image)
-                                                    : asset('images/default_product.png');
-                                            @endphp
-                                            <img src="{{ $productIcon }}" alt="{{ $product->name }}"
-                                                class="rounded-[8px] w-[60px] h-[60px] object-cover border border-gray-200">
-                                            <span>{{ $product->name }}</span>
-                                        </a>
-                                    @endforeach
-                                @else
-                                    <div class="px-2 py-1 text-sm text-gray-500">لا توجد منتجات لهذه الفئة.</div>
-                                @endif
-                            </div>
-                        </div>
-                    </li>
-                @endforeach
-            @endif
+                    <div class="text-black p-4 flex items-center space-x-3 rtl:space-x-reverse">
+                        <span class="text-[18px] font-semibold">{{ $category->name }}</span>
+                    </div>
+
+                    <div class="py-2 px-3 space-y-2 max-h-[300px] overflow-y-auto">
+                        @if ($category->subcategories && $category->subcategories->isNotEmpty())
+                            @foreach ($category->subcategories as $sIndex => $subcategory)
+                                <div x-data="{ openProducts: false }" class="border-b pb-1">
+                                    {{-- subcategory --}}
+                                    <div class="flex items-center justify-between px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded-lg cursor-pointer"
+                                        @click="openProducts = !openProducts">
+                                        <span>{{ $subcategory->name }}</span>
+                                        <svg class="h-4 w-4 text-gray-400 transition-transform duration-200"
+                                            :class="{ 'rotate-90': openProducts }"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd"
+                                                d="M7.293 14.707a1 1 0 010-1.414L10.586 10l-3.293-3.293a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                                clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+
+                                    {{-- Products --}}
+                                    <div x-show="openProducts" x-transition x-cloak class="pl-4 space-y-2">
+                                        @if ($subcategory->products && $subcategory->products->isNotEmpty())
+                                            @foreach ($subcategory->products as $product)
+                                                <a href="#"
+                                                    class="flex items-center space-x-2 rtl:space-x-reverse px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded-lg">
+                                                    @php
+                                                        $productIcon = $product->image
+                                                            ? asset('storage/' . $product->image)
+                                                            : asset('images/default_product.png');
+                                                    @endphp
+                                                    <img src="{{ $productIcon }}" alt="{{ $product->name }}"
+                                                        class="rounded-[8px] w-[40px] h-[40px] object-cover border border-gray-200">
+                                                    <span>{{ $product->name }}</span>
+                                                </a>
+                                            @endforeach
+                                        @else
+                                            <div class="px-2 py-1 text-sm text-gray-500">لا توجد منتجات لهذه الفئة.</div>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="px-2 py-1 text-sm text-gray-500">لا توجد فئات فرعية.</div>
+                        @endif
+                    </div>
+                </div>
+            </li>
+        @endforeach
+    </ul>
+@endif
+
         </ul>
     </div>
 

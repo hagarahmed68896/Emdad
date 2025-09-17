@@ -164,7 +164,7 @@
                             <span
                                 class="text-[#696969] text-[20px]">{{ $product->subCategory->category->name ?? 'غير مصنف' }}</span>
                             <div class="flex mt-2">
-                                @if ($product->supplier_confirmed)
+                                @if ($product->supplier->supplier_confirmed)
                                     <span class="flex items-center text-[#185D31]">
                                         <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]"
                                             src="{{ asset('images/Success.svg') }}" alt="Confirmed Supplier">

@@ -15,8 +15,13 @@
     </p>
 
         </div>
-    <a href="{{ route('products.index') }}"
-            class="text-[#FFFFFF] bg-[#185D31] h-[48px] text-[16px] px-[20px] py-[12px] rounded-[12px]">{{ __('messages.show_more') }}</a>
+<a href="{{ route('products.index') }}"
+    class="text-[#FFFFFF] bg-[#185D31] text-[16px] px-4 py-3 mb-1 rounded-[12px]
+           h-12 w-[140px]
+           flex items-center justify-center
+           hover:bg-green-700 transition-colors duration-200">
+    {{ __('messages.show_more') }}
+</a>
     </div>
  
 
@@ -95,7 +100,7 @@
                             <span
                                 class="text-[#696969] text-[20px]">{{ $featuredProduct->subCategory->category->name ?? 'غير مصنف' }}</span>
                             <div class="flex mt-2">
-                                @if ($featuredProduct->offer->supplier_confirmed)
+                                @if ($featuredProduct->supplier->supplier_confirmed)
                                     <span class="flex items-center text-[#185D31]">
                                         <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]"
                                             src="{{ asset('images/Success.svg') }}" alt="Confirmed Supplier">

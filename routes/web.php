@@ -42,6 +42,8 @@ use App\Http\Controllers\Admin\FinancialSettlementController;
 use App\Http\Controllers\Admin\UserBlocksController;
 use App\Http\Controllers\Admin\MessagesController;
 use App\Http\Controllers\Admin\ReportsController;
+use App\Http\Controllers\Admin\AdminNotificationController;
+
 
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -314,6 +316,35 @@ Route::post('/conversations/{conversation}/action', [MessagesController::class, 
         //reports
         Route::get('/reports', [ReportsController::class, 'index'])
     ->name('admin.reports');
+
+    //notifications
+
+// 📌 Index (list notifications)
+Route::get('notifications', [AdminNotificationController::class, 'index'])
+    ->name('admin.notifications.index');
+
+// 📌 Create form
+Route::get('notifications/create', [AdminNotificationController::class, 'create'])
+    ->name('admin.notifications.create');
+
+// 📌 Store (save new notification)
+Route::post('notifications', [AdminNotificationController::class, 'store'])
+    ->name('admin.notifications.store');
+
+// 📌 Edit form
+Route::get('notifications/{id}/edit', [AdminNotificationController::class, 'edit'])
+    ->name('admin.notifications.edit');
+
+// 📌 Update notification
+Route::put('notifications/{id}', [AdminNotificationController::class, 'update'])
+    ->name('admin.notifications.update');
+
+// 📌 Delete notification
+Route::delete('notifications/{id}', [AdminNotificationController::class, 'destroy'])
+    ->name('admin.notifications.destroy');
+
+    Route::delete('/notifications/bulk-delete', [AdminNotificationController::class, 'bulkDelete'])
+     ->name('admin.notifications.bulkDelete');
 
           });
 

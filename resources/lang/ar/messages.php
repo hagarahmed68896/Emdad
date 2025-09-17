@@ -703,6 +703,9 @@ return [
     'completed' => 'الطلبات المكتملة',
     'canceled' => 'الطلبات الملغاة',
     'in_progress' => 'الطلبات تحت التنفيذ',
+    'total_notifications' => 'إجمالي الإشعارات ',
+    'sent_notifications' => 'الإشعارات المُرسلة',
+    'unsent_notifications' => 'الإشعارات غير المُرسلة	',
 
  
 
