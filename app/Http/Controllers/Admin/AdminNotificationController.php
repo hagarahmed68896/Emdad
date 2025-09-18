@@ -3,152 +3,189 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Models\AdminNotification;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Auth;
-use App\Models\User; // Make sure to import the User model
-use Illuminate\Support\Facades\Notification; // Import the Notification facade
 use App\Notifications\AdminUserNotification;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Log; // Add this line for debugging
+use Illuminate\Support\Facades\DB; // Add this for database transactions
 
 class AdminNotificationController extends Controller
 {
-public function index(Request $request)
-{
-    $query = AdminNotification::latest();
-
-    if ($search = $request->input('search')) {
-        $query->where('title', 'like', "%{$search}%")
-              ->orWhere('content', 'like', "%{$search}%");
-    }
-
-    if ($status = $request->input('status')) {
-        $query->where('status', $status);
-    }
-
-    // THIS IS THE KEY: paginate the query builder
-    $notifications = $query->paginate(10)->withQueryString();
-
-    // Stats
-    $total = AdminNotification::count();
-    $pendingCount = AdminNotification::where('status', 'pending')->count();
-    $sentCount = AdminNotification::where('status', 'sent')->count();
-
-    $pendingPercent = $total > 0 ? round(($pendingCount / $total) * 100, 2) : 0;
-    $sentPercent = $total > 0 ? round(($sentCount / $total) * 100, 2) : 0;
-
-    return view('admin.notifications.index', compact(
-        'notifications',
-        'total',
-        'pendingCount', 'sentCount',
-        'pendingPercent', 'sentPercent'
-    ));
-}
-
-
-
-
-    // ... (Your other methods like create, store, etc., remain the same)
-
-    // Add a new method for bulk deletion
-    public function bulkDelete(Request $request)
+    /**
+     * Display a listing of the notifications.
+     */
+  public function index(Request $request)
     {
-        $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'exists:admin_notifications,id',
-        ]);
+        // Use a single query for the table data
+        $query = AdminNotification::latest();
 
-        AdminNotification::destroy($request->input('ids'));
+        // Apply search filter
+        if ($search = $request->input('search')) {
+            $query->where('title', 'like', "%{$search}%")
+                  ->orWhere('content', 'like', "%{$search}%");
+        }
 
-        return redirect()->route('admin.notifications.index')
-                         ->with('success', 'تم حذف الإشعارات المحددة بنجاح.');
+        // Apply status filter
+        if ($status = $request->input('status')) {
+            $query->where('status', $status);
+        }
+
+        // Apply category filter (if you add this to the form)
+        if ($category = $request->input('category')) {
+            $query->where('category', $category);
+        }
+
+        // Paginate the results
+        $Notifications = $query->paginate(10)->withQueryString();
+
+        // Calculate statistics from the same table
+        $total = AdminNotification::count();
+        $pendingCount = AdminNotification::where('status', 'pending')->count();
+        $sentCount = AdminNotification::where('status', 'sent')->count();
+
+        // Calculate percentages
+        $pendingPercent = $total > 0 ? round(($pendingCount / $total) * 100, 2) : 0;
+        $sentPercent = $total > 0 ? round(($sentCount / $total) * 100, 2) : 0;
+
+        // Pass data to the view
+        return view('admin.notifications.index', compact(
+            'Notifications',
+            'total',
+            'pendingCount',
+            'sentCount',
+            'pendingPercent',
+            'sentPercent'
+        ));
     }
+    
+    // ... other methods
 
 
+
+    /**
+     * Show the form for creating a new notification.
+     */
     public function create()
     {
         return view('admin.notifications.create');
     }
 
-
+    /**
+     * Store a newly created notification.
+     */
 
 
 public function store(Request $request)
 {
     $request->validate([
-        'title' => 'required|string|max:255',
-        'content' => 'required|string',
-        'category' => 'required|in:client,supplier',
+        'title'             => 'required|string|max:255',
+        'content'           => 'required|string',
+        'category'          => 'required|in:customer,supplier',
         'notification_type' => 'required|in:alert,offer,info',
-        'status' => 'required|in:sent,pending',
+        'status'            => 'required|in:sent,pending',
     ]);
 
-    $users = User::where('account_type', $request->category)->get();
+    $notification = AdminNotification::create($request->all());
 
-    // Send Laravel Notification to users
-    // Notification::send($users, new AdminUserNotification($request->title, $request->content));
+    // ✅ 3. Get users from selected category AND only those who accept notifications
+$users = User::where('account_type', $request->category)
+             ->whereJsonContains('notification_settings->receive_chat', true)
+             ->get();
 
-    // Store a record in admin_notifications table (safe, no notifiable_type required)
-    AdminNotification::create([
-        'id' => Str::uuid(),
-        'title' => $request->title,
-        // 'content' => $request->content,
-        'category' => $request->category,
-        'notification_type' => $request->notification_type,
-        'status' => 'sent',
-        'data' => [
-            'title' => $request->title,
-            // 'message' => $request->content,
-        ],
-    ]);
 
-    return redirect()->route('admin.notifications.index')->with('success', 'تم إرسال الإشعار بنجاح.');
+// ✅ 4. If status is 'sent', actually notify users
+if ($request->status === 'sent' && $users->isNotEmpty()) {
+    Notification::send($users, new AdminUserNotification(
+        $request->input('title'),
+        $request->input('content'),
+        $request->input('category'),
+        $request->input('notification_type'),
+        $request->input('status')
+    ));
 }
 
 
+    // 👇 Return back to the form with a success flag
+    return view('admin.notifications.create', [
+        'success' => 'تم حفظ الإشعار بنجاح ✅'
+    ]);
+}
 
-
+  // ================== New: Edit ==================
     public function edit($id)
     {
         $notification = AdminNotification::findOrFail($id);
         return view('admin.notifications.edit', compact('notification'));
     }
+  // ================== New: Update ==================
+ public function update(Request $request, $id)
+{
+    $request->validate([
+        'title'             => 'required|string|max:255',
+        'content'           => 'required|string',
+        'category'          => 'required|in:customer,supplier',
+        'notification_type' => 'required|in:alert,offer,info',
+        'status'            => 'required|in:sent,pending',
+    ]);
 
-    public function update(Request $request, $id)
-    {
-        $notification = AdminNotification::findOrFail($id);
+    $notification = AdminNotification::findOrFail($id);
+    $notification->update($request->all());
 
-        $request->validate([
-            'title'             => 'required|string|max:255',
-            'content'           => 'required|string',
-            'category'          => 'required|in:client,supplier',
-            'notification_type' => 'required|in:alert,offer,info',
-            'status'            => 'required|in:sent,pending',
-        ]);
+    // رجّع على صفحة التعديل ومعاها session flash
+ return view('admin.notifications.edit', [
+    'notification' => $notification,
+    'success' => 'تم تعديل الإشعار بنجاح ✅'
+]);
 
-        $notification->update([
-            'title'            => $request->input('title'),
-            'content'          => $request->input('content'),
-            'category'         => $request->input('category'),
-            'notification_type'=> $request->input('notification_type'),
-            'status'           => $request->input('status'),
-            'data'             => [
-                'message' => $request->input('content'),
-                'title'   => $request->input('title'),
-            ],
-        ]);
+}
 
-        return redirect()
-            ->route('admin.notifications.index')
-            ->with('success', 'تم تعديل الإشعار');
-    }
 
+    // ================== New: Destroy ==================
     public function destroy($id)
     {
-        AdminNotification::findOrFail($id)->delete();
+        $notification = AdminNotification::findOrFail($id);
+        $notification->delete();
 
-        return redirect()
-            ->route('admin.notifications.index')
-            ->with('success', 'تم حذف الإشعار');
+        return redirect()->route('admin.notifications.index')->with('success', 'تم حذف الإشعار بنجاح ❌');
     }
+
+    // ================== New: Bulk Delete ==================
+    public function bulkDelete(Request $request)
+{
+    $ids = $request->input('ids', []);
+
+    if (!empty($ids)) {
+        AdminNotification::whereIn('id', $ids)->delete();
+        return redirect()->route('admin.notifications.index')
+            ->with('success', 'تم حذف الإشعارات المحددة ✅');
+    }
+
+    return redirect()->route('admin.notifications.index')
+        ->with('error', 'لم يتم اختيار أي إشعار ❌');
+}
+
+// In App\Http\Controllers\Admin\AdminNotificationController.php
+
+// In App\Http\Controllers\Admin\AdminNotificationController.php
+
+
+// ... other code
+
+public function toggleStatus(AdminNotification $notification) // Change the type-hint here
+{
+    // Toggle the status between 'sent' and 'not_sent'
+    if ($notification->status === 'sent') {
+        $notification->status = 'pending';
+    } else {
+        $notification->status = 'sent';
+    }
+    
+    $notification->save();
+
+    // Redirect back to the previous page with a success message
+    return back()->with('success', 'Notification status updated successfully.');
+}
+
 }

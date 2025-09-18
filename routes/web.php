@@ -339,12 +339,17 @@ Route::get('notifications/{id}/edit', [AdminNotificationController::class, 'edit
 Route::put('notifications/{id}', [AdminNotificationController::class, 'update'])
     ->name('admin.notifications.update');
 
+     Route::delete('notifications/bulk-delete', [AdminNotificationController::class, 'bulkDelete'])
+     ->name('admin.notifications.bulkDelete');
+
+
 // 📌 Delete notification
 Route::delete('notifications/{id}', [AdminNotificationController::class, 'destroy'])
     ->name('admin.notifications.destroy');
 
-    Route::delete('/notifications/bulk-delete', [AdminNotificationController::class, 'bulkDelete'])
-     ->name('admin.notifications.bulkDelete');
+   // Add this route to your admin routes
+Route::post('notifications/{notification}/toggle-status', [AdminNotificationController::class, 'toggleStatus'])
+     ->name('admin.notifications.toggleStatus');
 
           });
 

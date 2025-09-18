@@ -4,6 +4,11 @@
 <div class="p-6 bg-gray-50 min-h-screen">
     <div class="bg-white shadow rounded-xl p-6">
         <h2 class="text-2xl font-bold mb-6 text-gray-800">العروض و الإشعارات</h2>
+@if(!empty($success))
+    <div class="mb-4 p-4 rounded-lg bg-green-100 text-green-700">
+        {{ $success }}
+    </div>
+@endif
 
         <form method="POST" action="{{ route('admin.notifications.update', $notification->id) }}" class="space-y-6">
             @csrf
@@ -14,7 +19,7 @@
                 <div>
                     <label class="block font-medium mb-2">الفئة المستهدفة</label>
                     <select name="category" class="w-full border rounded-lg p-2">
-                        <option value="client" {{ $notification->category == 'client' ? 'selected' : '' }}>عميل</option>
+                        <option value="customer" {{ $notification->category == 'customer' ? 'selected' : '' }}>عميل</option>
                         <option value="supplier" {{ $notification->category == 'supplier' ? 'selected' : '' }}>المورد</option>
                     </select>
                 </div>
