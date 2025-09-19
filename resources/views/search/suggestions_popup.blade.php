@@ -114,7 +114,7 @@
                     <div class="flex items-center border-[1px] bg-white rounded-[12px] overflow-hidden">
 <img src="{{ asset('images/interface-search--glass-search-magnifying--Streamline-Core.svg') }}"
     alt="Search Icon"
-    class="h-[16px] w-[16px] object-cover text-[#767676] ml-2 mr-1 md:mr-6 md:hidden">
+    class="h-[16px] w-[16px] object-cover text-[#767676] ml-2 md:mr-6 md:hidden">
                         <input type="text" name="query" x-model="searchText" 
                             @focus="showPopup = true; if (searchText.length === 0) fetchSuggestions(true); else fetchSuggestions();"
                             @input="showPopup = true; fetchSuggestions()" @click.stop

@@ -122,7 +122,7 @@ return [
     'profile_image' => 'إدارة صورة الملف الشخصي',
     'recommend' => 'اقتراحتنا لك',
     'refresh' => 'تحديث',
-    'register' => 'إنشاء حساب',
+    'register' => 'تسجيل دخول',
     'registerMSG' => 'اختر نوع حسابك وابدأ رحلتك معنا.',
     'register_failed' => 'فشل التسجيل، يرجى المحاولة مرة أخرى.',
     'register_success' => 'تم التسجيل بنجاح! مرحبًا بك.',
@@ -706,6 +706,7 @@ return [
     'total_notifications' => 'إجمالي الإشعارات ',
     'sent_notifications' => 'الإشعارات المُرسلة',
     'unsent_notifications' => 'الإشعارات غير المُرسلة	',
+    'days' => 'أيام',
 
  
 

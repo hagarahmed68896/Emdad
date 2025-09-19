@@ -43,6 +43,7 @@ use App\Http\Controllers\Admin\UserBlocksController;
 use App\Http\Controllers\Admin\MessagesController;
 use App\Http\Controllers\Admin\ReportsController;
 use App\Http\Controllers\Admin\AdminNotificationController;
+use App\Http\Controllers\Admin\ContactSettingController;
 
 
 use App\Models\Product;
@@ -350,6 +351,11 @@ Route::delete('notifications/{id}', [AdminNotificationController::class, 'destro
    // Add this route to your admin routes
 Route::post('notifications/{notification}/toggle-status', [AdminNotificationController::class, 'toggleStatus'])
      ->name('admin.notifications.toggleStatus');
+
+
+     //contacts 
+     Route::get('contact-settings', [ContactSettingController::class, 'index'])->name('admin.contact.settings');
+     Route::post('contact-settings', [ContactSettingController::class, 'store'])->name('admin.contact.settings.store');
 
           });
 

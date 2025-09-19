@@ -718,7 +718,8 @@ return [
     'canceled' => 'Cancelled orders',
     'total_notifications' => 'Total notifications',
     'sent_notifications' => 'Sent notifications',
-    'unsent_notifications' => 'Unsent notifications'
+    'unsent_notifications' => 'Unsent notifications',
+    'days' => 'Days',
 
 
 

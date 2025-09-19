@@ -52,7 +52,7 @@ bussnissdata: false,
 >
     <div class="flex items-center space-x-4">
         <button @click="showLogin = true"
-            class="w-[120px] h-[40px] bg-[#185D31] px-4 py-2 rounded-[12px] text-white flex items-center justify-center font-semibold text-sm">
+            class="w-[130px] h-[40px] bg-[#185D31] px-4 py-2 rounded-[12px] text-white flex items-center justify-center font-semibold text-sm">
             {{ __('messages.register') }}
         </button>
     </div>

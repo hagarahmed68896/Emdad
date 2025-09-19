@@ -389,8 +389,9 @@
         </li>
 
         <li>
-            <a href="#"
-               class="flex items-center p-2 transition-colors duration-200">
+            <a href="{{ route('admin.contact.settings') }}"
+                             class="flex items-center p-2 transition-colors duration-200
+               {{ (Request::is('admin/contact-settings*')) ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
              إعدادات التواصل 
             </a>
         </li>

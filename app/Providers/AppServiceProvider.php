@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\App;
 use App\Models\Cart as CustomCart;
+use App\Models\ContactSetting;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -15,6 +17,8 @@ class AppServiceProvider extends ServiceProvider
     {
         View::composer('*', function ($view) {
 
+             $view->with('footerSetting', ContactSetting::first());
+    
             // ------------------------
             // 🛒 CART ITEMS
             // ------------------------

@@ -108,7 +108,7 @@
 
             <div class="shrink-0">
                 <button type="submit"
-                    class="bg-[#185D31] px-3 md:px-4 h-[32px] text-white rounded-[12px] pb-1 mx-1 text-sm">
+                    class="bg-[#185D31] px-2 md:px-4 h-[32px] text-white rounded-[12px] pb-1 mx-1 text-sm">
                     {{ __('messages.Search') }}
                 </button>
             </div>

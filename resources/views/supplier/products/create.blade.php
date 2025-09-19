@@ -466,17 +466,27 @@ class="absolute top-1 left-1 bg-red-500 text-white rounded-full p-1 leading-none
 
         <p class="font-bold text-[24px]">{{ __('messages.manufacturing_delivery_time') }}</p>
 
-        {{-- ✅ مدة التصنيع والشحن --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <label class="block mb-1 font-bold">{{ __('messages.preparation_days') }}</label>
-                <input type="number" min="0" name="preparation_days" placeholder="{{ __('messages.preparation_days') }}" class="border p-2 w-full rounded-xl">
-            </div>
-            <div>
-                <label class="block mb-1 font-bold">{{ __('messages.shipping_days') }}</label>
-                <input type="number" min="0" name="shipping_days" placeholder="{{ __('messages.shipping_days') }}" class="border p-2 w-full rounded-xl">
-            </div>
+{{-- ✅ مدة التصنيع والشحن --}}
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+        <label class="block mb-1 font-bold">{{ __('messages.preparation_days') }}</label>
+        <div class="relative">
+            <input type="number" min="0" name="preparation_days" placeholder="{{ __('messages.preparation_days') }}" class="border p-2 w-full rounded-xl pr-12">
+            <span class="absolute bg-gray-100 inset-y-0 rtl:left-0 rounded-l-xl flex items-center rtl:p-3 pointer-events-none">
+               {{ __('messages.days') }} 
+            </span>
         </div>
+    </div>
+    <div>
+        <label class="block mb-1 font-bold">{{ __('messages.shipping_days') }}</label>
+        <div class="relative">
+            <input type="number" min="0" name="shipping_days" placeholder="{{ __('messages.shipping_days') }}" class="border p-2 w-full rounded-xl pr-12">
+            <span class="absolute bg-gray-100 inset-y-0 rounded-l-xl rtl:left-0 flex items-center rtl:p-3 pointer-events-none">
+                {{ __('messages.days') }}
+            </span>
+        </div> 
+    </div>
+</div>
 
         {{-- ✅ القدرة الإنتاجية --}}
         <div>
