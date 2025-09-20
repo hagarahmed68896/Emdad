@@ -1,19 +1,24 @@
 <!-- Category Section Starts -->
 <section class=" mx-[46px] px-4 py-8">
-    <p
-        class="text-center sm:text-right text-[16px] text-[#1F2B45] px-[16px] py-[8px] rounded-[40px] bg-[#F3F4F5] w-[112px] mb-3">
-        {{ __('messages.choosen_categories') }}</p>
+<p
+    class="text-center sm:text-right text-[16px] text-[#1F2B45] px-[16px] py-[8px] rounded-[40px] bg-[#F3F4F5] w-[112px] mb-3">
+    {{ $siteTexts['choosen_categories'] ?? __('messages.choosen_categories') }}
+</p>
 
-    <div class="flex flex-col sm:flex-row justify-between ">
-        <h2 class="sm:text-[40px] text-[30px] font-bold text-gray-800 mb-4 sm:mb-0">
-            {{ __('messages.discover_categories') }} </h2>
-        {{-- <a href="#"
-            class="text-[#FFFFFF] bg-[#185D31] h-[48px] text-[16px] px-[20px] py-[12px] rounded-[12px]">{{ __('messages.show_more') }}</a> --}}
-    </div>
+<div class="flex flex-col sm:flex-row justify-between ">
+    <h2 class="sm:text-[40px] text-[30px] font-bold text-gray-800 mb-4 sm:mb-0">
+        {{ $siteTexts['discover_categories'] ?? __('messages.discover_categories') }}
+    </h2>
+    {{-- <a href="#"
+        class="text-[#FFFFFF] bg-[#185D31] h-[48px] text-[16px] px-[20px] py-[12px] rounded-[12px]">
+        {{ $siteTexts['show_more'] ?? __('messages.show_more') }}
+    </a> --}}
+</div>
 
-    <p class="text-[#696969] text-[20px] mb-8  sm:text-right">
-        {{ __('messages.discover_categories_description') }}
-    </p>
+<p class="text-[#696969] text-[20px] mb-8 sm:text-right">
+    {{ $siteTexts['discover_categories_description'] ?? __('messages.discover_categories_description') }}
+</p>
+
 
     <!-- Swiper Container -->
     <div class="swiper mySwiper">

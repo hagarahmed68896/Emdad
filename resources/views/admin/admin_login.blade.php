@@ -1,6 +1,9 @@
 <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap" rel="stylesheet">
 <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<style>
+    [x-cloak] { display: none !important; }
+</style>
 
         <div dir="{{ app()->getLocale() == 'ar' ? 'rtl' : 'ltr' }}"
         style="font-family: 'Cairo', sans-serif;"
@@ -44,12 +47,51 @@
                        placeholder="ادخل كلمة المرور" required>
             </div>
 
-            <div>
-                <label class="inline-flex items-center">
-                    <input type="checkbox" x-model="form.remember_me" class="h-4 w-4 text-green-600">
-                    <span class="ml-2">تذكرني</span>
-                </label>
+    <div class="flex justify-between items-center mt-2">
+    <label class="inline-flex items-center">
+        <input type="checkbox" x-model="form.remember_me" class="h-4 w-4 text-green-600">
+        <span class="ml-2">تذكرني</span>
+    </label>
+
+<!-- Forgot Password Button + Modal -->
+<div x-data="{ showForgotPassword: false, forgotEmail: '', forgotMessage: '' }" x-cloak class="inline">
+    <!-- Button -->
+    <button type="button" @click="showForgotPassword = true"
+        class="text-sm text-[#185D31] hover:underline">
+        نسيت كلمة المرور؟
+    </button>
+
+    <!-- Modal -->
+    <div x-show="showForgotPassword" x-transition.opacity 
+         class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <div @click.away="showForgotPassword = false"
+             class="bg-white rounded-xl shadow-lg p-6 w-full max-w-sm text-center">
+            
+            <h2 class="text-lg font-bold mb-4">إعادة تعيين كلمة المرور</h2>
+            <p class="text-gray-600 mb-4">أدخل بريدك الإلكتروني لتلقي رابط إعادة التعيين.</p>
+            
+            <input type="email" x-model="forgotEmail"
+                   placeholder="example@gmail.com"
+                   class="w-full border border-gray-300 rounded-xl px-4 py-2 mb-4">
+
+            <div class="text-green-600 text-sm mb-2" x-text="forgotMessage"></div>
+
+            <div class="flex justify-center gap-4">
+                <button type="button"
+                        @click="sendResetLink()"
+                        class="px-4 py-2 rounded-xl bg-[#185D31] text-white hover:bg-green-800">
+                    إرسال الرابط
+                </button>
+                <button type="button" @click="showForgotPassword = false"
+                        class="px-4 py-2 rounded-xl bg-gray-300 text-gray-800 hover:bg-gray-400">
+                    إلغاء
+                </button>
             </div>
+        </div>
+    </div>
+</div>
+
+</div>
 
             <button type="submit"
                     class="w-full bg-[#185D31] text-white py-3 rounded-xl">
@@ -69,6 +111,7 @@
                 remember_me: false,
             },
             errorMessages: '',
+
 
             async submit() {
                 this.errorMessages = '';
@@ -103,8 +146,42 @@
                 } else {
                     this.errorMessages = 'حدث خطأ غير متوقع.';
                 }
+            },
+             // ✅ Forgot Password Logic
+        async sendResetLink() {
+            if (!this.forgotEmail) {
+                this.forgotMessage = 'الرجاء إدخال البريد الإلكتروني.';
+                return;
             }
+
+            try {
+                const response = await fetch('{{ route('admin.password.email') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    },
+                    body: JSON.stringify({ email: this.forgotEmail })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    this.forgotMessage = 'تم إرسال رابط إعادة التعيين إلى بريدك الإلكتروني.';
+                } else if (data.errors) {
+                    this.forgotMessage = Object.values(data.errors).flat().join(', ');
+                } else if (data.message) {
+                    this.forgotMessage = data.message;
+                } else {
+                    this.forgotMessage = 'حدث خطأ غير متوقع.';
+                }
+            } catch (e) {
+                this.forgotMessage = 'حدث خطأ أثناء إرسال البريد الإلكتروني.';
+            }
+        }
         };
+
     }
 </script>
 

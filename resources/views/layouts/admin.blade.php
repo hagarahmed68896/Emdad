@@ -238,7 +238,8 @@
                 <li class="mb-2">
                     <a href="{{route('invoices.index')}}"
      class="sidebar-link flex items-center p-3  transition-colors duration-200
-        {{ Request::is(patterns: 'admin/invoices*') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">                        <i class="fas fa-file-invoice ml-3 text-gray-500"></i>
+        {{ Request::is(patterns: 'admin/invoices*') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">           
+                      <i class="fas fa-file-invoice ml-3 "></i>
                         <span class="sidebar-text">الفواتير</span>
                     </a>
                 </li>
@@ -248,7 +249,7 @@
                     <a href="{{ route('admin.documents.index') }}"
      class="sidebar-link flex items-center p-3  transition-colors duration-200
         {{ Request::is(patterns: 'admin/documents*') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">   
-                               <i class="fas fa-file-alt ml-3 text-gray-500"></i>
+                               <i class="fas fa-file-alt ml-3 "></i>
                         <span class="sidebar-text">مراجعة الوثائق</span>
                     </a>
                 </li>
@@ -264,7 +265,7 @@
         <i class="fas fa-box ml-3"></i>
         <span class="sidebar-text">إدارة المنتجات</span>
         <i :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"
-           class="fas mr-auto text-gray-500 text-xs sidebar-text"></i>
+           class="fas mr-auto  text-xs sidebar-text"></i>
     </a>
 
     <ul x-show="open" x-transition class="mt-2 space-y-2 pr-6 sidebar-sub-menu">
@@ -298,10 +299,10 @@
     <a href="#"
        @click.prevent="open = !open"
        class="sidebar-link flex items-center p-3 text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl transition-colors duration-200">
-                        <i class="fas fa-shopping-cart ml-3 text-gray-500"></i>
+                        <i class="fas fa-shopping-cart ml-3"></i>
         <span class="sidebar-text">إدارة الطلبات</span>
         <i :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"
-           class="fas mr-auto text-gray-500 text-xs sidebar-text"></i>
+           class="fas mr-auto text-xs sidebar-text"></i>
     </a>
 
     <ul x-show="open" x-transition class="mt-2 space-y-2 pr-6 sidebar-sub-menu">
@@ -344,10 +345,10 @@
     <a href="#"
        @click.prevent="open = !open"
        class="sidebar-link flex items-center p-3 text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl transition-colors duration-200">
-        <i class="fas fa-comments ml-3 text-gray-500"></i>
+        <i class="fas fa-comments ml-3 "></i>
         <span class="sidebar-text">إدارة المحادثات</span>
         <i :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"
-           class="fas mr-auto text-gray-500 text-xs sidebar-text"></i>
+           class="fas mr-auto  text-xs sidebar-text"></i>
     </a>
 
     <ul x-show="open" x-transition class="mt-2 space-y-2 pr-6 sidebar-sub-menu">
@@ -381,7 +382,7 @@
                     <a  href="{{ route('admin.reviews.index') }}"
                   class="sidebar-link flex items-center p-3  transition-colors duration-200
                   {{ Request::is(patterns: 'admin/reviews*') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">   
-                                           <i class="fas fa-star ml-3 text-gray-500"></i>
+                                           <i class="fas fa-star ml-3 "></i>
                         <span class="sidebar-text">مراجعة التقييمات</span>
                     </a>
                 </li>
@@ -389,7 +390,7 @@
                     <a href="{{ route('admin.reports') }}"
                   class="sidebar-link flex items-center p-3  transition-colors duration-200
                   {{ Request::is(patterns: 'admin/reports*') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">              
-                               <i class="fas fa-chart-line ml-3 text-gray-500"></i>
+                               <i class="fas fa-chart-line ml-3 "></i>
                         <span class="sidebar-text">التقارير والإحصائيات</span>
                     </a>
                 </li>
@@ -397,8 +398,16 @@
                     <a href="{{ route('admin.notifications.index') }}"
                   class="sidebar-link flex items-center p-3  transition-colors duration-200
                   {{ Request::is(patterns: 'admin/notifications*') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">   
-                         <i class="fas fa-tags ml-3 text-gray-500"></i>
+                         <i class="fas fa-tags ml-3 "></i>
                         <span class="sidebar-text">العروض والإشعارات</span>
+                    </a>
+                </li>
+                     <li class="mb-2">
+                    <a href="{{ route('admin.site_texts.index') }}"
+                  class="sidebar-link flex items-center p-3  transition-colors duration-200
+                  {{ Request::is(patterns: 'admin/site_texts*') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">   
+                         <i class="fas fa-edit ml-3 "></i>
+                        <span class="sidebar-text"> إدارة النصوص</span>
                     </a>
                 </li>
                 <li class="mb-2"
@@ -557,7 +566,7 @@
 
                 <div class="flex items-center rtl:mr-6 ltr:ml-6">
                     <img src="{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : asset('images/Unknown_person.jpg') }}"
-                        class="w-10 h-10 rounded-full object-cover" id="profileImage" style="cursor: pointer;">
+                        class="w-10 h-10 rounded-full object-cover" id="profileImage" >
                 </div>
             </div>
         </header>

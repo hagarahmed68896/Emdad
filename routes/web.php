@@ -73,6 +73,17 @@ Route::middleware('web')->group(function () {
           // Admin Login Routes (accessible to guests)
           Route::get('/admin/login', [AdminLoginController::class, 'showLoginForm'])->name('admin.login.show');
           Route::post('/admin/login', [AdminLoginController::class, 'login'])->name('admin.login.store');
+Route::get('/admin/password/reset', [AdminLoginController::class, 'showForgotForm'])
+    ->name('admin.password.request');
+
+Route::post('/admin/password/email', [AdminLoginController::class, 'sendResetLink'])
+    ->name('admin.password.email');
+
+Route::get('/admin/password/reset/{token}', [AdminLoginController::class, 'showResetForm'])
+    ->name('password.reset');
+
+Route::post('/admin/password/reset', [AdminLoginController::class, 'resetPassword'])
+    ->name('admin.password.update');
 
           Route::get('/auth/google/redirect', [SocialLoginController::class, 'redirectToGoogle'])->name('login.google');
           Route::get('/auth/google/callback', [SocialLoginController::class, 'handleGoogleCallback']);
@@ -419,6 +430,35 @@ Route::post('notifications/{notification}/toggle-status', [AdminNotificationCont
 
     // 🔥 Download (تحميل CSV أو Excel)
     Route::get('faqs-download', [FaqController::class, 'download'])->name('admin.faqs.download');
+
+    // List all texts
+Route::get('site_texts', [\App\Http\Controllers\Admin\SiteTextController::class, 'index'])
+    ->name('admin.site_texts.index');
+
+// Show the form to create a new text
+Route::get('site_texts/create', [\App\Http\Controllers\Admin\SiteTextController::class, 'create'])
+    ->name('admin.site_texts.create');
+
+// Store a new text
+Route::post('site_texts', [\App\Http\Controllers\Admin\SiteTextController::class, 'store'])
+    ->name('admin.site_texts.store');
+
+// Show a single text (usually optional for admin)
+Route::get('site_texts/{site_text}', [\App\Http\Controllers\Admin\SiteTextController::class, 'show'])
+    ->name('admin.site_texts.show');
+
+// Show the form to edit a text
+Route::get('site_texts/{site_text}/edit', [\App\Http\Controllers\Admin\SiteTextController::class, 'edit'])
+    ->name('admin.site_texts.edit');
+
+// Update an existing text
+Route::put('site_texts/{site_text}', [\App\Http\Controllers\Admin\SiteTextController::class, 'update'])
+    ->name('admin.site_texts.update');
+
+// Delete a text
+// Route::delete('site_texts/{site_text}', [\App\Http\Controllers\Admin\SiteTextController::class, 'destroy'])
+//     ->name('admin.site_texts.destroy');
+
 });
 
 

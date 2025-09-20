@@ -2,22 +2,24 @@
 {{-- @section('content') --}}
 <section class="hero-section w-full px-[64px] md:px-[64px] bg-[#F8F9FA] overflow-hidden relative" dir="rtl">
     <div class="hero-content flex flex-col md:flex-row items-center justify-between gap-8 py-10 md:py-20 relative z-10">
-        <div class="hero-text-wrapper w-full md:w-[600px] md:text-right mb-8 md:mb-0">
-            <span
-                class="hero-tag text-[#1F2B45] text-sm md:text-[16px] bg-white rounded-[40px] py-[8px] px-[16px] inline-block mb-2">
-                {{ __('messages.wholesale') }}
-            </span>
-            <p
-                class="hero-description text-[#212121] text-3xl sm:text-4xl md:text-[48px] font-bold leading-tight md:leading-[100px] mb-2">
-                {{ __('messages.reliableSolution') }}
-            </p>
-            <p class="hero-description text-[#767676] text-base md:text-[20px] mb-2 leading-normal md:leading-[30px]">
-                {{ __('messages.heroDsecription') }}
-            </p>
-            <a href="{{ route('products.index') }}" class="bg-[#185D31] text-[#FFFFFF] rounded-[12px] px-[20px] py-[12px] inline-block mt-2">
-                {{ __('messages.shopNow') }}
-            </a>
-        </div>
+<div class="hero-text-wrapper w-full md:w-[600px] md:text-right mb-8 md:mb-0">
+    <span
+        class="hero-tag text-[#1F2B45] text-sm md:text-[16px] bg-white rounded-[40px] py-[8px] px-[16px] inline-block mb-2">
+        {{ $siteTexts['wholesale'] ?? __('messages.wholesale') }}
+    </span>
+    <p
+        class="hero-description text-[#212121] text-3xl sm:text-4xl md:text-[48px] font-bold leading-tight md:leading-[100px] mb-2">
+        {{ $siteTexts['reliableSolution'] ?? __('messages.reliableSolution') }}
+    </p>
+    <p class="hero-description text-[#767676] text-base md:text-[20px] mb-2 leading-normal md:leading-[30px]">
+        {{ $siteTexts['heroDsecription'] ?? __('messages.heroDsecription') }}
+    </p>
+    <a href="{{ route('products.index') }}" class="bg-[#185D31] text-[#FFFFFF] rounded-[12px] px-[20px] py-[12px] inline-block mt-2">
+        {{ $siteTexts['shopNow'] ?? __('messages.shopNow') }}
+    </a>
+</div>
+
+
 
         <div class="hero-image-wrapper w-full md:w-[665px] h-auto flex justify-center items-center relative ml-6 ">
             <img src="{{ asset('images/Frame 3252.png') }}" alt="Hero Image" class="hero-image max-w-full h-auto">
@@ -54,8 +56,9 @@
                 <div class="flex items-center justify-center"> {{-- Centered this div --}}
                     <div
                         class="flex items-center space-x-1 rtl:space-x-reverse text-xs xs:text-sm font-medium text-gray-800 mb-0.5 xs:mb-1">
-                        <div class="text-[12px] xs:text-[14px] sm:text-[16px] md:text-[20px] text-black text-center leading-tight ml-1 xs:ml-2">
-                            {{ __('messages.satisfied_customers') }}</div> {{-- Adjusted font size --}}
+                       <div class="text-[12px] xs:text-[14px] sm:text-[16px] md:text-[20px] text-black text-center leading-tight ml-1 xs:ml-2">
+    {{ $siteTexts['satisfied_customers'] ?? __('messages.satisfied_customers') }}
+</div> {{-- Adjusted font size --}}
                         <img src="{{ asset('images/Star.svg') }}" alt="Star Rating Icon" class="w-3 h-3 sm:w-4 sm:h-4">
                         <span class="text-[10px] xs:text-[12px] sm:text-[14px] text-[#696969]">4.5</span> {{-- Adjusted font size --}}
                     </div>
@@ -78,8 +81,9 @@
                     class="w-8 h-8 xs:w-10 xs:h-10 sm:w-12 sm:h-12 mr-2 xs:mr-3 sm:mr-4 rtl:ml-2 rtl:xs:ml-3 rtl:sm:ml-4 rtl:mr-0">
                 <div>
                     <p class="text-[20px] xs:text-[24px] sm:text-[28px] md:text-[32px] font-bold">100%</p> {{-- Adjusted font sizes --}}
-                    <p class="text-sm xs:text-base sm:text-[16px] md:text-[20px] text-[#212121]">{{ __('messages.fast_deliver') }}</p> {{-- Adjusted font sizes --}}
-                </div>
+<p class="text-sm xs:text-base sm:text-[16px] md:text-[20px] text-[#212121]">
+    {{ $siteTexts['fast_deliver'] ?? __('messages.fast_deliver') }}
+</p>                </div>
             </div>
         </div>
     </div>

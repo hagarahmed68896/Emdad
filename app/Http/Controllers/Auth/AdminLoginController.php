@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Password;
 
 class AdminLoginController extends Controller
 {
@@ -15,6 +16,7 @@ class AdminLoginController extends Controller
      *
      * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
+
     public function showLoginForm()
     {
         // If an admin is already authenticated, redirect them to the admin dashboard
@@ -71,7 +73,20 @@ public function login(Request $request)
 }
 
 
+ public function sendResetLink(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
 
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
+
+        if ($status === Password::RESET_LINK_SENT) {
+            return response()->json(['message' => __($status)]);
+        }
+
+        return response()->json(['message' => __($status)], 422);
+    }
 
     /**
      * Log the admin user out of the application.

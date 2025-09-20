@@ -2,22 +2,23 @@
 {{-- @section('content') --}}
 <section class="hero-section w-full px-[64px] md:px-[64px] bg-[#F8F9FA] overflow-hidden relative" dir="rtl">
     <div class="hero-content flex flex-col md:flex-row items-center justify-between gap-8 py-10 md:py-20 relative z-10">
-        <div class="hero-text-wrapper w-full md:w-[600px] md:text-right mb-8 md:mb-0">
-            <span
-                class="hero-tag text-[#1F2B45] text-sm md:text-[16px] bg-white rounded-[40px] py-[8px] px-[16px] inline-block mb-2">
-                {{ __('messages.wholesale') }}
-            </span>
-            <p
-                class="hero-description text-[#212121] text-[45px] sm:text-4xl md:text-[48px] font-bold leading-tight md:leading-[70px] mb-2">
-                {{ __('messages.reliableSolution_supplier') }}
-            </p>
-            <p class="hero-description text-[#767676] text-base md:text-[20px] mb-2 leading-normal md:leading-[30px]">
-                {{ __('messages.heroDescription_supplier') }}
-            </p>
-            <a href="{{ route('products.create') }}" class="bg-[#185D31] text-[#FFFFFF] rounded-[12px] px-[20px] py-[12px] inline-block mt-2">
-                {{ __('messages.sell_now') }}
-            </a>
-        </div>
+     <div class="hero-text-wrapper w-full md:w-[600px] md:text-right mb-8 md:mb-0">
+    <span
+        class="hero-tag text-[#1F2B45] text-sm md:text-[16px] bg-white rounded-[40px] py-[8px] px-[16px] inline-block mb-2">
+        {{ $siteTexts['wholesale'] ?? __('messages.wholesale') }}
+    </span>
+    <p
+        class="hero-description text-[#212121] text-[45px] sm:text-4xl md:text-[48px] font-bold leading-tight md:leading-[70px] mb-2">
+        {{ $siteTexts['reliableSolution_supplier'] ?? __('messages.reliableSolution_supplier') }}
+    </p>
+    <p class="hero-description text-[#767676] text-base md:text-[20px] mb-2 leading-normal md:leading-[30px]">
+        {{ $siteTexts['heroDescription_supplier'] ?? __('messages.heroDescription_supplier') }}
+    </p>
+    <a href="{{ route('products.create') }}" class="bg-[#185D31] text-[#FFFFFF] rounded-[12px] px-[20px] py-[12px] inline-block mt-2">
+        {{ $siteTexts['sell_now'] ?? __('messages.sell_now') }}
+    </a>
+</div>
+
 
         <div class="hero-image-wrapper w-full md:w-[665px] h-auto flex justify-center items-center relative ml-6 ">
             <img src="{{ asset('images/a957f2991cfdb613fac217bd00039b025f2c8728.png') }}" alt="Hero Image" class="hero-image max-w-full h-auto">

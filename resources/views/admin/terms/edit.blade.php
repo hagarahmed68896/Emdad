@@ -2,7 +2,7 @@
 @section('page_title', 'تعديل الشروط')
 
 @section('content')
-<div class="p-6 bg-gray-50 min-h-screen">
+<div class="p-6 bg-gray-50 h-screen overflow-y-auto">
     <h2 class="text-[28px] font-bold mb-6">تعديل الشروط</h2>
 
     <form method="POST" action="{{ route('admin.terms.update', $term->id) }}"

@@ -60,17 +60,18 @@
   {{-- Best Offers Section --}}
 <div class="flex flex-col sm:flex-row items-start sm:items-center mb-6 rounded-xl bg-[#F8F9FA] p-4">
     {{-- Left Text --}}
-    <div class="flex flex-col sm:text-right flex-1">
-        <p class="text-[#1F2B45] text-[16px] px-[16px] py-[8px] bg-white rounded-[40px] mb-4 w-fit md:mx-0">
-            {{ __('messages.limited_offers') }}
-        </p>
-        <p class="text-3xl sm:text-4xl md:text-[40px] font-bold text-gray-900 mb-2 mt-2">
-            {{ __('messages.best_offers') }}
-        </p>
-        <p class="text-[#696969] text-[20px] sm:text-lg mt-2">
-            {{ __('messages.best_offers_description') }}
-        </p>
-    </div>
+<div class="flex flex-col sm:text-right flex-1">
+    <p class="text-[#1F2B45] text-[16px] px-[16px] py-[8px] bg-white rounded-[40px] mb-4 w-fit md:mx-0">
+        {{ $siteTexts['limited_offers'] ??  __('messages.limited_offers') }}
+    </p>
+    <p class="text-3xl sm:text-4xl md:text-[40px] font-bold text-gray-900 mb-2 mt-2">
+        {{ $siteTexts['best_offers'] ??  __('messages.best_offers') }}
+    </p>
+    <p class="text-[#696969] text-[20px] sm:text-lg mt-2">
+        {{ $siteTexts['best_offers_description'] ??  __('messages.best_offers_description') }}
+    </p>
+</div>
+
 
     {{-- Countdown Timer --}}
     <div class="countdown-timer ltr-timer bg-[#EDEDED] flex font-extrabold text-[#1F2B45] 

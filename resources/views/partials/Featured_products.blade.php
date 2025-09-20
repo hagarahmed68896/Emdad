@@ -3,26 +3,28 @@
 <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
 
 <section class="px-[64px] py-8 font-inter">
-    <div class="flex sm:flex-row flex-col  justify-between mt-1">
-        <div class="flex flex-col justify-between mb-5  mt-3">
-            <p class="bg-[#F3F4F5] rounded-[40px] px-[16px] py-[8px] w-[97px] text-[16px] mb-4 text-[#1F2B45]">
-                {{ __('messages.chosen_for_you') }}</p>
-            <h2 class="text-3xl md:text-[40px] font-bold  mb-4 md:mb-0">
-                {{ __('messages.discover_our_products') }}
-            </h2>
-               <p class="text-[#696969]  text-[20px] ">
-        {{__('messages.discover_our_products_description')}}
-    </p>
-
-        </div>
-<a href="{{ route('products.index') }}"
-    class="text-[#FFFFFF] bg-[#185D31] text-[16px] px-4 py-3 mb-1 rounded-[12px]
-           h-12 w-[140px]
-           flex items-center justify-center
-           hover:bg-green-700 transition-colors duration-200">
-    {{ __('messages.show_more') }}
-</a>
+<div class="flex sm:flex-row flex-col justify-between mt-1">
+    <div class="flex flex-col justify-between mb-5 mt-3">
+        <p class="bg-[#F3F4F5] rounded-[40px] px-[16px] py-[8px] w-[97px] text-[16px] mb-4 text-[#1F2B45]">
+            {{ $siteTexts['chosen_for_you'] ?? __('messages.chosen_for_you') }}
+        </p>
+        <h2 class="text-3xl md:text-[40px] font-bold mb-4 md:mb-0">
+            {{ $siteTexts['discover_our_products'] ?? __('messages.discover_our_products') }}
+        </h2>
+        <p class="text-[#696969] text-[20px]">
+            {{ $siteTexts['discover_our_products_description'] ?? __('messages.discover_our_products_description') }}
+        </p>
     </div>
+
+    <a href="{{ route('products.index') }}"
+       class="text-[#FFFFFF] bg-[#185D31] text-[16px] px-4 py-3 mb-1 rounded-[12px]
+              h-12 w-[140px]
+              flex items-center justify-center
+              hover:bg-green-700 transition-colors duration-200">
+        {{ $siteTexts['show_more'] ?? __('messages.show_more') }}
+    </a>
+</div>
+
  
 
     <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="favorites-grid">

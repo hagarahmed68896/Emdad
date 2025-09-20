@@ -2,9 +2,10 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 md:gap-12 justify-between">
         <div class="flex flex-col items-center text-center md:items-start md:text-right">
             <h3 class="text-[16px] font-bold mb-3">Logo</h3>
-            <p class="text-sm leading-relaxed mb-6">
-                {{__('messages.footer_description')}}
-            </p>
+         <p class="text-sm leading-relaxed mb-6">
+    {{ $siteTexts['footer_description'] ?? __('messages.footer_description') }}
+</p>
+
   <div class="flex space-x-4 rtl:space-x-reverse justify-center md:justify-start">
     @php
         $socials = $footerSetting->social_links ?? [];

@@ -74,15 +74,19 @@
 
         <main class="w-full py-8 md:py-12">
             <section class="mb-12 bg-[#F8F9FA] w-full px-[64px] py-8">
-                <p
-                    class="text-center sm:text-right text-[16px] text-[#1F2B45] py-[8px] rounded-[40px] bg-[#FFFFFF] w-[112px] mb-3">
-                    {{ __('messages.choosen_categories') }}</p>
-                <h2 class="text-3xl font-bold text-gray-800 mb-6  relative">
-                  {{ __('messages.main_categories') }}
-                </h2>
-                <p class="text-[#696969] text-[20px] mb-8  sm:text-right">
-                    {{ __('messages.cosen_cat_description') }}
-                </p>
+           <p
+    class="text-center sm:text-right text-[16px] text-[#1F2B45] py-[8px] rounded-[40px] bg-[#FFFFFF] w-[112px] mb-3">
+    {{ $siteTexts['choosen_categories'] ?? __('messages.choosen_categories') }}
+</p>
+
+<h2 class="text-3xl font-bold text-gray-800 mb-6 relative">
+    {{ $siteTexts['main_categories'] ?? __('messages.main_categories') }}
+</h2>
+
+<p class="text-[#696969] text-[20px] mb-8 sm:text-right">
+    {{ $siteTexts['cosen_cat_description'] ?? __('messages.cosen_cat_description') }}
+</p>
+
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4  gap-6">
                     @foreach ($subCategories as $subCategory)
                         <div class="flex flex-col items-center text-center w-full">
@@ -104,14 +108,17 @@
             @isset($onOfferProducts)
     @if($onOfferProducts->isNotEmpty())
             <section class=" py-8 font-inter px-[64px]">
-                <div class="flex sm:flex-row flex-col  justify-between mt-1">
-                    <div class="flex flex-col justify-between mb-5  mt-3">
-                        <h2 class="text-[40px] font-bold text-[#212121] mb-6 relative">
-                            {{ __('messages.best_deals') }}
-                        </h2>
-                        <p class="text-gray-600 text-[20px] mb-8">{{ __('messages.offer_descriptions') }}</p>
-                    </div>
-                </div>
+              <div class="flex sm:flex-row flex-col justify-between mt-1">
+    <div class="flex flex-col justify-between mb-5 mt-3">
+        <h2 class="text-[40px] font-bold text-[#212121] mb-6 relative">
+            {{ $siteTexts['best_deals'] ?? __('messages.best_deals') }}
+        </h2>
+        <p class="text-gray-600 text-[20px] mb-8">
+            {{ $siteTexts['offer_descriptions'] ?? __('messages.offer_descriptions') }}
+        </p>
+    </div>
+</div>
+
                 <div class="swiper offerSwiper mb-4 px-[64px] py-8 ">
                     <div class="swiper-wrapper mb-8 ">
                         @forelse ($onOfferProducts as $product)
@@ -236,19 +243,23 @@
                 @endif
 @endisset
 
+
+      @isset($onFeaturedProducts)
+    @if($onFeaturedProducts->isNotEmpty())
     <section class=" px-[64px] py-4 font-inter">
     <div class="flex sm:flex-row flex-col  justify-between mt-1">
-        <div class="flex flex-col justify-between mb-5  mt-3">
-            <p class="bg-[#F3F4F5] rounded-[40px] px-[16px] py-[8px] w-[97px] text-[16px] mb-4 text-[#1F2B45]">
-                {{ __('messages.chosen_for_you') }}</p>
-            <h2 class="text-3xl md:text-[40px] font-bold  mb-4 md:mb-0">
-                {{ __('messages.discover_our_products') }}
-            </h2>
-               <p class="text-[#696969]  text-[20px] ">
-        {{__('messages.discover_our_products_description')}}
+    <div class="flex flex-col justify-between mb-5 mt-3">
+    <p class="bg-[#F3F4F5] rounded-[40px] px-[16px] py-[8px] w-[97px] text-[16px] mb-4 text-[#1F2B45]">
+        {{ $siteTexts['chosen_for_you'] ?? __('messages.chosen_for_you') }}
     </p>
+    <h2 class="text-3xl md:text-[40px] font-bold mb-4 md:mb-0">
+        {{ $siteTexts['discover_our_products'] ?? __('messages.discover_our_products') }}
+    </h2>
+    <p class="text-[#696969] text-[20px]">
+        {{ $siteTexts['discover_our_products_description'] ?? __('messages.discover_our_products_description') }}
+    </p>
+</div>
 
-        </div>
     <a href="#"
             class="text-[#FFFFFF] bg-[#185D31] h-[48px] text-[16px] px-[20px] py-[12px] rounded-[12px]">{{ __('messages.show_more') }}</a>
     </div>
@@ -262,7 +273,7 @@
                         <div class="relative w-full h-48 sm:h-56 overflow-hidden product-image-swiper inner-swiper">
                                       <div class="swiper-wrapper">
                                 @php
-                                    $images = collect(is_string($product->images) ? json_decode($product->images, true) : ($product->images ?? []));
+                                    $images = collect(is_string($featuredProduct->images) ? json_decode($featuredProduct->images, true) : ($featuredProduct->images ?? []));
                                 @endphp
 
                                 @forelse ($images as $image)
@@ -273,7 +284,7 @@
                                     </div>
                                 @empty
                                     <div class="swiper-slide">
-                                        <img src="{{ asset($product->image ?? 'https://placehold.co/300x200/F0F0F0/ADADAD?text=No+Image') }}"
+                                        <img src="{{ asset($featuredProduct->image ?? 'https://placehold.co/300x200/F0F0F0/ADADAD?text=No+Image') }}"
                                              onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
                                              class="w-full h-full object-contain">
                                     </div>
@@ -373,7 +384,8 @@
         @endforeach
     </div>
             </section>
-
+    @endif
+@endisset
         </main>
     </div>
 

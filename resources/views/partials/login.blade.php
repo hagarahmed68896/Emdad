@@ -105,23 +105,26 @@ bussnissdata: false,
     <p class="text-2xl font-bold text-[#212121]">{{ __('messages.login') }}</p>
     <p class="text-base text-[#767676] mb-4">{{ __('messages.loginMSG') }}</p>
 
-    <div class="mb-4">
-        <label for="phone" class="block font-bold text-lg text-[#212121]">
-            {{ __('messages.phone_number') }}
-        </label>
-        <div class="flex items-center mt-2 border rounded-[12px] overflow-hidden"
-            :class="{'border-red-500': errors.phone, 'border-gray-400': !errors.phone}">
-            <span class="border-r px-3 py-2 text-[#767676]">966+</span>
-            <input type="text" name="phone_number" id="phone"
-                maxlength="9" pattern="[0-9]*" inputmode="numeric"
-                placeholder="{{__('messages.phoneMSG')}}"
-                x-model="formData.phone_number"
-                class="block w-full px-2 py-2 h-[48px] border-none focus:outline-none text-base">
-        </div>
-        <template x-if="errors.phone_number">
-            <p class="text-red-500 text-xs mt-1" x-text="errors.phone_number[0]"></p>
-        </template>
+<div class="mb-4">
+    <label for="phone" class="block font-bold text-lg text-[#212121]">
+        {{ __('messages.phone_number') }}
+    </label>
+    <div class="relative mt-2">
+        <span class="absolute left-0 top-0 h-full flex items-center px-3 text-[#767676] border-r border-gray-300 rounded-l-[12px]">
+            +966
+        </span>
+        <input type="text" name="phone_number" id="phone"
+            maxlength="9" pattern="[0-9]*" inputmode="numeric"
+            placeholder="{{__('messages.phoneMSG')}}"
+            x-model="formData.phone_number"
+            :class="{'border-red-500': errors.phone_number, 'border-gray-400': !errors.phone_number}"
+            class="block w-full pl-20 pr-2 py-2 h-[48px] border rounded-[12px] focus:outline-none text-base text-left">
     </div>
+    <template x-if="errors.phone_number">
+        <p class="text-red-500 text-xs mt-1" x-text="errors.phone_number[0]"></p>
+    </template>
+</div>
+
 
     <button type="submit" :disabled="loading"
      {{-- @click="$dispatch('open-otp')" --}}
