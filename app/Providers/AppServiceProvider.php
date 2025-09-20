@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\App;
 use App\Models\Cart as CustomCart;
 use App\Models\ContactSetting;
+use App\Models\Term;
+use App\Models\Faq;
 
 
 class AppServiceProvider extends ServiceProvider
@@ -18,7 +20,35 @@ class AppServiceProvider extends ServiceProvider
         View::composer('*', function ($view) {
 
              $view->with('footerSetting', ContactSetting::first());
-    
+// حدد نوع المستخدم
+$userType = Auth::check() ? Auth::user()->account_type : 'customer';
+
+// الشروط والأحكام
+$activeTerms = Term::where('is_active', 1)
+    ->where('type', 'terms')
+    ->where('user_type', $userType)
+    ->latest('updated_at')
+    ->get();
+
+// سياسات الخصوصية
+$activePolicies = Term::where('is_active', 1)
+    ->where('type', 'policies')
+    ->where('user_type', $userType)
+    ->latest('updated_at')
+    ->get();
+      //faqs
+    $Faqs = Faq::where('user_type', Auth::check() ? Auth::user()->type : 'customer')
+           ->latest()
+           ->get();
+
+$view->with('activeTerms', $activeTerms)
+      ->with('Faqs', $Faqs)
+     ->with('activePolicies', $activePolicies);
+
+  
+
+
+
             // ------------------------
             // 🛒 CART ITEMS
             // ------------------------

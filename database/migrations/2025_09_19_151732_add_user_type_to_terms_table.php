@@ -1,0 +1,23 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    public function up(): void
+    {
+        Schema::table('terms', function (Blueprint $table) {
+            $table->enum('user_type', ['customer', 'supplier'])
+                  ->default('customer')
+                  ->after('body'); // put it after body
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('terms', function (Blueprint $table) {
+            $table->dropColumn('user_type');
+        });
+    }
+};

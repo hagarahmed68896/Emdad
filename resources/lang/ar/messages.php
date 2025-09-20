@@ -707,6 +707,7 @@ return [
     'sent_notifications' => 'الإشعارات المُرسلة',
     'unsent_notifications' => 'الإشعارات غير المُرسلة	',
     'days' => 'أيام',
+    'no_results_found' => 'لا توجد نتائج بحث'
 
  
 

@@ -329,7 +329,7 @@
 
     </ul>
 </li>
-                <li class="mb-2">
+                {{-- <li class="mb-2">
                     <a href="{{route('admin.messages.index')}}"
  class="flex items-center p-2 transition-colors duration-200
        {{ Request::is('admin/settlements*') 
@@ -337,7 +337,46 @@
             : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">                        <i class="fas fa-comments ml-3 text-gray-500"></i>
                         <span class="sidebar-text">إدارة المحادثات</span>
                     </a>
-                </li>
+                </li> --}}
+                <li class="mb-2"
+    x-data="{ open: {{ Request::is('admin/messages*') || Request::is('admin/quick_replies*') ? 'true' : 'false' }} }">
+    
+    <a href="#"
+       @click.prevent="open = !open"
+       class="sidebar-link flex items-center p-3 text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl transition-colors duration-200">
+        <i class="fas fa-comments ml-3 text-gray-500"></i>
+        <span class="sidebar-text">إدارة المحادثات</span>
+        <i :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"
+           class="fas mr-auto text-gray-500 text-xs sidebar-text"></i>
+    </a>
+
+    <ul x-show="open" x-transition class="mt-2 space-y-2 pr-6 sidebar-sub-menu">
+
+        {{-- المحادثات --}}
+        <li>
+            <a href="{{ route('admin.messages.index') }}"
+               class="flex items-center p-2 transition-colors duration-200
+               {{ Request::is('admin/messages*') 
+                    ? 'bg-[#185D31] text-white rounded-xl' 
+                    : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
+               المحادثات
+            </a>
+        </li>
+
+        {{-- الرسائل التلقائية --}}
+        <li>
+            <a href="{{ route('admin.quick_replies.index') }}"
+               class="flex items-center p-2 transition-colors duration-200
+               {{ Request::is('admin/quick_replies*') 
+                    ? 'bg-[#185D31] text-white rounded-xl' 
+                    : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
+               الرسائل التلقائية
+            </a>
+        </li>
+
+    </ul>
+</li>
+
                 <li class="mb-2">
                     <a  href="{{ route('admin.reviews.index') }}"
                   class="sidebar-link flex items-center p-3  transition-colors duration-200
@@ -397,15 +436,17 @@
         </li>
 
         <li>
-            <a href="#"
-               class="flex items-center p-2 transition-colors duration-200">
-            الشروط و الاحكام
+            <a href="{{ route('admin.terms.index') }}"
+                             class="flex items-center p-2 transition-colors duration-200
+               {{ (Request::is('admin/terms*')) ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
+                            الشروط و الاحكام
             </a>
         </li>
      <li>
-            <a href="#"
-               class="flex items-center p-2 transition-colors duration-200">
-           نسبة الأرباح 
+            <a href="{{ route('admin.profit.index') }}"
+                             class="flex items-center p-2 transition-colors duration-200
+               {{ (Request::is('admin/terms*')) ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">   
+                        نسبة الأرباح 
             </a>
         </li>
     </ul>
@@ -416,8 +457,13 @@
 
         <div class="mt-auto pt-4 border-t border-gray-200">
             <div class="flex items-center p-3">
-                <i class="fas fa-question-circle ml-3 text-gray-500"></i>
-                <span class="sidebar-text">الأسئلة الشائعة</span>
+                   <a href="{{ route('admin.faqs.index') }}"
+                             class="flex items-center p-2 transition-colors duration-200
+               {{ (Request::is('admin/faqs*')) ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">   
+                                <i class="fas fa-question-circle ml-3 "></i>
+
+                        الأسئلة الشائعة 
+            </a>
             </div>
             <div class="flex items-center p-3 mt-2">
                 <img src="https://placehold.co/40x40/E0F2F1/004D40?text=A" alt="Admin Profile"

@@ -28,260 +28,211 @@
 
     <div class="container flex bg-white p-4">
         <div class="row mb-2 mt-4">
-            <div class="col-lg-6 p-2 ">
+            <!-- العمود الأيسر -->
+            <div class="col-lg-6 p-2">
                 <div class="flex-grow-2 mt-1">
                     <h1 class="text-[#212121] text-[32px] mb-3 text-right font-bold">الأسئلة الشائعة</h1>
-                    <p class="text-[#767676] text-lg  text-right">هل لديك سؤال؟</p>
-                    <p class="text-[#767676] text-base  text-right">اعثر على إجابات للاستفسارات الشائعة حول منتجاتنا
+                    <p class="text-[#767676] text-lg text-right">هل لديك سؤال؟</p>
+                    <p class="text-[#767676] text-base text-right">اعثر على إجابات للاستفسارات الشائعة حول منتجاتنا
                         وخدماتنا</p>
                 </div>
-                <div class=" flex justify-center items-center relative overflow-hidden mt-4">
+
+                <div class="flex justify-center items-center relative overflow-hidden mt-4">
                     <img src="{{ asset('images/image.png') }}" alt="Man looking confused holding a phone"
-                        class="max-w-[80%] h-auto block rounded-md object-contain">
-                    <img class=" absolute rounded-full w-[80px] h-[64px]  flex justify-center items-center top-1/5 left-[72%]"
-                        src="{{ asset('images/Group (7).svg') }}" alt="">
-                    <img class=" absolute rounded-full w-[80px] h-[64px] flex justify-center items-center top-1/4 right-[55%]"
-                        src="{{ asset('images/Group (6).svg') }}" alt="">
+                         class="max-w-[80%] h-auto block rounded-md object-contain">
+                    <img class="absolute rounded-full w-[80px] h-[64px] flex justify-center items-center top-1/5 left-[72%]"
+                         src="{{ asset('images/Group (7).svg') }}" alt="">
+                    <img class="absolute rounded-full w-[80px] h-[64px] flex justify-center items-center top-1/4 right-[55%]"
+                         src="{{ asset('images/Group (6).svg') }}" alt="">
                 </div>
-                <div x-data="{ showContactUs: false }" class="mt-4">
-                    <button @click="showContactUs = true"
-                        class="bg-[#185D31] w-full text-white px-4 py-2 rounded-xl text-lg font-semibold transition-colors duration-200 hover:bg-[#154a29]">
-                        {{ __('messages.contact_us') }}
-                    </button>
 
-                    {{-- Contact Us Modal --}}
-                    <div x-show="showContactUs" x-transition:enter="transition ease-out duration-300"
-                        x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100"
-                        x-transition:leave="transition ease-in duration-200"
-                        x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90" x-cloak
-                        class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-                        style="backdrop-filter: blur(2px);" @click.self="showContactUs = false">
-                        <div class="bg-white p-8 rounded-lg shadow-xl  w-[588px] ">
-                            <h2 class="text-[32px] text-[#212121] font-bold mb-4">{{ __('messages.contactUs') }}</h2>
-                            <p class="mb-6">{{ __('messages.contactDescription') }}</p>
-                            <form action="" method="POST">
-                                <div class="mb-3">
-                                    <label for="name" class="block font-bold text-[20px] text-[#212121]">
-                                        {{ __('messages.full_name') }}
-                                    </label>
-                                    <div
-                                        class="flex items-center mt-2 border-[1px] border-[#767676] rounded-[12px] overflow-hidden">
-                                        <input type="text" name="full_name" required
-                                            placeholder="{{ __('messages.nameMSG') }}"
-                                            class="block w-full px-3 py-2 border-none h-[56px] focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                    </div>
-                                </div>
+           <!-- زر تواصل معنا + المودال -->
+<div x-data="{ showContactUs: false }" @close-contact.window="showContactUs = false" class="mt-4">
+    <button @click="showContactUs = true"
+            class="bg-[#185D31] w-full text-white px-4 py-2 rounded-xl text-lg font-semibold transition-colors duration-200 hover:bg-[#154a29]">
+        {{ __('messages.contact_us') }}
+    </button>
 
-                                <div class="mb-3">
-                                    <label for="email" class="block font-bold text-[20px] text-[#212121]">
-                                        {{ __('messages.email') }}
-                                    </label>
-                                    <div
-                                        class="flex items-center mt-2 border-[1px] border-[#767676] rounded-[12px] overflow-hidden">
-                                        <input type="email" name="email" required
-                                            placeholder="{{ __('messages.mailMessage') }}"
-                                            class="block w-full px-3 py-2 border-none h-[56px] focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                    </div>
-                                </div>
+    <!-- Contact Us Modal -->
+    <div x-show="showContactUs" x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90" x-cloak
+         class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+         style="backdrop-filter: blur(2px);" @click.self="showContactUs = false">
 
+        <div class="bg-white p-8 rounded-lg shadow-xl w-[588px]">
+            <h2 class="text-[32px] text-[#212121] font-bold mb-4">{{ __('messages.contactUs') }}</h2>
+            <p class="mb-6">{{ __('messages.contactDescription') }}</p>
 
-                                <div class="mb-3 ">
-                                    <label class="block font-bold text-[20px] text-[#212121]">
-                                        {{ __('messages.expType') }}
-                                    </label>
-                                    <div class="w-100 flex justify-between m-1 hs-dropdown [--auto-close:inside] relative"
-                                       >
-                                          <button  class="hs-dropdown-toggle py-3 px-4 inline-flex justify-between flex w-full border-[1px] border-[#767676]
-                                         gap-x-2 text-[16px] rounded-[12px]
-                                         bg-white text-[#767676] shadow-2xs hover:bg-gray-50 focus:outline-hidden 
-                                         focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800
-                                          dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"
-                                           
-                                           type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            {{ __('messages.selectExplanation') }}
-  </button>
-  <ul class="dropdown-menu w-100">
-    <li><class="dropdown-item" href="#">
-            <div
-                                                class="flex gap-x-2 py-2 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700">
-                                                <input id="hs-dropdown-item-radio-delete" name="hs-dropdown-item-radio"
-                                                    type="radio"
-                                                    class="mt-0.5 shrink-0 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800"
-                                                    aria-describedby="hs-dropdown-item-radio-delete-description" checked>
-                                                <label for="hs-dropdown-item-radio-delete">
-                                                    <span
-                                                        class="block text-sm font-semibold text-gray-800 dark:text-neutral-300">استفسار
-                                                        عام</span>
+            <!-- success message (AJAX) -->
+            <div id="contactSuccess" class="hidden bg-green-100 text-green-700 p-3 rounded-md mb-4"></div>
 
-                                                </label>
-                                            </div></li>
-    <li>
-        
-                                            <div
-                                                class="flex gap-x-2 py-2 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700">
-                                                <input id="hs-dropdown-item-radio-archive" name="hs-dropdown-item-radio"
-                                                    type="radio"
-                                                    class="mt-0.5 shrink-0 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800"
-                                                    aria-describedby="hs-dropdown-item-radio-archive-description">
-                                                <label for="hs-dropdown-item-radio-archive">
-                                                    <span
-                                                        class="block text-sm font-semibold text-gray-800 dark:text-neutral-300">
-                                                        استفسار عن منتج</span>
+            <form id="contactForm" action="{{ route('contact.store') }}" method="POST" novalidate>
+                @csrf
 
-                                                </label>
-                                            </div>
-
-    </li>
-    <li>
-             
-                                            <div
-                                                class="flex gap-x-2 py-2 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700">
-                                                <input id="hs-dropdown-item-radio-archive" name="hs-dropdown-item-radio"
-                                                    type="radio"
-                                                    class="mt-0.5 shrink-0 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800"
-                                                    aria-describedby="hs-dropdown-item-radio-archive-description">
-                                                <label for="hs-dropdown-item-radio-archive">
-                                                    <span
-                                                        class="block text-sm font-semibold text-gray-800 dark:text-neutral-300">مشكلة
-                                                        في الطلب أو التوصيل </span>
-
-                                                </label>
-                                            </div>
-
-    </li>
-    <li>
-
-                                            <div
-                                                class="flex gap-x-2 py-2 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700">
-                                                <input id="hs-dropdown-item-radio-archive" name="hs-dropdown-item-radio"
-                                                    type="radio"
-                                                    class="mt-0.5 shrink-0 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800"
-                                                    aria-describedby="hs-dropdown-item-radio-archive-description">
-                                                <label for="hs-dropdown-item-radio-archive">
-                                                    <span
-                                                        class="block text-sm font-semibold text-gray-800 dark:text-neutral-300">
-                                                        أخرى </span>
-
-                                                </label>
-                                            </div>
-                                            
-    </li>
-  </ul>
-
-                                    </div>
-                                </div>
-
-
-                                <div class="mb-3">
-                                    <label for="msg" class="block font-bold text-[20px] text-[#212121]">
-                                        {{ __('messages.msg') }}
-                                    </label>
-                                    <div
-                                        class="flex items-center mt-2 border-[1px] border-[#767676] rounded-[12px] overflow-hidden">
-                                        <textarea name="" rows="5" placeholder="{{ __('messages.writeQuestion') }}"
-                                            class="block w-full px-3 py-2 border-none focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                            id="msg">
-</textarea>
-
-                                    </div>
-                                </div>
-
-                                <button type="submit"
-                                    class="w-full bg-[#185D31] text-white p-[12px] h-[48px] rounded-[12px] hover:bg-green-800">
-                                    {{ __('messages.send') }}
-                                </button>
-                            </form>
-                        </div>
+                <div class="mb-3">
+                    <label class="block font-bold text-[20px] text-[#212121]">{{ __('messages.name') }}</label>
+                    <div class="flex items-center mt-2 border-[1px] border-[#767676] rounded-[12px] overflow-hidden">
+                        <input type="text" name="name" required
+                               placeholder="{{ __('messages.nameMSG') }}"
+                               class="block w-full px-3 py-2 border-none h-[56px] focus:outline-none">
                     </div>
-
+                    <p id="error-name" class="text-red-500 text-sm mt-1 hidden"></p>
                 </div>
 
+                <div class="mb-3">
+                    <label class="block font-bold text-[20px] text-[#212121]">{{ __('messages.email') }}</label>
+                    <div class="flex items-center mt-2 border-[1px] border-[#767676] rounded-[12px] overflow-hidden">
+                        <input type="email" name="email" required
+                               placeholder="{{ __('messages.mailMessage') }}"
+                               class="block w-full px-3 py-2 border-none h-[56px] focus:outline-none">
+                    </div>
+                    <p id="error-email" class="text-red-500 text-sm mt-1 hidden"></p>
+                </div>
 
+                <div class="mb-3">
+                    <label class="block font-bold text-[20px] text-[#212121]">{{ __('messages.expType') }}</label>
+                    <select name="type"
+                            class="w-full px-3 py-2 border border-[#767676] rounded-[12px] focus:outline-none">
+                        <option value="">-- اختر النوع --</option>
+                        <option value="استفسار عام">استفسار عام</option>
+                        <option value="استفسار عن منتج">استفسار عن منتج</option>
+                        <option value="مشكلة في الطلب أو التوصيل">مشكلة في الطلب أو التوصيل</option>
+                        <option value="أخرى">أخرى</option>
+                    </select>
+                    <p id="error-type" class="text-red-500 text-sm mt-1 hidden"></p>
+                </div>
 
+                <div class="mb-3">
+                    <label class="block font-bold text-[20px] text-[#212121]">{{ __('messages.msg') }}</label>
+                    <div class="flex items-center mt-2 border-[1px] border-[#767676] rounded-[12px] overflow-hidden">
+                        <textarea name="message" rows="5" required
+                                  placeholder="{{ __('messages.writeQuestion') }}"
+                                  class="block w-full px-3 py-2 border-none focus:outline-none"></textarea>
+                    </div>
+                    <p id="error-message" class="text-red-500 text-sm mt-1 hidden"></p>
+                </div>
 
+                <button type="submit" id="contactSubmit"
+                        class="w-full bg-[#185D31] text-white p-[12px] h-[48px] rounded-[12px] hover:bg-green-800">
+                    {{ __('messages.send') }}
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('contactForm');
+    const successBox = document.getElementById('contactSuccess');
+    const submitBtn = document.getElementById('contactSubmit');
 
+    function clearErrors() {
+        ['name','email','type','message'].forEach(k => {
+            const el = document.getElementById('error-' + k);
+            if (el) { el.textContent = ''; el.classList.add('hidden'); }
+        });
+    }
 
+    function showErrors(errors) {
+        for (const key in errors) {
+            const el = document.getElementById('error-' + key);
+            if (el) {
+                el.textContent = errors[key].join(' ');
+                el.classList.remove('hidden');
+            }
+        }
+    }
 
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearErrors();
+        successBox.classList.add('hidden');
+        submitBtn.disabled = true;
 
+        const token = form.querySelector('input[name="_token"]').value;
+        const url = form.getAttribute('action');
+        const formData = new FormData(form);
 
+        try {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json'
+                },
+                body: formData
+            });
 
+            const data = await res.json().catch(() => ({}));
 
+            if (!res.ok) {
+                // validation errors (422) or other
+                if (data.errors) {
+                    showErrors(data.errors);
+                } else if (data.message) {
+                    successBox.textContent = data.message;
+                    successBox.classList.remove('hidden');
+                } else {
+                    successBox.textContent = 'حدث خطأ غير متوقع. حاول مرة أخرى.';
+                    successBox.classList.remove('hidden');
+                }
+            } else {
+                // success
+                successBox.textContent = data.message || 'تم الإرسال';
+                successBox.classList.remove('hidden');
+                form.reset();
 
-
-
-
+                // dispatch event to close modal after short delay
+                setTimeout(() => {
+                    window.dispatchEvent(new Event('close-contact'));
+                }, 1000);
+            }
+        } catch (err) {
+            console.error(err);
+            successBox.textContent = 'خطأ في الشبكة. تأكد من اتصالك وحاول مرة أخرى.';
+            successBox.classList.remove('hidden');
+        } finally {
+            submitBtn.disabled = false;
+        }
+    });
+});
+</script>
 
             </div>
-            <div class="col-lg-6 p-2 ">
-                <div class="faq-item border-b border-gray-200 rounded-[20px] bg-[#F8F9FA] p-[24px] mb-3 mt-1">
-                    <div class="faq-question flex items-center font-semibold text-gray-800 cursor-pointer text-lg">
-                        <span class="flex-grow text-right text-[18px] leading-[150%] font-bold">
-                            هل يمكنني الحصول على مزيد من المعلومات حول منتج ما؟
-                        </span>
-                        <span class="arrow-icon mr-2"></span>
+
+            <!-- العمود الأيمن (الأسئلة من قاعدة البيانات) -->
+            <div class="col-lg-6 p-2">
+                @forelse($faqs as $faq)
+                    <div class="faq-item border-b border-gray-200 rounded-[20px] bg-[#F8F9FA] p-[24px] mb-3">
+                        <div class="faq-question flex justify-between items-center font-semibold text-gray-800 cursor-pointer text-lg">
+                            <span class="flex-grow text-right text-[18px] leading-[150%] font-bold">
+                                {{ $faq->question }}
+                            </span>
+                            <span class="arrow-icon ml-2"></span>
+                        </div>
+                        <div class="faq-answer pt-2 text-gray-700 leading-relaxed text-base">
+                            <p>{{ $faq->answer }}</p>
+                            {{-- <p class="mt-2 text-sm text-gray-500">
+                                الفئة: 
+                                {{ $faq->user_type === 'customer' ? 'عميل' : ($faq->user_type === 'supplier' ? 'مورد' : $faq->user_type) }}
+                            </p> --}}
+                        </div>
                     </div>
-                    <div class="faq-answer pt-2 text-gray-700 leading-relaxed text-base">
-                    </div>
-                </div>
-                <div class="faq-item border-b border-gray-200  p-[24px] open rounded-[20px] bg-[#F8F9FA] mb-3">
-                    <div
-                        class="faq-question flex justify-between items-center font-semibold text-gray-800 cursor-pointer text-lg">
-                        <span class="flex-grow text-right text-[18px] leading-[150%] font-bold">
-                            هل منتجاتكم تشمل الضمان؟
-                        </span>
-                        <span class="arrow-icon ml-2"></span>
-                    </div>
-                    <div class="faq-answer pt-2 text-gray-700 leading-relaxed text-base">
-                        <p>نعم، معظم منتجاتنا تأتي مع ضمان من الشركة المصنعة. عادةً ما تكون تفاصيل الضمان موضحة في عبوة
-                            المنتج أو على موقعنا الإلكتروني.</p>
-                    </div>
-                </div>
-                <div class="faq-item border-b border-gray-200 p-[24px] open rounded-[20px] bg-[#F8F9FA] mb-3">
-                    <div
-                        class="faq-question flex justify-between items-center font-semibold text-gray-800 cursor-pointer text-lg">
-                        <span class="flex-grow text-right text-[18px] leading-[150%] font-bold">
-                            ما هي خيارات الشحن المتاحة؟
-                        </span>
-                        <span class="arrow-icon ml-2"></span>
-                    </div>
-                    <div class="faq-answer pt-2 text-gray-700 leading-relaxed text-base">
-                        <p>توفر خيارات شحن قياسية وسريعة. يستغرق الشحن القياسي من 3 إلى 5 أيام عمل، بينما يستغرق الشحن
-                            السريع من يوم إلى يومين عمل.</p>
-                    </div>
-                </div>
-                <div class="faq-item border-b border-gray-200 rounded-[20px] p-[24px] bg-[#F8F9FA] mb-3">
-                    <div
-                        class="faq-question flex justify-between items-center font-semibold text-gray-800 cursor-pointer text-lg">
-                        <span class="flex-grow text-right text-[18px] leading-[150%] font-bold">
-                            كم يستغرق الشحن؟
-                        </span>
-                        <span class="arrow-icon ml-2"></span>
-                    </div>
-                    <div class="faq-answer pt-2 text-gray-700 leading-relaxed text-base">
-                    </div>
-                </div>
-                <div class="faq-item border-b border-gray-200 p-[24px] open bg-[#F8F9FA] mb-3 rounded-[20px]">
-                    <div
-                        class="faq-question flex justify-between items-center font-semibold text-gray-800 cursor-pointer text-lg">
-                        <span class="flex-grow text-right text-[18px] leading-[150%] font-bold">
-                            ما هي طرق الدفع المتاحة؟
-                        </span>
-                        <span class="arrow-icon ml-2"></span>
-                    </div>
-                    <div class="faq-answer pt-2 text-gray-700 leading-relaxed text-base">
-                        <p>نحن نقبل بطاقات الائتمان الرئيسية وبوابات الدفع عبر الإنترنت لإجراء معاملات آمنة ومريحة.</p>
-                    </div>
-                </div>
+                @empty
+                    <p class="text-gray-500 text-center">لا توجد أسئلة شائعة حالياً</p>
+                @endforelse
             </div>
         </div>
     </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const faqQuestions = document.querySelectorAll('.faq-question');
             faqQuestions.forEach(question => {
                 question.addEventListener('click', () => {
                     const faqItem = question.closest('.faq-item');
-                    const faqAnswer = faqItem.querySelector('.faq-answer');
                     faqItem.classList.toggle('open');
                 });
             });

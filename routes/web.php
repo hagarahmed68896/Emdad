@@ -44,6 +44,13 @@ use App\Http\Controllers\Admin\MessagesController;
 use App\Http\Controllers\Admin\ReportsController;
 use App\Http\Controllers\Admin\AdminNotificationController;
 use App\Http\Controllers\Admin\ContactSettingController;
+use App\Http\Controllers\Admin\TermController;
+use App\Http\Controllers\Admin\ProfitController;
+use App\Http\Controllers\Admin\FaqController;
+use App\Http\Controllers\ContactMessageController;
+use App\Http\Controllers\Admin\QuickReplyController;
+
+
 
 
 use App\Models\Product;
@@ -313,10 +320,19 @@ Route::post('/reviews/{review}/action', [ReviewController::class, 'takeAction'])
 Route::post('/conversations/{conversation}/action', [MessagesController::class, 'action'])
      ->name('admin.conversations.action');
         Route::patch('/admin/conversations/{id}/update-status', [MessagesController::class, 'updateStatus'])->name('admin.conversations.updateStatus');
-                 
+     
+        //quick replay
+          Route::get('quick_replies', [QuickReplyController::class, 'index'])->name('admin.quick_replies.index');
+          Route::get('quick_replies/create', [QuickReplyController::class, 'create'])->name('admin.quick_replies.create');
+          Route::post('quick_replies', [QuickReplyController::class, 'store'])->name('admin.quick_replies.store');
+          Route::get('quick_replies/{quick_reply}', [QuickReplyController::class, 'show'])->name('admin.quick_replies.show');
+          Route::get('quick_replies/{quick_reply}/edit', [QuickReplyController::class, 'edit'])->name('admin.quick_replies.edit');
+          Route::put('quick_replies/{quick_reply}', [QuickReplyController::class, 'update'])->name('admin.quick_replies.update');
+          Route::delete('quick_replies/{quick_reply}', [QuickReplyController::class, 'destroy'])->name('admin.quick_replies.destroy');
+
         //reports
         Route::get('/reports', [ReportsController::class, 'index'])
-    ->name('admin.reports');
+       ->name('admin.reports');
 
     //notifications
 
@@ -357,7 +373,53 @@ Route::post('notifications/{notification}/toggle-status', [AdminNotificationCont
      Route::get('contact-settings', [ContactSettingController::class, 'index'])->name('admin.contact.settings');
      Route::post('contact-settings', [ContactSettingController::class, 'store'])->name('admin.contact.settings.store');
 
-          });
+     //terms
+     // index (list all terms)
+    Route::get('terms', [TermController::class, 'index'])->name('admin.terms.index');
+
+    // create (form)
+    Route::get('terms/create', [TermController::class, 'create'])->name('admin.terms.create');
+
+    // store (save new term)
+    Route::post('terms', [TermController::class, 'store'])->name('admin.terms.store');
+
+    // edit (form)
+    Route::get('terms/{term}/edit', [TermController::class, 'edit'])->name('admin.terms.edit');
+
+    // update
+    Route::put('terms/{term}', [TermController::class, 'update'])->name('admin.terms.update');
+
+    // delete
+    Route::delete('terms/{term}', [TermController::class, 'destroy'])->name('admin.terms.destroy');
+
+    // show (view single term/version)
+    Route::get('terms/{term}', [TermController::class, 'show'])->name('admin.terms.show');
+        
+ // صفحة عرض وتعديل نسبة الأرباح
+    Route::get('profit', [ProfitController::class, 'index'])->name('admin.profit.index');
+    Route::post('profit', [ProfitController::class, 'store'])->name('admin.profit.store');
+
+    //Faq
+     // قائمة الأسئلة
+    Route::get('faqs', [FaqController::class, 'index'])->name('admin.faqs.index');
+    
+    // إضافة سؤال جديد
+    Route::get('faqs/create', [FaqController::class, 'create'])->name('admin.faqs.create');
+    Route::post('faqs', [FaqController::class, 'store'])->name('admin.faqs.store');
+    
+    // تعديل سؤال
+    Route::get('faqs/{faq}/edit', [FaqController::class, 'edit'])->name('admin.faqs.edit');
+    Route::put('faqs/{faq}', [FaqController::class, 'update'])->name('admin.faqs.update');
+    
+    // حذف سؤال
+    Route::delete('faqs/{faq}', [FaqController::class, 'destroy'])->name('admin.faqs.destroy');
+
+    // 🔥 Bulk Delete (حذف متعدد)
+    Route::delete('faqs', [FaqController::class, 'bulkDestroy'])->name('admin.faqs.bulk-destroy');
+
+    // 🔥 Download (تحميل CSV أو Excel)
+    Route::get('faqs-download', [FaqController::class, 'download'])->name('admin.faqs.download');
+});
 
 
           // Supplier-specific routes
@@ -438,13 +500,11 @@ Route::post('notifications/{notification}/toggle-status', [AdminNotificationCont
      Route::get('/offers', [ProductController::class, 'offers'])->name('offers.index');
      Route::get('/products/featured', [ProductController::class, 'showFeaturedProducts'])->name('products.featured');
      Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
-    Route::get('/products/{product}', [ProductController::class, 'show_notify'])->name('product.show');
+     Route::get('/products/{product}', [ProductController::class, 'show_notify'])->name('product.show');
 
      Route::get('/categories/{slug}', [CategoryController::class, 'filterByCategory'])->name('categories.show');
      Route::get('/sub_categories/{slug}', [CategoryController::class, 'userSubCategoriesWithProducts'])->name('sub_categories.show');
      // Route::get('/products/suggestions', [ProductSuggestionController::class, 'getSuggestions']);
-// This is the API route for product suggestions
-// This is the API route for product suggestions
 
      Route::get('language/{locale}', function ($locale) {
           if (in_array($locale, ['en', 'ar'])) {
@@ -465,6 +525,9 @@ Route::post('notifications/{notification}/toggle-status', [AdminNotificationCont
      Route::get('/common_questions', function () {
           return view('common_questions');
      })->name('common_questions');
+
+     Route::post('/contact-us', [ContactMessageController::class, 'store'])->name('contact.store');
+
 
      Route::get('/clothings', [ClothingController::class, 'index'])->name('clothings');
 });

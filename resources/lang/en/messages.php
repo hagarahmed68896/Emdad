@@ -720,6 +720,7 @@ return [
     'sent_notifications' => 'Sent notifications',
     'unsent_notifications' => 'Unsent notifications',
     'days' => 'Days',
+    'no_results_found' => 'No results found',
 
 
 
