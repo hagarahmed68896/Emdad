@@ -53,7 +53,7 @@ return [
     'emailValid' => 'البريد الإلكتروني غير صالح',
     'electrical-appliances' => 'الأجهزة الكهربائية',
     'Electronics' => 'الإلكترونيات',
-    'english' => 'الأنجليزية',
+    'english' => 'الإنجليزية',
     'enter_family_name' => 'أدخل اسم العائلة',
     'expType' => 'نوع الاستفسار',
     'favorites' => 'المفضلة',

@@ -80,7 +80,7 @@
                                 </span>
 
                                 <div class="flex mt-2">
-                                    @if ($item['data']->supplier_confirmed ?? false)
+                                    @if ($item['data']->supplier->supplier_confirmed)
                                         <span class="flex items-center text-[#185D31]">
                                             <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]"
                                                  src="{{ asset('images/Success.svg') }}" alt="Confirmed Supplier">

@@ -11,7 +11,7 @@
     <title>@yield('page_title', 'الرئيسية')</title>
 
     {{-- Favicon --}}
-    <link rel="icon" type="image/png" href="{{ asset('images/Logo.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/2.png') }}">
 
     {{-- Styles --}}
     {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}

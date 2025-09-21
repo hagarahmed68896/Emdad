@@ -166,8 +166,8 @@
     <aside id="sidebar"  x-data="{ activeItem: null }" class="sidebar bg-white shadow-lg flex flex-col p-4 overflow-y-auto">
         <div class="flex items-center justify-center py-4 border-b border-gray-200">
             <!-- Placeholder for logo -->
-            <div class="w-[100px] h-[100px]  flex items-center justify-center overflow-hidden">
-                <img src="/images/image-picture-landscape-1--photos-photo-landscape-picture-photography-camera-pictures--Streamline-Core.png"
+            <div class="w-[100px] h-[100px] rounded-lg flex items-center justify-center overflow-hidden">
+                <img src="/images/2.png"
                     alt="">
             </div>
         </div>

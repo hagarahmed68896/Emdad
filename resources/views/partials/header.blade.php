@@ -6,7 +6,7 @@
 
     <div class="flex items-center h-auto w-auto max-w-[72px] ">
         <a href="/">
-            <img src="{{ asset('images/Logo.png') }}" alt="Logo">
+            <img src="{{ asset('images/2.png') }}" alt="Logo">
         </a>
     </div>
 
