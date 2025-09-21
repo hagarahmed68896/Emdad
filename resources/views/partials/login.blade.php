@@ -71,7 +71,7 @@ bussnissdata: false,
 
     <form method="POST" action="{{ route('sendOtp') }}"
     x-data="{
-        formData: { phone_number: '', remember: false },
+        formData: { email: '',password:'', remember: false },
         errors: {},
         loading: false,
         submitForm() {
@@ -79,7 +79,8 @@ bussnissdata: false,
             this.errors = {};
 
             axios.post(this.$el.action, {
-                phone_number: this.formData.phone_number,   // ✅ backend expects 'phone'
+                email: this.formData.email,  
+                password: this.formData.password,   
                 auth_method: 'login'
             })
             .then(response => {
@@ -104,8 +105,56 @@ bussnissdata: false,
 
     <p class="text-2xl font-bold text-[#212121]">{{ __('messages.login') }}</p>
     <p class="text-base text-[#767676] mb-4">{{ __('messages.loginMSG') }}</p>
-
-<div class="mb-4">
+         <div class="mb-3">
+                        <label for="email" class="block font-bold text-lg sm:text-xl text-[#212121]">
+                            {{ __('messages.email') }}
+                        </label>
+                        <div class="flex items-center mt-2 border-[1px] rounded-lg overflow-hidden h-14"
+                            :class="{ 'border-[#d33]': errors.email, 'border-[#767676]': !errors.email }">
+                            <img class="h-6 w-6 object-cover text-[#767676] mx-3"
+                                src="{{ asset('images/mail-send-envelope--envelope-email-message-unopened-sealed-close--Streamline-Core.svg') }}"
+                                alt="">
+                            <input type="email" name="email" x-model="formData.email" required
+                                placeholder="example@gmail.com"
+                                class="block w-full px-3 py-2 border-none focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        </div>
+                        <template x-if="errors.email">
+                            <div class="text-[#d33] mt-1 text-xs" x-text="errors.email[0]"></div>
+                        </template>
+                    </div>
+                                        {{-- Password input field --}}
+                    <div class="mb-3">
+                        <label for="password" class="block font-bold text-lg sm:text-xl text-[#212121]">
+                            {{ __('messages.password') }}
+                        </label>
+                        <div class="flex items-center mt-2 border-[1px] rounded-lg overflow-hidden h-14"
+                            :class="{ 'border-[#d33]': errors.password, 'border-[#767676]': !errors.password }">
+                            <img class="h-6 w-6 object-cover text-[#767676] mx-3"
+                                src="{{ asset('images/interface-lock--combination-combo-lock-locked-padlock-secure-security-shield-keyhole--Streamline-Core.svg') }}"
+                                alt="">
+                            <input :type="showPassword ? 'text' : 'password'" name="password" required
+                                placeholder="{{ __('messages.passwordMSG') }}" x-model="formData.password"
+                                class="block w-full px-3 py-2 border-none focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <button @click.prevent="showPassword = !showPassword"
+                                class="ml-2 px-2 text-sm text-[#212121] flex items-center justify-center">
+                                <span x-show="!showPassword">
+                                    <img class="h-6 w-6"
+                                        src="{{ asset('images/interface-edit-view-off--disable-eye-eyeball-hide-off-view--Streamline-Core.svg') }}"
+                                        alt="Show password">
+                                </span>
+                                <span x-show="showPassword">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                        fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
+                                        <path
+                                            d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z" />
+                                        <path
+                                            d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0" />
+                                    </svg>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+{{-- <div class="mb-4">
     <label for="phone" class="block font-bold text-lg text-[#212121]">
         {{ __('messages.phone_number') }}
     </label>
@@ -123,7 +172,7 @@ bussnissdata: false,
     <template x-if="errors.phone_number">
         <p class="text-red-500 text-xs mt-1" x-text="errors.phone_number[0]"></p>
     </template>
-</div>
+</div> --}}
 
 
     <button type="submit" :disabled="loading"

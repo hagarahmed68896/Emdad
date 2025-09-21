@@ -1,6 +1,7 @@
 <div class="search w-full md:flex-grow md:max-w-2xl px-2 md:mx-8 order-4">
-    <form action="{{ route('search') }}" method="GET" class="main-search-form">
-        <div class="flex flex-nowrap border rounded-[12px] bg-[#F8F9FA] items-center py-1 px-2 relative gap-2">
+<form action="{{ route('search') }}" method="POST" class="main-search-form" enctype="multipart/form-data">
+    @csrf 
+            <div class="flex flex-nowrap border rounded-[12px] bg-[#F8F9FA] items-center py-1 px-2 relative gap-2">
 
             {{-- Category Dropdown (UNCHANGED logic) --}}
             {{-- <div class="relative z-50" x-data="{
@@ -99,10 +100,10 @@
                         <div class="flex flex-col sm:flex-row mt-4 mb-4 items-center justify-between">
                             <input type="text" x-model="imageUrl" placeholder="{{ __('messages.imageURL') }}"
                                 class="border border-gray-300 px-3 py-2 rounded w-full sm:w-[400px] text-sm mb-2 sm:mb-0" />
-                            <button type="button" @click="submitImage"
+                            {{-- <button type="button" @click="submitImage"
                                 class="bg-green-800 text-white px-6 py-2 rounded text-sm w-full sm:w-auto">
                                 {{ __('messages.Search') }}
-                            </button>
+                            </button> --}}
                         </div>
                     </div>
                 </div>

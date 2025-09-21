@@ -144,10 +144,7 @@
             @endforeach
         </div>
     @endif
-@endsection
-
-@push('scripts')
-<script>
+    <script>
 document.addEventListener('DOMContentLoaded', function() {
     function initializeInnerSwipers() {
         document.querySelectorAll('.inner-swiper').forEach(swiperElement => {
@@ -169,4 +166,6 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeInnerSwipers();
 });
 </script>
-@endpush
+
+@endsection
+

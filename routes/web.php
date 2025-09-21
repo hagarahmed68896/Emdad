@@ -49,6 +49,8 @@ use App\Http\Controllers\Admin\ProfitController;
 use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\Admin\QuickReplyController;
+use App\Http\Controllers\CameraSearchController;
+
 
 
 
@@ -515,7 +517,9 @@ Route::put('site_texts/{site_text}', [\App\Http\Controllers\Admin\SiteTextContro
      });
 
      // Public routes that also benefit from session (e.g., for language changes)
-     Route::get('/search', [SearchController::class, 'index'])->name('search');
+     Route::post('/search', [SearchController::class, 'index'])->name('search');
+     Route::post('/camera-search', [CameraSearchController::class, 'search'])->name('camera.search');
+
      Route::get('/products/category/{slug}', [CategoryController::class, 'filterByCategory'])->name('products.filterByCategory');
      Route::get('/products', [ProductController::class, 'index'])->name('products.index');
      Route::get('/products/suggestions', function (Request $request) {
