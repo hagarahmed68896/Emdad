@@ -26,6 +26,19 @@ class Document extends Model
 // {
 //     return $this->belongsTo(BusinessData::class, 'supplier_id');
 // }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($document) {
+            // If original_name is empty but file_path exists
+            if (empty($document->original_name) && !empty($document->file_path)) {
+                $document->original_name = basename($document->file_path);
+            }
+        });
+    }
+    
 public function supplier()
 {
     return $this->belongsTo(User::class, 'supplier_id');

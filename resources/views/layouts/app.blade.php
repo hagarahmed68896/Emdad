@@ -8,7 +8,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     {{-- Page Title --}}
-    <title>@yield('page_title', 'الرئيسية')</title>
+    <title>@yield('page_title', __('messages.home'))</title>
 
     {{-- Favicon --}}
     <link rel="icon" type="image/png" href="{{ asset('images/2.png') }}">
@@ -50,6 +50,12 @@
 
     {{-- Extra head for specific pages --}}
     @stack('head')
+
+ <script>
+   
+    window.isAuthenticated = {!! json_encode(Auth::check()) !!}; 
+    console.warn('Authentication status on page load:', window.isAuthenticated);
+</script>
 </head>
 
 <body style="font-family: 'Cairo', sans-serif;">
@@ -84,6 +90,59 @@
 
         {{-- FOOTER --}}
         @include('partials.footer')
+@php
+    $ad = \App\Models\Ad::where('status', 'approved')
+        ->where('start_date', '<=', now())
+        ->where('end_date', '>=', now())
+        ->inRandomOrder()
+        ->first(); // get only one random ad
+@endphp
+
+@if($ad)
+    <div class="modal fade modal-top-right" id="adsModal{{ $ad->id }}" tabindex="-1" aria-labelledby="adsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-scrollable">
+            <div class="modal-content shadow-lg border-0 rounded-3">
+                <div class="modal-header p-2 relative">
+                    <button type="button" class="btn-close absolute start-2" data-bs-dismiss="modal"></button>
+                    <h1 class="text-center w-full">{{ __('messages.ad') }}</h1>
+                    <h6 class="text-center w-full mt-1">{{ $ad->title }}</h6>
+                </div>
+
+                <div class="modal-body text-center p-2">
+                    @if($ad->image)
+                        <img src="{{ asset('storage/'.$ad->image) }}" class="img-fluid rounded mb-2" alt="Ad">
+                    @endif
+                    <p class="small">{{ $ad->description }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .modal.modal-top-right .modal-dialog {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            margin: 0;
+            max-width: 300px;
+        }
+    </style>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var adsModalEl = document.getElementById('adsModal{{ $ad->id }}');
+            var adsModal = new bootstrap.Modal(adsModalEl, {
+                backdrop: false,
+                keyboard: true
+            });
+            adsModal.show();
+        });
+    </script>
+@endif
+
+
+
+
 
     </div>
 

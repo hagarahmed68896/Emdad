@@ -1,12 +1,12 @@
 @extends('layouts.admin')
 
-@section('page_title', 'الطلبات')
+@section('page_title', __('messages.orders'))
 
 @section('content')
 
     <div class="p-6 overflow-y-auto">
 
-        <p class="text-[32px] font-bold">الطلبات</p>
+        <p class="text-[32px] font-bold">{{ __('messages.orders') }}</p>
         <div>
             @include('admin.total_orders')
         </div>
@@ -35,7 +35,7 @@
                 <div x-show="selectedOrders.length > 0" class="flex items-center justify-between mb-4">
                     <div class="flex items-center gap-4">
                         <span class="text-xl font-bold text-gray-800 rtl:mr-4 ltr:ml-4"
-                            x-text="selectedOrders.length + ' محدد'"></span>
+                            x-text="selectedOrders.length + ' {{ __('messages.selected') }}'"></span>
 
                         {{-- مثال زر اكشن --}}
                         <button type="button" class="p-2 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700">
@@ -63,13 +63,13 @@
                                 class="absolute mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow z-50 p-4 right-0 md:left-0">
 
                                 <!-- الترتيب حسب -->
-                                <h3 class="font-bold text-gray-700 mb-2 rtl:text-right">الترتيب حسب:</h3>
+                                <h3 class="font-bold text-gray-700 mb-2 rtl:text-right">{{ __('messages.sort_by') }}</h3>
                                 <ul class="space-y-1 mb-4">
                                     <li>
                                         <label class="flex items-center cursor-pointer">
                                             <input type="radio" name="sort_option" value="" x-model="selectedSort"
                                                 class="shrink-0 rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] appearance-none rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
-                                            <span class="text-gray-700">الكل</span>
+                                            <span class="text-gray-700">{{ __('messages.all') }}</span>
                                         </label>
                                     </li>
                                     <li>
@@ -77,40 +77,40 @@
                                             <input type="radio" name="sort_option" value="full_name_asc"
                                                 x-model="selectedSort"
                                                 class="shrink-0 rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] appearance-none rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
-                                            <span class="text-gray-700">الاسم</span>
+                                            <span class="text-gray-700">{{ __('messages.name') }}</span>
                                         </label>
                                     </li>
                                     <li>
                                         <label class="flex items-center cursor-pointer">
                                             <input type="radio" name="sort_option" value="latest" x-model="selectedSort"
                                                 class="shrink-0 rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] appearance-none rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
-                                            <span class="text-gray-700">اجمالي السعر</span>
+                                            <span class="text-gray-700">{{ __('messages.total_price') }}</span>
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label class="flex items-center cursor-pointer">
+                                            <input type="radio" name="sort_option" value="latest" x-model="selectedSort"
+                                                class="shrink-0 rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] appearance-none rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
+                                            <span class="text-gray-700">{{ __('messages.latest') }}</span>
                                         </label>
                                     </li>
                                     <li>
                                         <label class="flex items-center cursor-pointer">
                                             <input type="radio" name="sort_option" value="oldest" x-model="selectedSort"
                                                 class="shrink-0 rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] appearance-none rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
-                                            <span class="text-gray-700">الأحدث</span>
-                                        </label>
-                                    </li>
-                                    <li>
-                                        <label class="flex items-center cursor-pointer">
-                                            <input type="radio" name="sort_option" value="oldest" x-model="selectedSort"
-                                                class="shrink-0 rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] appearance-none rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
-                                            <span class="text-gray-700">الأقدم</span>
+                                            <span class="text-gray-700">{{ __('messages.oldest') }}</span>
                                         </label>
                                     </li>
                                 </ul>
 
                                 <!-- وسيلة الدفع -->
-                                <h3 class="font-bold text-gray-700 mb-2 rtl:text-right">وسيلة الدفع</h3>
+                                <h3 class="font-bold text-gray-700 mb-2 rtl:text-right">{{ __('messages.payment_method') }}</h3>
                                 <ul class="space-y-1 mb-4">
                                     <li>
                                         <label class="flex items-center cursor-pointer">
                                             <input type="radio" name="order_name" value="" x-model="selectedType"
                                                 class="shrink-0 rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] appearance-none rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
-                                            <span class="text-gray-700">الكل</span>
+                                            <span class="text-gray-700">{{ __('messages.all') }}</span>
                                         </label>
                                     </li>
                                     <li>
@@ -118,7 +118,7 @@
                                             <input type="radio" name="order_name" value="bank_card"
                                                 x-model="selectedType"
                                                 class="shrink-0 rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] appearance-none rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
-                                            <span class="text-gray-700">بطاقة بنكية</span>
+                                            <span class="text-gray-700">{{ __('messages.bank_card') }}</span>
                                         </label>
                                     </li>
                                 </ul>
@@ -127,12 +127,12 @@
                                 <div class="flex justify-end gap-2">
                                     <button type="submit" @click="open = false"
                                         class="px-4 py-2 rounded-xl bg-[#185D31] text-white hover:bg-green-800">
-                                        تطبيق
+                                        {{ __('messages.apply') }}
                                     </button>
                                     <button type="button"
                                         @click="selectedType = ''; selectedSort = ''; $el.closest('form').submit(); open = false;"
                                         class="px-4 py-2 rounded-xl bg-gray-200 text-gray-800 hover:bg-gray-300">
-                                        إعادة تعيين
+                                        {{ __('messages.reset') }}
                                     </button>
                                 </div>
                             </div>
@@ -152,21 +152,22 @@
                             </div>
 
                             <input type="text" name="search" value="{{ $search }}"
-                                placeholder="بحث"
+                                placeholder="{{ __('messages.search') }}"
                                 class="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-green-500 focus:border-green-500">
 
                             <button type="submit"
                                 class="absolute inset-y-0 left-0 flex items-center px-3 text-white bg-[#185D31] hover:bg-green-800 rounded-l-xl">
-                                بحث
+                                {{ __('messages.search') }}
                             </button>
                         </div>
                     </form>
- <div class="flex items-center space-x-3">
-                    {{-- ✅ تنزيل --}}
-                      <a href="{{ route('admin.orders.export.csv', request()->query()) }}"
+
+                    <div class="flex items-center space-x-3">
+                        {{-- ✅ تنزيل --}}
+                        <a href="{{ route('admin.orders.export.csv', request()->query()) }}"
                             class="bg-gray-100 mx-2 hover:bg-gray-300 text-[#185D31] py-2 px-4 rounded-xl flex items-center transition duration-150 ease-in-out">
                             <i class="fas fa-download ml-2"></i>
-                            <span>تحميل</span>
+                            <span>{{ __('messages.download') }}</span>
                         </a>
 
                         {{-- ✅ فلتر الحالة --}}
@@ -174,11 +175,11 @@
                             @php
                                 $status = request('status');
                                 $statusName = match ($status) {
-                                    'completed' => 'الطلبات المكتملة',
-                                    'processing' => 'الطلبات الجارية',
-                                    'cancelled' => 'الطلبات الملغاة',
-                                    'returned' => 'طلبات الإرجاع',
-                                    default => 'كل الطلبات',
+                                    'completed' => __('messages.completed_orders'),
+                                    'processing' => __('messages.processing_orders'),
+                                    'cancelled' => __('messages.cancelled_orders'),
+                                    'returned' => __('messages.returned_orders'),
+                                    default => __('messages.all_orders'),
                                 };
                             @endphp
 
@@ -195,27 +196,26 @@
                                 class="absolute mt-2 w-48 bg-white left-0 border border-gray-200 rounded-xl shadow z-50">
                                 <a href="{{ route('admin.orders.index') }}"
                                     class="block px-4 py-2 text-center {{ $status == null ? 'bg-[#185D31] text-white' : 'text-gray-700 hover:bg-[#185D31] hover:text-white' }}">
-                                    كل الطلبات
+                                    {{ __('messages.all_orders') }}
                                 </a>
                                 <a href="{{ route('admin.orders.index', ['status' => 'completed']) }}"
                                     class="block px-4 py-2 text-center {{ $status == 'completed' ? 'bg-[#185D31] text-white' : 'text-gray-700 hover:bg-[#185D31] hover:text-white' }}">
-                                    الطلبات المكتملة
+                                    {{ __('messages.completed_orders') }}
                                 </a>
                                 <a href="{{ route('admin.orders.index', ['status' => 'processing']) }}"
                                     class="block px-4 py-2 text-center {{ $status == 'processing' ? 'bg-[#185D31] text-white' : 'text-gray-700 hover:bg-[#185D31] hover:text-white' }}">
-                                    الطلبات الجارية
+                                    {{ __('messages.processing_orders') }}
                                 </a>
                                 <a href="{{ route('admin.orders.index', ['status' => 'cancelled']) }}"
                                     class="block px-4 py-2 text-center {{ $status == 'cancelled' ? 'bg-[#185D31] text-white' : 'text-gray-700 hover:bg-[#185D31] hover:text-white' }}">
-                                    الطلبات الملغاة
+                                    {{ __('messages.cancelled_orders') }}
                                 </a>
                                 <a href="{{ route('admin.orders.index', ['status' => 'returned']) }}"
                                     class="block px-4 py-2 text-center {{ $status == 'returned' ? 'bg-[#185D31] text-white' : 'text-gray-700 hover:bg-[#185D31] hover:text-white' }}">
-                                    طلبات الإرجاع
+                                    {{ __('messages.returned_orders') }}
                                 </a>
                             </div>
                         </div>
- </div>
                     </div>
                 </div>
 
@@ -228,7 +228,7 @@
             <nav class="flex items-center justify-between p-4 bg-[#EDEDED]">
                 <div class="flex-1 flex justify-between items-center">
                     <span class="text-sm text-gray-700 ml-4">
-                        {{ $orders->firstItem() }} - {{ $orders->lastItem() }} من {{ $orders->total() }}
+                        {{ __('messages.showing', ['from' => $orders->firstItem(), 'to' => $orders->lastItem(), 'total' => $orders->total()]) }}
                     </span>
                     <div class="flex">
                         {!! $orders->appends(request()->query())->links('pagination::tailwind') !!}

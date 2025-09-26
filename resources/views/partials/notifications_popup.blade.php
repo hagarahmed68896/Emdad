@@ -24,14 +24,16 @@
         @endif
     </a>
 
-    {{-- Notifications Popup --}}
-<div x-show="showNotificationPopup" x-cloak 
+{{-- Notifications Popup --}}
+<div x-show="showNotificationPopup" x-cloak
      @click.away="showNotificationPopup = false"
      x-transition:enter="transition ease-out duration-300"
      class="bg-white shadow-lg rounded-lg p-4
-            fixed top-[5%] left-0 w-[calc(100%-4rem)] max-w-[360px] z-20
-            sm:absolute sm:top-full sm:mt-2 sm:w-[404px] sm:left-0 sm:mx-0
+            absolute top-full left-1/2 -translate-x-1/2 mt-2
+            w-[300px] max-w-[360px] z-50
+            sm:left-0 sm:translate-x-0 sm:w-[404px] sm:mx-0
             max-h-[420px] overflow-y-auto">
+
 
 
 

@@ -6,6 +6,17 @@
         insufficient_quantity_3: @json(__('messages.insufficient_quantity_13'))
     };
 </script>
+
+<script>
+    window.translations = {
+        guest_added_to_cart: "{{ __('messages.added_to_cart_guest') }}",
+        added_to_cart: "{{ __('messages.added_to_cart') }}",
+        error_adding_to_cart: "{{ __('messages.error_adding_to_cart') }}",
+        select_at_least_one: "{{ __('messages.select_at_least_one_item') }}",
+    };
+
+</script>
+
 <div class="flex w-full justify-between">
      <p class="text-[24px] font-bold mb-3">{{ __('messages.changes') }}</p>
 
@@ -21,13 +32,16 @@
         showItemsTable: false,
         selected: [],
         productAvailable: {{ $product->available_quantity ?? 0 }},
-       async fetchLastCart() {
-    try {
-        const response = await fetch(`/cart/last/{{ $product->id }}`);
-        const data = await response.json();
-
-        if (data.items && data.items.length > 0) {
-            this.selected = data.items.map(item => ({
+        
+        currentProductId: @json($product->id),
+        
+        
+     async fetchLastCart() {
+    if (!window.isAuthenticated) {
+        // Guests: load from localStorage instead
+        const guestCart = JSON.parse(localStorage.getItem('guestCart') || '[]');
+        if (guestCart.length > 0) {
+            this.selected = guestCart.map(item => ({
                 key: item.color + '|' + item.size,
                 color: item.color,
                 size: item.size,
@@ -35,14 +49,40 @@
                 price: item.unit_price,
                 swatchImage: 'https://via.placeholder.com/64x64.png?text=' + (item.color?.charAt(0) || '?')
             }));
-
-            // 🚀 Broadcast so other Alpine components update too
             this.$dispatch('product-updated', { selectedItems: this.selected });
+        }
+        console.log('Guest cart loaded:', guestCart);
+        return; // Stop here for guests
+    }
+
+    // Authenticated users: fetch from backend
+    try {
+        const response = await fetch(`/cart/last/{{ $product->id }}`, {
+            headers: { 'Accept': 'application/json' }
+        });
+        const text = await response.text();
+
+        try {
+            const data = JSON.parse(text);
+            if (data.items && data.items.length > 0) {
+                this.selected = data.items.map(item => ({
+                    key: item.color + '|' + item.size,
+                    color: item.color,
+                    size: item.size,
+                    count: item.quantity,
+                    price: item.unit_price,
+                    swatchImage: 'https://via.placeholder.com/64x64.png?text=' + (item.color?.charAt(0) || '?')
+                }));
+                this.$dispatch('product-updated', { selectedItems: this.selected });
+            }
+        } catch (err) {
+            console.warn('Server returned non-JSON (HTML redirect?):', text);
         }
     } catch (e) {
         console.error('Failed to fetch last cart:', e);
     }
 }
+
 ,
         discount: {{ $product->offer->discount_percent ?? 0 }} || 0,
         shipping_cost_per_item: {{ $product->shipping_cost ?? 0 }} || 0,
@@ -70,70 +110,75 @@
             return this.selected.filter(item => item.count > 0).length;
         },
 
-        handleAddToCart() {
-            // 1. Filter out items with a quantity of zero
-            const itemsToAdd = this.selected
-                .filter(item => item.count > 0)
-                .map(item => ({
-                    color: item.color,
-                    size: item.size,
-                    quantity: item.count,
-                    unit_price: this.getUnitPrice(item),
-                }));
+handleAddToCart() {
+    const itemsToAdd = this.selected
+        .filter(item => item.count > 0)
+        .map(item => ({
+         // 🔹 ADD THE PRODUCT ID HERE
+            product_id: this.currentProductId,
+            name: this.currentProductName,
+            image: this.currentProductImage, 
+            color: item.color,
+            size: item.size,
+            quantity: item.count,
+            unit_price: this.getUnitPrice(item),
+        }));
 
-            // 2. Check if there are items to add to the cart
-            if (itemsToAdd.length === 0) {
-                this.message = 'Please select at least one item to add to the cart.';
-                this.messageType = 'error';
-                return;
-            }
-     // 3. Validate quantity
-            const totalRequested = itemsToAdd.reduce((sum, it) => sum + it.quantity, 0);
+    if (itemsToAdd.length === 0) {
+        this.message = window.translations.select_at_least_one;
+        this.messageType = 'error';
+        return;
+    }
 
-            if (totalRequested > this.productAvailable) {
-                this.message = `
-                    <div class='bg-yellow-100 border border-yellow-300 text-yellow-800 p-4 rounded-lg space-y-1'>
-                        <p>${window.translations.insufficient_quantity_1}</p>
-                        <p>${window.translations.insufficient_quantity_2.replace(':available', this.productAvailable)}</p>
-                        <p>${window.translations.insufficient_quantity_3}</p>
-                    </div>
-                `;
-                this.messageType = 'error';
-                setTimeout(() => this.message = '', 6000);
-                return;
-            }
-            // 3. Send the data to your server using a fetch API call
-            fetch('/cart', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name=\'csrf-token\']').content
-                },
-                body: JSON.stringify({
-                    product_id: {{ $product->id }},
-                    items: itemsToAdd
-                })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                this.message = '{{ __('messages.added_to_cart') }}';
-                this.messageType = 'success';
-                console.log('Success:', data);
-                // Optionally update cart icon/count
-                // this.$dispatch('cart-updated', { newCount: data.cartCount });
-            })
-            .catch(error => {
-                this.message = '{{ __('messages.error_adding_to_cart') }}';
-                this.messageType = 'error';
-                console.error('Error:', error);
-            });
-        }
-    }">
+    // Guest users: save to localStorage
+    if (!window.isAuthenticated) {
+        let guestCart = JSON.parse(localStorage.getItem('guestCart') || '[]');
+        itemsToAdd.forEach(newItem => {
+            const existing = guestCart.find(i =>
+            i.product_id === newItem.product_id && 
+             i.color === newItem.color && i.size === newItem.size);
+            if (existing) existing.quantity += newItem.quantity;
+            else guestCart.push(newItem);
+        });
+        localStorage.setItem('guestCart', JSON.stringify(guestCart));
+
+        this.message = window.translations.guest_added_to_cart;
+        this.messageType = 'success';
+        console.log('Guest cart:', guestCart);
+
+        return; // stop here
+    }
+
+    // Authenticated users: call backend
+    fetch('/cart', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name=\'csrf-token\']').content
+        },
+        body: JSON.stringify({
+            product_id: @json($product->id),
+            items: itemsToAdd
+        })
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Network error');
+        return response.json();
+    })
+    .then(data => {
+        this.message = window.translations.added_to_cart;
+        this.messageType = 'success';
+    })
+    .catch(error => {
+        this.message = window.translations.error_adding_to_cart;
+        this.messageType = 'error';
+        console.error(error);
+    });
+}
+
+    
+
+}">
 
 
 

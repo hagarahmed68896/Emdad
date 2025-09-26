@@ -50,6 +50,8 @@ use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\Admin\QuickReplyController;
 use App\Http\Controllers\CameraSearchController;
+use App\Http\Controllers\AdController;
+use App\Http\Controllers\Admin\AdminAdController;
 
 
 
@@ -92,6 +94,19 @@ Route::post('/admin/password/reset', [AdminLoginController::class, 'resetPasswor
 
           Route::get('/auth/facebook/redirect', [SocialLoginController::class, 'redirectToFacebook'])->name('login.facebook');
           Route::get('/auth/facebook/callback', [SocialLoginController::class, 'handleFacebookCallback']);
+
+     //cart
+               Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+               Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
+               Route::get('/cart/last/{product_id}', [CartController::class, 'getLastOrder']);
+
+
+
+               Route::delete('/cart/remove-item/{id}', [CartController::class, 'removeItem'])->name('cart.removeItem');
+               Route::patch('/cart/{id}/update-variant', [CartController::class, 'updateVariant'])->name('cart.updateVariant');
+               Route::delete('/cart/{id}/remove-variant', [CartController::class, 'removeVariant'])->name('cart.removeVariant');
+               Route::delete('/cart/bulk-delete', [CartController::class, 'bulkDelete'])->name('cart.bulkRemove');
+
      });
 
      // These routes also need session management, so they should be inside the 'web' group
@@ -112,18 +127,7 @@ Route::get('/products/{product}/download-attachment', [ProductController::class,
 
           Route::post('/user/save-location', [RegisterController::class, 'saveLocation'])
     ->name('user.saveLocation');
-               //cart
-               Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-               Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
-               Route::get('/cart/last/{product_id}', [CartController::class, 'getLastOrder']);
-
-
-
-               Route::delete('/cart/remove-item/{id}', [CartController::class, 'removeItem'])->name('cart.removeItem');
-               Route::patch('/cart/{id}/update-variant', [CartController::class, 'updateVariant'])->name('cart.updateVariant');
-               Route::delete('/cart/{id}/remove-variant', [CartController::class, 'removeVariant'])->name('cart.removeVariant');
-               Route::delete('/cart/bulk-delete', [CartController::class, 'bulkDelete'])->name('cart.bulkRemove');
-
+          
                Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
                Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
 
@@ -152,10 +156,21 @@ Route::post('/users/{user}/toggle-block', [MessageController::class, 'toggleBloc
 
              Route::post('/messages/upload-attachment', [MessageController::class,'uploadAttachment'])->name('messages.upload-attachment');
              
-Route::get('/orders/{order}/products', [ReviewController::class, 'productsByOrder'])
-    ->name('orders.products');
+        Route::get('/orders/{order}/products', [ReviewController::class, 'productsByOrder'])
+         ->name('orders.products');
 
+         Route::get('/suppliers/{id}', [SupplierrController::class, 'show'])->name('suppliers.show');
 
+Route::get('supplier/ads', [AdController::class, 'index'])->name('supplier.ads.index');
+Route::get('supplier/ads/create', [AdController::class, 'create'])->name('supplier.ads.create');
+Route::post('supplier/ads', [AdController::class, 'store'])->name('supplier.ads.store');
+    Route::get('/ads/{ad}/edit', [AdController::class, 'edit'])->name('supplier.ads.edit');
+    
+    // Update request
+    Route::put('supplier/ads/{ad}', [AdController::class, 'update'])->name('supplier.ads.update');
+
+    // Delete ad
+    Route::delete('supplier/ads/{ad}', [AdController::class, 'destroy'])->name('supplier.ads.destroy');
           // Admin-specific routes
           Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
                
@@ -461,6 +476,11 @@ Route::put('site_texts/{site_text}', [\App\Http\Controllers\Admin\SiteTextContro
 // Route::delete('site_texts/{site_text}', [\App\Http\Controllers\Admin\SiteTextController::class, 'destroy'])
 //     ->name('admin.site_texts.destroy');
 
+
+//ads
+    Route::get('ads', [AdminAdController::class, 'index'])->name('admin.ads.index');
+    Route::post('ads/{id}/approve', [AdminAdController::class, 'approve'])->name('admin.ads.approve');
+    Route::post('ads/{id}/reject', [AdminAdController::class, 'reject'])->name('admin.ads.reject');
 });
 
 

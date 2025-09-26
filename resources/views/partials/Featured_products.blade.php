@@ -106,11 +106,15 @@
                                     <span class="flex items-center text-[#185D31]">
                                         <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]"
                                             src="{{ asset('images/Success.svg') }}" alt="Confirmed Supplier">
-                                        <p class="text-[20px] text-[#212121] ">{{ $featuredProduct->supplier->company_name }}</p>
-                                    </span>
+<a href="{{ route('suppliers.show', $featuredProduct->supplier->id) }}"
+   class="inline-block py-1 rounded-lg text-[#185D31] text-[18px] font-medium  transition">
+    {{ $featuredProduct->supplier->company_name }}
+</a>                                    </span>
                                 @else
-                                    <p class="text-[20px] text-[#212121]">{{ $featuredProduct->supplier->company_name }}</p>
-                                @endif
+<a href="{{ route('suppliers.show', $featuredProduct->supplier->id) }}"
+   class="inline-block py-1 rounded-lg text-[#185D31] text-[18px] font-medium  transition">
+    {{ $featuredProduct->supplier->company_name }}
+</a>                                @endif
                             </div>
                             <div class="flex items-center mb-2">
                 <span class="flex text-lg font-bold text-gray-800">

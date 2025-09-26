@@ -1,9 +1,9 @@
 {{-- resources/views/settlements/index.blade.php --}}
 @extends('layouts.admin')
-@section('page_title', 'التسويات')
+@section('page_title', __('messages.settlements'))
 
 @section('content')
-<div class="p-6 space-y-6 " 
+<div class="p-6 space-y-6" 
      x-data="{
         selectedSettlements: [],
         selectAll: false,
@@ -54,14 +54,14 @@
 
     {{-- ✅ شريط الأكشن & الفلترة --}}
     <div x-show="selectedSettlements.length > 0" class="flex items-center justify-between bg-white p-3 rounded-xl shadow">
-        <span class="text-lg font-bold text-gray-800" x-text="selectedSettlements.length + ' محدد'"></span>
+        <span class="text-lg font-bold text-gray-800" x-text="selectedSettlements.length + ' {{ __('messages.selected') }}'"></span>
 
         {{-- زر تحويل جماعي --}}
         <form method="POST" action="{{ route('settlements.bulkTransfer') }}">
             @csrf
             <input type="hidden" name="ids" :value="JSON.stringify(selectedSettlements)">
             <button type="submit" class="bg-[#185D31] text-white px-4 py-2 rounded-xl flex items-center">
-                <i class="fas fa-exchange-alt mr-2"></i> تحويل المحدد
+                <i class="fas fa-exchange-alt mr-2"></i> {{ __('messages.bulk_transfer') }}
             </button>
         </form>
     </div>
@@ -82,67 +82,67 @@
          class="absolute mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow z-50 p-4 right-0 md:left-0">
 
         {{-- ✅ الحالة --}}
-        <h3 class="font-bold text-gray-700 text-right text-[20px] mb-2">الحالة:</h3>
+        <h3 class="font-bold text-gray-700 text-right text-[20px] mb-2">{{ __('messages.status') }}:</h3>
         <ul class="space-y-2 mb-4">
             <li>
                 <label class="flex items-center gap-2 cursor-pointer">
                     <input type="radio" value="" x-model="selectedStatus" class="text-green-600 focus:ring-green-500">
-                    <span>الكل</span>
+                    <span>{{ __('messages.all') }}</span>
                 </label>
             </li>
             <li>
                 <label class="flex items-center gap-2 cursor-pointer">
                     <input type="radio" value="pending" x-model="selectedStatus" class="text-green-600 focus:ring-green-500">
-                    <span>معلقة</span>
+                    <span>{{ __('messages.pending') }}</span>
                 </label>
             </li>
             <li>
                 <label class="flex items-center gap-2 cursor-pointer">
                     <input type="radio" value="transferred" x-model="selectedStatus" class="text-green-600 focus:ring-green-500">
-                    <span>محوّلة</span>
+                    <span>{{ __('messages.transferred') }}</span>
                 </label>
             </li>
         </ul>
 
         {{-- ✅ الترتيب --}}
-        <h3 class="font-bold text-gray-700 text-right text-[20px] mb-2" >الترتيب حسب:</h3>
+        <h3 class="font-bold text-gray-700 text-right text-[20px] mb-2">{{ __('messages.sort_by') }}:</h3>
         <ul class="space-y-2 mb-4">
             <li>
                 <label class="flex items-center gap-2 cursor-pointer">
                     <input type="radio" value="" x-model="selectedSort" class="text-green-600 focus:ring-green-500">
-                    <span>الكل</span>
+                    <span>{{ __('messages.all') }}</span>
                 </label>
             </li>
             <li>
                 <label class="flex items-center gap-2 cursor-pointer">
                     <input type="radio" value="latest" x-model="selectedSort" class="text-green-600 focus:ring-green-500">
-                    <span>الأحدث</span>
+                    <span>{{ __('messages.latest') }}</span>
                 </label>
             </li>
             <li>
                 <label class="flex items-center gap-2 cursor-pointer">
                     <input type="radio" value="oldest" x-model="selectedSort" class="text-green-600 focus:ring-green-500">
-                    <span>الأقدم</span>
+                    <span>{{ __('messages.oldest') }}</span>
                 </label>
             </li>
             <li>
                 <label class="flex items-center gap-2 cursor-pointer">
                     <input type="radio" value="amount_high" x-model="selectedSort" class="text-green-600 focus:ring-green-500">
-                    <span>الأعلى مبلغ</span>
+                    <span>{{ __('messages.amount_high') }}</span>
                 </label>
             </li>
             <li>
                 <label class="flex items-center gap-2 cursor-pointer">
                     <input type="radio" value="amount_low" x-model="selectedSort" class="text-green-600 focus:ring-green-500">
-                    <span>الأقل مبلغ</span>
+                    <span>{{ __('messages.amount_low') }}</span>
                 </label>
             </li>
         </ul>
 
         {{-- ✅ الأزرار --}}
         <div class="flex justify-end gap-2 mt-4">
-            <button type="submit" @click="open = false;" class="px-4 py-2 rounded-xl bg-[#185D31] text-white">تطبيق</button>
-            <a href="{{ route('settlements.index') }}" class="px-4 py-2 rounded-xl bg-gray-200 text-gray-800 hover:bg-gray-300">إعادة تعيين</a>
+            <button type="submit" @click="open = false;" class="px-4 py-2 rounded-xl bg-[#185D31] text-white">{{ __('messages.apply') }}</button>
+            <a href="{{ route('settlements.index') }}" class="px-4 py-2 rounded-xl bg-gray-200 text-gray-800 hover:bg-gray-300">{{ __('messages.reset') }}</a>
         </div>
     </div>
 
@@ -153,14 +153,13 @@
 
 
             {{-- ✅ Search Box --}}
-       {{-- ✅ Search Box (by supplier name OR request number) --}}
 <div class="relative w-full">
     <input type="text" name="search" value="{{ request('search') ?? '' }}"
-           placeholder="بحث برقم التسوية أو باسم المورد"
+           placeholder="{{ __('messages.search_placeholder') }}"
            class="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-xl focus:outline-none">
     <button type="submit"
             class="absolute inset-y-0 left-0 flex items-center px-3 text-white bg-[#185D31] rounded-l-xl">
-        بحث
+        {{ __('messages.search') }}
     </button>
 </div>
 
@@ -171,9 +170,9 @@
         <div class="flex items-center space-x-3">
             <a href="{{ route('settlements.download', request()->query()) }}"
                class="bg-gray-100 mx-2 hover:bg-gray-300 text-[#185D31] py-2 px-4 rounded-xl flex items-center">
-                <i class="fas fa-download ml-2"></i><span>تحميل</span>
+                <i class="fas fa-download ml-2"></i><span>{{ __('messages.download') }}</span>
             </a>
-            <a href="{{ route('settlements.create') }}" class="bg-[#185D31] text-white px-4 py-2 rounded-xl">+ إضافة تسوية</a>
+            <a href="{{ route('settlements.create') }}" class="bg-[#185D31] text-white px-4 py-2 rounded-xl">+ {{ __('messages.add_settlement') }}</a>
         </div>
     </div>
 
@@ -207,7 +206,7 @@
                     <td class="p-3">#تسوية-{{ $s->id }}</td>
                     <td class="p-3">{{ $s->supplier->company_name ?? '-' }}</td>
                     <td class="p-3">#{{ $s->order->order_number ?? '-' }}</td>
-                    <td class="p-3">{{ $s->amount }} رس</td>
+                    <td class="p-3">{{ $s->amount }} {{ __('messages.sar') }}</td>
                     <td class="p-3">
                         <span class="px-3 py-1 rounded-full {{ $s->status == 'transferred' ? 'bg-[#D4EDDA] text-[#007405]' : 'bg-[#EDEDED] text-[#696969]' }}">
                             {{ __('messages.' . $s->status) }}
@@ -233,7 +232,7 @@
         <nav class="flex items-center justify-between p-4 bg-[#EDEDED]">
             <div class="flex-1 flex justify-between items-center">
                 <span class="text-sm text-gray-700 ml-4">
-                    {{ $settlements->firstItem() }} - {{ $settlements->lastItem() }} من {{ $settlements->total() }}
+                    {{ $settlements->firstItem() }} - {{ $settlements->lastItem() }} {{ __('messages.of') }} {{ $settlements->total() }}
                 </span>
                 <div class="flex">
                     {!! $settlements->appends(request()->query())->links('pagination::tailwind') !!}

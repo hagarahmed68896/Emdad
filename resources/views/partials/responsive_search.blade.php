@@ -1,9 +1,10 @@
-<div class=" w-full md:flex-grow md:max-w-2xl px-2 md:mx-8 order-4">
-    <form action="{{ route('search') }}" method="GET" class="main-search-form">
-        <div class="flex flex-nowrap border rounded-[12px] bg-[#F8F9FA] items-center py-1 px-2 relative gap-2">
+<div class="w-full md:flex-grow md:max-w-2xl px-2 md:mx-8 order-4">
+<form action="{{ route('search') }}" method="POST" class="main-search-form" enctype="multipart/form-data">
+    @csrf 
+            <div class="flex flex-nowrap border rounded-[12px] bg-[#F8F9FA] items-center py-1 px-2 relative gap-2">
 
             {{-- Category Dropdown (UNCHANGED logic) --}}
-            <div class="relative z-50" x-data="{
+            {{-- <div class="relative z-50" x-data="{
                 categoryOpen: false,
                 selectedCategories: @json(request('search_categories', [])),
                 get buttonText() {
@@ -18,7 +19,7 @@
                 }
             }">
                 <button type="button" @click="categoryOpen = !categoryOpen"
-                    class="flex items-center px-1 h-full w-[100px] sm:w-[100px] md:w-[163px] border-l text-[#767676] text-sm font-normal font-[Cairo] shrink-0">
+                    class="flex items-center px-1 h-full w-[86px] sm:w-[100px] md:w-[163px] border-l text-[#767676] text-sm font-normal font-[Cairo] shrink-0">
                     <div class="flex items-center justify-between px-2 h-full w-full">
                         <span class="text-sm truncate" x-text="buttonText"></span>
                         <svg class="size-4 transform" :class="{ 'rotate-180': categoryOpen }" fill="none"
@@ -47,15 +48,14 @@
                         <span class="text-sm font-[Cairo] text-gray-700">{{ __('messages.suppliers') }}</span>
                     </label>
                 </div>
-            </div>
-
+            </div> --}}
             {{-- Main Search Input and Suggestions Popup --}}
             <div class="flex-1 min-w-0 relative z-40">
                 @include('search.suggestions_popup')
             </div>
 
             {{-- Image Upload Component (UNCHANGED logic) --}}
-            <div x-data="imageUploadComponent()" class="relative flex items-center justify-center mx-2 shrink-0 z-50">
+            <div x-data="imageUploadComponent()" class="relative flex items-center justify-center mx-2">
                 <label @click="showUploadModal = true" class="cursor-pointer hover:text-black text-[#767676]">
                     <img src="{{ asset('images/Group (3).svg') }}" alt="Upload Image" class="w-[20px] h-[20px]">
                 </label>
@@ -63,7 +63,6 @@
                 <div x-show="showUploadModal" x-cloak @click.away="showUploadModal = false"
                     class="absolute top-full -left-20 mt-2 bg-white shadow-lg rounded-lg py-2
                              sm:w-[660px] sm:h-[320px] w-[90vw] max-w-[660px]">
-                    {{-- The content div inside, responsible for its own padding --}}
                     <div class="p-6 relative w-full h-full">
                         <button @click="showUploadModal = false"
                             class="absolute top-3 right-3 text-gray-500 hover:text-gray-700">
@@ -72,6 +71,8 @@
                                     d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
+
+                        <!-- Upload area -->
                         <div class="border-2 border-dashed border-gray-300 p-6 rounded-md flex flex-col items-center justify-center text-gray-600 m-2 h-[180px] sm:w-[600px] sm:h-[210px]"
                             @drop.prevent="handleDrop" @dragover.prevent>
                             <template x-if="imagePreview">
@@ -94,21 +95,24 @@
                             <input type="file" id="imageInput" accept="image/*" class="hidden"
                                 @change="handleImageUpload">
                         </div>
+
+                        <!-- OR URL Input -->
                         <div class="flex flex-col sm:flex-row mt-4 mb-4 items-center justify-between">
                             <input type="text" x-model="imageUrl" placeholder="{{ __('messages.imageURL') }}"
                                 class="border border-gray-300 px-3 py-2 rounded w-full sm:w-[400px] text-sm mb-2 sm:mb-0" />
-                            <button type="button" @click="submitImage"
+                            {{-- <button type="button" @click="submitImage"
                                 class="bg-green-800 text-white px-6 py-2 rounded text-sm w-full sm:w-auto">
                                 {{ __('messages.Search') }}
-                            </button>
+                            </button> --}}
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Unified Search Button -->
             <div class="shrink-0">
                 <button type="submit"
-                    class="bg-[#185D31] px-2 md:px-4 h-[32px] text-white rounded-[12px] pb-1 mx-1 text-sm">
+                    class="bg-[#185D31] px-3 md:px-4 h-[32px] text-white rounded-[12px] pb-1 mx-1 text-sm">
                     {{ __('messages.Search') }}
                 </button>
             </div>

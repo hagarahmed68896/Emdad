@@ -17,92 +17,164 @@ class CartController extends Controller
     /**
      * Display the shopping cart contents for the authenticated user.
      */
-    public function index(Request $request)
-    {
-        // Get the authenticated user
-        $user = Auth::user();
+    // public function index(Request $request)
+    // {
+    //     // Get the authenticated user
+    //     $user = Auth::user();
 
-        // If a user is logged in, fetch their cart from the database
-        if ($user) {
-            $cart = Cart::where('user_id', $user->id)->first();
+    //     // If a user is logged in, fetch their cart from the database
+    //     if ($user) {
+    //         $cart = Cart::where('user_id', $user->id)->first();
 
-            // If a cart exists, load its items and the related product details
-            if ($cart) {
-                $cartItems = $cart->items()->with('product')->get();
-            } else {
-                // If the user has no cart, return an empty collection
-                $cartItems = collect();
-            }
-        } else {
-            // If the user is not authenticated, a cart cannot exist in the database
-            $cartItems = collect();
-        }
-           $order = null;
+    //         // If a cart exists, load its items and the related product details
+    //         if ($cart) {
+    //             $cartItems = $cart->items()->with('product')->get();
+    //         } else {
+    //             // If the user has no cart, return an empty collection
+    //             $cartItems = collect();
+    //         }
+    //     } else {
+    //         // If the user is not authenticated, a cart cannot exist in the database
+    //         $cartItems = collect();
+    //     }
+    //        $order = null;
 
-    if ($request->has('order_id')) {
-        $order = \App\Models\Order::with('orderItems')->find($request->order_id);
-    }
+    // if ($request->has('order_id')) {
+    //     $order = \App\Models\Order::with('orderItems')->find($request->order_id);
+    // }
 
-        return view('profile.cart', compact('cartItems','order'));
-    }
+    //     return view('profile.cart', compact('cartItems','order'));
+    // }
 
     /**
      * Add a product to the shopping cart.
      */
-    public function store(Request $request)
-    {
-        try {
-            if (!Auth::check()) {
-                return response()->json([
-                    'status'  => 'error',
-                    'message' => __('messages.must_login_before_cart'),
-                ], 401);
-            }
+    // public function store(Request $request)
+    // {
+    //     try {
+    //         if (!Auth::check()) {
+    //             return response()->json([
+    //                 'status'  => 'error',
+    //                 'message' => __('messages.must_login_before_cart'),
+    //             ], 401);
+    //         }
 
-            $validated = $request->validate([
-                'product_id'        => 'required|exists:products,id',
-                'items'              => 'required|array|min:1',
-                'items.*.color'      => 'required|string|max:255',
-                'items.*.size'       => 'nullable|string|max:255',
-                'items.*.quantity'   => 'required|integer|min:1',
-                'items.*.unit_price' => 'required|numeric|min:0',
-            ]);
+    //         $validated = $request->validate([
+    //             'product_id'        => 'required|exists:products,id',
+    //             'items'              => 'required|array|min:1',
+    //             'items.*.color'      => 'required|string|max:255',
+    //             'items.*.size'       => 'nullable|string|max:255',
+    //             'items.*.quantity'   => 'required|integer|min:1',
+    //             'items.*.unit_price' => 'required|numeric|min:0',
+    //         ]);
 
-            $user = Auth::user();
+    //         $user = Auth::user();
 
-            // 1. Find or create the user's cart
+    //         // 1. Find or create the user's cart
+    //         $cart = Cart::firstOrCreate(['user_id' => $user->id]);
+
+    //         foreach ($validated['items'] as $item) {
+    //             // Look for an existing cart item with same product
+    //             $cartItem = CartItem::where('cart_id', $cart->id)
+    //                 ->where('product_id', $validated['product_id'])
+    //                 ->first();
+
+    //             if ($cartItem) {
+    //                 // get existing options or start fresh
+    //                 $options = $cartItem->options ?? ['variants' => []];
+
+    //                 // build a unique key: "red" OR "red|XXL"
+    //                 $variantKey = $item['color'] . ($item['size'] ? '|' . $item['size'] : '');
+
+    //                 // increase quantity for this variant
+    //                 if (isset($options['variants'][$variantKey])) {
+    //                     $options['variants'][$variantKey] += $item['quantity'];
+    //                 } else {
+    //                     $options['variants'][$variantKey] = $item['quantity'];
+    //                 }
+
+    //                 // update cart item
+    //                 $cartItem->options  = $options;
+    //                 $cartItem->quantity = array_sum($options['variants']); // total sum of all variants
+    //                 $cartItem->save();
+    //             } else {
+    //                 // new product in cart
+    //                 $variantKey = $item['color'] . ($item['size'] ? '|' . $item['size'] : '');
+    //                 CartItem::create([
+    //                     'cart_id'            => $cart->id,
+    //                     'product_id'         => $validated['product_id'],
+    //                     'quantity'           => $item['quantity'],
+    //                     'price_at_addition'  => $item['unit_price'],
+    //                     'options'            => [
+    //                         'variants' => [
+    //                             $variantKey => $item['quantity']
+    //                         ]
+    //                     ],
+    //                 ]);
+    //             }
+    //         }
+
+    //         return response()->json([
+    //             'status'  => 'success',
+    //             'message' => __('messages.added_to_cart'),
+    //         ], 201);
+
+    //     } catch (ValidationException $e) {
+    //         return response()->json([
+    //             'status'  => 'validation_error',
+    //             'message' => __('messages.validation_failed'),
+    //             'errors'  => $e->errors(),
+    //         ], 422);
+
+    //     } catch (\Throwable $e) {
+    //         \Log::error('Cart store error: ' . $e->getMessage());
+    //         return response()->json([
+    //             'status'  => 'error',
+    //             'message' => __("messages.error_adding_to_cart"),
+    //             'error'   => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
+
+    // In CartController.php
+
+public function index(Request $request)
+{
+    // Get the authenticated user
+    $user = Auth::user();
+
+    // Check for unauthenticated cart items and merge them if a user is logged in
+    if ($user && $request->has('guest_cart')) {
+        $guestCart = json_decode($request->input('guest_cart'), true);
+
+        if (is_array($guestCart) && !empty($guestCart)) {
+            // Find or create the user's cart in the database
             $cart = Cart::firstOrCreate(['user_id' => $user->id]);
 
-            foreach ($validated['items'] as $item) {
-                // Look for an existing cart item with same product
+            foreach ($guestCart as $item) {
+                // You can reuse the logic from the store method to add/update items
+                $variantKey = $item['color'] . ($item['size'] ? '|' . $item['size'] : '');
+
                 $cartItem = CartItem::where('cart_id', $cart->id)
-                    ->where('product_id', $validated['product_id'])
+                    ->where('product_id', $item['product_id'])
                     ->first();
 
                 if ($cartItem) {
-                    // get existing options or start fresh
                     $options = $cartItem->options ?? ['variants' => []];
-
-                    // build a unique key: "red" OR "red|XXL"
-                    $variantKey = $item['color'] . ($item['size'] ? '|' . $item['size'] : '');
-
-                    // increase quantity for this variant
+                    
                     if (isset($options['variants'][$variantKey])) {
                         $options['variants'][$variantKey] += $item['quantity'];
                     } else {
                         $options['variants'][$variantKey] = $item['quantity'];
                     }
-
-                    // update cart item
+                    
                     $cartItem->options  = $options;
-                    $cartItem->quantity = array_sum($options['variants']); // total sum of all variants
+                    $cartItem->quantity = array_sum($options['variants']);
                     $cartItem->save();
                 } else {
-                    // new product in cart
-                    $variantKey = $item['color'] . ($item['size'] ? '|' . $item['size'] : '');
                     CartItem::create([
                         'cart_id'            => $cart->id,
-                        'product_id'         => $validated['product_id'],
+                        'product_id'         => $item['product_id'],
                         'quantity'           => $item['quantity'],
                         'price_at_addition'  => $item['unit_price'],
                         'options'            => [
@@ -113,58 +185,143 @@ class CartController extends Controller
                     ]);
                 }
             }
-
-            return response()->json([
-                'status'  => 'success',
-                'message' => __('messages.added_to_cart'),
-            ], 201);
-
-        } catch (ValidationException $e) {
-            return response()->json([
-                'status'  => 'validation_error',
-                'message' => __('messages.validation_failed'),
-                'errors'  => $e->errors(),
-            ], 422);
-
-        } catch (\Throwable $e) {
-            \Log::error('Cart store error: ' . $e->getMessage());
-            return response()->json([
-                'status'  => 'error',
-                'message' => __("messages.error_adding_to_cart"),
-                'error'   => $e->getMessage()
-            ], 500);
         }
     }
+    
+    // Continue with the original logic to display the cart
+    if ($user) {
+        $cart = Cart::where('user_id', $user->id)->first();
+        if ($cart) {
+            $cartItems = $cart->items()->with('product')->get();
+        } else {
+            $cartItems = collect();
+        }
+    } else {
+        $cartItems = collect();
+    }
+    
+    $order = null;
+    if ($request->has('order_id')) {
+        $order = \App\Models\Order::with('orderItems')->find($request->order_id);
+    }
+
+    return view('profile.cart', compact('cartItems', 'order'));
+}
+
+public function store(Request $request)
+{
+    try {
+        // This check is no longer strictly necessary as the JS handles it,
+        // but it's good practice for backend validation.
+        if (!Auth::check()) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => __('messages.must_login_before_cart'),
+            ], 401);
+        }
+
+        $validated = $request->validate([
+            'product_id'        => 'required|exists:products,id',
+            'items'             => 'required|array|min:1',
+            'items.*.color'     => 'required|string|max:255',
+            'items.*.size'      => 'nullable|string|max:255',
+            'items.*.quantity'  => 'required|integer|min:1',
+            'items.*.unit_price' => 'required|numeric|min:0',
+        ]);
+
+        $user = Auth::user();
+
+        // Find or create the user's cart
+        $cart = Cart::firstOrCreate(['user_id' => $user->id]);
+
+        foreach ($validated['items'] as $item) {
+            // Find existing cart item for the same product, color, and size
+            $cartItem = CartItem::where('cart_id', $cart->id)
+                ->where('product_id', $validated['product_id'])
+                ->whereJsonContains('options->variants->' . $item['color'] . ($item['size'] ? '|' . $item['size'] : ''), $item['quantity']) // More specific query
+                ->first();
+
+            $variantKey = $item['color'] . ($item['size'] ? '|' . $item['size'] : '');
+
+            if ($cartItem) {
+                // Get existing options or start fresh
+                $options = $cartItem->options ?? ['variants' => []];
+
+                // Increase quantity for this variant
+                if (isset($options['variants'][$variantKey])) {
+                    $options['variants'][$variantKey] += $item['quantity'];
+                } else {
+                    $options['variants'][$variantKey] = $item['quantity'];
+                }
+
+                // Update cart item
+                $cartItem->options  = $options;
+                $cartItem->quantity = array_sum($options['variants']); // total sum of all variants
+                $cartItem->save();
+            } else {
+                // New item in cart
+                CartItem::create([
+                    'cart_id'            => $cart->id,
+                    'product_id'         => $validated['product_id'],
+                    'quantity'           => $item['quantity'],
+                    'price_at_addition'  => $item['unit_price'],
+                    'options'            => [
+                        'variants' => [
+                            $variantKey => $item['quantity']
+                        ]
+                    ],
+                ]);
+            }
+        }
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => __('messages.added_to_cart'),
+        ], 201);
+
+    } catch (ValidationException $e) {
+        return response()->json([
+            'status'  => 'validation_error',
+            'message' => __('messages.validation_failed'),
+            'errors'  => $e->errors(),
+        ], 422);
+
+    } catch (\Throwable $e) {
+        \Log::error('Cart store error: ' . $e->getMessage());
+        return response()->json([
+            'status'  => 'error',
+            'message' => __("messages.error_adding_to_cart"),
+            'error'   => $e->getMessage()
+        ], 500);
+    }
+}
 
 
     /**
      * Get the last order details for a specific product and authenticated user.
      * This method is placed logically within the CartController.
      */
-    public function getLastOrder(Request $request, $productId)
-    {
-        if (!Auth::check()) {
-            return response()->json(['message' => 'User not authenticated'], 401);
-        }
+public function getLastOrder(Request $request, $productId)
+{
+    // Initialize response items
+    $items = [];
 
+    if (Auth::check()) {
+        // Authenticated user: fetch from database
         $user = Auth::user();
 
-        $lastCartItem = CartItem::whereHas('cart', function($query) use ($user) {
+        $lastCartItem = CartItem::whereHas('cart', function ($query) use ($user) {
                 $query->where('user_id', $user->id);
             })
             ->where('product_id', $productId)
             ->latest()
-            ->with('product') // make sure product is eager loaded
+            ->with('product') // eager load product
             ->first();
 
         if ($lastCartItem) {
             $optionsData = $lastCartItem->options;
-
             if (isset($optionsData['variants']) && is_array($optionsData['variants'])) {
                 $variants = $optionsData['variants'];
-                $items = [];
-
-                // product colors array
                 $colors = $lastCartItem->product->colors ?? [];
 
                 foreach ($variants as $key => $quantity) {
@@ -172,15 +329,11 @@ class CartController extends Controller
                     $colorName = $parts[0] ?? null;
                     $size      = $parts[1] ?? null;
 
-                    // find matching color
                     $colorData = collect($colors)->firstWhere('name', $colorName);
 
-                    // same logic you used in Blade
                     if ($colorData) {
-                        $isBase64 = isset($colorData['image']) && str_starts_with($colorData['image'], 'data:image');
                         $relativePath = ltrim(str_replace('storage/', '', $colorData['image']), '/');
                         $swatchImage  = Storage::url($relativePath);
-
                     } else {
                         $swatchImage = 'https://placehold.co/64x64/F0F0F0/ADADAD?text=N/A';
                     }
@@ -193,13 +346,31 @@ class CartController extends Controller
                         'swatchImage' => $swatchImage,
                     ];
                 }
-
-                return response()->json(['items' => $items]);
             }
         }
+    } else {
+        // Guest user: fetch from request input (guest_cart)
+        $guestCart = $request->input('guest_cart', []);
+        if (!empty($guestCart)) {
+            $lastItem = collect($guestCart)
+                ->where('product_id', $productId)
+                ->last(); // get last added item
 
-        return response()->json(['items' => []]);
+            if ($lastItem) {
+                $items[] = [
+                    'color'       => $lastItem['color'] ?? null,
+                    'size'        => $lastItem['size'] ?? null,
+                    'quantity'    => $lastItem['quantity'] ?? 1,
+                    'unit_price'  => $lastItem['unit_price'] ?? 0,
+                    'swatchImage' => $lastItem['swatchImage'] ?? 'https://placehold.co/64x64/F0F0F0/ADADAD?text=N/A',
+                ];
+            }
+        }
     }
+
+    return response()->json(['items' => $items]);
+}
+
 
     // You might also add other methods like updateQuantity, removeItem, clearCart here
     /**

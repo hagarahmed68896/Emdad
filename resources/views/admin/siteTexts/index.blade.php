@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('page_title', 'إدارة النصوص')
+@section('page_title', __('messages.manage_texts'))
 
 @section('content')
 <div class="p-6 overflow-y-auto" 
@@ -9,7 +9,7 @@
         selectedTexts = value ? @js($texts->pluck('id')) : [] 
      })">
 
-    <p class="text-[32px] font-bold mb-4">إدارة النصوص</p>
+    <p class="text-[32px] font-bold mb-4">{{ __('messages.manage_texts') }}</p>
 
     {{-- Top Controls --}}
     <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
@@ -20,7 +20,7 @@
             {{-- Search --}}
             <form action="{{ route('admin.site_texts.index') }}" method="GET" class="w-full md:w-auto">
                 <div class="relative w-full sm:w-[300px]">
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="بحث عن نص"
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="{{ __('messages.search_text') }}"
                            class="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-green-500 focus:border-green-500">
 
                     {{-- Search Icon --}}
@@ -35,27 +35,28 @@
                     {{-- Submit Button --}}
                     <button type="submit"
                             class="absolute inset-y-0 left-0 flex items-center px-3 text-white bg-[#185D31] hover:bg-green-800 rounded-l-xl">
-                        بحث
+                        {{ __('messages.search') }}
                     </button>
                 </div>
             </form>
 
             {{-- Add + Filter --}}
             <div class="flex flex-row items-center gap-3">
+                {{-- Add button example --}}
                 {{-- <a href="{{ route('admin.site_texts.create') }}"
                    class="bg-[#185D31] hover:bg-green-800 text-white py-2 px-4 rounded-xl flex items-center transition duration-150 ease-in-out">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1"
                          stroke="currentColor" class="w-5 h-5 ml-2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                     </svg>
-                    إضافة نص جديد
+                    {{ __('messages.add_text') }}
                 </a> --}}
 
                 <form action="{{ route('admin.site_texts.index') }}" method="GET">
                     <select name="page_name" onchange="this.form.submit()"
                         class="pl-2 pr-4 py-2 border border-gray-300 rounded-xl 
                                focus:outline-none focus:ring-green-500 focus:border-green-500">
-                        <option value="">كل الصفحات</option>
+                        <option value="">{{ __('messages.all_pages') }}</option>
                         @foreach($pages as $page)
                             <option value="{{ $page }}" {{ request('page_name') == $page ? 'selected' : '' }}>
                                 {{ $page }}
@@ -69,11 +70,10 @@
         {{-- When rows selected, show count --}}
         <div x-show="selectedTexts.length > 0" class="w-full text-right">
             <p class="text-lg font-semibold text-[#185D31]">
-                تم تحديد <span x-text="selectedTexts.length"></span> صف
+                {{ __('messages.selected_rows') }} <span x-text="selectedTexts.length"></span>
             </p>
         </div>
     </div>
-
 
     {{-- Table --}}
     <div class="overflow-x-auto rounded-xl border border-gray-200 mt-4">
@@ -84,10 +84,10 @@
                         <input type="checkbox" x-model="selectAll" class="h-4 w-4 text-[#185D31] border-[#185D31] rounded">
                     </th>
                     <th class="px-6 py-3 text-center">#</th>
-                    <th class="px-6 py-3 text-right">النص بالعربية</th>
-                    <th class="px-6 py-3 text-right">النص بالإنجليزية</th>
-                    <th class="px-6 py-3 text-right">الصفحة</th>
-                    <th class="px-6 py-3 text-center">الإجراءات</th>
+                    <th class="px-6 py-3 text-right">{{ __('messages.text_ar') }}</th>
+                    <th class="px-6 py-3 text-right">{{ __('messages.text_en') }}</th>
+                    <th class="px-6 py-3 text-right">{{ __('messages.page') }}</th>
+                    <th class="px-6 py-3 text-center">{{ __('messages.actions') }}</th>
                 </tr>
             </thead>
 
@@ -112,7 +112,7 @@
                 @empty
                     <tr>
                         <td colspan="6" class="px-6 py-4 text-center text-gray-500">
-                            لا توجد نصوص لعرضها.
+                            {{ __('messages.no_texts') }}
                         </td>
                     </tr>
                 @endforelse

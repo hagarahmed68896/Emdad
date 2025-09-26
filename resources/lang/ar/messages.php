@@ -172,6 +172,7 @@ return [
     'email_required' => 'البريد الإلكتروني مطلوب.',
     'email_invalid' => 'صيغة البريد الإلكتروني غير صحيحة.',
     'email_unique' => 'البريد الإلكتروني هذا مستخدم بالفعل.',
+    'email_failed' => 'البريد الالكتروني غير مسجل',
     'phone_number_digits' => 'يجب أن يتكون رقم الهاتف من 9 أرقام.',
     'phone_number_unique' => 'رقم الهاتف هذا مستخدم بالفعل.',
     'change_password'=> 'تغيير كلمة المرور',
@@ -239,7 +240,6 @@ return [
     'supplier_confirmed' => 'مصنع موثوق',
     'suppliers_featured' => 'ميزات المورد',
     'unit_price_depends_on_delivery_date'=> 'سعر الوحدة يعتمد على تاريخ التسليم المتوقع',
-    'delivery_by_date'=> 'التسليم بحلول :date',
     'from' => 'من',
     'to' => ' الي',
     'contact_supplier' =>'تواصل مع المورد',
@@ -707,18 +707,437 @@ return [
     'sent_notifications' => 'الإشعارات المُرسلة',
     'unsent_notifications' => 'الإشعارات غير المُرسلة	',
     'days' => 'أيام',
-    'no_results_found' => 'لا توجد نتائج بحث'
+    'no_results_found' => 'لا توجد نتائج بحث',
+    'no_suggestions_found' => 'لا توجد اقتراحات',
+
+
+       // Dashboard
+    'dashboard' => 'لوحة التحكم',
+
+    // Account Management
+    'account_management' => 'إدارة الحسابات',
+    'customers' => 'العملاء',
+    'banned_users' => 'المحظورون',
+
+    // Invoices & Documents
+    'invoices' => 'الفواتير',
+    'documents_review' => 'مراجعة الوثائق',
+
+    // Products Management
+    'products_management' => 'إدارة المنتجات',
+
+    // Orders Management
+    'orders_management' => 'إدارة الطلبات',
+    'settlements' => 'التسويات',
+
+    // Chat Management
+    'chat_management' => 'إدارة المحادثات',
+    'chats' => 'المحادثات',
+    'quick_replies' => 'الرسائل التلقائية',
+
+    // Reviews, Reports, Notifications
+    'reports' => 'التقارير والإحصائيات',
+
+    // Site Texts & Settings
+    'site_texts' => 'إدارة النصوص',
+    'settings' => 'الإعدادات',
+    'profile' => 'الملف الشخصي',
+    'contact_settings' => 'إعدادات التواصل',
+    'terms_conditions' => 'الشروط و الأحكام',
+    'profit_percentage' => 'نسبة الأرباح',
+
+    // FAQ
+    'faq' => 'الأسئلة الشائعة',
+    'faq_categories' => 'فئات الأسئلة الشائعة',
+  'welcome' => 'مرحباً',
+  'welcome_back_dashboard' => 'مرحباً بك مرة أخرى في لوحة التحكم',
+  'no_notifications' => 'لا توجد إشعارات حالياً',
+  'submitted_review_for_order' => 'قدم شكوى على الطلب رقم',
+  'new_notification' => 'إشعار جديد',
+  'notification_message' => 'رسالة إشعار',
+  'mark_as_read' => 'قراءة',
+ 'welcome_dashboard' => 'مرحباً بك في لوحة تحكمك',
+    'dashboard_description' => 'نظام ذكي يساعدك على إدارة كل شيء.',
+    'login_description' => 'سجل الدخول للوصول إلى لوحة التحكم الخاصة بك',
+    'enter_password' => 'ادخل كلمة المرور',
+    'reset_password' => 'إعادة تعيين كلمة المرور',
+    'reset_password_instructions' => 'أدخل بريدك الإلكتروني لتلقي رابط إعادة التعيين.',
+    'send_link' => 'إرسال الرابط',
+    'reset_link_sent' => 'تم إرسال رابط إعادة التعيين إلى بريدك الإلكتروني.',
+
+
+    // Metrics Cards
+    'total_users' => 'إجمالي المستخدمين',
+    'total_customers' => 'عدد العملاء',
+    'total_suppliers' => 'عدد الموردين',
+    'total_documents' => 'عدد الوثائق',
+
+    // Charts
+    'users' => 'المستخدمين',
+    'revenue' => 'الإيرادات',
+    'orders_revenue_summary' => 'ملخص الطلبات والإيرادات',
+    'products_by_category' => 'إجمالي المنتجات حسب الفئات',
+    'number_of_products' => 'عدد المنتجات',
+    'top_products' => 'أعلى المنتجات مبيعاً',
+
+    // Table
+    'latest_orders' => 'أحدث المعاملات',
+    'details' => 'التفاصيل',
+
+
+    // Latest Orders Table
+ 
+    'value' => 'القيمة',
+    'name_a_z' => 'الاسم (أ-ي)',
+    'name_z_a' => 'الاسم (ي-أ)',
+
+    'account_status' => 'حالة الحساب',
+    'active' => 'نشط',
+    'inactive' => 'غير نشط',
+    'banned' => 'محظور',
+    'add_account' => 'إضافة حساب',
+
+    'created_at' => 'تاريخ الإنشاء',
+    'no_users_found' => 'لم يتم العثور على مستخدمين',
+
+    'delivery_by_date' => 'التوصيل بحلول :date',
+    'no_products_found' => 'لا توجد منتجات مطابقة لمعاييرك.',
+    'try_adjusting_filters' => 'حاول تعديل الفلاتر أو إعادة ضبطها.',
+    'avg_response' => 'متوسط وقت الرد',
+    'edit_document' => 'تعديل الوثيقة',
+    'edit_document_data' => 'تعديل بيانات الوثيقة',
+    'select_company' => 'حدد اسم الشركة',
+
+    'select_document' => 'حدد نوع الوثيقة',
+
+    'enter_document_number' => 'ادخل رقم الوثيقة',
+
+    'file' => 'الملف',
+    'view_file' => 'عرض الملف',
+    'no_file_uploaded' => 'لم يتم رفع ملف بعد',
+
+    'select_status' => 'اختر الحالة',
+
+    'enter_notes' => 'أدخل الملاحظات',
+    'add_new_question' => 'إضافة سؤال جديد',
+    'question' => 'السؤال',
+    'answer' => 'المحتوى',
+    'question_type' => 'نوع السؤال',
+    'type_placeholder' => 'مثال: استفسار، شكوى، اقتراح ...',
+    'target_audience' => 'الفئة المستهدفة',
+    'faqs' => 'الأسئلة الشائعة',
+    'add_faq' => 'إضافة سؤال',
+    'undefined' => 'غير محدد',
+    'user_type' => 'نوع المستخدم',
+    'from_to_total' => ':from - :to من :total',
+    'target' => 'الفئة المستهدفة',
+    'add_question' => 'إضافة سؤال',
+    'of' => 'من',
+       'conversations' => 'المحادثات',
+    'review_report' => 'مراجعة البلاغ',
+
+    'oldest_first' => 'الأقدم أولاً',
+    'latest_first' => 'الأحدث أولاً',
+
+    'all_status' => 'كل الحالات',
+    'reported' => 'تم الإبلاغ',
+    'closed' => 'مغلقة',
+    'client_name' => 'اسم العميل',
+    'last_message' => 'آخر رسالة',
+    'report_date' => 'تاريخ البلاغ',
+    'close_conversation' => 'إغلاق المحادثة',
+    'target_group' => 'الفئة المستهدفة',
+    'client' => 'عميل',
+    'action' => 'الإجراء',
+    'close_only' => 'إغلاق المحادثة فقط',
+    'close_suspend' => 'إغلاق المحادثة + تعليق الرسائل لمدة 3 أيام',
+    'warn_only' => 'تحذير المستخدم فقط دون إغلاق المحادثة',
+    'submit' => 'إرسال',
+    'success_action' => 'تم تنفيذ الإجراء بنجاح',
+    'error_action' => 'حدث خطأ، حاول مرة أخرى',
+    'must_choose_action' => 'الرجاء اختيار الإجراء',
+      'show' => 'عرض',
+
+    'report_review' => 'مراجعة البلاغ',
+    'report_review_note' => 'هذه المحادثة للعرض فقط. يمكنك مراجعة الرسائل دون إمكانية التعديل',
+
+    'choose_action_prompt' => 'يرجى اختيار الإجراء المناسب بناءً على مراجعتك للمحادثة.',
+    'target_category' => 'الفئة المستهدفة',
+    'action_close_only' => 'إغلاق المحادثة فقط',
+    'action_close_suspend' => 'إغلاق المحادثة + تعليق الرسائل لمدة 3 أيام',
+    'action_warn_only' => 'تحذير المستخدم فقط دون إغلاق المحادثة',
+    'open' => 'نشطة',
+    'add_notification' => 'إضافة إشعار جديد',
+    'notification_type' => 'نوع الإشعار',
+    'alert' => 'تنبيه',
+    'offer' => 'عرض',
+    'info' => 'إشعار',
+    'sent' => 'تم الإرسال',
+    'notification_title' => 'عنوان الإشعار',
+    'content' => 'المحتوى',
+    'notifications_offers' => 'العروض و الإشعارات',
+      'notifications_list' => 'قائمة الإشعارات',
+
+    'notification_status' => 'حالة الإشعار',
+    'search_notifications' => 'بحث عن إشعار',
+
+    'selected_notifications' => 'إشعارات محددة',
+
+    'confirm_delete_selected_text' => 'هل أنت متأكد أنك تريد حذف جميع الإشعارات المحددة؟',
+    'confirm_delete_single_text' => 'هل أنت متأكد أنك تريد حذف هذا الإشعار؟',
+    'delete_all' => 'حذف الكل',
+    'not_sent' => 'غير مرسل',
+    'bank_card' => 'بطاقة بنكية',
+  
+    // Status
+    'all_orders' => 'كل الطلبات',
+
+    'returned_orders' => 'طلبات الإرجاع',
+
+    // Pagination
+    'showing' => ':from - :to من :total',
+   
+    'product_quantity' => 'عدد المنتجات',
+
+    'no_orders' => 'لا توجد طلبات.',
+ 
+    'total_products' => 'إجمالي المنتجات',
+    'available_products' => 'عدد المنتجات المتاحة',
+    'unavailable_products' => 'عدد المنتجات الغير متاحة',
+    'manage_products' => 'إدارة المنتجات',
+    'search_product' => 'بحث عن منتج',
+    'orders_count' => 'عدد الطلبات',
+    'available' => 'متاح',
+    'unavailable' => 'غير متاح',
+  
+    'bulk_transfer' => 'تحويل المحدد',
+ 
+    'amount_high' => 'الأعلى مبلغ',
+    'amount_low' => 'الأقل مبلغ',
+    'sar' => 'ر.س',
+    'auto_messages' => 'الرسائل التلقائية',
+    'add_auto_message' => 'إضافة رسالة تلقائية',
+    'yes_delete' => 'نعم، احذف',
+    'edit_auto_message' => 'تعديل الرسالة التلقائية',
+    'message_text' => 'الرسالة',
+    'message_content' => 'المحتوى',
+    'enter_message_text' => 'أدخل نوع الرسالة',
+    'enter_message_content' => 'أدخل المحتوى',
+     'review_complaint' => 'مراجعة الشكوى',
+
+    'review_date' => 'تاريخ التقييم',
+    'issue_type' => 'نوع الشكوى',
+    'product_issue' => 'مشكلة في المنتج',
+    'order_issue' => 'مشكلة في التسليم',
+    'complaint_reason' => 'سبب الشكوى',
+    'requested_quantity' => 'الكمية المطلوبة',
+    'unit_price' => 'السعر للوحدة',
+    'total_amount' => 'المجموع الكلي للطلب',
+    'take_action' => 'تنفيذ الإجراء',
+    'send_warning' => 'إرسال تحذير للمورد',
+    'suspend_account' => 'إيقاف مؤقت لحساب المورد',
+    'no_action' => 'لا يوجد إجراء (شكوى غير صحيحة)',
+
+    'close_complaint' => 'إغلاق الشكوى',
+    'closed_complaint_msg' => 'هذه الشكوى مغلقة',
+    // Page titles
+    'review_ratings' => 'مراجعة التقييمات',
+
+    // Alerts / messages
+    'error_try_again' => 'حدث خطأ، حاول مرة أخرى.',
+    'action_success' => 'تم تنفيذ الإجراء بنجاح ✅',
+
+    // Filters / sorting
+    'all_reviews' => 'كل التقييمات',
+    'positive_reviews' => 'التقييمات الإيجابية',
+    'negative_reviews' => 'التقييمات السلبية',
+    'complaints' => 'الشكاوى',
+    // Misc
+    'order' => 'الطلب',
+    'search_reviews' => 'بحث في التقييمات',
+    'total_reviews' => 'إجمالي التقييمات',
+'comment' => 'التعليق',
+'complaint' => 'شكوى',
+'positive' => 'إيجابي',
+'negative' => 'سلبي',
+'no_reviews' => 'لا توجد مراجعات.',
+'reports_statistics' => 'التقارير والإحصائيات',
+'total_revenue' => 'إجمالي الإيرادات',
+'sales_by_category' => 'المبيعات حسب الفئة',
+
+'recent_activity' => 'النشاط مؤخراً',
+'top_suppliers' => 'أعلى الموردين إيراداً',
+'neutral' => 'محايد',
+
+'sales' => 'المبيعات',
+'weeks' => 'الأسابيع',
+    'manage_texts' => 'إدارة النصوص',
+    'search_text' => 'بحث عن نص',
+    'add_text' => 'إضافة نص جديد',
+    'all_pages' => 'كل الصفحات',
+    'selected_rows' => 'تم تحديد',
+    'text_ar' => 'النص بالعربية',
+    'text_en' => 'النص بالإنجليزية',
+    'page' => 'الصفحة',
+    'no_texts' => 'لا توجد نصوص لعرضها.',
+    'edit_text' => 'تعديل النص',
+    'key' => 'المفتاح',
+    'update' => 'تحديث',
+    'enter_profit_percentage' => 'أدخل نسبة الأرباح',
+    'current_password' => 'كلمة المرور الحالية',
+    'password_confirmation' => 'تأكيد كلمة المرور',
+    'save_changes' => 'حفظ التغييرات',
+    'save_photo' => 'حفظ الصورة',
+    'uploading' => 'جاري التحميل...',
+    'change_profile_photo' => 'تغيير صورة الملف الشخصي',
+    'choose_new_photo' => 'اختر صورة جديدة',
+    'remove_current_photo' => 'إزالة الصورة الحالية',
+    'close' => 'إغلاق',
+      'new_photo_selected' => 'تم اختيار صورة جديدة.',
+    'photo_uploaded_success' => '✅ تم رفع الصورة بنجاح.',
+    'profile_photo_updated' => '✅ تم تحديث صورة الملف الشخصي بنجاح.',
+    'upload_error' => '⚠️ حدث خطأ ما أثناء رفع الصورة.',
+    'upload_failed' => '⚠️ فشل الرفع. يرجى المحاولة مرة أخرى.',
+    'photo_removed_success' => 'تمت إزالة الصورة بنجاح.',
+    'profile_photo_removed' => '✅ تم إزالة صورة الملف الشخصي بنجاح.',
+    'remove_error' => '⚠️ حدث خطأ أثناء إزالة الصورة.',
+    'remove_failed' => '⚠️ فشل الاتصال بالخادم لإزالة الصورة.',
+    'profile_updated' => '✅ تم حفظ التغييرات بنجاح.',
+    'connection_failed' => '⚠️ فشل الاتصال بالخادم. يرجى التحقق من اتصالك بالإنترنت.',
+    
+    'social_links' => 'روابط منصات التواصل الاجتماعي',
+    'select_platform' => 'اختر منصة',
+    'enter_url_here' => 'ضع الرابط هنا',
+    'copyrights' => 'حقوق النشر',
+    'add_new_account' => 'إضافة حساب جديد',
+    'add_supplier_account' => 'إضافة حساب للمورد',
+
+    'trusted_supplier' => 'المورد موثوق به',
+ 
+    'saved_successfully' => 'تم الحفظ بنجاح',
+ 
+    'bulk_delete_confirmation' => 'تأكيد الحذف الجماعي',
+    'bulk_delete_message' => 'هل أنت متأكد من حذف',
+    'responsible_name' => 'اسم المسؤول',
+
+    'n_a' => 'غير متوفر',
+    'confirm_ban' => 'تأكيد الحظر',
+    'ban_message' => 'هل أنت متأكد من حظر هذا المورد؟',
+    'confirm_unban' => 'تأكيد رفع الحظر',
+    'unban_message' => 'هل أنت متأكد من رفع الحظر عن هذا المورد؟',
+    'delete_message_single' => 'هل أنت متأكد من حذف هذا المورد؟',
+    'no_suppliers' => 'لا يوجد موردين حالياً',
+    'edit_supplier_account' => 'تعديل حساب المورد',
+    'update_account' => 'تحديث الحساب',
+    'account_type' => 'النوع (عميل/مورد)',
+    'total_banned_users' => 'إجمالي المستخدمين المحظورين',
+    'total_banned_customers' => 'عدد العملاء المحظورين',
+    'total_banned_suppliers' => 'عدد الموردين المحظورين',
+    'total_categories' => 'إجمالي الفئات',
+    'selected_invoices' => 'فاتورة محددة',
+    'confirm_delete_invoice' => 'هل أنت متأكد أنك تريد حذف هذه الفاتورة؟',
+    'bulk_delete_confirm' => 'تأكيد الحذف الجماعي',
+    'search_invoice' => 'ابحث عن فاتورة...',
+    'invoice_number' => 'رقم الفاتورة',
+    'not_defined' => 'غير محدد',
+    'no_invoices' => 'لا توجد فواتير',
+    'download_pdf' => 'تحميل PDF',
+    'no_products_in_category' => 'لا توجد منتجات لهذه الفئة.',
+    'no_subcategories' => 'لا توجد فئات فرعية.',
+    'loading_suggestions' => 'جاري تحميل الاقتراحات...',
+    'no_favorites_illustration' => 'لا توجد منتجات مضافة للمفضلة',
+    'no_favorites_message' => 'لم تقم باضافة أي منتج الى المفضلة بعد',
+     'ready_for_delivery' => 'جاهز للتوصيل الفوري',
+    'platform_terms' => 'شروط المنصة',
+   'terms_description' => 'تعرف على البنود التي تنظم استخدامك للمنصة وتحمي حقوقك كمستخدم.',
+   'no_terms_available' => 'لا توجد شروط حالياً.',
+    'order_cancelled_message' => 'لقد قمت بإلغاء هذا الطلب. لا يمكن استرجاعه.',
+    'order_in_preparation' => 'طلبك قيد التحضير',
+    'order_prepared' => 'تم تحضير طلبك بنجاح',
+    'confirm_cancellation' => 'تأكيد الإلغاء',
+    'confirm_cancellation_message' => 'هل أنت متأكد أنك تريد إلغاء هذا الطلب؟',
+    'conversation_closed' => 'تم إغلاق المحادثة، لا يمكن إرسال رسائل.',
+    'conversation_under_review' => 'تم وضع المحادثة تحت المراجعة، لا يمكن إرسال رسائل ',
+    'you_need_login' => 'تحتاج لتسجيل الدخول أولاً.',
+        // Supplier
+    'no_description'        => 'لا يوجد وصف متاح',
+    'confirmed_supplier'    => 'مورد موثق',
+    'experience_years'      => 'خبرة :years سنوات',
+
+    // Products
+    'products_from_supplier'=> 'منتجات المورد',
+    'uncategorized'         => 'غير مصنف',
+    'ok'                     => 'موافق',
+      'myAds' => 'إعلاناتي',
+    'create_new_ad' => 'إنشاء إعلان جديد',
+    'no_ads' => 'لا توجد إعلانات حتى الآن',
+
+    // statuses
+    'approved' => 'مقبول',
+
+
+    // extra if needed
+    'start_date' => 'تاريخ البداية',
+    'end_date' => 'تاريخ النهاية',
+    'ad' => 'إعلان',
+    'edit_ad'       => 'تعديل الإعلان',
+    'adTitle'       => 'عنوان الإعلان',
+    'current_image' => 'الصورة الحالية',
+    'update_ad'     => 'تحديث الإعلان',
+    'ad_details'    => 'تفاصيل الإعلان',
+    'create_ad'     => 'إنشاء إعلان',
+    'ad_created' => '✅ تم إرسال إعلانك وهو قيد المراجعة.',
+    'ad_updated' => '✅ تم تحديث إعلانك بنجاح.',
+    'ads'       => 'الإعلانات',
+        // General
+    'manage_ads'   => 'إدارة الإعلانات',
+    'dates'        => 'التواريخ',
+    'approve'      => 'موافقة',
+    'reject'       => 'رفض',
+    'no_actions'   => 'لا توجد إجراءات',
+
+
+    // Statuses
+    'Pending'      => 'قيد الانتظار',
+    'submit_ad' =>'إنشاء إعلان',
+    'select_at_least_one_item' => 'الرجاء اختيار عنصر واحد على الأقل.',
+    'added_to_cart_guest' => 'تم إضافة المنتج إلى السلة .',
+    'added_to_cart' => 'تم إضافة المنتج إلى السلة.',
+    'error_adding_to_cart' => 'حدث خطأ أثناء إضافة المنتج إلى السلة.',
+
+
+
+
+
+
+
+
 
  
 
 
-    
+
+
+
+
+
+
+
+
+
+
+
+  
+
 
     
     
     
 
    
+
+
+
 
 
 

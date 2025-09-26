@@ -1,12 +1,12 @@
 @extends('layouts.admin')
 
-@section('page_title', 'العملاء')
+@section('page_title', __('messages.customers'))
 
 @section('content')
 
     <div class="p-6 overflow-y-auto">
 
-        <p class="text-[32px] font-bold">العملاء</p>
+        <p class="text-[32px] font-bold">{{ __('messages.customers') }}</p>
         <div>
             @include('admin.total_numbers')
         </div>
@@ -43,7 +43,7 @@
                 <div x-show="selectedUsers.length > 0" class="flex items-center justify-between mb-4">
                     <div class="flex items-center gap-4">
                         <span class="text-xl font-bold text-gray-800 rtl:mr-4 ltr:ml-4"
-                            x-text="selectedUsers.length + ' محدد'"></span>
+                            x-text="selectedUsers.length + '{{ __('messages.selected') }}'"></span>
 
                         {{-- Placeholder for view icon (if needed for bulk view) --}}
                         <button type="button" class="p-2 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700">

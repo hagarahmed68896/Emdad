@@ -27,14 +27,19 @@
         }
     </style>
 <div class="container py-5">
-    <p class="py-[8px] px-[16px] bg-[#F3F4F5] rounded-[40px] mb-4 w-[123px] text-[16px]">شروط المنصة</p>
-    <h2 class="mb-4 text-[#212121] font-bold text-[40px]">{{ __('messages.terms_and_conditions') }}</h2>
-    <p class="text-[16px] mb-4 text-[#696969]">تعرف على البنود التي تنظم استخدامك للمنصة وتحمي حقوقك كمستخدم.</p>
+    <p class="py-[8px] px-[16px] bg-[#F3F4F5] rounded-[40px] mb-4 w-[123px] text-[16px]">
+        {{ __('messages.platform_terms') }}
+    </p>
+    <h2 class="mb-4 text-[#212121] font-bold text-[40px]">
+        {{ __('messages.terms_and_conditions') }}
+    </h2>
+    <p class="text-[16px] mb-4 text-[#696969]">
+        {{ __('messages.terms_description') }}
+    </p>
 
     @forelse($activeTerms as $term)
         <div class="faq-item border-b border-gray-200 p-[24px] rounded-[20px] bg-[#F8F9FA] mb-3">
-            <div
-                class="faq-question flex justify-between items-center font-semibold text-gray-800 cursor-pointer text-lg">
+            <div class="faq-question flex justify-between items-center font-semibold text-gray-800 cursor-pointer text-lg">
                 <span class="flex-grow text-right text-[18px] leading-[150%] font-bold">
                     {{ $term->title }}
                 </span>
@@ -47,9 +52,12 @@
             </div>
         </div>
     @empty
-        <p class="text-gray-500">لا توجد شروط حالياً.</p>
+        <p class="text-gray-500">
+            {{ __('messages.no_terms_available') }}
+        </p>
     @endforelse
 </div>
+
 
 
 

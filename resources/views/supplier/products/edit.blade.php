@@ -392,14 +392,15 @@ colors: Array.isArray(window.productColors) ? window.productColors : [],
     open: false, 
     selectedStatus: '{{ old('product_status', $product->product_status ?? '') }}', 
     statusOptions: {
-        'ready_for_delivery': 'جاهز للتوصيل الفوري',
-        'made_to_order': 'حسب الطلب'
+        'ready_for_delivery': '{{ __("messages.ready_for_delivery") }}',
+        'made_to_order': '{{ __("messages.made_to_order") }}'
     },
     get selectedStatusText() {
-        return this.statusOptions[this.selectedStatus] || 'حدد حالة المنتج';
+        return this.statusOptions[this.selectedStatus] || '{{ __("messages.select_product_status") }}';
     }
 }">
-    <label class="block mb-1 font-bold">حالة المنتج</label>
+
+<label class="block mb-1 font-bold">{{ __('messages.product_status') }}</label>
     
     <div class="relative">
         <input type="hidden" name="product_status" x-model="selectedStatus">

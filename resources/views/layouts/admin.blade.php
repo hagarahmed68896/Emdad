@@ -4,7 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم  - @yield('page_title', 'الرئيسية')</title>
+<title>{{ __('messages.dashboard') }} - @yield('page_title', __('messages.home'))</title>
+    {{-- Favicon --}}
+    <link rel="icon" type="image/png" href="{{ asset('images/2.png') }}">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome for icons -->
@@ -162,337 +164,274 @@
 
 <body class="flex h-screen overflow-hidden bg-gray-100" style="font-family: 'Cairo', sans-serif;">
 
-    <!-- Sidebar -->
-    <aside id="sidebar"  x-data="{ activeItem: null }" class="sidebar bg-white shadow-lg flex flex-col p-4 overflow-y-auto">
-        <div class="flex items-center justify-center py-4 border-b border-gray-200">
-            <!-- Placeholder for logo -->
-            <div class="w-[100px] h-[100px] rounded-lg flex items-center justify-center overflow-hidden">
-                <img src="/images/2.png"
-                    alt="">
+<!-- Sidebar -->
+<aside id="sidebar" x-data="{ activeItem: null }" class="sidebar bg-white shadow-lg flex flex-col p-4 overflow-y-auto">
+    <div class="flex items-center justify-center py-4 border-b border-gray-200">
+        <!-- Logo -->
+        <div class="w-[100px] h-[100px] rounded-lg flex items-center justify-center overflow-hidden">
+            <img src="/images/2.png" alt="">
+        </div>
+    </div>
+
+    <nav class="mt-6 flex-grow">
+        <ul>
+            <li class="mb-2">
+                <a href="{{ route('admin.dashboard') }}"
+                   class="sidebar-link flex items-center p-3 transition-colors duration-200
+                   {{ Request::is('admin/dashboard') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
+                    <i class="fas fa-th-large ml-3"></i>
+                    <span class="sidebar-text">{{ __('messages.dashboard') }}</span>
+                </a>
+            </li>
+
+            <li class="mb-2" x-data="{ open: {{
+                (Request::is('admin/users*') || Request::is('admin/suppliers*') || Request::is('admin/banned-users*')) ? 'true' : 'false'
+            }} }">
+                <a href="#" @click.prevent="open = !open"
+                   class="sidebar-link flex items-center p-3 transition-colors duration-200 rounded-xl text-gray-700">
+                    <i class="fas fa-users ml-3"></i>
+                    <span class="sidebar-text">{{ __('messages.account_management') }}</span>
+                    <i :class="open ? 'fa-chevron-up' : 'fa-chevron-down'" class="fas mr-auto text-gray-500 text-xs sidebar-text"></i>
+                </a>
+
+                <ul x-show="open" x-transition class="mt-2 space-y-2 pr-6 sidebar-sub-menu">
+                    <li>
+                        <a href="{{ route('admin.users.index') }}"
+                           class="flex items-center p-2 transition-colors duration-200
+                           {{ (Request::is('admin/users*') || request('account_type') === 'customer') ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
+                           {{ __('messages.customers') }}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.suppliers.index') }}"
+                           class="flex items-center p-2 transition-colors duration-200
+                           {{ Request::is('admin/suppliers*') ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
+                           {{ __('messages.suppliers') }}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.banned.index') }}"
+                           class="flex items-center p-2 transition-colors duration-200
+                           {{ Request::is('admin/banned-users*') ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
+                           {{ __('messages.banned_users') }}
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="mb-2">
+                <a href="{{ route('invoices.index') }}"
+                   class="sidebar-link flex items-center p-3 transition-colors duration-200
+                   {{ Request::is('admin/invoices*') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
+                    <i class="fas fa-file-invoice ml-3"></i>
+                    <span class="sidebar-text">{{ __('messages.invoices') }}</span>
+                </a>
+            </li>
+
+            <li class="mb-2">
+                <a href="{{ route('admin.documents.index') }}"
+                   class="sidebar-link flex items-center p-3 transition-colors duration-200
+                   {{ Request::is('admin/documents*') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
+                    <i class="fas fa-file-alt ml-3"></i>
+                    <span class="sidebar-text">{{ __('messages.documents_review') }}</span>
+                </a>
+            </li>
+
+            <li class="mb-2" x-data="{ open: {{ Request::is('admin/products*') ? 'true' : 'false' }} }">
+                <a href="#" @click.prevent="open = !open"
+                   class="sidebar-link flex items-center p-3 text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl transition-colors duration-200">
+                    <i class="fas fa-box ml-3"></i>
+                    <span class="sidebar-text">{{ __('messages.products_management') }}</span>
+                    <i :class="open ? 'fa-chevron-up' : 'fa-chevron-down'" class="fas mr-auto text-xs sidebar-text"></i>
+                </a>
+
+                <ul x-show="open" x-transition class="mt-2 space-y-2 pr-6 sidebar-sub-menu">
+                    <li>
+                        <a href="{{ route('admin.products.index') }}"
+                           class="flex items-center p-2 transition-colors duration-200
+                           {{ Request::is('admin/products*') ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
+                           {{ __('messages.products') }}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.categories.index') }}"
+                           class="flex items-center p-2 transition-colors duration-200
+                           {{ Request::is('admin/categories*') ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
+                           {{ __('messages.categories') }}
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="mb-2" x-data="{ open: {{ Request::is('admin/orders*') ? 'true' : 'false' }} }">
+                <a href="#" @click.prevent="open = !open"
+                   class="sidebar-link flex items-center p-3 text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl transition-colors duration-200">
+                    <i class="fas fa-shopping-cart ml-3"></i>
+                    <span class="sidebar-text">{{ __('messages.orders_management') }}</span>
+                    <i :class="open ? 'fa-chevron-up' : 'fa-chevron-down'" class="fas mr-auto text-xs sidebar-text"></i>
+                </a>
+
+                <ul x-show="open" x-transition class="mt-2 space-y-2 pr-6 sidebar-sub-menu">
+                    <li>
+                        <a href="{{ route('admin.orders.index') }}"
+                           class="flex items-center p-2 transition-colors duration-200
+                           {{ Request::is('admin/orders*') ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
+                           {{ __('messages.orders') }}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('settlements.index') }}"
+                           class="flex items-center p-2 transition-colors duration-200
+                           {{ Request::is('admin/settlements*') ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
+                           {{ __('messages.settlements') }}
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="mb-2" x-data="{ open: {{ Request::is('admin/messages*') || Request::is('admin/quick_replies*') ? 'true' : 'false' }} }">
+                <a href="#" @click.prevent="open = !open"
+                   class="sidebar-link flex items-center p-3 text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl transition-colors duration-200">
+                    <i class="fas fa-comments ml-3"></i>
+                    <span class="sidebar-text">{{ __('messages.chat_management') }}</span>
+                    <i :class="open ? 'fa-chevron-up' : 'fa-chevron-down'" class="fas mr-auto text-xs sidebar-text"></i>
+                </a>
+
+                <ul x-show="open" x-transition class="mt-2 space-y-2 pr-6 sidebar-sub-menu">
+                    <li>
+                        <a href="{{ route('admin.messages.index') }}"
+                           class="flex items-center p-2 transition-colors duration-200
+                           {{ Request::is('admin/messages*') ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
+                           {{ __('messages.chats') }}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.quick_replies.index') }}"
+                           class="flex items-center p-2 transition-colors duration-200
+                           {{ Request::is('admin/quick_replies*') ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
+                           {{ __('messages.quick_replies') }}
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="mb-2">
+                <a href="{{ route('admin.reviews.index') }}"
+                   class="sidebar-link flex items-center p-3 transition-colors duration-200
+                   {{ Request::is('admin/reviews*') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
+                    <i class="fas fa-star ml-3"></i>
+                    <span class="sidebar-text">{{ __('messages.reviews') }}</span>
+                </a>
+            </li>
+
+            <li class="mb-2">
+                <a href="{{ route('admin.reports') }}"
+                   class="sidebar-link flex items-center p-3 transition-colors duration-200
+                   {{ Request::is('admin/reports*') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
+                    <i class="fas fa-chart-line ml-3"></i>
+                    <span class="sidebar-text">{{ __('messages.reports') }}</span>
+                </a>
+            </li>
+               <li class="mb-2">
+                <a href="{{ route('admin.ads.index') }}"
+                   class="sidebar-link flex items-center p-3 transition-colors duration-200
+                   {{ Request::is('admin/ads*') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
+                    <i class="fas fa-ad ml-3"></i>
+                    <span class="sidebar-text">{{ __('messages.ads') }}</span>
+                </a>
+            </li>
+
+            <li class="mb-2">
+                <a href="{{ route('admin.notifications.index') }}"
+                   class="sidebar-link flex items-center p-3 transition-colors duration-200
+                   {{ Request::is('admin/notifications*') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
+                    <i class="fas fa-tags ml-3"></i>
+                    <span class="sidebar-text">{{ __('messages.notifications') }}</span>
+                </a>
+            </li>
+
+            <li class="mb-2">
+                <a href="{{ route('admin.site_texts.index') }}"
+                   class="sidebar-link flex items-center p-3 transition-colors duration-200
+                   {{ Request::is('admin/site_texts*') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
+                    <i class="fas fa-edit ml-3"></i>
+                    <span class="sidebar-text">{{ __('messages.site_texts') }}</span>
+                </a>
+            </li>
+
+            <li class="mb-2" x-data="{ open: {{ Request::is('admin/profile*') ? 'true' : 'false' }} }">
+                <a href="#" @click.prevent="open = !open"
+                   class="sidebar-link flex items-center p-3 transition-colors duration-200 rounded-xl text-gray-700">
+                    <i class="fas fa-cog ml-3 text-gray-500"></i>
+                    <span class="sidebar-text">{{ __('messages.settings') }}</span>
+                    <i :class="open ? 'fa-chevron-up' : 'fa-chevron-down'" class="fas mr-auto text-gray-500 text-xs sidebar-text"></i>
+                </a>
+
+                <ul x-show="open" x-transition class="mt-2 space-y-2 pr-6 sidebar-sub-menu">
+                    <li>
+                        <a href="{{ route('admin.profile.index') }}"
+                           class="flex items-center p-2 transition-colors duration-200
+                           {{ Request::is('admin/profile*') ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
+                            {{ __('messages.profile') }}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.contact.settings') }}"
+                           class="flex items-center p-2 transition-colors duration-200
+                           {{ Request::is('admin/contact-settings*') ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
+                            {{ __('messages.contact_settings') }}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.terms.index') }}"
+                           class="flex items-center p-2 transition-colors duration-200
+                           {{ Request::is('admin/terms*') ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
+                            {{ __('messages.terms_conditions') }}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.profit.index') }}"
+                           class="flex items-center p-2 transition-colors duration-200
+                           {{ Request::is('admin/profit*') ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
+                            {{ __('messages.profit_percentage') }}
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="mt-auto pt-4 border-t border-gray-200">
+        <div class="flex items-center p-3">
+            <a href="{{ route('admin.faqs.index') }}"
+               class="flex items-center p-2 transition-colors duration-200
+               {{ Request::is('admin/faqs*') ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
+                <i class="fas fa-question-circle ml-3"></i>
+                {{ __('messages.faq') }}
+            </a>
+        </div>
+
+        <div class="flex items-center p-3 mt-2">
+            <img src="https://placehold.co/40x40/E0F2F1/004D40?text=A" alt="Admin Profile"
+                 class="w-10 h-10 rounded-full ml-3 flex-shrink-0 profile-picture">
+            <div class="profile-info">
+                <p class="text-sm font-semibold text-gray-800">{{ Auth::user()->full_name ?? 'Admin' }}</p>
+                <p class="text-xs text-gray-500">{{ Auth::user()->email ?? 'admin@example.com' }}</p>
             </div>
         </div>
 
-        <nav class="mt-6 flex-grow">
-            <ul>
-      <li class="mb-2">
-  <a href="{{ route('admin.dashboard') }}"
-     class="sidebar-link flex items-center p-3  transition-colors duration-200
-        {{ Request::is('admin/dashboard') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
-      <i class="fas fa-th-large ml-3 "></i>
-      <span class="sidebar-text">لوحة التحكم</span>
-  </a>
-</li>
-<li class="mb-2"
-    x-data="{ open: {{
-        (
-            Request::is('admin/users*') ||
-            Request::is('admin/suppliers*') ||
-            Request::is('admin/banned-users*')
-        ) ? 'true' : 'false' }} }">
-
-    <a href="#"
-       @click.prevent="open = !open"
-       class="sidebar-link flex items-center p-3 transition-colors duration-200 rounded-xl text-gray-700">
-        <i class="fas fa-users ml-3"></i>
-        <span class="sidebar-text">إدارة الحسابات</span>
-        <i :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"
-           class="fas mr-auto text-gray-500 text-xs sidebar-text"></i>
-    </a>
-
-    <ul x-show="open" x-transition class="mt-2 space-y-2 pr-6 sidebar-sub-menu">
-
-        {{-- العملاء --}}
-        <li>
-            <a href="{{ route('admin.users.index') }}"
-               class="flex items-center p-2 transition-colors duration-200
-               {{ (Request::is('admin/users*') || request('account_type') === 'customer') ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
-               العملاء
-            </a>
-        </li>
-
-        {{-- الموردين --}}
-        <li>
-            <a href="{{ route('admin.suppliers.index') }}"
-               class="flex items-center p-2 transition-colors duration-200
-               {{ Request::is('admin/suppliers*') ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
-               الموردين
-            </a>
-        </li>
-
-        {{-- المحظورون --}}
-        <li>
-            <a href="{{ route('admin.banned.index') }}"
-               class="flex items-center p-2 transition-colors duration-200
-               {{ Request::is('admin/banned-users*') ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
-               المحظورون
-            </a>
-        </li>
-
-    </ul>
-</li>
-
-
-
-
-
-                <li class="mb-2">
-                    <a href="{{route('invoices.index')}}"
-     class="sidebar-link flex items-center p-3  transition-colors duration-200
-        {{ Request::is(patterns: 'admin/invoices*') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">           
-                      <i class="fas fa-file-invoice ml-3 "></i>
-                        <span class="sidebar-text">الفواتير</span>
-                    </a>
-                </li>
-
-
-                <li class="mb-2">
-                    <a href="{{ route('admin.documents.index') }}"
-     class="sidebar-link flex items-center p-3  transition-colors duration-200
-        {{ Request::is(patterns: 'admin/documents*') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">   
-                               <i class="fas fa-file-alt ml-3 "></i>
-                        <span class="sidebar-text">مراجعة الوثائق</span>
-                    </a>
-                </li>
-           <li class="mb-2"
-    x-data="{ open: {{
-        (
-            Request::is('admin/products*') 
-                    ) ? 'true' : 'false' }} }">
-
-    <a href="#"
-       @click.prevent="open = !open"
-       class="sidebar-link flex items-center p-3 text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl transition-colors duration-200">
-        <i class="fas fa-box ml-3"></i>
-        <span class="sidebar-text">إدارة المنتجات</span>
-        <i :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"
-           class="fas mr-auto  text-xs sidebar-text"></i>
-    </a>
-
-    <ul x-show="open" x-transition class="mt-2 space-y-2 pr-6 sidebar-sub-menu">
-
-        {{-- المنتجات --}}
-        <li>
-            <a href="{{ route('admin.products.index') }}"
-               class="flex items-center p-2 transition-colors duration-200
-               {{ Request::is('admin/products*') ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
-               المنتجات
-            </a>
-        </li>
-
-        {{-- الفئات --}}
-        <li>
-            <a href="{{ route('admin.categories.index') }}"
-               class="flex items-center p-2 transition-colors duration-200
-               {{ Request::is('admin/categories*') ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
-               الفئات
-            </a>
-        </li>
-
-    </ul>
-</li>
-          <li class="mb-2"
-    x-data="{ open: {{
-        (
-            Request::is('admin/orders*')
-            ) ? 'true' : 'false' }} }">
-
-    <a href="#"
-       @click.prevent="open = !open"
-       class="sidebar-link flex items-center p-3 text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl transition-colors duration-200">
-                        <i class="fas fa-shopping-cart ml-3"></i>
-        <span class="sidebar-text">إدارة الطلبات</span>
-        <i :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"
-           class="fas mr-auto text-xs sidebar-text"></i>
-    </a>
-
-    <ul x-show="open" x-transition class="mt-2 space-y-2 pr-6 sidebar-sub-menu">
-
-        {{-- الطلبات --}}
-        <li>
-            <a href="{{ route('admin.orders.index') }}"
-               class="flex items-center p-2 transition-colors duration-200
-               {{ Request::is('admin/orders*') ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
-               الطلبات
-            </a>
-        </li>
-
-        {{-- التسويات --}}
-     <li>
-    <a href="{{ route('settlements.index') }}"
-       class="flex items-center p-2 transition-colors duration-200
-       {{ Request::is('admin/settlements*') 
-            ? 'bg-[#185D31] text-white rounded-xl' 
-            : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
-        التسويات
-    </a>
-</li>
-
-
-    </ul>
-</li>
-                {{-- <li class="mb-2">
-                    <a href="{{route('admin.messages.index')}}"
- class="flex items-center p-2 transition-colors duration-200
-       {{ Request::is('admin/settlements*') 
-            ? 'bg-[#185D31] text-white rounded-xl' 
-            : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">                        <i class="fas fa-comments ml-3 text-gray-500"></i>
-                        <span class="sidebar-text">إدارة المحادثات</span>
-                    </a>
-                </li> --}}
-                <li class="mb-2"
-    x-data="{ open: {{ Request::is('admin/messages*') || Request::is('admin/quick_replies*') ? 'true' : 'false' }} }">
-    
-    <a href="#"
-       @click.prevent="open = !open"
-       class="sidebar-link flex items-center p-3 text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl transition-colors duration-200">
-        <i class="fas fa-comments ml-3 "></i>
-        <span class="sidebar-text">إدارة المحادثات</span>
-        <i :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"
-           class="fas mr-auto  text-xs sidebar-text"></i>
-    </a>
-
-    <ul x-show="open" x-transition class="mt-2 space-y-2 pr-6 sidebar-sub-menu">
-
-        {{-- المحادثات --}}
-        <li>
-            <a href="{{ route('admin.messages.index') }}"
-               class="flex items-center p-2 transition-colors duration-200
-               {{ Request::is('admin/messages*') 
-                    ? 'bg-[#185D31] text-white rounded-xl' 
-                    : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
-               المحادثات
-            </a>
-        </li>
-
-        {{-- الرسائل التلقائية --}}
-        <li>
-            <a href="{{ route('admin.quick_replies.index') }}"
-               class="flex items-center p-2 transition-colors duration-200
-               {{ Request::is('admin/quick_replies*') 
-                    ? 'bg-[#185D31] text-white rounded-xl' 
-                    : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
-               الرسائل التلقائية
-            </a>
-        </li>
-
-    </ul>
-</li>
-
-                <li class="mb-2">
-                    <a  href="{{ route('admin.reviews.index') }}"
-                  class="sidebar-link flex items-center p-3  transition-colors duration-200
-                  {{ Request::is(patterns: 'admin/reviews*') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">   
-                                           <i class="fas fa-star ml-3 "></i>
-                        <span class="sidebar-text">مراجعة التقييمات</span>
-                    </a>
-                </li>
-                <li class="mb-2">
-                    <a href="{{ route('admin.reports') }}"
-                  class="sidebar-link flex items-center p-3  transition-colors duration-200
-                  {{ Request::is(patterns: 'admin/reports*') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">              
-                               <i class="fas fa-chart-line ml-3 "></i>
-                        <span class="sidebar-text">التقارير والإحصائيات</span>
-                    </a>
-                </li>
-                <li class="mb-2">
-                    <a href="{{ route('admin.notifications.index') }}"
-                  class="sidebar-link flex items-center p-3  transition-colors duration-200
-                  {{ Request::is(patterns: 'admin/notifications*') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">   
-                         <i class="fas fa-tags ml-3 "></i>
-                        <span class="sidebar-text">العروض والإشعارات</span>
-                    </a>
-                </li>
-                     <li class="mb-2">
-                    <a href="{{ route('admin.site_texts.index') }}"
-                  class="sidebar-link flex items-center p-3  transition-colors duration-200
-                  {{ Request::is(patterns: 'admin/site_texts*') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">   
-                         <i class="fas fa-edit ml-3 "></i>
-                        <span class="sidebar-text"> إدارة النصوص</span>
-                    </a>
-                </li>
-                <li class="mb-2"
-    x-data="{ open: {{
-        (
-            Request::is('admin/profile*') 
-     
-        ) ? 'true' : 'false' }} }">
-
-    <a href= "#"
-       @click.prevent="open = !open"
-       class="sidebar-link flex items-center p-3 transition-colors duration-200 rounded-xl text-gray-700">
-        <i class="fas fa-cog ml-3 text-gray-500"></i>
-        <span class="sidebar-text"> الإعدادات</span>
-        <i :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"
-           class="fas mr-auto text-gray-500 text-xs sidebar-text"></i>
-    </a>
-
-    <ul x-show="open" x-transition class="mt-2 space-y-2 pr-6 sidebar-sub-menu">
-
-        <li>
-            <a href="{{ route('admin.profile.index') }}"
-               class="flex items-center p-2 transition-colors duration-200
-               {{ (Request::is('admin/profile*')) ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
-              الملف الشخصي
-            </a>
-        </li>
-
-        <li>
-            <a href="{{ route('admin.contact.settings') }}"
-                             class="flex items-center p-2 transition-colors duration-200
-               {{ (Request::is('admin/contact-settings*')) ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
-             إعدادات التواصل 
-            </a>
-        </li>
-
-        <li>
-            <a href="{{ route('admin.terms.index') }}"
-                             class="flex items-center p-2 transition-colors duration-200
-               {{ (Request::is('admin/terms*')) ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
-                            الشروط و الاحكام
-            </a>
-        </li>
-     <li>
-            <a href="{{ route('admin.profit.index') }}"
-                             class="flex items-center p-2 transition-colors duration-200
-               {{ (Request::is('admin/terms*')) ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">   
-                        نسبة الأرباح 
-            </a>
-        </li>
-    </ul>
-</li>
- 
-            </ul>
-        </nav>
-
-        <div class="mt-auto pt-4 border-t border-gray-200">
-            <div class="flex items-center p-3">
-                   <a href="{{ route('admin.faqs.index') }}"
-                             class="flex items-center p-2 transition-colors duration-200
-               {{ (Request::is('admin/faqs*')) ? 'bg-[#185D31] text-white rounded-xl' : 'text-gray-600 hover:bg-[#185D31] hover:text-white rounded-xl' }}">   
-                                <i class="fas fa-question-circle ml-3 "></i>
-
-                        الأسئلة الشائعة 
-            </a>
-            </div>
-            <div class="flex items-center p-3 mt-2">
-                <img src="https://placehold.co/40x40/E0F2F1/004D40?text=A" alt="Admin Profile"
-                    class="w-10 h-10 rounded-full ml-3 flex-shrink-0 profile-picture">
-                <div class="profile-info">
-                    <p class="text-sm font-semibold text-gray-800">{{ Auth::user()->full_name ?? 'أحمد محمد' }}</p>
-                    <p class="text-xs text-gray-500">{{ Auth::user()->email ?? 'admin@gmail.com' }}</p>
-                </div>
-            </div>
-            <div class="mt-4">
-                <form action="{{ route('admin.logout') }}" method="POST">
-                    @csrf
-                    <button type="submit"
+        <div class="mt-4">
+            <form action="{{ route('admin.logout') }}" method="POST">
+                @csrf
+                <button type="submit"
                         class="w-full flex justify-center py-2 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-150 ease-in-out">
-                        <span class="sidebar-text">تسجيل الخروج</span>
-                    </button>
-                </form>
-            </div>
+                    {{ __('messages.logout') }}
+                </button>
+            </form>
         </div>
-    </aside>
+    </div>
+</aside>
+
 
     <!-- Main Content Area -->
     <div id="main-content-area" class="flex-1 flex flex-col overflow-hidden">
@@ -509,10 +448,15 @@
                     class="mobile-menu-button text-gray-500 hover:text-gray-700 focus:outline-none md:hidden ml-4">
                     <i class="fas fa-bars text-xl"></i>
                 </button>
-                <div>
-                <h1 class="text-xl font-semibold text-gray-800">مرحباً {{ Auth::user()->first_name}}</h1>
-                <p class="text-gray-500 text-sm hidden md:block">مرحباً بك مرة أخرى في لوحة التحكم</p>
-                </div>
+           <div>
+    <h1 class="text-xl font-semibold text-gray-800">
+        {{ __('messages.welcome') }} {{ Auth::user()->first_name }}
+    </h1>
+    <p class="text-gray-500 text-sm hidden md:block">
+        {{ __('messages.welcome_back_dashboard') }}
+    </p>
+</div>
+
             </div>
             <div class="flex items-center space-x-4 w-[271px] justify-between">
 

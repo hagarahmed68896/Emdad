@@ -1,12 +1,14 @@
 {{-- This partial will be rendered when the page loads, and also via AJAX --}}
 @if ($favorites->isEmpty())
-    <div class="flex flex-col justify-center items-center w-full py-10 text-gray-600 empty-state">
-        <img src="{{ asset('images/Illustrations.svg') }}" alt="No favorites illustration" class=" mb-10 ">
-        <p class="text-[#696969] text-[24px]">لم تقم باضافة أي منتج الي المفضلة بعد</p>
-        <a href="{{ route('products.index') ?? '/' }}" class="mt-6 inline-block bg-[#185D31] text-white py-2 px-4 rounded-xl hover:bg-[#154a2a] transition-colors">
-            تصفح المنتجات
-        </a>
-    </div>
+<div class="flex flex-col justify-center items-center w-full py-10 text-gray-600 empty-state">
+    <img src="{{ asset('images/Illustrations.svg') }}" alt="{{ __('messages.no_favorites_illustration') }}" class=" mb-10 ">
+    <p class="text-[#696969] text-[24px]">{{ __('messages.no_favorites_message') }}</p>
+    <a href="{{ route('products.index') ?? '/' }}" 
+       class="mt-6 inline-block bg-[#185D31] text-white py-2 px-4 rounded-xl hover:bg-[#154a2a] transition-colors">
+        {{ __('messages.browse_products') }}
+    </a>
+</div>
+
 @else
     <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="favorites-grid">
         @foreach ($favorites as $favorite)
@@ -113,9 +115,10 @@
                         @endif
                     </div>
 
-                    <p class="text-sm text-gray-600 mb-4">
-                        الحد الأدنى للطلب: {{ $favorite->product->min_order_quantity ?? '1' }} قطعة
-                    </p>
+                 <p class="text-sm text-gray-600 mb-4">
+    {{ __('messages.minimum_order_quantity', ['quantity' => $favorite->product->min_order_quantity ?? 1]) }}
+</p>
+
 
                     <div class="mt-auto">
                         <a href="{{ route('products.show', $favorite->product->slug) }}"

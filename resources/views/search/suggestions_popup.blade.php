@@ -140,7 +140,7 @@
                     3.042 1.135 5.824 3 7.938l3-2.647z">
                 </path>
             </svg>
-            Loading suggestions...
+<span>{{ __('messages.loading_suggestions') }}</span>
         </div>
 
         {{-- Recent Searches --}}

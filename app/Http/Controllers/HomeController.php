@@ -9,8 +9,12 @@ use App\Models\Cart;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use App\Models\Offer;
-use App\Models\OrderItem; // ⬅️ Add this import
-use Carbon\Carbon; // ⬅️ Add this import
+use App\Models\Order;
+use App\Models\User;
+use App\Models\OrderItem; 
+use Carbon\Carbon; 
+use App\Models\Ad;
+
 
 class HomeController extends Controller
 {
@@ -137,21 +141,19 @@ if ($business) {
             }
         }
 
-        $cartItems = collect();
-        $cart = null;
+    $cartItems = collect();
+$cart = null;
 
-        if (Auth::check()) {
-            $cart = Auth::user()->cart;
-        } else {
-            $sessionId = Session::getId();
-            $cart = Cart::where('session_id', $sessionId)
-                        ->where('status', 'active')
-                        ->first();
-        }
+if (Auth::check()) {
+    $cart = Auth::user()->cart;
+    if ($cart) {
+        $cartItems = $cart->items()->with('product')->get();
+    }
+} else {
+    // Guest user: cart will be read from localStorage on the frontend
+    $cartItems = collect(); // empty collection
+}
 
-        if ($cart) {
-            $cartItems = $cart->items()->with('product')->get();
-        }
 
         $notifications = collect();
         $unreadNotificationCount = 0;
@@ -183,6 +185,41 @@ if ($business) {
             }
         }
 
+ // عدد الموردين
+    $totalSuppliers = User::where('account_type', 'supplier')->count();
+
+    // عدد العملاء
+    $totalClients = User::where('account_type', 'customer')->count();
+
+    // عدد الطلبات
+    $totalProducts = product::count();
+
+    $successfulOrders = Order::whereIn('status', ['delivered', 'completed'])->count();
+    // متوسط وقت الاستجابة
+    $avgResponseTime = Order::whereNotNull('responded_at')
+        ->get()
+        ->avg(function ($order) {
+            return $order->response_time_in_minutes; // accessor من الموديل
+        });
+
+        // أول 10 مستخدمين فقط مع صورة بروفايل
+$usersWithPictures = User::whereNotNull('profile_picture')
+    ->take(10)
+    ->get(['id', 'profile_picture']);
+
+// العدد الكلي
+$totalUsers = User::count();
+
+// باقي المستخدمين (إجمالي - اللي اتعرضوا)
+$remainingUsers = max(0, $totalUsers - $usersWithPictures->count());
+
+$ads = Ad::where('supplier_id', Auth::id())
+    ->where('status', 'approved')
+    ->where('start_date', '<=', now())
+    ->where('end_date', '>=', now())
+    ->latest()
+    ->get();
+
         return view('layouts.app', compact(
             'categories',
             'onOfferProducts',
@@ -197,7 +234,14 @@ if ($business) {
             'supplierCategoryCount',
             'currentMonthSales', // ⬅️ Add new variables to compact
             'lastMonthSales',
-            'sales'
+            'sales',
+            'totalSuppliers',
+            'totalClients',
+            'totalProducts',
+            'avgResponseTime',
+            'usersWithPictures',
+            'remainingUsers',
+            'ads'
         ));
     }
 }

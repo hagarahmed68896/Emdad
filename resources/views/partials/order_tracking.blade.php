@@ -7,7 +7,7 @@
         'processing' => 2,
         'shipped'    => 3,
         'delivered'  => 4,
-        'cancelled'   => 0,
+        'cancelled'  => 0,
     ];
     $activeStep = $stepMap[$order->status] ?? 1;
 @endphp
@@ -16,10 +16,10 @@
 
     <div class="flex justify-between items-center text-center mx-[10%]">
         <template x-for="(step, index) in [
-            {id: 1, label: 'الطلب مكتمل'},
-            {id: 2, label: 'قيد التحضير'},
-            {id: 3, label: 'تم الشحن'},
-            {id: 4, label: 'تم التوصيل'}
+            {id: 1, label: '{{ __("messages.order_completed") }}'},
+            {id: 2, label: '{{ __("messages.processing") }}'},
+            {id: 3, label: '{{ __("messages.shipped") }}'},
+            {id: 4, label: '{{ __("messages.delivered") }}'}
         ]" :key="index">
             <div class="flex flex-col md:flex-row items-center text-center w-1/4">
                 <button
@@ -42,22 +42,23 @@
     <div class="bg-white rounded-2xl shadow-md p-6 max-w-3xl mx-auto text-right">
 
         @if($order->status === 'cancelled')
-            <h3 class="text-2xl font-bold mb-6 text-red-600">تم إلغاء الطلب</h3>
-            <p class="text-gray-600">لقد قمت بإلغاء هذا الطلب. لا يمكن استرجاعه.</p>
+            <h3 class="text-2xl font-bold mb-6 text-red-600">{{ __('messages.order_cancelled') }}</h3>
+            <p class="text-gray-600">{{ __('messages.order_cancelled_message') }}</p>
         @else
             <template x-if="currentTab === 1">
-                <h3 class="text-xl font-bold mb-6 text-[#185D31] text-center">طلبك قيد التحضير</h3>
+                <h3 class="text-xl font-bold mb-6 text-[#185D31] text-center">{{ __('messages.order_in_preparation') }}</h3>
             </template>
             <template x-if="currentTab === 2">
-                <h3 class="text-xl font-bold mb-6 text-[#185D31] text-center">تم تحضير طلبك بنجاح</h3>
+                <h3 class="text-xl font-bold mb-6 text-[#185D31] text-center">{{ __('messages.order_prepared') }}</h3>
             </template>
             <template x-if="currentTab === 3">
-                <h3 class="text-xl font-bold mb-6 text-[#185D31] text-center"> تم الشحن</h3>
+                <h3 class="text-xl font-bold mb-6 text-[#185D31] text-center">{{ __('messages.shipped') }}</h3>
             </template>
             <template x-if="currentTab === 4">
-                <h3 class="text-xl font-bold mb-6 text-gray-800 text-center">تم التوصيل</h3>
+                <h3 class="text-xl font-bold mb-6 text-gray-800 text-center">{{ __('messages.delivered') }}</h3>
             </template>
 
+            {{-- Product Items --}}
             <div class="flex items-center justify-center gap-4 mb-6">
                 @foreach($order->orderItems as $item)
                     <div class="relative w-20 h-20 bg-gray-50 rounded-md flex items-center justify-center">
@@ -72,19 +73,20 @@
                 @endforeach
             </div>
 
+            {{-- Order Info --}}
             <div class="border-t pt-4 space-y-2">
                 <p class="flex justify-between">
-                    <strong>رقم الطلب:</strong>
+                    <strong>{{ __('messages.order_number') }}:</strong>
                     <span class="text-gray-700">#{{ $order->order_number }}</span>
                 </p>
                 <p class="flex justify-between">
-                    <strong>التاريخ:</strong>
+                    <strong>{{ __('messages.date') }}:</strong>
                     <span class="text-gray-700">
                         {{ \Carbon\Carbon::parse($order->created_at)->translatedFormat('d F Y') }}
                     </span>
                 </p>
                 <p class="flex justify-between">
-                    <strong>الإجمالي:</strong>
+                    <strong>{{ __('messages.total') }}:</strong>
                     <span class="flex items-center gap-1">
                         <span class="text-lg font-bold text-gray-800">
                             {{ number_format($order->total_amount, 2) }}
@@ -93,15 +95,14 @@
                     </span>
                 </p>
                 <p class="flex justify-between">
-                    <strong>طريقة الدفع:</strong>
+                    <strong>{{ __('messages.payment_method') }}:</strong>
                     <span class="text-gray-700">{{ $order->payment_way }}</span>
                 </p>
             </div>
 
-            {{-- Conditional Buttons for Customers and Suppliers --}}
+            {{-- Action Buttons --}}
             <div class="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
                 @if (Auth::user()->account_type === 'supplier')
-                    {{-- Buttons for the supplier --}}
                     @if ($order->status === 'completed')
                         <form action="{{ route('orders.update-status', $order->id) }}" method="POST">
                             @csrf
@@ -134,42 +135,42 @@
                         </form>
                     @endif
                 @else
-                    {{-- Original buttons for the customer --}}
                     <a href="{{ route('messages.index') }}"
                        class="px-6 py-2 bg-[#185D31] text-white rounded-lg hover:bg-[#154a2a]">
-                        تواصل مع المورد
+                        {{ __('messages.contact_supplier') }}
                     </a>
                     <button type="button"
                             @click="showCancelModal = true"
                             class="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
                             :disabled="activeStep > 2">
-                        إلغاء الطلب
+                        {{ __('messages.cancel_order') }}
                     </button>
                 @endif
             </div>
         @endif
     </div>
+
+    {{-- Cancel Modal --}}
     <div x-show="showCancelModal" x-cloak
          class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
         <div class="bg-white p-6 rounded-lg shadow-lg w-96 text-center">
-            <h2 class="text-lg font-bold mb-4">تأكيد الإلغاء</h2>
-            <p class="mb-6">هل أنت متأكد أنك تريد إلغاء هذا الطلب؟</p>
+            <h2 class="text-lg font-bold mb-4">{{ __('messages.confirm_cancellation') }}</h2>
+            <p class="mb-6">{{ __('messages.confirm_cancellation_message') }}</p>
             <div class="flex justify-center gap-4">
                 <button @click="showCancelModal = false"
                         class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">
-                    لا
+                    {{ __('messages.no') }}
                 </button>
                 <form action="{{ route('orders.cancel', $order->id) }}" method="POST">
                     @csrf
                     @method('DELETE')
                     <button type="submit"
                             class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
-                        نعم، إلغاء
+                        {{ __('messages.yes_cancel') }}
                     </button>
                 </form>
             </div>
         </div>
     </div>
 </div>
-
 @endsection

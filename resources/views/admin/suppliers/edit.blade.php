@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('page_title', 'تعديل حساب المورد')
+@section('page_title', __('messages.edit_supplier_account'))
 
 @section('content')
 <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
@@ -8,7 +8,7 @@
         x-data="editSupplierForm()" 
         class="bg-white rounded-b-xl shadow p-6 mx-auto"
     >
-        <h2 class="text-[24px] font-bold text-[#212121] mb-6">تعديل حساب المورد</h2>
+        <h2 class="text-[24px] font-bold text-[#212121] mb-6">{{ __('messages.edit_supplier_account') }}</h2>
 
         <div 
             x-show="success" 
@@ -28,16 +28,15 @@
         <form @submit.prevent="submitForm" class="space-y-6">
             @csrf
 
-            {{-- نفس الحقول مع البيانات القديمة --}}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="block font-bold text-[20px] text-[#212121]">الاسم</label>
+                    <label class="block font-bold text-[20px] text-[#212121]">{{ __('messages.full_name') }}</label>
                     <input type="text" x-model="form.full_name"
                         class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 rounded-xl">
                 </div>
 
                 <div>
-                    <label class="block font-bold text-[20px] text-[#212121]">اسم المورد</label>
+                    <label class="block font-bold text-[20px] text-[#212121]">{{ __('messages.company_name') }}</label>
                     <input type="text" x-model="form.company_name"
                         class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 rounded-xl">
                 </div>
@@ -45,13 +44,13 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="block font-bold text-[20px] text-[#212121]">البريد الإلكتروني</label>
+                    <label class="block font-bold text-[20px] text-[#212121]">{{ __('messages.email') }}</label>
                     <input type="email" x-model="form.email"
                         class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 rounded-xl">
                 </div>
 
                 <div>
-                    <label class="block font-bold text-[20px] text-[#212121]">رقم الهاتف</label>
+                    <label class="block font-bold text-[20px] text-[#212121]">{{ __('messages.phone') }}</label>
                     <input type="text" x-model="form.phone_number"
                         class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 rounded-xl">
                 </div>
@@ -59,24 +58,24 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="block font-bold text-[20px] text-[#212121]">العنوان</label>
+                    <label class="block font-bold text-[20px] text-[#212121]">{{ __('messages.address') }}</label>
                     <input type="text" x-model="form.address"
                         class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 rounded-xl">
                 </div>
 
-            {{-- Status Dropdown --}}
-                     <div x-data="{ 
+                {{-- Status Dropdown --}}
+                <div x-data="{ 
         open: false, 
         selected: '{{ old('status', $supplier->status) }}' 
     }" 
     x-init="$watch('selected', value => form.status = value)" 
     class="relative w-full">
     
-    <label class="block font-bold text-[20px] text-[#212121]">حالة الحساب</label>
+    <label class="block font-bold text-[20px] text-[#212121]">{{ __('messages.account_status') }}</label>
     <button type="button"
         @click="open = !open"
         class="w-full flex justify-between items-center border border-gray-300 rounded-xl shadow-sm py-3 px-4 focus:outline-none focus:ring-[#185D31] focus:border-[#185D31]">
-        <span x-text="selected === 'active' ? 'نشط' : selected === 'inactive' ? 'غير نشط' : 'محظور'"></span>
+        <span x-text="selected === 'active' ? '{{ __('messages.active') }}' : selected === 'inactive' ? '{{ __('messages.inactive') }}' : '{{ __('messages.banned') }}'"></span>
         <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
         </svg>
@@ -87,24 +86,25 @@
         <label class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
             <input type="radio" value="active" x-model="selected"
                 class="shrink-0 appearance-none rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
-            <span class="ml-2">نشط</span>
+            <span class="ml-2">{{ __('messages.active') }}</span>
         </label>
         <label class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
             <input type="radio" value="inactive" x-model="selected"
                 class="shrink-0 appearance-none rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
-            <span class="ml-2">غير نشط</span>
+            <span class="ml-2">{{ __('messages.inactive') }}</span>
         </label>
         <label class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
             <input type="radio" value="banned" x-model="selected"
                 class="shrink-0 appearance-none rtl:ml-3 ltr:mr-3 w-5 h-5 border-[#185D31] rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
-            <span class="ml-2">محظور</span>
+            <span class="ml-2">{{ __('messages.banned') }}</span>
         </label>
     </div>
 
     <input type="hidden" x-model="form.status">
 </div>
             </div>
-          {{-- New: supplier_confirmed Checkbox --}}
+
+          {{-- supplier_confirmed Checkbox --}}
             <div>
                 <label class="flex items-center space-x-2 cursor-pointer">
                     <input 
@@ -113,24 +113,25 @@
                         class="form-checkbox ml-4 h-5 w-5 rounded 
                                text-green-600 checked:bg-green-600 checked:border-green-600 focus:ring-green-600
                                accent-green-600">
-                    <span class="text-[20px] font-bold text-[#212121]">المورد موثوق به</span>
+                    <span class="text-[20px] font-bold text-[#212121]">{{ __('messages.supplier_confirmed') }}</span>
                 </label>
             </div>
 
             <div class="flex space-x-4 mt-6">
                 <button type="submit"
                     class="px-4 py-2 border ml-2 border-transparent rounded-[16px] shadow-sm text-sm font-medium text-white bg-[#185D31] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out">
-                    تحديث الحساب
+                    {{ __('messages.update_account') }}
                 </button>
 
                 <button type="button" onclick="window.history.back()"
                     class="px-4 py-2 border border-gray-300 rounded-[16px] shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
-                    إلغاء
+                    {{ __('messages.cancel') }}
                 </button>
             </div>
         </form>
     </div>
 </main>
+
 
 <script>
     function editSupplierForm() {

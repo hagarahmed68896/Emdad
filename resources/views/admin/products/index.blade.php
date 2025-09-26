@@ -1,12 +1,12 @@
 @extends('layouts.admin')
 
-@section('page_title', 'إدارة المنتجات')
+@section('page_title', __('messages.manage_products'))
 
 @section('content')
 
 <div class="p-6 overflow-y-auto">
 
-    <p class="text-[32px] font-bold">إدارة المنتجات</p>
+    <p class="text-[32px] font-bold">{{ __('messages.manage_products') }}</p>
 
     {{-- 👇 إحصائيات المنتجات --}}
     <div>
@@ -32,18 +32,15 @@
         }
     }" class="rounded-xl shadow mx-2 bg-white p-3">
 
-        {{-- ✅ شريط الأكشن & الفلترة --}}
-        {{-- ✅ Action Bar --}}
+        {{-- ✅ شريط الأكشن --}}
         <div x-show="selectedProducts.length > 0" class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-4">
                 <span class="text-xl font-bold text-gray-800 rtl:mr-4 ltr:ml-4"
-                      x-text="selectedProducts.length + ' محدد'"></span>
-
+                      x-text="selectedProducts.length + ' {{ __('messages.selected') }}'"></span>
             </div>
-
         </div>
 
-        {{-- ✅ Filter/Search Bar --}}
+        {{-- ✅ شريط الفلترة والبحث --}}
         <div x-show="selectedProducts.length === 0" x-cloak
              class="flex flex-col md:flex-row items-center justify-between mb-4 space-y-4 md:space-y-0">
 
@@ -57,55 +54,55 @@
 
                     <div x-show="open" @click.away="open = false" x-transition.opacity x-cloak
                          class="absolute mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow z-50 p-4 right-0 md:left-0">
-                        <h3 class="font-bold text-gray-700 mb-2">الترتيب حسب:</h3>
+                        <h3 class="font-bold text-gray-700 mb-2">{{ __('messages.sort_by') }}</h3>
                         <ul class="space-y-1 mb-4">
                             <li><label class="flex items-center cursor-pointer">
                                 <input type="radio" name="sort_option" value="" x-model="selectedSort"
                                        class="w-5 h-5 border-[#185D31] rounded-full checked:bg-[#185D31]">
-                                <span class="ml-2 text-gray-700">الكل</span></label></li>
+                                <span class="ml-2 text-gray-700">{{ __('messages.all') }}</span></label></li>
                             <li><label class="flex items-center cursor-pointer">
                                 <input type="radio" name="sort_option" value="name_asc" x-model="selectedSort"
                                        class="w-5 h-5 border-[#185D31] rounded-full checked:bg-[#185D31]">
-                                <span class="ml-2 text-gray-700">الاسم (أ-ي)</span></label></li>
+                                <span class="ml-2 text-gray-700">{{ __('messages.name_asc') }}</span></label></li>
                             <li><label class="flex items-center cursor-pointer">
                                 <input type="radio" name="sort_option" value="name_desc" x-model="selectedSort"
                                        class="w-5 h-5 border-[#185D31] rounded-full checked:bg-[#185D31]">
-                                <span class="ml-2 text-gray-700">الاسم (ي-أ)</span></label></li>
+                                <span class="ml-2 text-gray-700">{{ __('messages.name_desc') }}</span></label></li>
                             <li><label class="flex items-center cursor-pointer">
                                 <input type="radio" name="sort_option" value="latest" x-model="selectedSort"
                                        class="w-5 h-5 border-[#185D31] rounded-full checked:bg-[#185D31]">
-                                <span class="ml-2 text-gray-700">الأحدث</span></label></li>
+                                <span class="ml-2 text-gray-700">{{ __('messages.latest') }}</span></label></li>
                             <li><label class="flex items-center cursor-pointer">
                                 <input type="radio" name="sort_option" value="oldest" x-model="selectedSort"
                                        class="w-5 h-5 border-[#185D31] rounded-full checked:bg-[#185D31]">
-                                <span class="ml-2 text-gray-700">الأقدم</span></label></li>
+                                <span class="ml-2 text-gray-700">{{ __('messages.oldest') }}</span></label></li>
                         </ul>
 
-                        <h3 class="font-bold text-gray-700 mb-2">الحالة:</h3>
+                        <h3 class="font-bold text-gray-700 mb-2">{{ __('messages.status') }}</h3>
                         <ul class="space-y-1 mb-4">
                             <li><label class="flex items-center cursor-pointer">
                                 <input type="radio" name="status_option" value="" x-model="selectedStatus"
                                        class="w-5 h-5 border-[#185D31] rounded-full checked:bg-[#185D31]">
-                                <span class="ml-2 text-gray-700">الكل</span></label></li>
+                                <span class="ml-2 text-gray-700">{{ __('messages.all') }}</span></label></li>
                             <li><label class="flex items-center cursor-pointer">
                                 <input type="radio" name="status_option" value="true" x-model="selectedStatus"
                                        class="w-5 h-5 border-[#185D31] rounded-full checked:bg-[#185D31]">
-                                <span class="ml-2 text-gray-700">متاح</span></label></li>
+                                <span class="ml-2 text-gray-700">{{ __('messages.available') }}</span></label></li>
                             <li><label class="flex items-center cursor-pointer">
                                 <input type="radio" name="status_option" value="false" x-model="selectedStatus"
                                        class="w-5 h-5 border-[#185D31] rounded-full checked:bg-[#185D31]">
-                                <span class="ml-2 text-gray-700">غير متاح</span></label></li>
+                                <span class="ml-2 text-gray-700">{{ __('messages.unavailable') }}</span></label></li>
                         </ul>
 
                         <div class="flex justify-end gap-2">
                             <button type="submit" @click="open = false;"
                                     class="px-4 py-2 rounded-xl bg-[#185D31] text-white hover:bg-green-800">
-                                تطبيق
+                                {{ __('messages.apply') }}
                             </button>
                             <button type="button"
                                     @click="selectedStatus = ''; selectedSort = ''; $el.closest('form').submit(); open = false;"
                                     class="px-4 py-2 rounded-xl bg-gray-200 text-gray-800 hover:bg-gray-300">
-                                إعادة تعيين
+                                {{ __('messages.reset') }}
                             </button>
                         </div>
                     </div>
@@ -116,7 +113,7 @@
 
                 {{-- ✅ مربع البحث --}}
                 <div class="relative w-full">
-                    <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="بحث عن منتج"
+                    <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="{{ __('messages.search_product') }}"
                            class="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-xl focus:outline-none">
 
                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -129,7 +126,7 @@
 
                     <button type="submit"
                             class="absolute inset-y-0 left-0 flex items-center px-3 text-white bg-[#185D31] rounded-l-xl">
-                        بحث
+                        {{ __('messages.search') }}
                     </button>
                 </div>
             </form>
@@ -138,7 +135,7 @@
                 <a href="{{ route('admin.products.export.csv', request()->query()) }}"
                    class="bg-gray-100 mx-2 hover:bg-gray-300 text-[#185D31] py-2 px-4 rounded-xl flex items-center">
                     <i class="fas fa-download ml-2"></i>
-                    <span>تحميل</span>
+                    <span>{{ __('messages.download') }}</span>
                 </a>
             </div>
 

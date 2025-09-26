@@ -33,9 +33,7 @@
             sm:absolute sm:top-full sm:mt-2 sm:w-[404px] sm:left-0 sm:mx-0
             max-h-[420px] overflow-y-auto">
 
-
-
-        <h3 class="text-xl font-bold text-right text-gray-900 mb-4">{{ __('الإشعارات') }}</h3>
+        <h3 class="text-xl font-bold text-right text-gray-900 mb-4">{{ __('messages.notifications') }}</h3>
 
         <div id="notifications-content-area" class="w-full flex flex-col items-center">
             @if ($notifications->isEmpty())
@@ -43,7 +41,7 @@
                 <div class="flex flex-col justify-center items-center w-full py-10 text-gray-600">
                     <img src="{{ asset('images/Illustrations (3).svg') }}"
                          alt="No notifications illustration" class="w-[156px] h-[163px] mb-10 ">
-                    <p class="text-[#696969] text-[20px] text-center">{{ __('لا توجد إشعارات حالياً') }}</p>
+                    <p class="text-[#696969] text-[20px] text-center">{{ __('messages.no_notifications') }}</p>
                 </div>
             @else
                 {{-- Notifications List --}}
@@ -58,8 +56,8 @@
                        @if ($notification->type === App\Notifications\NewOrderReviewNotification::class)
      <div class="p-3 hover:bg-gray-50 border-b">
                 <p class="text-sm text-gray-800">
-                    {{ $notification->data['reviewer'] ?? 'مستخدم' }}
-                    {{ __('قدم شكوى على الطلب رقم') }}
+                    {{ $notification->data['reviewer'] ?? __('messages.user') }}
+                    {{ __('messages.submitted_review_for_order') }}
                     <span class="font-bold">#{{ $notification->data['order_id'] ?? 'N/A' }}</span>
                 </p>
 
@@ -71,17 +69,16 @@
 
                 <a href="{{ route('admin.reviews.show', $notification->data['review_id']) }}"
                    class="text-xs text-[#185D31] hover:underline mt-1 block">
-                    {{ __('عرض التفاصيل') }}
+                    {{ __('messages.view_details') }}
                 </a>
             </div>
 
-
                 @else
-                                    <p class="text-[16px] rtl:text-right ltr:text-left">
-                                        <span class="font-bold">{{ __('إشعار جديد') }}: </span>
-                                        {{ $notification->data['message'] ?? 'رسالة إشعار' }}
-                                    </p>
-                                @endif
+                    <p class="text-[16px] rtl:text-right ltr:text-left">
+                        <span class="font-bold">{{ __('messages.new_notification') }}: </span>
+                        {{ $notification->data['message'] ?? __('messages.notification_message') }}
+                    </p>
+                @endif
 
                                 {{-- Time Ago --}}
                                 <p class="text-xs text-gray-500 rtl:text-right ltr:text-left mt-1">
@@ -94,21 +91,12 @@
                                 <button type="button"
                                         onclick="markAsRead('{{ route('notifications.markAsRead', $notification->id) }}')"
                                         class="text-xs text-[#185D31] hover:underline flex-shrink-0 rtl:mr-2 ltr:ml-2">
-                                    {{ __('قراءة') }}
+                                    {{ __('messages.mark_as_read') }}
                                 </button>
                             @endif
                         </div>
                     @endforeach
                 </div>
-
-                {{-- "View All Notifications" Button --}}
-                {{-- <div class="mt-6 text-center w-full">
-                    <button type="button"
-                            onclick="loadAllNotifications()"
-                            class="mt-2 w-full px-[20px] py-[11px] bg-[#185D31] text-white rounded-[12px] text-[16px]">
-                        {{ __('عرض كل الإشعارات') }}
-                    </button>
-                </div> --}}
             @endif
         </div>
     </div>

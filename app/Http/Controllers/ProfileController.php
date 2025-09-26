@@ -284,7 +284,7 @@ public function updateDetails(Request $request)
             'business.national_address'       => 'required|string|max:255',
             'business.iban'                   => 'required|string|max:255',
             'business.tax_certificate'        => 'required|string|max:255',
-            'documents.*'                     => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
+            'documents.*'                      => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
         ]);
 
         $messages = array_merge($messages, [
@@ -343,6 +343,7 @@ public function updateDetails(Request $request)
         
 
      // In your controller or service class where you handle the upload
+     if ($request->hasFile('documents')) {
 foreach ($request->file('documents') as $key => $file) {
     if  ($file->isValid()) {
         $docType = $this->getDocumentType($key); // A helper function to map keys to document names
@@ -362,7 +363,7 @@ foreach ($request->file('documents') as $key => $file) {
 );
 
     }
-}
+}}
     }
 
     return response()->json([

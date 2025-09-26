@@ -45,6 +45,13 @@ public function toggleBan(User $user)
 
 
 
+public function show($id)
+{
+    $supplier = BusinessData::with('products')->findOrFail($id);
+    $products = $supplier->products()->with(['subCategory.category', 'offer'])->get();
+
+    return view('supplier.show', compact('supplier', 'products'));
+}
 
 
 

@@ -5,7 +5,7 @@
         <div class="bg-white rounded-xl shadow p-6 flex items-center justify-between">
             <div>
                 <p class="text-3xl font-bold text-gray-800">{{ $totalProducts }}</p>
-                <p class="text-gray-500 text-sm"> إجمالي المنتجات</p>
+                <p class="text-gray-500 text-sm">{{ __('messages.total_products') }}</p>
                 <p class="text-[#185D31] text-sm flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" 
                          stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -17,14 +17,14 @@
                     100%
                 </p>
             </div>
-            <img src="{{asset('images/Growth.svg')}}" alt="">
+            <img src="{{ asset('images/Growth.svg') }}" alt="">
         </div>
 
         <!-- Available Products -->
         <div class="bg-white rounded-xl shadow p-6 flex items-center justify-between">
             <div>
                 <p class="text-3xl font-bold text-gray-800">{{ $availableProducts }}</p>
-                <p class="text-gray-500 text-sm"> عدد المنتجات المتاحة</p>
+                <p class="text-gray-500 text-sm">{{ __('messages.available_products') }}</p>
                 <p class="text-[#185D31] text-sm flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" 
                          stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -36,14 +36,14 @@
                     {{ $availablePercentage }}%
                 </p>
             </div>
-            <img src="{{asset('images/Growth.svg')}}" alt="">
+            <img src="{{ asset('images/Growth.svg') }}" alt="">
         </div>
 
         <!-- Unavailable Products -->
         <div class="bg-white rounded-xl shadow p-6 flex items-center justify-between">
             <div>
                 <p class="text-3xl font-bold text-gray-800">{{ $unavailableProducts }}</p>
-                <p class="text-gray-500 text-sm"> عدد المنتجات الغير متاحة </p>
+                <p class="text-gray-500 text-sm">{{ __('messages.unavailable_products') }}</p>
                 <p class="text-[#C62525] text-sm flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" 
                          stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -55,7 +55,7 @@
                     {{ $unavailablePercentage }}%
                 </p>
             </div>
-            <img src="{{asset('images/Growth (1).svg')}}" alt="">
+            <img src="{{ asset('images/Growth (1).svg') }}" alt="">
         </div>
     </div>
 </main>

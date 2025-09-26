@@ -203,11 +203,17 @@ if ($request->filled('sort_by')) {
 
         $availableSubCategories = SubCategory::has('products')->get();
 
-        $deliveryOptions = [
-            '5' => ['label_key' => 'delivery_in_days', 'days_param' => 5],
-            '10' => ['label_key' => 'delivery_in_days', 'days_param' => 10],
-            '15' => ['label_key' => 'delivery_in_days', 'days_param' => 15],
+   // هنولّد 3 مواعيد توصيل مبنية على اليوم الحالي
+    $daysArray = [2, 4, 7]; // أقرب مواعيد منطقية بدل [5, 10, 15]
+
+    $deliveryOptions = collect($daysArray)->mapWithKeys(function ($days) {
+        return [
+            $days => [
+                'label_key'  => 'delivery_by_date',
+                'date_param' => Carbon::today()->addDays($days)->translatedFormat('j F Y'),
+            ]
         ];
+    });
 
 $colorsData = include resource_path('data/colors.php');
 

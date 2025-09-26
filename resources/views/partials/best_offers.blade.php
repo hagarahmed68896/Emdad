@@ -60,17 +60,18 @@
   {{-- Best Offers Section --}}
 <div class="flex flex-col sm:flex-row items-start sm:items-center mb-6 rounded-xl bg-[#F8F9FA] p-4">
     {{-- Left Text --}}
-<div class="flex flex-col sm:text-right flex-1">
+<div class="flex flex-col flex-1">
     <p class="text-[#1F2B45] text-[16px] px-[16px] py-[8px] bg-white rounded-[40px] mb-4 w-fit md:mx-0">
-        {{ $siteTexts['limited_offers'] ??  __('messages.limited_offers') }}
+        {{ $siteTexts['limited_offers'] ?? __('messages.limited_offers') }}
     </p>
     <p class="text-3xl sm:text-4xl md:text-[40px] font-bold text-gray-900 mb-2 mt-2">
-        {{ $siteTexts['best_offers'] ??  __('messages.best_offers') }}
+        {{ $siteTexts['best_offers'] ?? __('messages.best_offers') }}
     </p>
     <p class="text-[#696969] text-[20px] sm:text-lg mt-2">
-        {{ $siteTexts['best_offers_description'] ??  __('messages.best_offers_description') }}
+        {{ $siteTexts['best_offers_description'] ?? __('messages.best_offers_description') }}
     </p>
 </div>
+
 
 
     {{-- Countdown Timer --}}
@@ -169,11 +170,16 @@
                                     <span class="flex items-center text-[#185D31]">
                                         <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]"
                                             src="{{ asset('images/Success.svg') }}" alt="Confirmed Supplier">
-                                        <p class="text-[20px] text-[#212121] ">{{ $product->supplier->company_name }}</p>
+<a href="{{ route('suppliers.show', $product->supplier->id) }}"
+   class="inline-block py-1 rounded-lg text-[18px] font-medium  transition">
+    {{ $product->supplier->company_name }}
+</a>
                                     </span>
                                 @else
-                                    <p class="text-[20px] text-[#212121] ">{{ $product->supplier->company_name }}</p>
-                                @endif
+<a href="{{ route('suppliers.show', $product->supplier->id) }}"
+   class="inline-block py-1 text-[#185D31] rounded-lg text-[18px] font-medium transition">
+    {{ $product->supplier->company_name }}
+</a>                                @endif
                             </div>
                             <div class="flex items-center mb-2">
 <span class="flex text-lg font-bold text-gray-800">
@@ -232,12 +238,12 @@
         <div class="flex justify-end space-x-2 rtl:space-x-reverse">
             <button id="close-login-popup"
                 class="bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors">
-                {{ __('messages.cancel') }}
+                {{ __('messages.ok') }}
             </button>
-            <a href="{{ route('login') }}"
+            {{-- <a href="{{ route('login') }}"
                 class="bg-[#185D31] text-white py-2 px-4 rounded-md hover:bg-[#154a2a] transition-colors">
                 {{ __('messages.login') }}
-            </a>
+            </a> --}}
         </div>
     </div>
 </div>

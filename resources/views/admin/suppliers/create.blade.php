@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('page_title', 'إضافة حساب جديد')
+@section('page_title', __('messages.add_new_account'))
 
 @section('content')
 <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
@@ -8,9 +8,9 @@
         x-data="supplierForm()" x-cloak
         class="bg-white rounded-xl shadow p-6 mx-auto"
     >
-        <h2 class="text-[24px] font-bold text-[#212121] mb-6">إضافة حساب للمورد</h2>
+        <h2 class="text-[24px] font-bold text-[#212121] mb-6">{{ __('messages.add_supplier_account') }}</h2>
 
-        {{-- ✅ عرض رسائل النجاح --}}
+        {{-- Success message --}}
         <div 
             x-show="success" 
             x-transition 
@@ -18,7 +18,7 @@
             x-text="success"
         ></div>
 
-        {{-- ✅ عرض الأخطاء --}}
+        {{-- Errors --}}
         <template x-if="Object.keys(errors).length">
             <ul class="bg-red-100 border border-red-400 text-red-700 p-4 rounded mb-4 list-disc list-inside">
                 <template x-for="[key, messages] of Object.entries(errors)" :key="key">
@@ -35,13 +35,13 @@
             {{-- First Row --}}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="block font-bold text-[20px] text-[#212121]">الاسم</label>
+                    <label class="block font-bold text-[20px] text-[#212121]">{{ __('messages.full_name') }}</label>
                     <input type="text" x-model="form.full_name"
                         class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 rounded-xl">
                 </div>
 
                 <div>
-                    <label class="block font-bold text-[20px] text-[#212121]">اسم المورد</label>
+                    <label class="block font-bold text-[20px] text-[#212121]">{{ __('messages.company_name') }}</label>
                     <input type="text" x-model="form.company_name"
                         class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 rounded-xl">
                 </div>
@@ -50,13 +50,13 @@
             {{-- Second Row --}}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="block font-bold text-[20px] text-[#212121]">البريد الإلكتروني</label>
+                    <label class="block font-bold text-[20px] text-[#212121]">{{ __('messages.email') }}</label>
                     <input type="email" x-model="form.email"
                         class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 rounded-xl">
                 </div>
 
                 <div>
-                    <label class="block font-bold text-[20px] text-[#212121]">رقم الهاتف</label>
+                    <label class="block font-bold text-[20px] text-[#212121]">{{ __('messages.phone_number') }}</label>
                     <input type="text" x-model="form.phone_number"
                         class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 rounded-xl">
                 </div>
@@ -65,17 +65,17 @@
             {{-- Third Row --}}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="block font-bold text-[20px] text-[#212121]">العنوان</label>
+                    <label class="block font-bold text-[20px] text-[#212121]">{{ __('messages.address') }}</label>
                     <input type="text" x-model="form.address"
                         class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 rounded-xl">
                 </div>
 
                 <div x-data="{ open: false }" class="relative w-full">
-                    <label class="block font-bold text-[20px] text-[#212121]">حالة الحساب</label>
+                    <label class="block font-bold text-[20px] text-[#212121]">{{ __('messages.account_status') }}</label>
                     <button type="button"
                         @click="open = !open"
                         class="w-full flex justify-between items-center border border-gray-300 rounded-xl shadow-sm py-3 px-4 focus:outline-none focus:ring-[#185D31] focus:border-[#185D31]">
-                        <span x-text="form.status === 'active' ? 'نشط' : form.status === 'inactive' ? 'غير نشط' : 'محظور'"></span>
+                        <span x-text="form.status === 'active' ? '{{ __('messages.active') }}' : form.status === 'inactive' ? '{{ __('messages.inactive') }}' : '{{ __('messages.banned') }}'"></span>
                         <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M19 9l-7 7-7-7"></path>
@@ -87,47 +87,47 @@
                         <label class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
                             <input type="radio" value="active" x-model="form.status"
                                 class="shrink-0 w-5 h-5 border-[#185D31] focus:ring-[#185D31] rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
-                            <span class="ml-2">نشط</span>
+                            <span class="ml-2">{{ __('messages.active') }}</span>
                         </label>
 
                         <label class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
                             <input type="radio" value="inactive" x-model="form.status"
                                 class="shrink-0 w-5 h-5 border-[#185D31] focus:ring-[#185D31] rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
-                            <span class="ml-2">غير نشط</span>
+                            <span class="ml-2">{{ __('messages.inactive') }}</span>
                         </label>
 
                         <label class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
                             <input type="radio" value="banned" x-model="form.status"
                                 class="shrink-0 w-5 h-5 border-[#185D31] focus:ring-[#185D31] rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]">
-                            <span class="ml-2">محظور</span>
+                            <span class="ml-2">{{ __('messages.banned') }}</span>
                         </label>
                     </div>
                 </div>
             </div>
-            <div class="grid grid-cols-1">
-<label class="flex items-center space-x-2 cursor-pointer">
-    <input 
-        type="checkbox" 
-        x-model="form.supplier_confirmed" 
-        class="form-checkbox ml-4 h-5 w-5 rounded 
-               text-green-600 checked:bg-green-600 checked:border-green-600 focus:ring-green-600
-               accent-green-600"
-    >
-    <span class="text-[20px] font-bold text-[#212121]">المورد موثوق به</span>
-</label>
-</div>
 
+            <div class="grid grid-cols-1">
+                <label class="flex items-center space-x-2 cursor-pointer">
+                    <input 
+                        type="checkbox" 
+                        x-model="form.supplier_confirmed" 
+                        class="form-checkbox ml-4 h-5 w-5 rounded 
+                               text-green-600 checked:bg-green-600 checked:border-green-600 focus:ring-green-600
+                               accent-green-600"
+                    >
+                    <span class="text-[20px] font-bold text-[#212121]">{{ __('messages.trusted_supplier') }}</span>
+                </label>
+            </div>
 
             {{-- Buttons --}}
             <div class="flex space-x-4 mt-6">
                 <button type="submit"
                     class="px-4 py-2 border ml-2 border-transparent rounded-[16px] shadow-sm text-sm font-medium text-white bg-[#185D31] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out">
-                    إضافة حساب
+                    {{ __('messages.add_account') }}
                 </button>
 
                 <button type="button" onclick="window.history.back()"
                     class="px-4 py-2 border border-gray-300 rounded-[16px] shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
-                    إلغاء
+                    {{ __('messages.cancel') }}
                 </button>
             </div>
         </form>
@@ -145,7 +145,7 @@
                 address: '',
                 status: 'active',
                 account_type: 'supplier',
-                supplier_confirmed: false, // <-- Add this line
+                supplier_confirmed: false,
             },
             errors: {},
             success: '',
@@ -168,7 +168,7 @@
                     if (!response.ok) {
                         this.errors = data.errors || {};
                     } else {
-                        this.success = data.success || 'تم الحفظ بنجاح';
+                        this.success = data.success || '{{ __("messages.saved_successfully") }}';
                         setTimeout(() => {
                             window.location.href = "{{ route('admin.suppliers.index') }}";
                         }, 1500);

@@ -175,7 +175,6 @@
                                         })()"
                                     placeholder="{{ __('messages.select_file') }}"
                                     class="block w-full px-3 py-2 border-none h-[56px]">
-
                                 <!-- Attach button -->
                                 <div
                                     class="file-input-container flex items-center justify-center w-[90px] h-[32px] mx-2 bg-[#185D31] rounded-[12px]">

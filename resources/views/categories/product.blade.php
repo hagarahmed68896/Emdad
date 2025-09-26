@@ -94,7 +94,7 @@
                                 <span class="rtl:mr-3 ltr:ml-3 text-[#212121] text-base">{{ $descriptionOption }}</span>
                             </label>
                         @empty
-                            <p class="text-gray-500 text-sm">{{ __('messages.no_description_filters_available') }}</p>
+                            {{-- <p class="text-gray-500 text-sm">{{ __('messages.no_description_filters_available') }}</p> --}}
                         @endforelse
                     </div>
                 </div>
@@ -216,6 +216,8 @@
                         </label>
                     </div>
                 @endif
+
+
                 {{-- Delivery Options --}}
                 @if (!Auth::check() || Auth::user()->account_type !== 'supplier')
                     <div class="mb-6 border-b pb-3">
@@ -224,17 +226,18 @@
 
                         @php $selectedDeliveryDate = request('delivery_date'); @endphp
 
-                        @foreach ($deliveryOptions as $dateValue => $optionData)
-                            <label class="flex items-center mb-2 text-gray-700">
-                                <input type="radio" name="delivery_date" value="{{ $dateValue }}"
-                                    class="form-radio h-[20px] w-[20px] rounded-full border-2 border-black focus:ring-[#185D31] accent-[#185D31]"
-                                    {{ $selectedDeliveryDate == $dateValue ? 'checked' : '' }}
-                                    onchange="document.getElementById('filterForm').submit()">
-                                <span class="rtl:mr-3 ltr:ml-3">
-                                    {{ __('messages.' . $optionData['label_key'], ['days' => $optionData['days_param']]) }}
-                                </span>
-                            </label>
-                        @endforeach
+                   @foreach ($deliveryOptions as $dateValue => $optionData)
+    <label class="flex items-center mb-2 text-gray-700">
+        <input type="radio" name="delivery_date" value="{{ $dateValue }}"
+            class="form-radio h-[20px] w-[20px] rounded-full border-2 border-black focus:ring-[#185D31] accent-[#185D31]"
+            {{ request('delivery_date') == $dateValue ? 'checked' : '' }}
+            onchange="document.getElementById('filterForm').submit()">
+        <span class="rtl:mr-3 ltr:ml-3">
+            {{ __('messages.' . $optionData['label_key'], ['date' => $optionData['date_param']]) }}
+        </span>
+    </label>
+@endforeach
+
                     </div>
                 @endif
                 {{-- Price Range Slider --}}
@@ -388,7 +391,7 @@
 
                     <!-- Options -->
                     <ul x-show="open" @click.away="open = false"
-                        class="absolute left-0 w-full bg-white border border-[#185D31] mt-1 rounded-lg shadow z-10">
+                        class="absolute left-0 w-full bg-white border border-[#185D31] mt-1 rounded-lg shadow z-50">
 
                         <template
                             x-for="option in [
@@ -421,11 +424,13 @@
 
             @if ($products->isEmpty())
                 <div class="bg-white p-8 rounded-xl shadow-lg text-center text-gray-600">
-                    <p class="text-xl font-semibold mb-4">No products found matching your criteria.</p>
-                    <p>Try adjusting your filters or resetting them.</p>
+             <p class="text-xl font-semibold mb-4">{{ __('messages.no_products_found') }}</p>
+             <p>{{ __('messages.try_adjusting_filters') }}</p>
+
                     <button onclick="resetFilters()"
-                        class="mt-6 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300">Reset
-                        Filters</button>
+                        class="mt-6 bg-[#185D31] text-white py-2 px-4 rounded-lg transition duration-300">
+                        {{ __('messages.reset_filters') }}
+                    </button>
                 </div>
             @else
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -511,13 +516,16 @@
                                             <span class="flex items-center text-[#185D31]">
                                                 <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]"
                                                     src="{{ asset('images/Success.svg') }}" alt="Confirmed Supplier">
-                                                <p class="text-[20px] text-[#212121] ">
-                                                    {{ $product->supplier->company_name }}
-                                                </p>
+                                              <a href="{{ route('suppliers.show', $product->supplier->id) }}"
+   class="inline-block py-1 rounded-lg text-[#185D31] text-[18px] font-medium  transition">
+    {{ $product->supplier->company_name }}
+</a>
                                             </span>
                                         @else
-                                            <p class="text-[20px] text-[#212121] ">{{ $product->supplier->company_name }}
-                                            </p>
+                                          <a href="{{ route('suppliers.show', $product->supplier->id) }}"
+   class="inline-block py-1 rounded-lg text-[#185D31] text-[18px] font-medium  transition">
+    {{ $product->supplier->company_name }}
+</a>
                                         @endif
                                     </div>
                                 @endif
@@ -657,12 +665,12 @@
             <div class="flex justify-end space-x-2 rtl:space-x-reverse">
                 <button id="close-login-popup"
                     class="bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors">
-                    {{ __('messages.cancel') }}
+                    {{ __('messages.ok') }}
                 </button>
-                <a href="{{ route('login') }}"
+                {{-- <a href="{{ route('login') }}"
                     class="bg-[#185D31] text-white py-2 px-4 rounded-md hover:bg-[#154a2a] transition-colors">
                     {{ __('messages.login') }}
-                </a>
+                </a> --}}
             </div>
         </div>
     </div>

@@ -407,7 +407,7 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
     <!-- 🔽 زرار القائمة الرئيسية -->
     <a @click="mainDropdownOpen = !mainDropdownOpen" id="mainDropdownButton"
        class="justify-between px-3 py-2 flex items-center cursor-pointer rounded-lg hover:text-white">
-        <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="h-5 w-5 rtl:ml-2 ltr:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                   d="M4 6h16M4 12h16M4 18h16" />
         </svg>
@@ -476,13 +476,13 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
                                                     </a>
                                                 @endforeach
                                             @else
-                                                <div class="text-sm text-gray-500 px-2">لا توجد منتجات.</div>
+                                                <div class="text-sm text-gray-500 px-2">{{ __('messages.no_products_in_category') }}</div>
                                             @endif
                                         </div>
                                     </div>
                                 @endforeach
                             @else
-                                <div class="px-4 py-2 text-sm text-gray-500">لا توجد أقسام فرعية.</div>
+                                <div class="px-4 py-2 text-sm text-gray-500">{{ __('messages.no_subcategories') }}</div>
                             @endif
                         </div>
                     </div>
@@ -736,13 +736,13 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
                                                 </a>
                                             @endforeach
                                         @else
-                                            <div class="px-2 py-1 text-sm text-gray-500">لا توجد منتجات لهذه الفئة.</div>
+<div class="px-2 py-1 text-sm text-gray-500">{{ __('messages.no_products_in_category') }}</div>
                                         @endif
                                     </div>
                                 </div>
                             @endforeach
                         @else
-                            <div class="px-2 py-1 text-sm text-gray-500">لا توجد فئات فرعية.</div>
+<div class="px-2 py-1 text-sm text-gray-500">{{ __('messages.no_subcategories') }}</div>
                         @endif
                     </div>
                 </div>

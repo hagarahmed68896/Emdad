@@ -24,13 +24,13 @@
             <img src="{{ asset('images/a957f2991cfdb613fac217bd00039b025f2c8728.png') }}" alt="Hero Image" class="hero-image max-w-full h-auto">
 
             {{-- SATISFIED CUSTOMERS CARD --}}
-            <div
+            {{-- <div
                 class="satisfied-customers-card absolute z-20
-                       top-1/2 sm:top-[25%] md:top-[40%]  {{-- Adjust top position responsively --}}
-                       right-0 sm:right-[10%] md:-right-[7%] {{-- Use right to position from the right edge --}}
-                       -translate-y-1/2         {{-- Vertically center it relative to its top percentage --}}
+                       top-1/2 sm:top-[25%] md:top-[40%] 
+                       right-0 sm:right-[10%] md:-right-[7%] 
+                       -translate-y-1/2        
                        w-[140px] xs:w-[160px] sm:w-[200px] md:w-[232px]
-                       p-3 xs:p-3 sm:p-4         {{-- Responsive padding --}}
+                       p-3 xs:p-3 sm:p-4       
                        flex flex-col bg-white shadow-md rounded-[16px] text-center">
 
                 <div class="flex -space-x-3 xs:-space-x-4 justify-center mb-2 xs:mb-3 sm:mb-4 rtl:space-x-reverse">
@@ -52,16 +52,63 @@
                     </div>
                 </div>
 
-                <div class="flex items-center justify-center"> {{-- Centered this div --}}
+                <div class="flex items-center justify-center"> 
                     <div
                         class="flex items-center space-x-1 rtl:space-x-reverse text-xs xs:text-sm font-medium text-gray-800 mb-0.5 xs:mb-1">
                         <div class="text-[12px] xs:text-[14px] sm:text-[16px] md:text-[20px] text-black text-center leading-tight ml-1 xs:ml-2">
-                            {{ __('messages.satisfied_customers') }}</div> {{-- Adjusted font size --}}
+                            {{ __('messages.satisfied_customers') }}</div> 
                         <img src="{{ asset('images/Star.svg') }}" alt="Star Rating Icon" class="w-3 h-3 sm:w-4 sm:h-4">
-                        <span class="text-[10px] xs:text-[12px] sm:text-[14px] text-[#696969]">4.5</span> {{-- Adjusted font size --}}
+                        <span class="text-[10px] xs:text-[12px] sm:text-[14px] text-[#696969]">4.5</span> 
                     </div>
                 </div>
-            </div>
+            </div> --}}
+
+            <div
+    class="absolute z-20 top-1/2 sm:top-[25%] md:top-[40%] right-0 sm:right-[10%] md:-right-[7%]
+           -translate-y-1/2 w-[160px] sm:w-[220px] md:w-[260px]
+           p-3 sm:p-4 flex flex-col bg-white shadow-lg rounded-[16px] text-center">
+
+
+
+{{-- صور المستخدمين --}}
+<div class="flex -space-x-3 sm:-space-x-4 justify-center mb-2 rtl:space-x-reverse">
+    @foreach($usersWithPictures as $user)
+        <img class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white"
+             src="{{ asset('storage/' . $user->profile_picture) }}"
+             alt="User Avatar">
+    @endforeach
+
+    @if($remainingUsers > 0)
+        <div
+            class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-200 text-center text-xs sm:text-sm flex items-center justify-center border-2 border-white">
+            +{{ $remainingUsers }}
+        </div>
+    @endif
+</div>
+
+{{-- الإحصائيات --}}
+<div class="grid grid-cols-3 gap-3 sm:gap-4 text-gray-700 text-xs sm:text-sm font-medium">
+    <div class="flex flex-col items-center">
+        <span class="text-base sm:text-lg font-bold text-black">{{ $totalSuppliers }}</span>
+        <span class="text-gray-500">{{ __('messages.suppliers') }}</span>
+    </div>
+    <div class="flex flex-col items-center">
+        <span class="text-base sm:text-lg font-bold text-black">{{ $totalClients }}</span>
+        <span class="text-gray-500">{{ __('messages.customers') }}</span>
+    </div>
+    <div class="flex flex-col items-center">
+        <span class="text-base sm:text-lg font-bold text-black">{{ $totalProducts }}</span>
+        <span class="text-gray-500">{{ __('messages.products') }}</span>
+    </div>
+    {{-- <div class="flex flex-col items-center">
+        <span class="text-base sm:text-lg font-bold text-black">
+            {{ number_format($avgResponseTime, 1) }}m
+        </span>
+        <span class="text-gray-500">{{ __('messages.avg_response') }}</span>
+    </div> --}}
+</div>
+
+</div>
 
             {{-- FAST DELIVER CARD --}}
             <div
@@ -95,6 +142,8 @@
    
 @include('supplier.offers.index')
 @include('supplier.products.products')
+@include('supplier.ads.index')
+{{-- @endsection --}}
 {{-- ChartJS --}}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 

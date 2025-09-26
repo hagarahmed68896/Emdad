@@ -32,7 +32,7 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
-       protected static function booted()
+    protected static function booted()
     {
         static::created(function ($order) {
             $order->order_number =  str_pad($order->id, 6, '0', STR_PAD_LEFT);
@@ -46,5 +46,14 @@ class Order extends Model
         return $item->quantity * $item->price;
     });
 }
+
+public function getResponseTimeInMinutesAttribute()
+{
+    if ($this->responded_at) {
+        return $this->created_at->diffInMinutes($this->responded_at);
+    }
+    return null;
+}
+
 
 }

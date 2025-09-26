@@ -370,8 +370,10 @@
                             <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]" src="{{ asset('images/Success.svg') }}"
                                 alt="Confirmed Supplier">
                         @endif
-                        <p class="text-[20px] text-[#212121]">{{ $product->supplier->company_name }}</p>
-                    </div>
+<a href="{{ route('suppliers.show', $product->supplier->id) }}"
+   class="inline-block py-1 rounded-lg text-[#185D31] text-[18px] font-medium  transition">
+    {{ $product->supplier->company_name }}
+</a>                    </div>
                 @endif
                 <div class="mb-2 w-full bg-[#F8F9FA] p-4 rounded-[12px]">
                     {{-- Top flex row with "selectable" and discount --}}
@@ -524,15 +526,36 @@ $defaultSelectedColorName = $productColors[0]['name'] ?? null;
                 @if (!Auth::check() || Auth::user()->account_type !== 'supplier')
                     {{-- Action Buttons --}}
                     <div class="flex gap-4">
-                        <button 
+                        {{-- <button 
                             class="flex-1 bg-[#185D31] text-white py-3 rounded-[12px] font-semibold transition duration-300 shadow-md flex items-center justify-center gap-2">
                             {{ __('messages.place_order') }}
-                        </button>
+                        </button> --}}
 
-                 <a href="{{ route('messages.index', ['product_id' => $product->id]) }}"
-   class="flex-1 bg-[#EDEDED] text-[#696969] py-3 rounded-[12px] font-semibold transition duration-300 shadow-md flex items-center justify-center gap-2">
-    {{ __('messages.contact_supplier') }}
-</a>
+@auth
+    {{-- Logged in → go to messages --}}
+    <a href="{{ route('messages.index', ['product_id' => $product->id]) }}"
+       class="flex-1 bg-[#EDEDED] text-[#696969] py-3 rounded-[12px] font-semibold transition duration-300 shadow-md flex items-center justify-center gap-2">
+        {{ __('messages.contact_supplier') }}
+    </a>
+@else
+    {{-- Guest → show floating modal message --}}
+    <div x-data="{ show: false }" class="relative flex-1">
+        <a href="javascript:void(0)"
+           @click="show = true; setTimeout(() => show = false, 3000)"
+           class="w-full block bg-[#EDEDED] text-[#696969] py-3 rounded-[12px] font-semibold transition duration-300 shadow-md text-center">
+            {{ __('messages.contact_supplier') }}
+        </a>
+
+        {{-- Floating message modal --}}
+        <div x-show="show" x-transition x-cloak
+             class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-xs bg-blue-400 text-white text-sm rounded-lg shadow-lg px-4 py-2">
+            {{ __('messages.you_need_login') }}
+        </div>
+    </div>
+@endauth
+
+
+
 
 
                     </div>
@@ -1212,12 +1235,12 @@ $defaultSelectedColorName = $productColors[0]['name'] ?? null;
         <div class="flex justify-end space-x-2 rtl:space-x-reverse">
             <button id="close-login-popup"
                 class="bg-gray-200 text-gray-800 py-2 px-4 ml-2 rounded-md hover:bg-gray-300 transition-colors">
-                {{ __('messages.cancel') }}
+                {{ __('messages.ok') }}
             </button>
-            <a href="{{ route('login') }}"
+            {{-- <a href="{{ route('login') }}"
                 class="bg-[#185D31] text-white py-2 px-4 rounded-md hover:bg-[#154a2a] transition-colors">
                 {{ __('messages.login') }}
-            </a>
+            </a> --}}
         </div>
     </div>
 </div>

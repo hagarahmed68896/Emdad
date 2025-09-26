@@ -722,9 +722,418 @@ return [
     'days' => 'Days',
     'no_results_found' => 'No results found',
 
+     // Dashboard
+    'dashboard' => 'Dashboard',
+
+    // Account Management
+    'account_management' => 'Account Management',
+    'customers' => 'Customers',
+    'banned_users' => 'Banned Users',
+
+    // Invoices & Documents
+    'invoices' => 'Invoices',
+    'documents_review' => 'Documents Review',
+
+    // Products Management
+    'products_management' => 'Products Management',
+
+
+    // Orders Management
+    'orders_management' => 'Orders Management',
+    'settlements' => 'Settlements',
+
+    // Chat Management
+    'chat_management' => 'Chat Management',
+    'chats' => 'Chats',
+    'quick_replies' => 'Quick Replies',
+
+    // Reviews, Reports, Notifications
+    'reports' => 'Reports & Statistics',
+
+    // Site Texts & Settings
+    'site_texts' => 'Site Texts',
+    'settings' => 'Settings',
+    'profile' => 'Profile',
+    'contact_settings' => 'Contact Settings',
+    'terms_conditions' => 'Terms & Conditions',
+    'profit_percentage' => 'Profit Percentage',
+
+    // FAQ
+    'faq' => 'FAQ',
+'welcome' => 'Welcome',
+'welcome_back_dashboard' => 'Welcome back to the dashboard',
+'no_notifications' => 'No notifications at the moment',
+'submitted_review_for_order' => 'submitted a review for order',
+'new_notification' => 'New Notification',
+'notification_message' => 'Notification message',
+'mark_as_read' => 'Mark as Read',
+  'welcome_dashboard' => 'Welcome to your Dashboard',
+    'dashboard_description' => 'A smart system that helps you manage everything.',
+    'login_description' => 'Sign in to access your dashboard',
+    'enter_password' => 'Enter your password',
+    'reset_password' => 'Reset Password',
+    'reset_password_instructions' => 'Enter your email to receive the reset link.',
+    'send_link' => 'Send Link',
+    'reset_link_sent' => 'The reset link has been sent to your email.',
+
+    // Metrics Cards
+    'total_users' => 'Total Users',
+    'total_customers' => 'Total Customers',
+    'total_suppliers' => 'Total Suppliers',
+    'total_documents' => 'Total Documents',
+
+    // Charts
+    'users' => 'Users',
+    'revenue' => 'Revenue',
+    'orders_revenue_summary' => 'Orders & Revenue Summary',
+    'products_by_category' => 'Products by Category',
+    'number_of_products' => 'Number of Products',
+    'top_products' => 'Top Products',
+
+    // Table
+    'latest_orders' => 'Latest Orders',
+    'details' => 'Details',
+      // Metrics Cards
+
+
+    'value' => 'Value',
+
+ 
+    'filter_icon' => 'Filter Icon',
+    'name_a_z' => 'Name (A-Z)',
+    'name_z_a' => 'Name (Z-A)',
+
+    'account_status' => 'Account Status',
+    'active' => 'Active',
+    'inactive' => 'Inactive',
+    'banned' => 'Banned',
+    'add_account' => 'Add Account',
+
+    'created_at' => 'Created At',
+    'no_users_found' => 'No users found',
+
+    'delivery_in_days' => 'Delivery in :days days',
+    'no_products_found' => 'No products found matching your criteria.',
+    'try_adjusting_filters' => 'Try adjusting your filters or resetting them.',
+    'avg_response' => 'Avg. Response Time',
+
+       'edit_document' => 'Edit Document',
+    'edit_document_data' => 'Edit Document Data',
+    'select_company' => 'Select a Company',
+
+    'select_document' => 'Select Document Type',
+    'enter_document_number' => 'Enter Document Number',
+
+    'file' => 'File',
+    'view_file' => 'View File',
+    'no_file_uploaded' => 'No file uploaded yet',
+    'select_status' => 'Select Status',
+
+    'enter_notes' => 'Enter Notes',
+    'add_new_question' => 'Add New Question',
+    'question' => 'Question',
+    'answer' => 'Answer',
+    'question_type' => 'Question Type',
+    'type_placeholder' => 'Example: Inquiry, Complaint, Suggestion ...',
+    'target_audience' => 'Target Audience',
+    'faqs' => 'FAQs',
+
+    'confirm_delete_selected' => 'Are you sure you want to delete',
+    'items' => 'selected items?',
+    'user_type' => 'User Type:',
+
+    'not_specified' => 'Not specified',
+
+    'search_placeholder' => 'Search for a question or content',
+    'add_question' => 'Add Question',
+    'of' => 'of',
+    'edit_faq' => 'Edit Question',
+    'update' => 'Update',
+      'conversations' => 'Conversations',
+    'review_report' => 'Review Report',
+    'oldest_first' => 'Oldest First',
+    'latest_first' => 'Latest First',
+    'all_status' => 'All Statuses',
+    'reported' => 'Reported',
+    'closed' => 'Closed',
+    'client_name' => 'Client Name',
+    'last_message' => 'Last Message',
+    'report_date' => 'Report Date',
+    'close_conversation' => 'Close Conversation',
+    'target_group' => 'Target Group',
+    'client' => 'Client',
+    'action' => 'Action',
+    'close_only' => 'Close conversation only',
+    'close_suspend' => 'Close conversation + suspend messages for 3 days',
+    'warn_only' => 'Warn user only without closing conversation',
+    'submit' => 'Submit',
+    'success_action' => 'Action completed successfully',
+    'error_action' => 'An error occurred, please try again',
+    'must_choose_action' => 'Please select an action',
+       'show' => 'Show',
+
+    'report_review' => 'Report Review',
+    'report_review_note' => 'This conversation is read-only. You can review messages but cannot edit them.',
+
+    'choose_action_prompt' => 'Please choose the appropriate action based on your review of the conversation.',
+    'target_category' => 'Target Category',
+    'action_close_only' => 'Close conversation only',
+    'action_close_suspend' => 'Close conversation + Suspend messages for 3 days',
+    'action_warn_only' => 'Warn user only without closing the conversation',
+    'open' => 'Open',
+    'add_notification' => 'Add New Notification',
+    'notification_type' => 'Notification Type',
+    'alert' => 'Alert',
+    'offer' => 'Offer',
+    'info' => 'Info',
+    'sent' => 'Sent',
+    'notification_title' => 'Notification Title',
+    'content' => 'Content',
+    'notifications_offers' => 'Offers & Notifications',
+    'notifications_list' => 'Notifications List',
+    'notification_status' => 'Notification Status',
+    'search_notifications' => 'Search Notification',
+    'selected_notifications' => 'Selected Notifications',
+    'confirm_delete_selected_text' => 'Are you sure you want to delete all selected notifications?',
+    'confirm_delete_single_text' => 'Are you sure you want to delete this notification?',
+    'delete_all' => 'Delete All',
+    'not_sent' => 'Not Sent',
+
+    // Filter & Search
+    'bank_card' => 'Bank Card',
+
+    // Status
+    'all_orders' => 'All Orders',
+    'returned_orders' => 'Returned Orders',
+
+    // Pagination
+    'showing' => ':from - :to of :total',
+    'total_products' => 'Total Products',
+    'available_products' => 'Available Products',
+    'unavailable_products' => 'Unavailable Products',
+    'manage_products' => 'Manage Products',
+    'search_product' => 'Search for a product',
+    'orders_count' => 'Orders Count',
+    'available' => 'Available',
+    'unavailable' => 'Unavailable',
+    'bulk_transfer' => 'Bulk Transfer',
+    'amount_high' => 'Highest Amount',
+    'amount_low' => 'Lowest Amount',
+    'sar' => 'SAR',
+    'auto_messages' => 'Automatic Messages',
+    'add_auto_message' => 'Add Automatic Message',
+    'yes_delete' => 'Yes, Delete',
+    'edit_auto_message' => 'Edit Automatic Message',
+    'message_text' => 'Message',
+    'message_content' => 'Content',
+    'enter_message_text' => 'Enter message type',
+    'enter_message_content' => 'Enter content',
+    'review_complaint' => 'Review Complaint',
+    'review_date' => 'Review Date',
+    'issue_type' => 'Issue Type',
+    'product_issue' => 'Product Issue',
+    'order_issue' => 'Order Issue',
+    'complaint_reason' => 'Complaint Reason',
+    'requested_quantity' => 'Requested Quantity',
+    'unit_price' => 'Unit Price',
+    'total_amount' => 'Total Amount',
+    'take_action' => 'Take Action',
+    'send_warning' => 'Send Warning to Supplier',
+    'suspend_account' => 'Suspend Supplier Account',
+    'no_action' => 'No Action (Invalid Complaint)',
+    'close_complaint' => 'Close Complaint',
+    'closed_complaint_msg' => 'This complaint is closed',
+    // Page titles
+    'review_ratings' => 'Review Ratings',
+
+    // Alerts / messages
+    'error_try_again' => 'An error occurred, please try again.',
+    'action_success' => 'Action executed successfully ✅',
+
+    // Filters / sorting
+    'all_reviews' => 'All Reviews',
+    'positive_reviews' => 'Positive Reviews',
+    'negative_reviews' => 'Negative Reviews',
+    'complaints' => 'Complaints',
+
+    // Misc
+    'order' => 'Order',
+    'search_reviews' => 'Search Reviews',
+    'total_reviews' => 'Total Reviews',
+'comment' => 'Comment',
+'complaint' => 'Complaint',
+'positive' => 'Positive',
+'negative' => 'Negative',
+'no_reviews' => 'No reviews found.',
+'reports_statistics' => 'Reports & Statistics',
+'total_revenue' => 'Total Revenue',
+'sales_by_category' => 'Sales by Category',
+'recent_activity' => 'Recent Activity',
+'top_suppliers' => 'Top Suppliers',
+'neutral' => 'Neutral',
+
+'sales' => 'Sales',
+'weeks' => 'Weeks',
+'in_progress' => 'In Progress',
+    'manage_texts' => 'Manage Texts',
+    'search_text' => 'Search Text',
+    'add_text' => 'Add New Text',
+    'all_pages' => 'All Pages',
+    'selected_rows' => 'Selected',
+    'text_ar' => 'Text (AR)',
+    'text_en' => 'Text (EN)',
+    'page' => 'Page',
+    'no_texts' => 'No texts available.',
+     'edit_text' => 'Edit Text',
+    'key' => 'Key',
+    'enter_profit_percentage' => 'Enter profit percentage',
+    'current_password' => 'Current Password',
+    'password_confirmation' => 'Confirm Password',
+    'save_changes' => 'Save Changes',
+    'save_photo' => 'Save Photo',
+    'uploading' => 'Uploading...',
+    'change_profile_photo' => 'Change Profile Photo',
+    'choose_new_photo' => 'Choose New Photo',
+    'remove_current_photo' => 'Remove Current Photo',
+    'close' => 'Close',
+     'new_photo_selected' => 'A new photo has been selected.',
+    'photo_uploaded_success' => '✅ Photo uploaded successfully.',
+    'profile_photo_updated' => '✅ Profile photo updated successfully.',
+    'upload_error' => '⚠️ An error occurred while uploading the photo.',
+    'upload_failed' => '⚠️ Upload failed. Please try again.',
+    'photo_removed_success' => 'Photo removed successfully.',
+    'profile_photo_removed' => '✅ Profile photo removed successfully.',
+    'remove_error' => '⚠️ An error occurred while removing the photo.',
+    'remove_failed' => '⚠️ Failed to connect to the server to remove the photo.',
+    'profile_updated' => '✅ Changes saved successfully.',
+    'connection_failed' => '⚠️ Failed to connect to the server. Please check your internet connection.',
+
+    'social_links' => 'Social Media Links',
+    'select_platform' => 'Select Platform',
+    'enter_url_here' => 'Enter URL here',
+    'copyrights' => 'Copyrights',
+     'add_new_account' => 'Add New Account',
+    'add_supplier_account' => 'Add Supplier Account',
+
+    'trusted_supplier' => 'Trusted Supplier',
+
+    'saved_successfully' => 'Saved successfully',
+ 
+    'bulk_delete_confirmation' => 'Bulk Delete Confirmation',
+    'bulk_delete_message' => 'Are you sure you want to delete',
+
+    'undefined' => 'Undefined',
+
+
+    'responsible_name' => 'Responsible Name',
+
+
+    'n_a' => 'N/A',
+    'confirm_ban' => 'Confirm Ban',
+    'ban_message' => 'Are you sure you want to ban this supplier?',
+    'confirm_unban' => 'Confirm Unban',
+    'unban_message' => 'Are you sure you want to unban this supplier?',
+    'delete_message_single' => 'Are you sure you want to delete this supplier?',
+    'no_suppliers' => 'No suppliers found',
+    'edit_supplier_account' => 'Edit Supplier Account',
+    'account_type' => 'Account Type',
+    'update_account' => 'Update Account',
+    'total_banned_users' => 'Total Banned Users',
+    'total_banned_customers' => 'Total Banned Customers',
+    'total_banned_suppliers' => 'Total Banned Suppliers',
+    'total_categories' => 'Total Categories',
+    'selected_invoices' => 'Selected Invoice',
+    'confirm_delete_invoice' => 'Are you sure you want to delete this invoice?',
+    'bulk_delete_confirm' => 'Confirm Bulk Deletion',
+
+  
+    'search_invoice' => 'Search for invoice...',
+
+    'invoice_number' => 'Invoice Number',
+    'not_defined' => 'Not Defined',
+    'no_invoices' => 'No invoices available',
+    'download_pdf' => 'Download PDF',
+    'no_products_in_category' => 'No products in this category.',
+    'no_subcategories' => 'No subcategories.',
+    'loading_suggestions' => 'Loading suggestions...',
+    'no_favorites_illustration' => 'No favorites illustration',
+    'no_favorites_message' => 'You have not added any products to favorites yet',
+    'ready_for_delivery' => 'Ready for immediate delivery',
+    'platform_terms' => 'Platform Terms',
+    'terms_description' => 'Learn about the clauses that govern your use of the platform and protect your rights as a user.',
+    'no_terms_available' => 'No terms available currently.',
+    'processing' => 'Processing',
+    'order_cancelled_message' => 'You have cancelled this order. It cannot be restored.',
+    'order_in_preparation' => 'Your order is being prepared',
+    'order_prepared' => 'Your order has been prepared successfully',
+    'confirm_cancellation' => 'Confirm Cancellation',
+    'confirm_cancellation_message' => 'Are you sure you want to cancel this order?',
+    'conversation_closed' => 'The conversation has been closed, you cannot send messages.',
+    'conversation_under_review' => 'The conversation is under review, you cannot send messages until then.',
+    'you_need_login' => 'You need to log in to use this feature.',
+    'email_failed' => 'Failed to send email. Please try again later.',
+      // Supplier
+    'no_description'        => 'No description available',
+    'confirmed_supplier'    => 'Confirmed Supplier',
+    'experience_years'      => ':years years of experience',
+
+    // Products
+    'products_from_supplier'=> 'Products from Supplier',
+    'uncategorized'         => 'Uncategorized',
+    'ok'                     => 'OK',
+        'myAds' => 'My Ads',
+    'create_new_ad' => 'Create New Ad',
+    'no_ads' => 'You don’t have any ads yet',
+
+    // statuses
+    'approved' => 'Approved',
+
+
+    // extra if needed
+    'start_date' => 'Start Date',
+    'end_date' => 'End Date',
+    'ad' => 'Addvertisement',
+    'ad_details' => 'Ad Details',
+    'creaate_ad' => 'Create Ad',
+    'ad_created' => '✅ Your ad has been submitted and is pending approval.',
+    'ad_updated' => '✅ Your ad has been updated successfully.',
+    'ads' => 'Ads',
+       // General
+    'manage_ads'   => 'Manage Ads',
+    'adTitle'      => 'Ad Title',
+    'dates'        => 'Dates',
+    'approve'      => 'Approve',
+    'reject'       => 'Reject',
+    'no_actions'   => 'No actions available',
+
+
+    // Statuses
+    'Pending'      => 'Pending',
+    'submit_ad' => 'Submit Ad',
+    'added_to_cart_guest' => 'Added to cart',
+    'select_at_least_one_item' => 'Please select at least one item.',
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
 
 
 

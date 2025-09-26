@@ -1,12 +1,12 @@
 @extends('layouts.admin')
 
-@section('page_title', 'التقارير والإحصائيات')
+@section('page_title', __('messages.reports_statistics'))
 
 @section('content')
 <div class="p-6 overflow-y-auto">
  {{-- Header --}}
 <div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-bold">التقارير والإحصائيات</h1>
+    <h1 class="text-2xl font-bold">{{ __('messages.reports_statistics') }}</h1>
     <form method="GET" action="{{ route('admin.reports') }}">
         <input type="month" name="month" value="{{ $month }}" class="border rounded-lg px-3 py-1" onchange="this.form.submit()">
     </form>
@@ -17,32 +17,32 @@
 
         {{-- إجمالي التقييمات --}}
         <div class="bg-white shadow rounded-xl p-4">
-            <p class="font-semibold mb-2">إجمالي التقييمات</p>
+            <p class="font-semibold mb-2">{{ __('messages.total_reviews') }}</p>
             <canvas id="reviewsChart" class="h-40"></canvas>
         </div>
 
         {{-- إجمالي الإيرادات --}}
         <div class="bg-white shadow rounded-xl p-4">
-            <p class="font-semibold mb-2">إجمالي الإيرادات</p>
+            <p class="font-semibold mb-2">{{ __('messages.total_revenue') }}</p>
             <canvas id="revenueChart" class="h-40"></canvas>
         </div>
 
         {{-- إجمالي المنتجات حسب الفئات --}}
         <div class="bg-white shadow rounded-xl p-4">
-            <p class="font-semibold mb-2">إجمالي المنتجات حسب الفئات</p>
+            <p class="font-semibold mb-2">{{ __('messages.products_by_category') }}</p>
             <canvas id="productsChart" class="h-40"></canvas>
         </div>
 
         {{-- مبيعات حسب الفئة --}}
         <div class="bg-white shadow rounded-xl p-4">
             <div class="flex justify-between">
-                <p class="font-semibold mb-2">مبيعات حسب الفئة</p>
+                <p class="font-semibold mb-2">{{ __('messages.sales_by_category') }}</p>
                 <div class="mb-4">
                     <select id="categoryFilter"
                         class="px-3 py-1 rounded-xl border border-[#185D31] 
                                text-gray-800 shadow-sm focus:outline-none focus:border-[#185D31] 
                                transition ease-in-out duration-200 hover:shadow-md cursor-pointer">
-                        <option value="all" class="bg-white text-gray-700">الكل</option>
+                        <option value="all" class="bg-white text-gray-700">{{ __('messages.all') }}</option>
                         @foreach($salesByCategory as $cat)
                             <option value="{{ $cat->category_id }}" class="bg-white text-gray-700">
                                 {{ $cat->category_name }}
@@ -56,7 +56,7 @@
 
         {{-- إجمالي الطلبات --}}
         <div class="bg-white shadow rounded-xl p-4">
-            <p class="font-semibold mb-2">إجمالي الطلبات</p>
+            <p class="font-semibold mb-2">{{ __('messages.total_orders') }}</p>
             <div class="flex">
                 <div id="ordersLegend" class="w-1/2 flex flex-col justify-center text-sm space-y-2"></div>
                 <div class="w-1/2">
@@ -67,22 +67,22 @@
 
         {{-- النشاط مؤخراً --}}
         <div class="bg-white shadow rounded-xl p-4">
-            <p class="font-semibold mb-2">النشاط مؤخراً</p>
+            <p class="font-semibold mb-2">{{ __('messages.recent_activity') }}</p>
             <canvas id="activityChart" class="h-40"></canvas>
         </div>
     </div>
 
     {{-- Suppliers Table --}}
  <div class="bg-white shadow rounded-xl p-6 mt-8">
-    <h2 class="text-xl font-semibold mb-4">أعلى الموردين إيراداً</h2>
+    <h2 class="text-xl font-semibold mb-4">{{ __('messages.top_suppliers') }}</h2>
     <div class="overflow-x-auto">
         <table class="w-full border border-gray-200 rounded-lg overflow-hidden">
             <thead>
                 <tr class="bg-gray-100 text-right">
                     <th class="p-3 border-b border-gray-200 w-12">#</th>
-                    <th class="p-3 border-b border-gray-200">اسم المورد</th>
-                    <th class="p-3 border-b border-gray-200">عدد الطلبات</th>
-                    <th class="p-3 border-b border-gray-200">إجمالي الإيرادات</th>
+                    <th class="p-3 border-b border-gray-200">{{ __('messages.supplier_name') }}</th>
+                    <th class="p-3 border-b border-gray-200">{{ __('messages.orders_count') }}</th>
+                    <th class="p-3 border-b border-gray-200">{{ __('messages.total_revenue') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -92,7 +92,7 @@
                         <td class="p-3 border-b border-gray-200">{{ $supplier->name }}</td>
                         <td class="p-3 border-b border-gray-200">{{ $supplier->orders_count }}</td>
                         <td class="p-3 border-b border-gray-200">
-                            {{ number_format($supplier->total_revenue, 2) }} {{ __('ريال') }}
+                            {{ number_format($supplier->total_revenue, 2) }} {{ __('messages.currency') }}
                         </td>
                     </tr>
                 @endforeach
@@ -113,12 +113,12 @@ new Chart(reviewsCtx, {
     data: {
         labels: @json($weeks),
         datasets: [
-            { label: 'إيجابي', data: @json($reviews->pluck('positive')), borderColor: 'green', fill:false },
-            { label: 'محايد', data: @json($reviews->pluck('neutral')), borderColor: 'orange', fill:false },
-            { label: 'سلبي', data: @json($reviews->pluck('negative')), borderColor: 'red', fill:false },
+            { label: '{{ __("messages.positive") }}', data: @json($reviews->pluck('positive')), borderColor: 'green', fill:false },
+            { label: '{{ __("messages.neutral") }}', data: @json($reviews->pluck('neutral')), borderColor: 'orange', fill:false },
+            { label: '{{ __("messages.negative") }}', data: @json($reviews->pluck('negative')), borderColor: 'red', fill:false },
         ]
     },
-    options: { scales: { x: { title: { display: true, text: 'الأسابيع' } } } }
+    options: { scales: { x: { title: { display: true, text: '{{ __("messages.weeks") }}' } } } }
 });
 
 // 🔹 Revenue chart
@@ -128,13 +128,13 @@ new Chart(revenueCtx, {
     data: {
         labels: @json($weeks),
         datasets: [{
-            label: 'الإيرادات',
+            label: '{{ __("messages.revenue") }}',
             data: @json($revenue->pluck('total')),
             borderColor: '#3b82f6',
             fill: false
         }]
     },
-    options: { scales: { x: { title: { display: true, text: 'الأسابيع' } } } }
+    options: { scales: { x: { title: { display: true, text: '{{ __("messages.weeks") }}' } } } }
 });
 
 // 🔹 Products by category
@@ -142,7 +142,7 @@ new Chart(document.getElementById('productsChart'), {
     type: 'bar',
     data: {
         labels: @json($productsByCategory->pluck('name')),
-        datasets: [{ label: 'عدد المنتجات', data: @json($productsByCategory->pluck('count')), backgroundColor: '#16a34a' }]
+        datasets: [{ label: '{{ __("messages.products_count") }}', data: @json($productsByCategory->pluck('count')), backgroundColor: '#16a34a' }]
     }
 });
 
@@ -153,7 +153,7 @@ let salesChart = new Chart(document.getElementById('salesChart'), {
     type: 'bar',
     data: {
         labels: salesByCategory.map(c => c.category_name),
-        datasets: [{ label: 'المبيعات', data: salesByCategory.map(c => c.total), backgroundColor: '#1e293b' }]
+        datasets: [{ label: '{{ __("messages.sales") }}', data: salesByCategory.map(c => c.total), backgroundColor: '#1e293b' }]
     }
 });
 document.getElementById('categoryFilter').addEventListener('change', function () {
@@ -198,8 +198,8 @@ new Chart(document.getElementById('activityChart'), {
     data: {
         labels: @json($weeks),
         datasets: [
-            { label: 'العملاء', data: @json($customers), backgroundColor: '#3b82f6' },
-            { label: 'الموردين', data: @json($suppliersCounts), backgroundColor: '#f59e0b' }
+            { label: '{{ __("messages.customers") }}', data: @json($customers), backgroundColor: '#3b82f6' },
+            { label: '{{ __("messages.suppliers") }}', data: @json($suppliersCounts), backgroundColor: '#f59e0b' }
         ]
     },
     options: { responsive: true, scales: { y: { beginAtZero: true } } }
