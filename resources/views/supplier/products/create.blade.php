@@ -214,6 +214,7 @@ class="absolute top-1 left-1 bg-red-500 text-white rounded-full p-1 leading-none
     </div>
 </div>
 {{--السعر الاساسي--}}
+
         <div>
         <label class="block mb-1 font-bold">{{ __('messages.base_price') }}</label>
   <div class="flex">

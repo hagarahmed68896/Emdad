@@ -75,7 +75,7 @@
 
     </button>
 
-    <div x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div x-show="open" x-cloak class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
         <div class="bg-white rounded-lg p-6 w-full max-w-md shadow-lg">
             <h2 class="text-xl font-bold mb-4">{{ __('messages.confirm_delete') }}</h2>
             <div class="flex justify-end space-x-3">

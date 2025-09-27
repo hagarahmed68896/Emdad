@@ -450,4 +450,33 @@ $productData['colors'] = collect($request->input('colors', []))
 
         return redirect()->back()->with('success', 'Product deleted successfully');
     }
+
+    public function bulkUploadPage()
+{
+    return view('supplier.products.bulk-upload'); // Create this Blade view
+}
+
+    public function bulkUpload(Request $request)
+{
+    $request->validate([
+        'file' => 'required|file|mimes:xlsx,csv|max:5120', // max 5MB
+    ]);
+
+    $user = Auth::user();
+    if (!$user || !$user->business) {
+        return response()->json(['error' => 'لا يمكن حفظ المنتجات: المورّد غير معرف.'], 422);
+    }
+
+    try {
+        \Maatwebsite\Excel\Facades\Excel::import(
+            new \App\Imports\ProductsImport($user),
+            $request->file('file')
+        );
+
+        return response()->json(['success' => 'تم رفع المنتجات بنجاح']);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'حدث خطأ أثناء رفع المنتجات: ' . $e->getMessage()], 500);
+    }
+}
+
 }

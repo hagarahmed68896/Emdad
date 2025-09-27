@@ -1102,8 +1102,11 @@ return [
     'submit_ad' =>'إنشاء إعلان',
     'select_at_least_one_item' => 'الرجاء اختيار عنصر واحد على الأقل.',
     'added_to_cart_guest' => 'تم إضافة المنتج إلى السلة .',
-    'added_to_cart' => 'تم إضافة المنتج إلى السلة.',
-    'error_adding_to_cart' => 'حدث خطأ أثناء إضافة المنتج إلى السلة.',
+    'bulk_upload' => 'تحميل جماعي',
+    'bulk_product_upload' => 'رفع المنتجات بالجملة',
+    'choose_file_label'=> 'اختر ملف Excel / CSV',
+    'upload_products_button' => 'رفع المنتجات',
+    'download_template' => 'تحميل القالب'
 
 
 

@@ -91,11 +91,18 @@
         {{-- FOOTER --}}
         @include('partials.footer')
 @php
-    $ad = \App\Models\Ad::where('status', 'approved')
-        ->where('start_date', '<=', now())
-        ->where('end_date', '>=', now())
-        ->inRandomOrder()
-        ->first(); // get only one random ad
+    $user = Auth::user();
+
+    // Only show ad if user is not a supplier or not logged in
+    if (!$user || $user->account_type !== 'supplier') {
+        $ad = \App\Models\Ad::where('status', 'approved')
+            ->where('start_date', '<=', now())
+            ->where('end_date', '>=', now())
+            ->inRandomOrder()
+            ->first(); // get only one random ad
+    } else {
+        $ad = null;
+    }
 @endphp
 
 @if($ad)

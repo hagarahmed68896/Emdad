@@ -30,16 +30,30 @@
         {{-- Supplier Products Section --}}
         <h2 class="text-[40px] font-bold mb-4">{{ __('messages.myProducts') }}</h2>
 
-        <div class="flex items-center space-x-4 mb-6">
-            <a href="{{ route('products.create') }}" class="flex bg-[#185D31] text-white px-4 py-2 rounded-xl items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                     stroke-width="1.5" stroke="currentColor" class="size-6 rtl:ml-2 ltr:mr-2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-                </svg>
-                {{ __('messages.add_product') }}
-            </a>
-        </div>
+  <div class="flex items-center space-x-4 mb-6">
+    <!-- Add Product Button -->
+    <a href="{{ route('products.create') }}" 
+       class="flex bg-[#185D31] text-white px-4 py-2 rounded-xl items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+             stroke-width="1.5" stroke="currentColor" class="w-6 h-6 rtl:ml-2 ltr:mr-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+        </svg>
+        {{ __('messages.add_product') }}
+    </a>
+
+    <!-- Bulk Upload Button -->
+    <a href="{{ route('products.bulkUploadPage') }}" 
+       class="flex bg-[#185D31] text-white mx-1 px-4 py-2 rounded-xl items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+             stroke-width="1.5" stroke="currentColor" class="w-6 h-6 rtl:ml-2 ltr:mr-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M4 12V4a2 2 0 012-2h12a2 2 0 012 2v8"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 16h8"/>
+        </svg>
+        {{ __('messages.bulk_upload') }}
+    </a>
+</div>
+
     </div>
 
     @if ($products && $products->count() === 0)

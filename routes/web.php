@@ -52,6 +52,9 @@ use App\Http\Controllers\Admin\QuickReplyController;
 use App\Http\Controllers\CameraSearchController;
 use App\Http\Controllers\AdController;
 use App\Http\Controllers\Admin\AdminAdController;
+use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 
 
@@ -495,6 +498,46 @@ Route::put('site_texts/{site_text}', [\App\Http\Controllers\Admin\SiteTextContro
           Route::get('/products/{product}/edit', [SupplierProductController::class, 'edit'])->name('products.edit');
           Route::delete('/products/{product}', [SupplierProductController::class, 'destroy'])->name('products.destroy');
           Route::patch('/products/{product}', [SupplierProductController::class, 'update'])->name('products.update');
+  
+            // Page with the upload form
+    Route::get('/products/bulk-upload', [SupplierProductController::class, 'bulkUploadPage'])
+         ->name('products.bulkUploadPage');
+
+    // Handle the upload submission
+    Route::post('/products/bulk-upload', [SupplierProductController::class, 'bulkUpload'])
+         ->name('products.bulkUpload');
+Route::get('/products/bulk-upload-template', function() {
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+
+    $headers = [
+        'name','price','model_number','sub_category_id','description','min_order_quantity',
+        'preparation_days','shipping_days','production_capacity','product_weight','package_dimensions',
+        'material_type','available_quantity','sizes','colors','wholesale_from_1','wholesale_to_1','wholesale_price_1',
+        'wholesale_from_2','wholesale_to_2','wholesale_price_2','product_status','offer_name','offer_description',
+        'discount_percent','offer_start','offer_end'
+    ];
+
+    $sheet->fromArray($headers, NULL, 'A1');
+
+    // Optional: add an example row
+    $exampleRow = [
+        'Red T-Shirt',100,'TSHIRT001',5,'High quality cotton T-shirt',1,2,3,'500 pcs',0.2,'30x20x2 cm','Cotton',100,'S,M,L','[{"name":"Red","image":""},{"name":"Blue","image":""}]',10,50,90,51,100,85,'ready_for_delivery','Summer Sale','10% off selected colors',10,'2025-07-01','2025-07-31'
+    ];
+    $sheet->fromArray($exampleRow, NULL, 'A2');
+
+    $writer = new Xlsx($spreadsheet);
+    $fileName = 'bulk_products_template.xlsx';
+
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header("Content-Disposition: attachment; filename=\"$fileName\"");
+    $writer->save('php://output');
+    exit;
+});
+
+
+
+
 
           //offers
           Route::get('/supplier', [OfferController::class, 'index'])->name('offeres.index'); // Show all offers

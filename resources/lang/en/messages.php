@@ -1112,6 +1112,11 @@ return [
     'submit_ad' => 'Submit Ad',
     'added_to_cart_guest' => 'Added to cart',
     'select_at_least_one_item' => 'Please select at least one item.',
+    'bulk_upload' => 'Bulk Upload',
+     'bulk_product_upload' => 'رفع المنتجات بالجملة',
+    'choose_file_label' => 'اختر ملف Excel / CSV',
+    'upload_products_button' => 'رفع المنتجات',
+    'download_template' => 'Download Template',
 
 
 
