@@ -173,7 +173,8 @@ class OtpController extends Controller
             }
     
             Auth::login($user);
-    
+        $this->mergeGuestCartWithUserCart($request, $user);
+
         } elseif ($authMethod === 'register') {
             $data = session('pending_registration');
             $user = User::create([
@@ -238,4 +239,46 @@ class OtpController extends Controller
     
         return response()->json(['success' => true, 'redirect' => route('home')]);
     }
+
+protected function mergeGuestCartWithUserCart(Request $request, User $user)
+{
+    $cart = $user->cart()->firstOrCreate(['user_id' => $user->id]);
+
+    $guestCart = json_decode($request->input('guest_cart'), true);
+    if (!$guestCart || !is_array($guestCart)) {
+        return;
+    }
+
+    foreach ($guestCart as $item) {
+        $variants = [
+            'color' => $item['color'] ?? null,
+            'size'  => $item['size'] ?? null,
+        ];
+
+        // Try to find existing item with same product_id and variants
+        $existingItem = $cart->items()
+            ->where('product_id', $item['product_id'])
+            ->where('options->variants', json_encode($variants))
+            ->first();
+
+        if ($existingItem) {
+            // Increment quantity
+            $existingItem->increment('quantity', $item['quantity']);
+        } else {
+            // Create new cart item
+            $cart->items()->create([
+                'product_id'       => $item['product_id'],
+                'cart_id'          => $cart->id,
+                'price_at_addition'=> $item['unit_price'],
+                'quantity'         => $item['quantity'],
+                'options'          => ['variants' => $variants],
+            ]);
+        }
+    }
+}
+
+
+
+
+    
 }

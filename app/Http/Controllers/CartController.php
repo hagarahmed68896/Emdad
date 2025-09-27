@@ -138,21 +138,21 @@ class CartController extends Controller
 
     // In CartController.php
 
+// In App\Http\Controllers\YourController.php
+
 public function index(Request $request)
 {
-    // Get the authenticated user
     $user = Auth::user();
 
-    // Check for unauthenticated cart items and merge them if a user is logged in
+    // 🔹 Merge guest cart into DB if user logs in
     if ($user && $request->has('guest_cart')) {
         $guestCart = json_decode($request->input('guest_cart'), true);
 
         if (is_array($guestCart) && !empty($guestCart)) {
-            // Find or create the user's cart in the database
             $cart = Cart::firstOrCreate(['user_id' => $user->id]);
 
             foreach ($guestCart as $item) {
-                // You can reuse the logic from the store method to add/update items
+                // Ensure the variant key matches the one saved in the database
                 $variantKey = $item['color'] . ($item['size'] ? '|' . $item['size'] : '');
 
                 $cartItem = CartItem::where('cart_id', $cart->id)
@@ -161,23 +161,21 @@ public function index(Request $request)
 
                 if ($cartItem) {
                     $options = $cartItem->options ?? ['variants' => []];
-                    
-                    if (isset($options['variants'][$variantKey])) {
-                        $options['variants'][$variantKey] += $item['quantity'];
-                    } else {
-                        $options['variants'][$variantKey] = $item['quantity'];
-                    }
-                    
+
+                    // Safely update or add the variant quantity
+                    $options['variants'][$variantKey] = ($options['variants'][$variantKey] ?? 0) + $item['quantity'];
+
                     $cartItem->options  = $options;
+                    // Recalculate total quantity for the CartItem (sum of all variants)
                     $cartItem->quantity = array_sum($options['variants']);
                     $cartItem->save();
                 } else {
                     CartItem::create([
-                        'cart_id'            => $cart->id,
-                        'product_id'         => $item['product_id'],
-                        'quantity'           => $item['quantity'],
-                        'price_at_addition'  => $item['unit_price'],
-                        'options'            => [
+                        'cart_id'           => $cart->id,
+                        'product_id'        => $item['product_id'],
+                        'quantity'          => $item['quantity'],
+                        'price_at_addition' => $item['unit_price'],
+                        'options'           => [
                             'variants' => [
                                 $variantKey => $item['quantity']
                             ]
@@ -187,26 +185,57 @@ public function index(Request $request)
             }
         }
     }
-    
-    // Continue with the original logic to display the cart
+
+    // 🔹 Build cartItems for view
     if ($user) {
+        // Authenticated: use DB cart
         $cart = Cart::where('user_id', $user->id)->first();
-        if ($cart) {
-            $cartItems = $cart->items()->with('product')->get();
-        } else {
-            $cartItems = collect();
-        }
+        $cartItems = $cart ? $cart->items()->with('product')->get() : collect();
     } else {
+        // Guest: hydrate from localStorage data
         $cartItems = collect();
+        if ($request->has('guest_cart')) {
+            $guestCart = json_decode($request->input('guest_cart'), true);
+
+            if (is_array($guestCart) && !empty($guestCart)) {
+                // Collect product IDs and load all at once
+                $productIds = collect($guestCart)->pluck('product_id')->unique()->toArray();
+                $products = \App\Models\Product::whereIn('id', $productIds)->get()->keyBy('id');
+
+                $cartItems = collect($guestCart)->map(function ($item) use ($products) {
+                    $product = $products->get($item['product_id']);
+                    
+                    // Use a unique ID based on product and variant for Alpine
+                    $syntheticId = $item['product_id'] . '-' . $item['color'] . '-' . $item['size'];
+
+                    return (object) [
+                        // We use the synthetic ID for Alpine tracking/selection
+                        'id'                => $syntheticId, 
+                        'product_id'        => $item['product_id'],
+                        'quantity'          => $item['quantity'],
+                        'price_at_addition' => $item['unit_price'],
+                        // The options structure needs to be consistent
+                        'options'           => [
+                            'variants' => [
+                                $item['color'] . ($item['size'] ? '|' . $item['size'] : '') => $item['quantity']
+                            ]
+                        ],
+                        'product'           => $product, // already eager-loaded
+                    ];
+                });
+            }
+        }
     }
-    
-    $order = null;
-    if ($request->has('order_id')) {
-        $order = \App\Models\Order::with('orderItems')->find($request->order_id);
-    }
+
+    $order = $request->has('order_id')
+        ? \App\Models\Order::with('orderItems')->find($request->order_id)
+        : null;
 
     return view('profile.cart', compact('cartItems', 'order'));
 }
+
+
+
 
 public function store(Request $request)
 {
@@ -544,5 +573,26 @@ public function bulkDelete(Request $request)
 
         return response()->json(['message' => __('messages.cart_cleared'), 'status' => 'success']);
     }
+
+ public function guestProducts(Request $request)
+{
+    $ids = explode(',', $request->query('ids', ''));
+
+    $products = Product::whereIn('id', $ids)->get();
+
+    return response()->json(
+        $products->map(function ($product) {
+            return [
+                'id'    => $product->id,
+                'name'  => $product->name,
+                'image' => $product->image
+                    ? asset('storage/' . $product->image) // 👈 force correct URL
+                    : 'https://via.placeholder.com/80x80?text=No+Image'
+            ];
+        })
+    );
+}
+
+
 
 }

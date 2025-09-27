@@ -96,10 +96,10 @@ Route::post('/admin/password/reset', [AdminLoginController::class, 'resetPasswor
           Route::get('/auth/facebook/callback', [SocialLoginController::class, 'handleFacebookCallback']);
 
      //cart
-               Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
                Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
                Route::get('/cart/last/{product_id}', [CartController::class, 'getLastOrder']);
-
+Route::get('/guest-products', [CartController::class, 'guestProducts'])
+    ->name('guest.products');
 
 
                Route::delete('/cart/remove-item/{id}', [CartController::class, 'removeItem'])->name('cart.removeItem');
@@ -482,6 +482,7 @@ Route::put('site_texts/{site_text}', [\App\Http\Controllers\Admin\SiteTextContro
     Route::post('ads/{id}/approve', [AdminAdController::class, 'approve'])->name('admin.ads.approve');
     Route::post('ads/{id}/reject', [AdminAdController::class, 'reject'])->name('admin.ads.reject');
 });
+               Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 
 
           // Supplier-specific routes

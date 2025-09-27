@@ -185,7 +185,7 @@ return [
     'no_offers_available_description' => 'يرجى التحقق مرة أخرى لاحقًا أو تصفح منتجاتنا الأخرى.',
     'view_details' => 'عرض التفاصيل',
     'discount_percentage' => 'خصم :percent %', // :percent will be replaced by the value
-    'minimum_order_quantity' => 'الحد الأدنى للطلب: :quantity قطعة', // :quantity will be replaced
+'minimum_order_quantity' => 'الحد الأدنى للطلب: :quantity قطعة',
         // ... existing translations ...
     'receive_in_app' => 'استلام إشعارات داخل الموقع',
     'receive_chat' => 'استلام تنبيهات داخل الموقع', // Or 'استلام رسائل الدردشة'

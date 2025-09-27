@@ -78,6 +78,18 @@ public function getLastNameAttribute()
       
     }
 
+    public function cartItems()
+{
+    return $this->hasManyThrough(
+        \App\Models\CartItem::class,
+        \App\Models\Cart::class,
+        'user_id',   // Foreign key on carts table
+        'cart_id',   // Foreign key on cart_items table
+        'id',        // Local key on users table
+        'id'         // Local key on carts table
+    );
+}
+
     public function favorites()
     {
         return $this->hasMany(Favorite::class);

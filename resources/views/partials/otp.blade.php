@@ -125,17 +125,22 @@ function otpComponent() {
 
         verifyOtp() {
             this.errorMessage = '';
+            let guestCart = localStorage.getItem("guestCart");
+
             fetch("{{ route('verifyOtp') }}", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
                 },
-                body: JSON.stringify({ otp: this.digits.join('') })
+                body: JSON.stringify({ otp: this.digits.join('') ,          
+                                       guest_cart: guestCart // ⬅️ مهم
+})
             })
             .then(response => response.json().then(data => ({ status: response.status, body: data })))
             .then(data => {
                 if (data.status === 200 && data.body.success) {
+                            localStorage.removeItem("guestCart");
                     window.location.href = data.body.redirect;
                 } else {
                     this.errorMessage = data.body.message || 'An unknown error occurred.';

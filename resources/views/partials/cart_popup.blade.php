@@ -3,7 +3,7 @@
     {{-- Cart Button --}}
     <a href="#" @click.prevent="showCartPopup = !showCartPopup" class="relative w-[24px] h-[24px] z-10">
         <img src="{{ asset('images/Group.svg') }}" alt="Cart Icon">
-        <span x-show="totalQuantity > 0"
+        <span x-show="totalQuantity > 0" x-cloak
               class="absolute -top-3 -right-4 bg-red-500 text-white rounded-full text-xs w-7 h-7 flex items-center justify-center"
               x-text="totalQuantity"></span>
     </a>
@@ -36,6 +36,8 @@
             </template>
 
             <template x-for="(item, index) in cartItems" :key="index">
+                {{-- <pre>{{ json_encode($cartItems, JSON_PRETTY_PRINT) }}</pre> --}}
+
                 <div class="flex items-center justify-between bg-gray-50 rounded-lg p-3 mb-2">
                     <div class="w-16 h-16 bg-white rounded-md flex-shrink-0 overflow-hidden">
                         <img :src="item.product.image && item.product.image.startsWith('http') 
@@ -59,29 +61,58 @@
         {{-- Go to Cart Button --}}
         <div x-show="cartItems.length > 0" class="border-t px-4 py-3 bg-gray-50">
             <a href="{{ route('cart.index') }}"
-               class="block w-full text-center px-4 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800 text-sm">
+               class="block w-full text-center px-4 py-2 bg-[#185D31] text-white rounded-lg hover:bg-green-800 text-sm">
                {{ __('messages.show_cart') }}
             </a>
         </div>
     </div>
 </div>
 
+@php
+// Prepare cart items for JSON safely
+$cartItemsTransformed = $cartItems->map(function($item) {
+    // determine correct path
+    $imageUrl = $item['product']['image']
+        ? (file_exists(public_path('storage/' . $item['product']['image']))
+            ? asset('storage/' . $item['product']['image'])
+            : url($item['product']['image']))
+        : '';
+
+    return [
+        'product' => [
+            'id'    => $item['product']['id'],
+            'name'  => $item['product']['name'],
+            'image' => $imageUrl,
+        ],
+        'quantity' => $item['quantity'],
+        'price'    => floatval($item['price_at_addition']),
+        'subtotal' => floatval($item['price_at_addition']) * $item['quantity']
+    ];
+});
+
+
+@endphp
+
 <script>
 function cartComponent() {
     return {
         showCartPopup: false,
-        cartItems: @json($cartItems), // authenticated user's cart from DB
+        cartItems: [], // populate in initCart()
 
         get totalQuantity() {
             return this.cartItems.reduce((sum, item) => sum + item.quantity, 0);
         },
+
         get subtotal() {
             return this.cartItems.reduce((sum, item) => sum + (item.subtotal ?? (item.price * item.quantity)), 0).toFixed(2);
         },
 
         async initCart() {
-            // Only load guest cart if user is not authenticated
-            if (!@json(Auth::check())) {
+            if (@json(Auth::check())) {
+                // Authenticated user
+                this.cartItems = @json($cartItemsTransformed);
+            } else {
+                // Guest user
                 await this.loadGuestCart();
             }
         },
@@ -91,33 +122,32 @@ function cartComponent() {
             if (guestCart.length === 0) return;
 
             try {
-                // Unique product IDs
                 const uniqueIds = [...new Set(guestCart.map(item => item.product_id))];
 
-                // Fetch product details from API
-                const response = await fetch(`/api/guest-products?ids=${uniqueIds.join(',')}`);
+                const response = await fetch(`/guest-products?ids=${uniqueIds.join(',')}`);
                 if (!response.ok) throw new Error(`API status ${response.status}`);
 
                 const productDetails = await response.json();
 
-                // Map guest cart items with product details
-                this.cartItems = guestCart.map(item => {
-                    const product = productDetails.find(p => p.id === parseInt(item.product_id)) || {};
-                    return {
-                        product: {
-                            id: product.id || item.product_id,
-                            name: product.name || 'منتج غير معروف',
-                            image: product.image || ''
-                        },
-                        quantity: item.quantity,
-                        price: item.unit_price,
-                        subtotal: item.unit_price * item.quantity
-                    };
-                });
+           this.cartItems = guestCart.map(item => {
+    const product = productDetails.find(p => p.id === parseInt(item.product_id)) || {};
+    return {
+        product: {
+            id: product.id || item.product_id,
+            name: product.name || 'منتج غير معروف',
+            image: product.image 
+                ? (product.image.startsWith('http') ? product.image : '{{ url('/') }}/' + product.image) 
+                : ''
+        },
+        quantity: item.quantity,
+        price: item.unit_price,
+        subtotal: item.unit_price * item.quantity
+    };
+});
+
 
             } catch (error) {
                 console.error('Error loading guest cart:', error);
-                // Fallback
                 this.cartItems = guestCart.map(item => ({
                     product: { name: 'خطأ في التحميل', image: '' },
                     quantity: item.quantity,
@@ -129,3 +159,4 @@ function cartComponent() {
     }
 }
 </script>
+

@@ -1,10 +1,21 @@
 @extends('layouts.app')
 @section('page_title', __('messages.Cart'))
 @section('content')
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const guestCart = localStorage.getItem("cart");
+    const url = new URL(window.location.href);
+    if (guestCart && !url.searchParams.has("guest_cart")) {
+        url.searchParams.set("guest_cart", guestCart);
+        window.location.href = url.toString();
+    }
+});
+</script>
+
 <div class="cart-container p-[64px]" 
     x-data="checkoutWizard()"
      x-cloak>
-     @guest
+     {{-- @guest
             <div class="flex flex-col justify-center items-center w-full py-10 text-gray-600">
 
                 <img src="{{ asset('images/Illustrations (2).svg') }}" alt="No cart items illustration"
@@ -16,16 +27,14 @@
 
                 <a href="{{ route('products.index') }}"
                     class="px-[20px] py-[12px] bg-[#185D31] text-[white] rounded-[12px] mt-3">
-
                     {{ __('messages.browse_products') }}
-
                 </a>
 
             </div>
      @endguest
-     @auth
+     @auth --}}
          
-             @if (empty($cartItems))
+            @if (empty($cartItems))
             <div class="flex flex-col justify-center items-center w-full py-10 text-gray-600">
 
                 <img src="{{ asset('images/Illustrations (2).svg') }}" alt="No cart items illustration"
@@ -77,19 +86,27 @@
                 :class="{ 'bg-[#185D31]': activeStep >= 2 }"></div>
 
             <!-- Step 2 -->
-            <div @click="activeStep = 2" class="flex items-center flex-1 hidden md:flex">
-                <div class="w-8 h-8 flex items-center justify-center rounded-full font-bold mr-2"
-                    :class="{
-                        'bg-[#185D31] text-white': activeStep >= 2,
-                        'bg-gray-200 text-gray-500': activeStep < 2
-                    }">
-                    2
-                </div>
-                <span class="mx-1"
-                    :class="{ 'text-black': activeStep >= 2, 'text-gray-500': activeStep < 2 }">
-                    {{ __('messages.payment_details') }}
-                </span>
-            </div>
+<div 
+    @auth @click="activeStep = 2" @endauth
+    class="flex items-center flex-1 hidden md:flex cursor-pointer"
+>
+    <div class="w-8 h-8 flex items-center justify-center rounded-full font-bold mr-2"
+        :class="{
+            'bg-[#185D31] text-white': activeStep >= 2 && {{ auth()->check() ? 'true' : 'false' }},
+            'bg-gray-200 text-gray-500': activeStep < 2 || {{ auth()->guest() ? 'true' : 'false' }}
+        }">
+        2
+    </div>
+    <span class="mx-1"
+        :class="{ 
+            'text-black': activeStep >= 2 && {{ auth()->check() ? 'true' : 'false' }}, 
+            'text-gray-500': activeStep < 2 || {{ auth()->guest() ? 'true' : 'false' }} 
+        }">
+        {{ __('messages.payment_details') }}
+    </span>
+</div>
+
+
 
             <div class="h-0.5 bg-gray-300 w-full mx-2 flex-1 hidden md:block"
                 :class="{ 'bg-[#185D31]': activeStep >= 3 }"></div>
@@ -114,202 +131,241 @@
         </div>
 
 
-                    <div x-data="cartManager()" x-show="activeStep === 1" id="cart-step" >
-                       <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
-        <input type="checkbox" 
+                 <div x-data="cartManager()" x-show="activeStep === 1" id="cart-step">
+    <!-- Header -->
+    <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
+        <input type="checkbox"
             x-model="selectAll"
             @change="toggleAll()"
-            class="ml-1 h-5 w-5 text-[#185D31] bg-[#185D31] focus:ring-[#185D31] accent-[#185D31] border-[#185D31] rounded">
+            class="ml-1 h-5 w-5 text-[#185D31] bg-[#185D31] border-[#185D31] rounded">
         <h3 class="text-xl mx-1 font-bold text-[#212121]">
-            {{ __('messages.select_all_products') }} ({{ $cartItems->count() }})
+            {{ __('messages.select_all_products') }}
+            (<span x-text="items.length"></span>)
         </h3>
     </div>
-    
-       <!-- Bulk Delete Button -->
+
+    <!-- Bulk Delete -->
     <div class="mb-4" x-show="selectedItems.length > 0">
-        <form method="POST" action="{{ route('cart.bulkRemove') }}">
-            @csrf
-            @method('DELETE')
-            <template x-for="id in selectedItems" :key="id">
-                <input type="hidden" name="ids[]" :value="id">
-            </template>
-            <button type="submit"
-                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
-                {{ __('messages.delete_selected') }}
-            </button>
-        </form>
-    </div>                    <div id="product-list" class="flex flex-col gap-4">
-                            @foreach ($cartItems as $item)
-                                <div class="flex flex-col bg-[#F8F9FA] p-4 rounded-xl shadow-sm border border-gray-200" data-row-id="{{ $item->rowId }}">
+        <button @click="bulkDelete()"
+            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+            {{ __('messages.delete_selected') }}
+        </button>
+    </div>
 
-                                    <div class="flex items-start justify-between">
-                                                       <!-- Checkbox -->
+    <!-- Product List -->
+    <div id="product-list" class="flex flex-col gap-4">
+        <!-- Loop items dynamically -->
+        <template x-for="item in items" :key="item.id">
+            <div class="flex flex-col bg-[#F8F9FA] p-4 rounded-xl shadow-sm border border-gray-200">
+
+                <div class="flex items-start justify-between">
+                    <!-- Checkbox -->
                     <input type="checkbox"
-                        value="{{ $item->id }}"
+                        :value="item.id"
                         x-model="selectedItems"
-                        class="ml-1 h-5 w-5 text-[#185D31] bg-[#185D31] focus:ring-[#185D31] accent-[#185D31] border-[#185D31] rounded">
+                        class="ml-1 h-5 w-5 text-[#185D31] bg-[#185D31] border-[#185D31] rounded">
 
-                                        <img src="{{ Storage::url($item->product->image ?? '') }}"
-                                            onerror="this.onerror=null;this.src='https://via.placeholder.com/80x80?text=Image+Error';"
-                                            class="w-20 h-20 object-cover ml-4 rounded-lg">
-                                        <div class="flex justify-between flex-1">
-                                            <div class="flex-1 flex flex-col justify-center ml-4">
-                                                <p class="font-bold text-lg text-[#212121]">{{ $item->product->name }}</p>
-                                                <p class="text-gray-500 text-sm">
-                                                    {{ __('messages.minimum_order_quantity', ['quantity' => $item->product->min_order_quantity ?? '']) }}
-                                                </p>
-                                                <p class="text-gray-500 text-sm">{{ $item->price_at_addition }} ريال / {{ $item->product->name }}</p>
-                                            </div>
-                                            <div class="flex items-center gap-4 mt-4">
-                                                <span class="text-lg font-bold text-[#212121]">
-                                                    {{ number_format($item->price_at_addition * $item->quantity, 2) }} ريال
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div x-data="{ showDeleteModal: false }">
-                                            <button type="button"
-                                                    @click="showDeleteModal = true"
-                                                    class="text-gray-400 hover:text-red-500 transition-colors">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                            </svg>
-                                            </button>
+                    <!-- Product Image -->
+                    <img :src="item.image"
+                        class="w-20 h-20 object-cover ml-4 rounded-lg">
 
-                                            <div x-show="showDeleteModal"
-                                                class="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
-                                                x-cloak>
-                                                <div class="bg-white p-6 rounded-xl shadow-xl w-full max-w-sm">
-                                                    <h2 class="text-lg font-bold text-gray-800 mb-4">
-                                                        {{ __('messages.confirm_delete') }}
-                                                    </h2>
-                                                    <p class="text-gray-600 mb-6">
-                                                        {{ __('messages.delete_warning') }}
-                                                    </p>
+                    <!-- Product Info -->
+                    <div class="flex justify-between flex-1">
+                        <div class="flex-1 flex flex-col justify-center ml-4">
+                            <p class="font-bold text-lg text-[#212121]" x-text="item.name"></p>
+                         <p class="text-gray-500 text-sm">
+    {{ __('messages.minimum_order_quantity', ['quantity' => '' ]) }}
+    <span x-text="item.min_order_quantity"></span>
+</p>
 
-                                                    <div class="flex justify-end gap-3">
-                                                        <button type="button"
-                                                                @click="showDeleteModal = false"
-                                                                class="px-4 py-2 bg-gray-200 rounded-lg text-gray-700 hover:bg-gray-300">
-                                                            {{ __('messages.cancel') }}
-                                                        </button>
+                            <p class="text-gray-500 text-sm">
+                                <span x-text="item.unit_price"></span> {{ __('messages.currency') }} / {{ __('messages.piece') }}
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-4 mt-4">
+                            <span class="text-lg font-bold text-[#212121]">
+                                <span x-text="(item.unit_price * item.quantity).toFixed(2)"></span> {{ __('messages.currency') }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
 
-                                                        <form action="{{ route('cart.removeItem', $item->id) }}" method="POST">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit"
-                                                                    class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
-                                                                {{ __('messages.delete') }}
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-
-
-                                    </div>
-                                    @if (!empty($item->options['variants']) && is_array($item->options['variants']))
-                                        <div class="mt-3 flex flex-col gap-2" data-cart-item-id="{{ $item->id }}">
-                                            @foreach ($item->options['variants'] as $variantKey => $qty)
-                                                @php
-                                                    $colorName = ucfirst(explode('|', $variantKey)[0]);
-                                                    $productColors = $item->product->colors ?? [];
-                                                    $colorImage = null;
-
-                                                    foreach ($productColors as $color) {
-                                                        if (isset($color['name']) && strtolower($color['name']) === strtolower($colorName)) {
-                                                            $colorImage = !empty($color['image'])
-                                                                ? Storage::url($color['image'])
-                                                                : 'https://placehold.co/40x40/F0F0F0/ADADAD?text=N/A';
-                                                            break;
-                                                        }
-                                                    }
-                                                @endphp
-
-                                                <div class="flex items-center justify-between bg-gray-100 p-2 rounded-lg">
-                                                    <div class="flex items-center gap-2">
-                                                        @if($colorImage)
-                                                            <img src="{{ $colorImage }}" class="w-10 h-10 object-cover rounded-md">
-                                                        @endif
-                                                        <p class="text-gray-700 text-sm font-semibold">{{ $colorName }}</p>
-                                                    </div>
-
-                                                    <div class="flex items-center">
-                                                        <div class="flex items-center gap-2 bg-gray-200 rounded-lg p-1">
-                                                            <form action="{{ route('cart.updateVariant', $item->id) }}" method="POST">
-                                                                @csrf
-                                                                @method('PATCH')
-                                                                <input type="hidden" name="variantKey" value="{{ $variantKey }}">
-                                                                <input type="hidden" name="quantity" value="{{ max(1, $qty - 1) }}">
-                                                                <button type="submit" class="w-6 h-6 flex items-center justify-center text-gray-600 hover:text-black">
-                                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
-                                                                    </svg>
-                                                                </button>
-                                                            </form>
-
-                                                            <span class="quantity-value text-base font-bold text-[#212121]">{{ $qty }}</span>
-
-                                                            <form action="{{ route('cart.updateVariant', $item->id) }}" method="POST">
-                                                                @csrf
-                                                                @method('PATCH')
-                                                                <input type="hidden" name="variantKey" value="{{ $variantKey }}">
-                                                                <input type="hidden" name="quantity" value="{{ $qty + 1 }}">
-                                                                <button type="submit" class="w-6 h-6 flex items-center justify-center text-gray-600 hover:text-black">
-                                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                                                                    </svg>
-                                                                </button>
-                                                            </form>
-                                                        </div>
-
-                                                        <p class="text-gray-500 text-sm mx-2">
-                                                            <span class="variant-price" data-price="{{ number_format($item->price_at_addition * $qty, 2, '.', '') }}">
-                                                                {{ number_format($item->price_at_addition * $qty, 2) }} ريال
-                                                            </span>
-                                                            <span class="text-xs text-gray-400">({{ $item->price_at_addition }} ريال / قطعة)</span>
-                                                        </p>
-
-                                                        <form action="{{ route('cart.removeVariant', $item->id) }}" method="POST">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <input type="hidden" name="variantKey" value="{{ $variantKey }}">
-                                                            <button type="submit" class="ml-2 text-red-500 hover:text-red-700">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                                                </svg>
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    @endif
-                                </div>
-                            @endforeach
-                            
+                <!-- Variants -->
+                <div class="mt-3 flex flex-col gap-2">
+                    <div class="flex items-center justify-between bg-gray-100 p-2 rounded-lg">
+                        <div class="flex items-center gap-2">
+                            <p class="text-gray-700 text-sm font-semibold" x-text="item.color"></p>
+                            <p class="text-gray-700 text-sm font-semibold" x-text="item.size"></p>
                         </div>
 
+                        <div class="flex items-center gap-2">
+                            <!-- Decrease -->
+                            <button @click="decrease(item)" class="px-2">-</button>
+                            <span class="font-bold" x-text="item.quantity"></span>
+                            <!-- Increase -->
+                            <button @click="increase(item)" class="px-2">+</button>
+                        </div>
                     </div>
+                </div>
+            </div>
+        </template>
+    </div>
+</div>
+
 <script>
 function cartManager() {
     return {
         selectAll: false,
         selectedItems: [],
+        items: [],
+        shipping: 14.94, // Fixed shipping cost
+        discount: 20.00, // Fixed discount amount
+
+        async init() {
+            // 🔹 Guest: load cart from localStorage
+            if (!@json(Auth::check())) {
+                await this.loadGuestCart();
+            }
+
+            // 🔹 Authenticated user: load from DB (Blade injects data)
+            @auth
+            @php
+                $jsCartItems = $cartItems->map(function($item) {
+                    $variantKey = key($item->options['variants'] ?? []);
+                    $color = $variantKey;
+                    $size = '';
+
+                    // Split variant key if size is present (e.g., "Red|Large")
+                    if (strpos($variantKey, '|') !== false) {
+                         [$color, $size] = explode('|', $variantKey);
+                    }
+
+                    return [
+                        'id' => $item->id, // DB CartItem ID
+                        'name' => $item->product->name,
+                        'image' => $item->product->image ? Storage::url($item->product->image) : 'https://via.placeholder.com/80',
+                        'unit_price' => $item->price_at_addition,
+                        'quantity' => $item->quantity,
+                        'color' => $color,
+                        'size' => $size,
+                        'min_order_quantity' => $item->product->min_order_quantity ?? 1,
+                    ];
+                })->values()->toArray();
+            @endphp
+            this.items = @json($jsCartItems);
+            localStorage.removeItem("guestCart"); // cleanup
+            @endauth
+        },
+
+        // 💡 NEW: Computed Property for Subtotal
+        get subtotal() {
+            // Calculates the sum of (unit_price * quantity) for all items.
+            return this.items.reduce((total, item) => {
+                const price = parseFloat(item.unit_price) || 0;
+                const quantity = parseInt(item.quantity) || 0;
+                return total + (price * quantity);
+            }, 0);
+        },
+
+        // 💡 NEW: Computed Property for Grand Total
+        get grandTotal() {
+            // Applies shipping and discount to the subtotal.
+            // Note: In a real app, discount and shipping might be conditional.
+            return this.subtotal + this.shipping - this.discount;
+        },
+
+        async loadGuestCart() {
+            let guestCart = JSON.parse(localStorage.getItem("guestCart")) || [];
+            if (guestCart.length === 0) return;
+
+            try {
+                // Collect unique product IDs
+                const uniqueIds = [...new Set(guestCart.map(item => item.product_id))];
+
+                // Fetch product details from backend API
+                const response = await fetch(`/guest-products?ids=${uniqueIds.join(',')}`);
+                if (!response.ok) throw new Error(`API status ${response.status}`);
+
+                const productDetails = await response.json();
+
+                // Merge cart data with product details
+                this.items = guestCart.map(item => {
+                    const prod = productDetails.find(p => p.id === parseInt(item.product_id)) || {};
+
+                    // Generate synthetic ID for Alpine selection (product_id-color-size)
+                    let syntheticId = `${item.product_id}-${item.color ?? ''}-${item.size ?? ''}`;
+
+                    return {
+                        id: syntheticId,
+                        name: prod.name || "منتج غير معروف",
+                        image: prod.image ? prod.image : "https://via.placeholder.com/80",
+                        unit_price: item.unit_price ?? prod.price ?? 0,
+                        quantity: item.quantity,
+                        color: item.color ?? "",
+                        size: item.size ?? "",
+                        min_order_quantity: prod.min_order_quantity ?? 1,
+                    };
+                });
+
+            } catch (error) {
+                console.error("❌ Error loading guest cart:", error);
+                this.items = [];
+            }
+        },
+
         toggleAll() {
-            if (this.selectAll) {
-                this.selectedItems = Array.from(
-                    document.querySelectorAll('#product-list input[type=checkbox]')
-                ).map(cb => cb.value);
+            // Toggles selection state
+            this.selectedItems = this.selectAll ? this.items.map(i => i.id) : [];
+        },
+
+        increase(item) {
+            item.quantity++;
+            this.save(); // Save triggers reactivity/re-render
+        },
+        decrease(item) {
+            // Ensure quantity doesn't go below 1 or min_order_quantity
+            const min = item.min_order_quantity ?? 1;
+            if (item.quantity > min) {
+                item.quantity--;
+                this.save(); // Save triggers reactivity/re-render
+            }
+        },
+        bulkDelete() {
+            this.items = this.items.filter(i => !this.selectedItems.includes(i.id));
+            this.selectedItems = [];
+            this.selectAll = false;
+            this.save(); // Save triggers reactivity/re-render
+        },
+        save() {
+            // 🔹 Save only for guests (Authenticated user saving should happen via a backend AJAX call)
+            if (!@json(Auth::check())) {
+                let guestData = this.items.map(i => {
+                    // Split the synthetic ID (e.g., "123-Red-Large" -> 123)
+                    const productId = i.id.split('-')[0];
+                    return {
+                        product_id: productId,
+                        quantity: i.quantity,
+                        unit_price: i.unit_price,
+                        color: i.color,
+                        size: i.size,
+                    };
+                });
+                localStorage.setItem("guestCart", JSON.stringify(guestData));
             } else {
-                this.selectedItems = [];
+                // 🔹 Authenticated user: Trigger API call to update DB
+                // This part requires a separate function (e.g., this.updateDatabaseCart(this.items))
+                // and is not implemented in this front-end script.
+                // For now, the Alpine data updates reactively, but the DB is not updated here.
             }
         }
     }
 }
 </script>
 
+
+
+@auth
+    
                  <div x-show="activeStep === 2" class="p-4 rounded-lg">
     <h3 class="text-xl font-bold mb-4">{{ __('messages.contact_info') }}</h3>
 
@@ -406,7 +462,7 @@ function cartManager() {
         </div>
     </form>
 </div>
-
+@endauth
 
 <div x-data="{ showCancelModal: false }">
     <div x-show="activeStep === 3" class="p-6 rounded-3xl bg-white shadow-md text-center max-w-2xl mx-auto">
@@ -520,31 +576,55 @@ function cartManager() {
 
                 </div>
 
-          <div class="w-full lg:w-1/3 bg-white p-6 rounded-3xl shadow-lg">
+          <div x-data="cartManager()" x-init="init()" class="w-full lg:w-1/3 bg-white p-6 rounded-3xl shadow-lg">
     <h3 class="text-2xl font-bold text-[#212121] mb-6">{{ __('messages.order_summary') }}</h3>
     <div class="flex flex-col gap-4">
-        <div class="flex justify-between items-center text-gray-600">
-            <span>{{ __('messages.items_total') }}</span>
-            <span class="font-semibold text-[#212121] text-lg" id="subtotal">0.00 {{ __('messages.currency') }}</span>
-        </div>
-        <div class="flex justify-between items-center text-gray-600">
-            <span>{{ __('messages.shipping_fee') }}</span>
-            <span class="font-semibold text-[#212121] text-lg">14.94 {{ __('messages.currency') }}</span>
-        </div>
-        <div class="flex justify-between items-center text-red-500">
-            <span>{{ __('messages.shipping_discount') }}</span>
-            <span class="font-semibold text-red-500 text-lg">- 20.00 {{ __('messages.currency') }}</span>
-        </div>
-        <div class="w-full h-px bg-gray-300 my-4"></div>
-        <div class="flex justify-between items-center font-bold text-lg">
-            <span>{{ __('messages.total') }}</span>
-            <span class="text-2xl text-[#185D31]" id="grand-total">0.00 {{ __('messages.currency') }}</span>
-        </div>
-        <button @click="activeStep = 2"
-            class="w-full py-4 bg-[#185D31] text-white rounded-xl text-lg font-bold mt-4 hover:bg-[#154a2a] transition-colors">
-            {{ __('messages.checkout') }}
-            <i class="fas fa-credit-card mr-2"></i>
-        </button>
+      <div class="flex justify-between items-center text-gray-600">
+    <span>{{ __('messages.items_total') }}</span>
+    <span class="font-semibold text-[#212121] text-lg" 
+          x-text="`${subtotal.toFixed(2)} {{ __('messages.currency') }}`">0.00 {{ __('messages.currency') }}</span>
+</div>
+<div class="flex justify-between items-center text-gray-600">
+    <span>{{ __('messages.shipping_fee') }}</span>
+    <span class="font-semibold text-[#212121] text-lg"
+          x-text="`${shipping.toFixed(2)} {{ __('messages.currency') }}`">14.94 {{ __('messages.currency') }}</span>
+</div>
+<div class="flex justify-between items-center text-red-500">
+    <span>{{ __('messages.shipping_discount') }}</span>
+    <span class="font-semibold text-red-500 text-lg"
+          x-text="`- ${discount.toFixed(2)} {{ __('messages.currency') }}`">- 20.00 {{ __('messages.currency') }}</span>
+</div>
+<div class="flex justify-between items-center font-bold text-lg">
+    <span>{{ __('messages.total') }}</span>
+    <span class="text-2xl text-[#185D31]"
+          x-text="`${grandTotal.toFixed(2)} {{ __('messages.currency') }}`">0.00 {{ __('messages.currency') }}</span>
+</div>
+   @guest
+<div x-data="{ showMessage: false }" class="relative w-full">
+    <button type="button"
+            @click="showMessage = true"
+            class="w-full py-4 bg-gray-400 text-white rounded-xl text-lg font-bold mt-4 cursor-not-allowed">
+        {{ __('messages.checkout') }}
+        <i class="fas fa-credit-card mr-2"></i>
+    </button>
+
+    <!-- الرسالة تظهر فوق الزر -->
+    <div x-show="showMessage"
+         x-transition
+         class="absolute inset-x-0 -top-8 mx-auto w-max bg-blue-400 text-white text-sm font-medium px-4 py-2 rounded-lg shadow-lg">
+        {{ __('messages.you_need_login') }}
+    </div>
+</div>
+@endguest
+
+@auth
+<button @click="activeStep = 2"
+        class="w-full py-4 bg-[#185D31] text-white rounded-xl text-lg font-bold mt-4 hover:bg-[#154a2a] transition-colors">
+    {{ __('messages.checkout') }}
+    <i class="fas fa-credit-card mr-2"></i>
+</button>
+@endauth
+
     </div>
 
     <div class="mt-8 flex flex-col items-center">
@@ -572,9 +652,9 @@ function cartManager() {
 </div>
 
 
-            </div>
+            </div>  
         @endif
-             @endauth
+             {{-- @endauth --}}
 
     </div>
 
@@ -605,7 +685,7 @@ function cartManager() {
         }
     </script>
 
-    <script>
+    {{-- <script>
         document.addEventListener('DOMContentLoaded', () => {
             const subtotalEl = document.getElementById('subtotal');
             const grandTotalEl = document.getElementById('grand-total');
@@ -632,5 +712,5 @@ function cartManager() {
             // Initial calculation on page load
             calculateTotals();
         });
-    </script>
+    </script> --}}
 @endsection
