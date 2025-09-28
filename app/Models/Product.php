@@ -113,6 +113,15 @@ public function getPriceRangeAttribute()
 }
 
 
+public function getDeliveryEstimateAttribute()
+{
+    $prep = $this->preparation_days ?? 0;
+    $ship = $this->shipping_days ?? 0;
+
+    return $prep + $ship; // total estimated delivery days
+}
+
+
 
     
 }

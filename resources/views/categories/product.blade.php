@@ -433,9 +433,84 @@
                     </button>
                 </div>
             @else
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                    @forelse ($products as $product)
-                        <div class="product-card bg-white rounded-xl overflow-hidden shadow-md flex flex-col">
+<!-- wrapper واحد يشمل الزر، المودال، والمنتجات -->
+<div x-data="compareProducts()" x-cloak>
+
+    <!-- زر المقارنة -->
+    <button x-show="selectedProducts.length > 1"
+            @click="openCompareModal = true"
+            class="bg-green-600 text-white px-4 py-2 rounded mb-4">
+        قارن المنتجات
+    </button>
+
+    <!-- المودال -->
+    <div x-show="openCompareModal" x-cloak
+         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg w-11/12 max-w-5xl p-6">
+            <h2 class="text-xl font-bold mb-4">جدول المقارنة</h2>
+
+            <table class="w-full text-center border border-gray-200">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th>الخاصية</th>
+                        <template x-for="id in selectedProducts" :key="id">
+                            <th x-text="getProductName(id)"></th>
+                        </template>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>السعر</td>
+                        <template x-for="id in selectedProducts" :key="id">
+                            <td x-text="getProductPrice(id)"></td>
+                        </template>
+                    </tr>
+                    <tr>
+                        <td>الكمية</td>
+                        <template x-for="id in selectedProducts" :key="id">
+                            <td x-text="getProductQuantity(id)"></td>
+                        </template>
+                    </tr>
+                          <tr>
+                <td>مدة التوصيل</td>
+                <template x-for="id in selectedProducts" :key="id">
+                    <td x-text="getProductDelivery(id)"></td>
+                </template>
+            </tr>
+            <tr>
+                <td>الشركة</td>
+                <template x-for="id in selectedProducts" :key="id">
+                    <td x-text="getProductCompany(id)"></td>
+                </template>
+            </tr>
+                    <tr>
+                        <td>الشهادات</td>
+                        <template x-for="id in selectedProducts" :key="id">
+                            <td x-text="getProductCertifications(id)"></td>
+                        </template>
+                    </tr>
+                </tbody>
+            </table>
+
+            <button @click="openCompareModal = false" class="mt-4 bg-red-500 text-white px-4 py-2 rounded">
+                اغلق
+            </button>
+        </div>
+    </div>
+
+    <!-- بطاقات المنتجات -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        @forelse ($products as $product)
+            <div class="product-card bg-white rounded-xl overflow-hidden shadow-md flex flex-col"
+                 data-id="{{ $product->id }}"
+                 data-name="{{ $product->name }}"
+                 data-price="{{ number_format($product->price_range['min'], 2) }} {{ $product->price_range['min'] != $product->price_range['max'] ? ' - ' . number_format($product->price_range['max'], 2) : '' }}"
+                 data-available_quantity="{{ $product->available_quantity ?? '1' }}"
+                 data-attachments="{{ $product->attachments ?? 'لا يوجد' }}"
+                 data-delivery="{{ $product->shipping_days }}" {{-- ✅ new logic --}}
+                 data-company="{{ $product->supplier->company_name ?? '' }}"> {{-- ✅ supplier name --}}
+
+                {{-- ✅ هنا الكارت الأصلي بتاعك بدون تغيير --}}
                             <div class="relative w-full h-48 sm:h-56 overflow-hidden product-image-swiper inner-swiper">
                                 <div class="swiper-wrapper">
                                     @php
@@ -499,7 +574,13 @@
                                 @endif
                             </div>
                             <div class="p-4 flex flex-col flex-grow">
-                                <div class="flex w-full items-center text-sm mb-2 justify-between">
+                                <div class="flex w-full items-center text-sm mb-2">
+ <input type="checkbox"
+                                   x-model="selectedProducts"
+                                   :value="{{ $product->id }}"
+                                   class="mx-2">
+
+
                                     <h3 class="text-[24px] font-bold text-[#212121] mb-1">{{ $product->name }}</h3>
                                     <div class="flex items-center ">
                                         @if( $product->rating)
@@ -641,14 +722,42 @@
 
 
                             </div>
-                        </div>
-                    @empty
-                        <div class="swiper-slide w-full text-center py-10 text-gray-600">
-                            <p class="text-2xl font-bold mb-4">{{ __('messages.no_offers_available_title') }}</p>
-                            <p>{{ __('messages.no_offers_available_description') }}</p>
-                        </div>
-                    @endforelse
-                </div>
+                        
+            </div>
+        @empty
+            <div class="swiper-slide w-full text-center py-10 text-gray-600">
+                <p class="text-2xl font-bold mb-4">{{ __('messages.no_offers_available_title') }}</p>
+                <p>{{ __('messages.no_offers_available_description') }}</p>
+            </div>
+        @endforelse
+    </div>
+</div>
+
+<script>
+    function compareProducts() {
+        return {
+            selectedProducts: [],
+            openCompareModal: false,
+            getProductData(id) {
+                const el = document.querySelector(`.product-card[data-id='${id}']`);
+                return el ? el.dataset : {};
+            },
+            getProductName(id) { return this.getProductData(id).name || ''; },
+            getProductPrice(id) { return this.getProductData(id).price || ''; },
+            getProductQuantity(id) { return this.getProductData(id).available_quantity || ''; },
+            getProductCertifications(id) { return this.getProductData(id).attachments || ''; },
+             // ✅ improved delivery: "X days"
+        getProductDelivery(id) { 
+            const days = this.getProductData(id).delivery || 0;
+            return days ? `${days} يوم` : 'غير متوفر'; 
+        },
+
+        // ✅ supplier name
+        getProductCompany(id) { return this.getProductData(id).company || 'غير محدد'; },
+        }
+    }
+</script>
+
                 <div class="swiper-pagination offer-swiper-pagination mt-8"></div>
 
                 <div class="mt-8">
@@ -656,6 +765,7 @@
                 </div>
             @endif
         </main>
+        
     </div>
     {{-- Login Popup HTML --}}
     <div id="login-popup" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
@@ -674,6 +784,14 @@
             </div>
         </div>
     </div>
+
+
+<!-- تأكد من وجود هذه القاعدة في CSS -->
+<style>
+    [x-cloak] { display: none !important; }
+</style>
+
+
     <script>
         // Function to clear a specific filter
         function clearFilter(filterName) {

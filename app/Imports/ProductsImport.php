@@ -3,6 +3,8 @@
 namespace App\Imports;
 
 use App\Models\Product;
+use App\Models\SubCategory;
+use App\Models\Offer;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -23,7 +25,14 @@ class ProductsImport implements ToModel, WithHeadingRow
             return null;
         }
 
-        return Product::create([
+        // Validate subcategory exists
+        $subCategory = SubCategory::find($row['sub_category_id']);
+        if (!$subCategory) {
+            return null; // skip row if subcategory doesn't exist
+        }
+
+        // Create product
+        $product = Product::create([
             'name' => $row['name'],
             'price' => $row['price'],
             'model_number' => $row['model_number'] ?? null,
@@ -43,14 +52,29 @@ class ProductsImport implements ToModel, WithHeadingRow
             'product_status' => $row['product_status'] ?? 'ready_for_delivery',
             'business_data_id' => $this->user->business->id,
             'slug' => Str::slug($row['name']) . '-' . uniqid(),
-            'is_feature' => true,
+            'is_featured' => true,
         ]);
+
+        // Create offer if offer data exists
+        if (!empty($row['discount_percent']) && !empty($row['offer_start']) && !empty($row['offer_end'])) {
+            Offer::create([
+                'product_id' => $product->id,
+                'discount_percent' => $row['discount_percent'],
+                'offer_start' => $row['offer_start'],
+                'offer_end' => $row['offer_end'],
+            ]);
+        }
+
+        return $product;
     }
 
+    /**
+     * Parse wholesale tiers from Excel row
+     */
     private function parseWholesale($row)
     {
         $tiers = [];
-        for ($i = 1; $i <= 2; $i++) { // support 2 wholesale tiers for example
+        for ($i = 1; $i <= 2; $i++) { // support 2 wholesale tiers
             if (!empty($row["wholesale_from_$i"]) || !empty($row["wholesale_to_$i"]) || !empty($row["wholesale_price_$i"])) {
                 $tiers[] = [
                     'from' => $row["wholesale_from_$i"],
@@ -62,5 +86,3 @@ class ProductsImport implements ToModel, WithHeadingRow
         return $tiers;
     }
 }
-
-

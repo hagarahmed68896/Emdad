@@ -62,15 +62,15 @@ document.getElementById('bulkUploadForm').addEventListener('submit', function(e)
         if (data.success) {
             messageDiv.textContent = data.success;
             messageDiv.classList.remove('bg-red-500');
-            messageDiv.classList.add('bg-green-600');
+            messageDiv.classList.add('bg-green-200');
         } else if (data.error) {
             messageDiv.textContent = data.error;
-            messageDiv.classList.remove('bg-green-600');
+            messageDiv.classList.remove('bg-green-200');
             messageDiv.classList.add('bg-red-500');
         }
     })
     .catch(error => {
-        messageDiv.classList.remove('hidden', 'bg-green-600');
+        messageDiv.classList.remove('hidden', 'bg-green-200');
         messageDiv.classList.add('bg-red-500');
         messageDiv.textContent = 'حدث خطأ أثناء رفع المنتجات';
         console.error(error);
