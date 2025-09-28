@@ -583,6 +583,8 @@ Route::get('/products/bulk-upload-template', function() {
      // Public routes that also benefit from session (e.g., for language changes)
      Route::post('/search', [SearchController::class, 'index'])->name('search');
      Route::post('/camera-search', [CameraSearchController::class, 'search'])->name('camera.search');
+     Route::post('/search/image', [SearchController::class, 'searchByImage'])->name('search.image');
+     Route::post('/search/image-url', [SearchController::class, 'searchByImageUrl'])->name('search.image.url');
 
      Route::get('/products/category/{slug}', [CategoryController::class, 'filterByCategory'])->name('products.filterByCategory');
      Route::get('/products', [ProductController::class, 'index'])->name('products.index');

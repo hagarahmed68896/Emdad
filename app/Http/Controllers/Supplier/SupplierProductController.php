@@ -12,6 +12,9 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 use App\Models\Offer;
 use Illuminate\Support\Facades\Log;
+use Jenssegers\ImageHash\ImageHash;
+use Jenssegers\ImageHash\Implementations\PerceptualHash;
+
 
 class SupplierProductController extends Controller
 {
@@ -109,6 +112,26 @@ class SupplierProductController extends Controller
         } elseif (!empty($images)) {
             $data['image'] = $images[0];
         }
+
+        $hasher = new ImageHash(new PerceptualHash());
+$phashes = [];
+
+// ✅ Main image
+if (!empty($data['image'])) {
+    $path = Storage::disk('public')->path($data['image']);
+    $hash = $hasher->hash($path);
+    $phashes[] = (string)$hash;
+}
+
+// ✅ Gallery images
+foreach ($images as $imgPath) {
+    $path = Storage::disk('public')->path($imgPath);
+    $hash = $hasher->hash($path);
+    $phashes[] = (string)$hash;
+}
+
+$data['phashes'] = json_encode($phashes);
+
 
         // ✅ Wholesale tiers
         $wholesaleTiers = [];
@@ -237,208 +260,210 @@ if (is_string($productColors)) {
 
 public function update(Request $request, Product $product)
 {
-    Log::info('Update method called for product id: ' . $product->id);
+    try {
+        Log::info('Update method called for product id: ' . $product->id);
 
-    $maxFileSizeKB = 5120;
+        $maxFileSizeKB = 5120;
 
-    // ✅ Validate input
-    $data = $request->validate([
-        'name'               => 'required|string|max:255',
-        'price'              => 'required|numeric|min:0',
-        'model_number'       => 'nullable|string',
-        'sub_category_id'    => 'required|exists:sub_categories,id',
-        'image'              => "nullable|image|max:$maxFileSizeKB",
-        'images.*'           => "nullable|image|max:$maxFileSizeKB",
-        'description'        => 'nullable|string',
-        'min_order_quantity' => 'nullable|integer|min:1',
-        'preparation_days'   => 'nullable|integer|min:0',
-        'shipping_days'      => 'nullable|integer|min:0',
-        'production_capacity'=> 'nullable|string',
-        'product_weight'     => 'nullable|numeric|min:0',
-        'package_dimensions' => 'nullable|string',
-        'attachments'        => "nullable|file|mimes:pdf,jpg,jpeg,png|max:$maxFileSizeKB",
-        'material_type'      => 'nullable|string',
-        'available_quantity' => 'nullable|integer|min:0',
-        'sizes'              => 'nullable|array',
-        'colors'             => 'nullable|array',
-        'wholesale_from'     => 'nullable|array',
-        'wholesale_from.*'   => 'nullable|integer|min:1',
-        'wholesale_to'       => 'nullable|array',
-        'wholesale_to.*'     => 'nullable|integer|min:1',
-        'wholesale_price'    => 'nullable|array',
-        'wholesale_price.*'  => 'nullable|numeric|min:0',
-        'existing_images'    => 'nullable|array',
-        'existing_images.*'  => 'string',
-        'product_status'     => 'nullable|string|in:ready_for_delivery,made_to_order',
+        // ✅ Validate input
+        $data = $request->validate([
+            'name'               => 'required|string|max:255',
+            'price'              => 'required|numeric|min:0',
+            'model_number'       => 'nullable|string',
+            'sub_category_id'    => 'required|exists:sub_categories,id',
+            'image'              => "nullable|image|max:$maxFileSizeKB",
+            'images.*'           => "nullable|image|max:$maxFileSizeKB",
+            'description'        => 'nullable|string',
+            'min_order_quantity' => 'nullable|integer|min:1',
+            'preparation_days'   => 'nullable|integer|min:0',
+            'shipping_days'      => 'nullable|integer|min:0',
+            'production_capacity'=> 'nullable|string',
+            'product_weight'     => 'nullable|numeric|min:0',
+            'package_dimensions' => 'nullable|string',
+            'attachments'        => "nullable|file|mimes:pdf,jpg,jpeg,png|max:$maxFileSizeKB",
+            'material_type'      => 'nullable|string',
+            'available_quantity' => 'nullable|integer|min:0',
+            'sizes'              => 'nullable|array',
+            'colors'             => 'nullable|array',
+            'wholesale_from'     => 'nullable|array',
+            'wholesale_from.*'   => 'nullable|integer|min:1',
+            'wholesale_to'       => 'nullable|array',
+            'wholesale_to.*'     => 'nullable|integer|min:1',
+            'wholesale_price'    => 'nullable|array',
+            'wholesale_price.*'  => 'nullable|numeric|min:0',
+            'existing_images'    => 'nullable|array',
+            'existing_images.*'  => 'string',
+            'product_status'     => 'nullable|string|in:ready_for_delivery,made_to_order',
 
-        // Offer
-        'offer_name'         => 'nullable|string|max:255',
-        'offer_description'  => 'nullable|string',
-        'offer_image'        => "nullable|image|max:$maxFileSizeKB",
-        'discount_percent'   => 'nullable|integer|min:0|max:100',
-        'offer_start'        => 'nullable|date',
-        'offer_end'          => 'nullable|date|after_or_equal:offer_start',
-    ]);
-    Log::info('Validated data:', $data);
+            // Offer
+            'offer_name'         => 'nullable|string|max:255',
+            'offer_description'  => 'nullable|string',
+            'offer_image'        => "nullable|image|max:$maxFileSizeKB",
+            'discount_percent'   => 'nullable|integer|min:0|max:100',
+            'offer_start'        => 'nullable|date',
+            'offer_end'          => 'nullable|date|after_or_equal:offer_start',
+        ]);
 
-    // -------------------------
-    // ✅ Start with full data (include 'name')
-    // -------------------------
-    $productData = $data;
+        Log::info('Validated data:', $data);
 
-    // -------------------------
-    // ✅ Slug update if name changes
-    // -------------------------
-    if ($product->name !== $data['name']) {
-        $productData['slug'] = Str::slug($data['name']) . '-' . Str::random(8);
-    }
+        // -------------------------
+        // ✅ Start with full data
+        // -------------------------
+        $productData = $data;
 
-    // -------------------------
-    // ✅ Main image
-    // -------------------------
-    if ($request->hasFile('image')) {
-        if ($product->image) {
-            Storage::disk('public')->delete($product->image);
-        }
-        $productData['image'] = $request->file('image')->store('products', 'public');
-    }
-
-    // -------------------------
-    // ✅ Attachments
-    // -------------------------
-    if ($request->hasFile('attachments')) {
-        if ($product->attachments) {
-            Storage::disk('public')->delete($product->attachments);
-        }
-        $productData['attachments'] = $request->file('attachments')->store('attachments', 'public');
-    }
-
-    // -------------------------
-    // ✅ Gallery images
-    // -------------------------
-
-    $existingImages = $request->input('existing_images', []);
-    $updatedImages = $existingImages;
-
-    if ($request->hasFile('images')) {
-        foreach ($request->file('images') as $file) {
-            $updatedImages[] = $file->store('products', 'public');
-        }
-    }
-
-    // Remove deleted images from storage
-    if ($product->images) {
-        $imagesToDelete = array_diff($product->images, $existingImages);
-        foreach ($imagesToDelete as $imagePath) {
-            Storage::disk('public')->delete($imagePath);
-        }
-    }
-
-    $productData['images'] = $updatedImages;
-    if (!isset($productData['image']) && count($productData['images'])) {
-        $productData['image'] = $productData['images'][0];
-    }
-
-    // -------------------------
-    // ✅ Wholesale tiers
-    // -------------------------
-    $wholesaleTiers = [];
-    foreach ($request->input('wholesale_from', []) as $i => $from) {
-        $to = $request->input("wholesale_to.$i");
-        $price = $request->input("wholesale_price.$i");
-        if (!empty($from) && !empty($to) && !empty($price)) {
-            $wholesaleTiers[] = compact('from', 'to', 'price');
-        }
-    }
-    $productData['price_tiers'] = $wholesaleTiers;
-
-    // -------------------------
-    // ✅ Colors
-    // -------------------------
-$productData['colors'] = collect($request->input('colors', []))
-    ->map(function ($color) {
-        if (is_string($color)) {
-            $decoded = json_decode($color, true);
-            $color = is_array($decoded) ? $decoded : [];
+        // ✅ Slug update if name changes
+        if ($product->name !== $data['name']) {
+            $productData['slug'] = Str::slug($data['name']) . '-' . Str::random(8);
         }
 
-        // ✅ Prefer image if available
-        $image = $color['image'] ?? null;
-
-        if (!empty($image) && str_starts_with($image, 'data:image')) {
-            // Handle new base64 upload
-            $image_parts = explode(";base64,", $image);
-            $image_base64 = base64_decode($image_parts[1]);
-
-            $extension = explode('/', mime_content_type($image))[1];
-            $fileName = 'color_images/' . uniqid() . '.' . $extension;
-
-            Storage::disk('public')->put($fileName, $image_base64);
-
-            $image = $fileName;
+        // ✅ Main image
+        if ($request->hasFile('image')) {
+            if ($product->image) {
+                Storage::disk('public')->delete($product->image);
+            }
+            $productData['image'] = $request->file('image')->store('products', 'public');
         }
 
-        return [
-            'name'  => $color['name'] ?? null,
-            // ✅ if image exists, save it; otherwise fall back to hex
-            'hex'   => empty($image) ? ($color['hex'] ?? null) : null,
-            'image' => $image,
-        ];
-    })
-    ->toArray();
+        // ✅ Attachments
+        if ($request->hasFile('attachments')) {
+            if ($product->attachments) {
+                Storage::disk('public')->delete($product->attachments);
+            }
+            $productData['attachments'] = $request->file('attachments')->store('attachments', 'public');
+        }
 
+        // ✅ Gallery images
+        $existingImages = $request->input('existing_images', []);
+        $updatedImages = $existingImages;
 
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                $updatedImages[] = $file->store('products', 'public');
+            }
+        }
 
-    // -------------------------
-    // ✅ Default min_order_quantity if missing
-    // -------------------------
-    $productData['min_order_quantity'] = $productData['min_order_quantity'] ?? 1;
+        if ($product->images) {
+            $imagesToDelete = array_diff($product->images, $existingImages);
+            foreach ($imagesToDelete as $imagePath) {
+                Storage::disk('public')->delete($imagePath);
+            }
+        }
 
-    // -------------------------
-    // ✅ Save product changes
-    // -------------------------
-    $product->update($productData);
-    Log::info('Product updated successfully.');
+        $productData['images'] = $updatedImages;
+        if (!isset($productData['image']) && count($productData['images'])) {
+            $productData['image'] = $productData['images'][0];
+        }
 
-    // -------------------------
-    // ✅ Offer create/update/delete
-    // -------------------------
-    $hasOfferData = $request->filled('offer_name') || $request->filled('discount_percent') || $request->hasFile('offer_image');
+        // ✅ pHashes
+        $hasher = new ImageHash(new PerceptualHash());
+        $phashes = [];
 
-    if ($hasOfferData) {
-        $offerData = [
-            'name'             => $request->input('offer_name') ?? $product->offer->name ?? '',
-            'description'      => $request->input('offer_description'),
-            'discount_percent' => $request->input('discount_percent'),
-            'offer_start'      => $request->input('offer_start'),
-            'offer_end'        => $request->input('offer_end'),
-        ];
+        if (!empty($productData['image'])) {
+            $path = Storage::disk('public')->path($productData['image']);
+            $hash = $hasher->hash($path);
+            $phashes[] = (string)$hash;
+        }
 
-        if ($request->hasFile('offer_image')) {
-            if ($product->offer && $product->offer->image) {
+        foreach ($updatedImages as $imgPath) {
+            $path = Storage::disk('public')->path($imgPath);
+            $hash = $hasher->hash($path);
+            $phashes[] = (string)$hash;
+        }
+
+        $productData['phashes'] = json_encode($phashes);
+
+        // ✅ Wholesale tiers
+        $wholesaleTiers = [];
+        foreach ($request->input('wholesale_from', []) as $i => $from) {
+            $to = $request->input("wholesale_to.$i");
+            $price = $request->input("wholesale_price.$i");
+            if (!empty($from) && !empty($to) && !empty($price)) {
+                $wholesaleTiers[] = compact('from', 'to', 'price');
+            }
+        }
+        $productData['price_tiers'] = $wholesaleTiers;
+
+        // ✅ Colors
+        $productData['colors'] = collect($request->input('colors', []))
+            ->map(function ($color) {
+                if (is_string($color)) {
+                    $decoded = json_decode($color, true);
+                    $color = is_array($decoded) ? $decoded : [];
+                }
+
+                $image = $color['image'] ?? null;
+
+                if (!empty($image) && str_starts_with($image, 'data:image')) {
+                    $image_parts = explode(";base64,", $image);
+                    $image_base64 = base64_decode($image_parts[1]);
+
+                    $extension = explode('/', mime_content_type($image))[1];
+                    $fileName = 'color_images/' . uniqid() . '.' . $extension;
+
+                    Storage::disk('public')->put($fileName, $image_base64);
+
+                    $image = $fileName;
+                }
+
+                return [
+                    'name'  => $color['name'] ?? null,
+                    'hex'   => empty($image) ? ($color['hex'] ?? null) : null,
+                    'image' => $image,
+                ];
+            })
+            ->toArray();
+
+        $productData['min_order_quantity'] = $productData['min_order_quantity'] ?? 1;
+
+        // ✅ Save product
+        $product->update($productData);
+        Log::info('Product updated successfully.');
+
+        // ✅ Offer
+        $hasOfferData = $request->filled('offer_name') || $request->filled('discount_percent') || $request->hasFile('offer_image');
+
+        if ($hasOfferData) {
+            $offerData = [
+                'name'             => $request->input('offer_name') ?? $product->offer->name ?? '',
+                'description'      => $request->input('offer_description'),
+                'discount_percent' => $request->input('discount_percent'),
+                'offer_start'      => $request->input('offer_start'),
+                'offer_end'        => $request->input('offer_end'),
+            ];
+
+            if ($request->hasFile('offer_image')) {
+                if ($product->offer && $product->offer->image) {
+                    Storage::disk('public')->delete($product->offer->image);
+                }
+                $offerData['image'] = $request->file('offer_image')->store('offers', 'public');
+            }
+
+            if ($product->offer) {
+                $product->offer->update($offerData);
+                Log::info('Offer updated successfully.');
+            } else {
+                $offerData['product_id'] = $product->id;
+                Offer::create($offerData);
+                Log::info('Offer created successfully.');
+            }
+        } elseif ($product->offer) {
+            if ($product->offer->image) {
                 Storage::disk('public')->delete($product->offer->image);
             }
-            $offerData['image'] = $request->file('offer_image')->store('offers', 'public');
+            $product->offer->delete();
+            Log::info('Offer deleted successfully.');
         }
 
-        if ($product->offer) {
-            $product->offer->update($offerData);
-            Log::info('Offer updated successfully.');
-        } else {
-            $offerData['product_id'] = $product->id;
-            Offer::create($offerData);
-            Log::info('Offer created successfully.');
-        }
-    } elseif ($product->offer) {
-        if ($product->offer->image) {
-            Storage::disk('public')->delete($product->offer->image);
-        }
-        $product->offer->delete();
-        Log::info('Offer deleted successfully.');
+        return response()->json(['success' => 'تم تحديث المنتج بنجاح']);
+    } catch (\Throwable $e) {
+        Log::error('Update failed: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+        return response()->json([
+            'error' => 'حدث خطأ غير متوقع',
+            'message' => $e->getMessage(),
+        ], 500);
     }
-
-    return response()->json(['success' => 'تم تحديث المنتج بنجاح']);
 }
+
 
 
 

@@ -10,7 +10,7 @@ class Offer extends Model
     protected $fillable = [
         'product_id',
         'name',
-        'user_id',
+        // 'user_id',
         'image',
         'description',
         'discount_percent',

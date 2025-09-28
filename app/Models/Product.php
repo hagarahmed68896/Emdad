@@ -15,6 +15,7 @@ class Product extends Model
         'description',
         'price',
         'image',
+        'phashes',
         'images',
         'sub_category_id',
         'min_order_quantity',
@@ -51,6 +52,7 @@ class Product extends Model
         'offer_expires_at' => 'datetime',
         'offer_start' => 'date',
         'offer_end' => 'date',
+        'phashes' => 'array',
     ];
 
 // public function getRouteKeyName()

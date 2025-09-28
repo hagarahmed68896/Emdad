@@ -5,7 +5,7 @@ return [
     // Authentication
     'login'                    => 'Login',
     'Register'                 => 'Register',
-    'register'                 => 'Create Account',
+    'register'                 => 'Sign in',
     'loginMSG'                 => 'Login to your account and track orders and special offers.',
     'login_success'           => 'Login successful!',
     'login_failed'            => 'Login failed, please check your credentials.',
@@ -96,8 +96,8 @@ return [
     'chooseCity'            => 'Choose your City',
     'products'              => 'Products',
     'suppliers'             => 'Suppliers',
-    'english'               => 'English',
-    'arabic'                => 'Arabic',
+    'english'               => 'En',
+    'arabic'                => 'Ar',
     'return'                => 'Return',
     'confirmLocation'       => 'Confirm Location',
     'locationconfirmedmsg'  => 'Location Confirmed!',
@@ -1117,6 +1117,7 @@ return [
     'choose_file_label' => 'اختر ملف Excel / CSV',
     'upload_products_button' => 'رفع المنتجات',
     'download_template' => 'Download Template',
+    'edit_offer' => 'Edit Offer',
 
 
 

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('page_title', 'Edit Offer')
+@section('page_title', __('messages.edit_offer'))
 
 @section('content')
 <div class="mx-[64px] mb-4 bg-white rounded-xl mt-4 p-6">

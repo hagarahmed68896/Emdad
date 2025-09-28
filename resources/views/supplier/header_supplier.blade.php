@@ -634,23 +634,29 @@ function deliveryDropdown() {
 
 
 <!-- Dropdown + Modal -->
-<div x-data="deliveryDropdown()" class="deliver relative inline-block text-[12px] max-w-[150px]">
+<div x-data="deliveryDropdown()" class=" relative inline-block text-[12px] max-w-[150px]">
 
     <!-- Dropdown button -->
-    <div @click="toggleDropdown()"
-         class="flex items-center cursor-pointer p-1 hover:border font-normal rounded-[4px] space-x-1 justify-center">
-        <img src="{{ asset('images/Flag Pack.svg') }}" alt="" class="w-[24px] h-[24px] ml-2">
-        <span x-text="selectedLocationText"></span>
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-             stroke="currentColor" class="w-[12px] h-[12px] shrink-0">
-            <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-        </svg>
-    </div>
+<div @click="toggleDropdown()"
+     class="flex items-center cursor-pointer p-1 hover:border font-normal rounded-[4px] space-x-1 justify-center">
+
+    <!-- Always show icon -->
+    <img src="{{ asset('images/Flag Pack.svg') }}" alt="Location" class="w-[24px] h-[24px] ml-2">
+
+    <!-- Only show text on medium screens and above -->
+    <span x-text="selectedLocationText" class="hidden sm:inline"></span>
+
+    <!-- Arrow icon, can also hide on very small screens if desired -->
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+         stroke="currentColor" class="w-[12px] h-[12px] shrink-0 hidden sm:inline">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+    </svg>
+</div>
 
     <!-- Dropdown content -->
     <div x-show="open" @click.away="open = false" x-cloak
-         class="absolute z-50 mt-2 w-[calc(100vw-32px)] left-0 sm:right-0 bg-white border border-gray-200 rounded-lg shadow-lg p-4
-                md:w-[350px] md:left-auto md:right-0 md:translate-x-0">
+         class="absolute z-50 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg p-4
+                w-[250px] sm:w-[350px] md:left-auto sm:right-0 -right-25 md:translate-x-0">
 
         <div class="flex flex-col mb-4">
             <p class="font-bold text-[20px] mb-2">{{ __('messages.deliverySite') }}</p>
@@ -730,7 +736,13 @@ function deliveryDropdown() {
 
 
    <div class="search w-full md:flex-grow md:max-w-2xl mx-8 order-4">
-    <form action="{{ route('search') }}" method="GET" class="main-search-form">
+ <form x-data="searchForm()" action="{{ route('search') }}" method="POST" enctype="multipart/form-data" class="main-search-form" @submit="setMode">
+        @csrf
+
+        <!-- Hidden inputs -->
+        <input type="hidden" name="mode" x-model="mode">
+        <input type="hidden" name="image_url" x-model="imageUrl">
+        <input type="file" name="image_file" x-ref="imageFile" class="hidden" @change="handleFileUpload">
         <div class="flex border rounded-[12px] bg-[#F8F9FA] items-center py-1 px-2 relative">
             {{-- Main Search Input and Suggestions Popup --}}
             <div class="relative w-full mx-2" x-cloak x-data="{
@@ -975,7 +987,7 @@ function deliveryDropdown() {
             </div>
             
             {{-- Image Upload Component (Unchanged) --}}
-            <div x-data="imageUploadComponent()" class="relative flex items-center justify-center mx-2 shrink-0">
+            <div  class="relative flex items-center justify-center mx-2 shrink-0">
                 <label @click="showUploadModal = true" class="cursor-pointer hover:text-black text-[#767676]">
                     <img src="{{ asset('images/Group (3).svg') }}" alt="Upload Image" class="w-[20px] h-[20px]">
                 </label>
@@ -1014,15 +1026,15 @@ function deliveryDropdown() {
                                 </div>
                             </template>
                             <input type="file" id="imageInput" accept="image/*" class="hidden"
-                                @change="handleImageUpload">
+                              x-ref="imageFile"  @change="handleImageUpload">
                         </div>
                         <div class="flex flex-col sm:flex-row mt-4 mb-4 items-center justify-between">
                             <input type="text" x-model="imageUrl" placeholder="{{ __('messages.imageURL') }}"
                                 class="border border-gray-300 px-3 py-2 rounded w-full sm:w-[400px] text-sm mb-2 sm:mb-0" />
-                            <button type="button" @click="submitImage"
+                            {{-- <button type="button" @click="submitImage"
                                 class="bg-green-800 text-white px-6 py-2 rounded text-sm w-full sm:w-auto">
                                 {{ __('messages.Search') }}
-                            </button>
+                            </button> --}}
                         </div>
                     </div>
                 </div>
@@ -1049,18 +1061,25 @@ function deliveryDropdown() {
         // @dd($currentLang)
     @endphp
     <!-- Language -->
-    <div class="language btn-group flex items-center  order-5" style="color: #212121;  width:90px; height:24px; ">
+    <div class=" btn-group flex items-center  order-5" style="color: #212121;  width:90px; height:24px; ">
 
-        <div class="dropdown flex items-center cursor-pointer" data-bs-toggle="dropdown" aria-expanded="false">
-            {{-- The image is now inside the clickable area --}}
-            <img src="{{ asset('images/Vector (2).svg') }}" alt="Language Icon"
-                class="w-[16px] h-[16px] rtl:ml-2 ltr:mr-2">
-            {{-- The span text is also inside the clickable area --}}
-            <span class="text-[#212121] text-sm md:text-base">
-                {{ $currentLang == 'ar' ? 'العربية' : 'English' }}
-            </span>
-            {{-- The actual dropdown menu would follow this div --}}
-        </div>
+          <div class="dropdown flex items-center cursor-pointer" data-bs-toggle="dropdown" aria-expanded="false">
+    
+    <!-- Always show icon -->
+    <img src="{{ asset('images/Vector (2).svg') }}" alt="Language Icon"
+         class="w-[16px] h-[16px] rtl:ml-2 ltr:mr-2">
+
+    <!-- Show text only on medium+ screens -->
+    <span class="text-[#212121] text-sm md:text-base hidden md:inline">
+        {{ $currentLang == 'ar' ? 'العربية' : 'En' }}
+    </span>
+
+    <!-- Dropdown menu here -->
+    <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="?lang=ar">العربية</a></li>
+        <li><a class="dropdown-item" href="?lang=en">English</a></li>
+    </ul>
+</div>
         <div class="dropdown-menu w-[180px] h-auto rounded-[12px] bg-[#FFFFFF] py-2 shadow-lg">
             <div class="flex items-center cursor-pointer py-3 px-4 text-base text-[#212121]"
                 onclick="window.location.href='{{ route('change.language', 'ar') }}'">
@@ -1130,294 +1149,24 @@ function deliveryDropdown() {
     </button>
 
     <!-- Dropdown menu -->
-    <div id="mergedDropdownMenu"
+    {{-- <div id="mergedDropdownMenu"
         class="z-20 hidden p-4 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-[200px] dark:bg-gray-700 dark:divide-gray-600">
         <ul class="py-2 text-sm text-gray-700 " aria-labelledby="dropdownMenuIconButton">
 
-            {{-- Delivery Location Section --}}
-            <li class="mb-4">
- <!-- Google Maps API -->
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDUUMjGzzsoinenATBytoscF54qWQc_q0w&libraries=places&callback=initMap" async defer></script>
-
-<script>
-let map, marker, selectedLocation;
-
-// Pull saved location from backend (if any)
-let savedLocation = @json(Auth::user()->address ?? null);
-
-function initMap() {
-    if (map) return;
-
-    let center = { lat: 24.7136, lng: 46.6753 };
-
-    if (savedLocation && savedLocation.includes("(") && savedLocation.includes(")")) {
-        try {
-            const coords = savedLocation.match(/\(([^)]+)\)/)[1].split(",");
-            center = { lat: parseFloat(coords[0]), lng: parseFloat(coords[1]) };
-        } catch (e) {}
-    }
-
-    map = new google.maps.Map(document.getElementById('map'), {
-        center,
-        zoom: 10
-    });
-
-    marker = new google.maps.Marker({
-        position: center,
-        map,
-        draggable: true
-    });
-
-    selectedLocation = center;
-
-    marker.addListener('dragend', e => {
-        selectedLocation = e.latLng;
-    });
-
-    const input = document.getElementById('searchInput');
-    if (input) {
-        const autocomplete = new google.maps.places.Autocomplete(input);
-        autocomplete.bindTo('bounds', map);
-
-        autocomplete.addListener('place_changed', () => {
-            const place = autocomplete.getPlace();
-            if (place.geometry) {
-                map.setCenter(place.geometry.location);
-                marker.setPosition(place.geometry.location);
-                selectedLocation = place.geometry.location;
-            }
-        });
-    }
-}
-
-function deliveryDropdown() {
-    return {
-        open: false,
-        selectedLocationText: savedLocation ?? '{{ __("messages.chooseLocation") }}',
-        showMapModal: false,
-
-        toggleDropdown() {
-            this.open = !this.open;
-        },
-
-        openMapModal() {
-            this.showMapModal = true;
-            setTimeout(() => {
-                google.maps.event.trigger(map, "resize");
-                map.setCenter(marker.getPosition());
-            }, 300);
-        },
-
-        closeMapModal() {
-            this.showMapModal = false;
-        },
-
-        chooseCity(city) {
-            this.selectedLocationText = city;
-            this.open = false;
-
-            fetch("{{ route('user.saveLocation') }}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
-                },
-                body: JSON.stringify({ city })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (!data.success) {
-                    alert("Failed to save city.");
-                }
-            });
-        },
-
-        saveLocation() {
-            if (!selectedLocation) {
-                this.closeMapModal();
-                return;
-            }
-
-            const lat = selectedLocation.lat ? selectedLocation.lat() : selectedLocation.lat;
-            const lng = selectedLocation.lng ? selectedLocation.lng() : selectedLocation.lng;
-
-            const geocoder = new google.maps.Geocoder();
-            geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-                let address = null;
-
-                if (status === "OK" && results[0]) {
-                    address = results[0].formatted_address;
-                }
-
-                // Fallback: if no address, just use lat/lng
-                if (!address) {
-                    address = `Lat: ${lat}, Lng: ${lng}`;
-                }
-
-                fetch("{{ route('user.saveLocation') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': "{{ csrf_token() }}"
-                    },
-                    body: JSON.stringify({ address, lat, lng })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        this.selectedLocationText = address;
-                    } else {
-                        alert("Failed to save location.");
-                    }
-                    this.closeMapModal();
-                })
-                .catch(() => this.closeMapModal());
-            });
-        }
-    }
-}
-</script>
-
-
-
-<!-- Dropdown + Modal -->
-<div x-data="deliveryDropdown()" class="relative inline-block text-[12px] max-w-[150px]">
-
-    <!-- Dropdown button -->
-    <div @click="toggleDropdown()"
-         class="flex items-center cursor-pointer p-1 hover:border font-normal rounded-[4px] space-x-1 justify-center">
-        <img src="{{ asset('images/Flag Pack.svg') }}" alt="" class="w-[24px] h-[24px] ml-2">
-        <span x-text="selectedLocationText"></span>
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-             stroke="currentColor" class="w-[12px] h-[12px] shrink-0">
-            <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-        </svg>
-    </div>
-
-    <!-- Dropdown content -->
-    <div x-show="open" @click.away="open = false" x-cloak
-         class=" absolute z-50 mt-2 w-[calc(100vw-32px)] left-0 sm:right-0 bg-white border border-gray-200 rounded-lg shadow-lg p-4
-                md:w-[350px] md:left-auto md:right-0 md:translate-x-0">
-
-        <div class="flex flex-col mb-4">
-            <p class="font-bold text-[20px] mb-2">{{ __('messages.deliverySite') }}</p>
-            <p class="text-gray-500 text-[14px]">{{ __('messages.deliverySiteMSG') }}</p>
-        </div>
-
-        <!-- Riyadh Cities Dropdown -->
-        <div x-data="{ cityOpen: false, selectedCity: '{{ __('messages.chooseCity') }}' }" class="relative mb-4">
-            <div @click="cityOpen = !cityOpen"
-                 class="w-full h-[40px] bg-white px-4 py-2 rounded-[12px] flex items-center justify-between border border-gray-400 text-gray-600 cursor-pointer">
-                <span x-text="selectedCity" class="flex-1"></span>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                     stroke="currentColor" class="w-5 h-5 ml-2 shrink-0" :class="{ 'rotate-180': cityOpen }">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                </svg>
-            </div>
-
-            <div x-show="cityOpen" @click.away="cityOpen = false" x-cloak
-                 class="absolute z-10 w-full mt-1 bg-white rounded-[12px] shadow-lg border border-gray-300 overflow-hidden max-h-[200px] overflow-y-auto">
-                <ul class="py-1">
-                    <li><a href="#" @click.prevent="chooseCity('الرياض')" class="block px-4 py-2 hover:bg-gray-100">الرياض</a></li>
-                    <li><a href="#" @click.prevent="chooseCity('الدرعية')" class="block px-4 py-2 hover:bg-gray-100">الدرعية</a></li>
-                    <li><a href="#" @click.prevent="chooseCity('الخرج')" class="block px-4 py-2 hover:bg-gray-100">الخرج</a></li>
-                    <li><a href="#" @click.prevent="chooseCity('المجمعة')" class="block px-4 py-2 hover:bg-gray-100">المجمعة</a></li>
-                    <li><a href="#" @click.prevent="chooseCity('الزلفي')" class="block px-4 py-2 hover:bg-gray-100">الزلفي</a></li>
-                    <li><a href="#" @click.prevent="chooseCity('شقراء')" class="block px-4 py-2 hover:bg-gray-100">شقراء</a></li>
-                    <li><a href="#" @click.prevent="chooseCity('وادي الدواسر')" class="block px-4 py-2 hover:bg-gray-100">وادي الدواسر</a></li>
-                    <li><a href="#" @click.prevent="chooseCity('حوطة بني تميم')" class="block px-4 py-2 hover:bg-gray-100">حوطة بني تميم</a></li>
-                    <li><a href="#" @click.prevent="chooseCity('الأفلاج')" class="block px-4 py-2 hover:bg-gray-100">الأفلاج</a></li>
-                    <li><a href="#" @click.prevent="chooseCity('عفيف')" class="block px-4 py-2 hover:bg-gray-100">عفيف</a></li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Map Option -->
-        @auth
-        <button @click="openMapModal()"
-                class="w-full h-[40px] bg-[#185D31] text-white rounded-[12px] flex items-center justify-center">
-            {{ __('messages.addLocationAuth') }}
-        </button>
-        @endauth
-
-        @guest
-        <a href="{{ route('login') }}"
-           class="w-full h-[40px] bg-[#185D31] text-white rounded-[12px] flex items-center justify-center">
-            {{ __('messages.addLocation') }}
-        </a>
-        @endguest
-    </div>
-
-    <!-- Map Modal -->
-    <div id="mapModal" x-show="showMapModal" x-cloak
-         class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-        <div class="bg-white w-full max-w-4xl rounded-lg shadow-lg relative mx-4 md:mx-auto">
-            <!-- Search + Close -->
-            <div class="p-4 border-b flex items-center gap-2">
-                <input id="searchInput" type="text" placeholder="{{ __('messages.Search') }}"
-                       class="w-full p-2 border rounded">
-                <button @click="closeMapModal()" class="px-4 py-2 border rounded">{{ __('messages.return') }}</button>
-            </div>
-
-            <!-- Map -->
-            <div id="map" class="w-full h-[300px] md:h-[500px]"></div>
-
-            <!-- Confirm Button -->
-            <div class="flex justify-end p-4 border-t">
-                <button @click="saveLocation()"
-                        class="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800">
-                    {{ __('messages.confirmLocation') }}
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-            </li>
-
-            {{-- Language Selector Section --}}
-            <li class="mb-4">
-                @php
-                    $currentLang = app()->getLocale();
-                @endphp
-                <div class="btn-group flex items-center" style="color: #212121; width:90px; height:24px;">
-                    <div class="dropdown flex items-center cursor-pointer" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        {{-- The image is now inside the clickable area --}}
-                        <img src="{{ asset('images/Vector (2).svg') }}" alt="Language Icon"
-                            class="w-[16px] h-[16px] rtl:ml-2 ltr:mr-2">
-                        {{-- The span text is also inside the clickable area --}}
-                        <span class="text-[#212121] text-sm md:text-base">
-                            {{ $currentLang == 'ar' ? 'العربية' : 'English' }}
-                        </span>
-                        {{-- The actual dropdown menu would follow this div --}}
-                    </div>
-                    <div class="dropdown-menu w-[180px] h-auto rounded-[12px] bg-[#FFFFFF] py-2 shadow-lg">
-                        <div class="flex items-center cursor-pointer py-3 px-4 text-base text-[#212121]"
-                            onclick="window.location.href='{{ route('change.language', 'ar') }}'">
-                            <input type="radio" value="arabic" {{ $currentLang == 'ar' ? 'checked' : '' }}
-                                class="shrink-0 rtl:ml-3 ltr:mr-3 w-6 h-6 border-[#185D31] focus:ring-[#185D31] disabled:pointer-events-none dark:bg-[#185D31] dark:border-neutral-700 dark:checked:border-[#185D31] dark:focus:ring-offset-gray-800 appearance-none rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]"
-                                id="arabic" readonly>
-                            <label for="arabic" class="text-neutral-700">{{ __('messages.arabic') }}</label>
-                        </div>
-                        <div class="flex items-center cursor-pointer py-3 px-4 text-base text-[#212121]"
-                            onclick="window.location.href='{{ route('change.language', 'en') }}'">
-                            <input type="radio" value="english" {{ $currentLang == 'en' ? 'checked' : '' }}
-                                class="shrink-0 rtl:ml-3 ltr:mr-3 w-6 h-6 border-[#185D31] focus:ring-[#185D31] disabled:pointer-events-none dark:bg-[#185D31] dark:border-neutral-700 dark:checked:border-[#185D31] dark:focus:ring-offset-gray-800 appearance-none rounded-full border-2 checked:bg-[#185D31] checked:border-[#185D31]"
-                                id="english" readonly>
-                            <label for="english" class="text-neutral-700">{{ __('messages.english') }}</label>
-                        </div>
-                    </div>
-                </div>
-            </li>
-
-            <hr class="my-2 border-gray-100 dark:border-gray-600">
-
+          
         </ul>
-    </div>
+    </div> --}}
 
     {{-- ***************************************************************************************************** --}}
   <div class="w-full md:flex-grow md:max-w-2xl mx-8 order-4">
-    <form action="{{ route('search') }}" method="GET" class="main-search-form">
+    <form x-data="searchForm()" action="{{ route('search') }}" method="POST" enctype="multipart/form-data" class="main-search-form" @submit="setMode">
+        @csrf
+
+        <!-- Hidden inputs -->
+        <input type="hidden" name="mode" x-model="mode">
+        <input type="hidden" name="image_url" x-model="imageUrl">
+        <input type="file" name="image_file" x-ref="imageFile" class="hidden" @change="handleFileUpload">
+
         <div class="flex border rounded-[12px] bg-[#F8F9FA] items-center py-1 px-2 relative">
             {{-- Main Search Input and Suggestions Popup --}}
             <div class="relative w-full mx-2" x-cloak x-data="{
@@ -1577,7 +1326,7 @@ function deliveryDropdown() {
                                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                             </path>
                         </svg>
-                        Loading suggestions...
+<span>{{ __('messages.loading_suggestions') }}</span>
                     </div>
             
                     {{-- Recent Searches Section --}}
@@ -1701,15 +1450,15 @@ function deliveryDropdown() {
                                 </div>
                             </template>
                             <input type="file" id="imageInput" accept="image/*" class="hidden"
-                                @change="handleImageUpload">
+                              x-ref="imageFile"   @change="handleImageUpload">
                         </div>
                         <div class="flex flex-col sm:flex-row mt-4 mb-4 items-center justify-between">
                             <input type="text" x-model="imageUrl" placeholder="{{ __('messages.imageURL') }}"
                                 class="border border-gray-300 px-3 py-2 rounded w-full sm:w-[400px] text-sm mb-2 sm:mb-0" />
-                            <button type="button" @click="submitImage"
+                            {{-- <button type="button" @click="submitImage"
                                 class="bg-green-800 text-white px-6 py-2 rounded text-sm w-full sm:w-auto">
                                 {{ __('messages.Search') }}
-                            </button>
+                            </button> --}}
                         </div>
                     </div>
                 </div>
@@ -1724,7 +1473,59 @@ function deliveryDropdown() {
         </div>
     </form>
 </div>
+<script>
+function searchForm() {
+    return {
+        mode: 'text',
+        query: '',
+        imageUrl: '',
+        showUploadModal: false,
+        imagePreview: null,
 
+        handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                this.mode = 'image';
+                this.imageUrl = '';
+                this.imagePreview = URL.createObjectURL(file);
+            }
+        },
+
+        handleDrop(event) {
+            const file = event.dataTransfer.files[0];
+            if (file) {
+                this.$refs.imageFile.files = event.dataTransfer.files;
+                this.imagePreview = URL.createObjectURL(file);
+                this.imageUrl = '';
+                this.mode = 'image';
+            }
+        },
+
+        setMode() {
+            // This ensures the hidden input "mode" is correct before submitting
+            if (this.$refs.imageFile.files.length > 0) {
+                this.mode = 'image';
+            } else if (this.imageUrl.trim() !== '') {
+                this.mode = 'url';
+            } else {
+                this.mode = 'text';
+            }
+        },
+
+        init() {
+            this.$watch('imageUrl', (value) => {
+                if (value.trim() !== '') {
+                    this.mode = 'url';
+                    this.imagePreview = null;
+                    this.$refs.imageFile.value = '';
+                } else if (!this.$refs.imageFile.files.length) {
+                    this.mode = 'text';
+                }
+            });
+        }
+    }
+}
+</script>
 
 
 

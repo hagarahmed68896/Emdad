@@ -155,23 +155,30 @@ function deliveryDropdown() {
 
 
 <!-- Dropdown + Modal -->
-<div  x-data="deliveryDropdown()" class="deliver relative inline-block text-[12px] max-w-[150px]">
+<div  x-data="deliveryDropdown()" class=" relative inline-block text-[12px] max-w-[150px]">
 
     <!-- Dropdown button -->
-    <div @click="toggleDropdown()"
-         class="flex items-center cursor-pointer p-1 hover:border font-normal rounded-[4px] space-x-1 justify-center">
-        <img src="{{ asset('images/Flag Pack.svg') }}" alt="" class="w-[24px] h-[24px] ml-2">
-        <span x-text="selectedLocationText"></span>
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-             stroke="currentColor" class="w-[12px] h-[12px] shrink-0">
-            <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-        </svg>
-    </div>
+<div @click="toggleDropdown()"
+     class="flex items-center cursor-pointer p-1 hover:border font-normal rounded-[4px] space-x-1 justify-center">
+
+    <!-- Always show icon -->
+    <img src="{{ asset('images/Flag Pack.svg') }}" alt="Location" class="w-[24px] h-[24px] ml-2">
+
+    <!-- Only show text on medium screens and above -->
+    <span x-text="selectedLocationText" class="hidden sm:inline"></span>
+
+    <!-- Arrow icon, can also hide on very small screens if desired -->
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+         stroke="currentColor" class="w-[12px] h-[12px] shrink-0 hidden sm:inline">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+    </svg>
+</div>
+
 
     <!-- Dropdown content -->
     <div x-show="open" @click.away="open = false" x-cloak
-         class="absolute z-50 mt-2 w-[calc(100vw-32px)] left-0 sm:right-0 bg-white border border-gray-200 rounded-lg shadow-lg p-4
-                md:w-[350px] md:left-auto md:right-0 md:translate-x-0">
+         class="absolute z-50 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg p-4
+                w-[250px] sm:w-[350px] md:left-auto sm:right-0 -right-25 md:translate-x-0">
 
         <div class="flex flex-col mb-4">
             <p class="font-bold text-[20px] mb-2">{{ __('messages.deliverySite') }}</p>
@@ -254,18 +261,26 @@ function deliveryDropdown() {
         // @dd($currentLang)
     @endphp
     <!-- Language -->
-    <div class="language btn-group flex items-center  order-5" style="color: #212121;  width:90px; height:24px; ">
+    <div class=" btn-group flex items-center  order-5" style="color: #212121;  width:90px; height:24px; ">
 
-        <div class="dropdown flex items-center cursor-pointer" data-bs-toggle="dropdown" aria-expanded="false">
-            {{-- The image is now inside the clickable area --}}
-            <img src="{{ asset('images/Vector (2).svg') }}" alt="Language Icon"
-                class="w-[16px] h-[16px] rtl:ml-2 ltr:mr-2">
-            {{-- The span text is also inside the clickable area --}}
-            <span class="text-[#212121] text-sm md:text-base">
-                {{ $currentLang == 'ar' ? 'العربية' : 'English' }}
-            </span>
-            {{-- The actual dropdown menu would follow this div --}}
-        </div>
+       <div class="dropdown flex items-center cursor-pointer" data-bs-toggle="dropdown" aria-expanded="false">
+    
+    <!-- Always show icon -->
+    <img src="{{ asset('images/Vector (2).svg') }}" alt="Language Icon"
+         class="w-[16px] h-[16px] rtl:ml-2 ltr:mr-2">
+
+    <!-- Show text only on medium+ screens -->
+    <span class="text-[#212121] text-sm md:text-base hidden md:inline">
+        {{ $currentLang == 'ar' ? 'العربية' : 'En' }}
+    </span>
+
+    <!-- Dropdown menu here -->
+    <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="?lang=ar">العربية</a></li>
+        <li><a class="dropdown-item" href="?lang=en">English</a></li>
+    </ul>
+</div>
+
         <div class="dropdown-menu w-[180px] h-auto rounded-[12px] bg-[#FFFFFF] py-2 shadow-lg">
             <div class="flex items-center cursor-pointer py-3 px-4 text-base text-[#212121]"
                 onclick="window.location.href='{{ route('change.language', 'ar') }}'">
@@ -528,7 +543,7 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
         <ul class="py-2 text-sm text-gray-700 " aria-labelledby="dropdownMenuIconButton">
 
             {{-- Delivery Location Section --}}
-            <li class="mb-4">
+            {{-- <li class="mb-4">
              <!-- Dropdown + Modal -->
 <div  x-data="deliveryDropdown()"
                     class="relative inline-block text-[12px] tracking-[0%] w-auto max-w-[150px] lg:mx-4 sm:mx-1 md:w-[120px] md:h-[36px] shrink-0">
@@ -622,24 +637,21 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
         </div>
     </div>
 </div>
-            </li>
+            </li> --}}
 
             {{-- Language Selector Section --}}
-            <li class="mb-4">
+            {{-- <li class="mb-4">
                 @php
                     $currentLang = app()->getLocale();
                 @endphp
                 <div class="btn-group flex items-center" style="color: #212121; width:90px; height:24px;">
                     <div class="dropdown flex items-center cursor-pointer" data-bs-toggle="dropdown"
                         aria-expanded="false">
-                        {{-- The image is now inside the clickable area --}}
                         <img src="{{ asset('images/Vector (2).svg') }}" alt="Language Icon"
                             class="w-[16px] h-[16px] rtl:ml-2 ltr:mr-2">
-                        {{-- The span text is also inside the clickable area --}}
                         <span class="text-[#212121] text-sm md:text-base">
-                            {{ $currentLang == 'ar' ? 'العربية' : 'English' }}
+                            {{ $currentLang == 'ar' ? 'العربية' : 'En' }}
                         </span>
-                        {{-- The actual dropdown menu would follow this div --}}
                     </div>
                     <div class="dropdown-menu w-[180px] h-auto rounded-[12px] bg-[#FFFFFF] py-2 shadow-lg">
                         <div class="flex items-center cursor-pointer py-3 px-4 text-base text-[#212121]"
@@ -658,10 +670,9 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
                         </div>
                     </div>
                 </div>
-            </li>
+            </li> --}}
 
-            <hr class="my-2 border-gray-100 dark:border-gray-600">
-
+<h1 class="text-2xl font-bold">{{ __('messages.categories') }}</h1>
             {{-- Categories and Products Section --}}
         @if (isset($categories))
     <ul x-data="{ openCategory: null }">
@@ -756,7 +767,6 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
 
     {{-- ***************************************************************************************************** --}}
    @include('partials.responsive_search')
-   {{-- @include('search.search_bar') --}}
 
 
 </div>

@@ -48,7 +48,7 @@ public function store(Request $request)
     $offer->offer_end        = $validated['offer_end'];
     $offer->discount_percent = $validated['discount_percent'];
     $offer->description      = $validated['description'] ?? null;
-    $offer->user_id          = Auth::id();
+    // $offer->user_id          = Auth::id();
 
     if ($request->hasFile('image')) {
         $offer->image = $request->file('image')->store('offers', 'public');
@@ -107,7 +107,7 @@ public function store(Request $request)
 
 
         // **Add the authenticated user's ID**
-        $offer->user_id = Auth::id(); // or auth()->id();
+        // $offer->user_id = Auth::id(); // or auth()->id();
 
 
         $offer->name             = $validated['name'];

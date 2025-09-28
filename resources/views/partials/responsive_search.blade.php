@@ -1,6 +1,12 @@
-<div class="w-full md:flex-grow md:max-w-2xl px-2 md:mx-8 order-4">
-<form action="{{ route('search') }}" method="POST" class="main-search-form" enctype="multipart/form-data">
-    @csrf 
+<div class="w-full md:flex-grow  px-2 md:mx-8 order-4">
+ <form x-data="searchForm()" action="{{ route('search') }}" method="POST" enctype="multipart/form-data" class="main-search-form" @submit="setMode">
+        @csrf
+
+        <!-- Hidden inputs -->
+        <input type="hidden" name="mode" x-model="mode">
+        <input type="hidden" name="image_url" x-model="imageUrl">
+        <input type="file" name="image_file" x-ref="imageFile" class="hidden" @change="handleFileUpload">
+
             <div class="flex flex-nowrap border rounded-[12px] bg-[#F8F9FA] items-center py-1 px-2 relative gap-2">
 
             {{-- Category Dropdown (UNCHANGED logic) --}}
@@ -93,7 +99,7 @@
                                 </div>
                             </template>
                             <input type="file" id="imageInput" accept="image/*" class="hidden"
-                                @change="handleImageUpload">
+                                x-ref="imageFile" @change="handleImageUpload">
                         </div>
 
                         <!-- OR URL Input -->
@@ -119,3 +125,56 @@
         </div>
     </form>
 </div>
+<script>
+function searchForm() {
+    return {
+        mode: 'text',
+        query: '',
+        imageUrl: '',
+        showUploadModal: false,
+        imagePreview: null,
+
+        handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                this.mode = 'image';
+                this.imageUrl = '';
+                this.imagePreview = URL.createObjectURL(file);
+            }
+        },
+
+        handleDrop(event) {
+            const file = event.dataTransfer.files[0];
+            if (file) {
+                this.$refs.imageFile.files = event.dataTransfer.files;
+                this.imagePreview = URL.createObjectURL(file);
+                this.imageUrl = '';
+                this.mode = 'image';
+            }
+        },
+
+        setMode() {
+            // This ensures the hidden input "mode" is correct before submitting
+            if (this.$refs.imageFile.files.length > 0) {
+                this.mode = 'image';
+            } else if (this.imageUrl.trim() !== '') {
+                this.mode = 'url';
+            } else {
+                this.mode = 'text';
+            }
+        },
+
+        init() {
+            this.$watch('imageUrl', (value) => {
+                if (value.trim() !== '') {
+                    this.mode = 'url';
+                    this.imagePreview = null;
+                    this.$refs.imageFile.value = '';
+                } else if (!this.$refs.imageFile.files.length) {
+                    this.mode = 'text';
+                }
+            });
+        }
+    }
+}
+</script>

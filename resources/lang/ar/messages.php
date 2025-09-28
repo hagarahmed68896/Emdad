@@ -1106,7 +1106,8 @@ return [
     'bulk_product_upload' => 'رفع المنتجات بالجملة',
     'choose_file_label'=> 'اختر ملف Excel / CSV',
     'upload_products_button' => 'رفع المنتجات',
-    'download_template' => 'تحميل القالب'
+    'download_template' => 'تحميل القالب',
+    'edit_offer' => 'تعديل العرض',
 
 
 
