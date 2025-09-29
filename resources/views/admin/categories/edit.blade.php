@@ -53,6 +53,17 @@
                 </template>
             </div>
 
+                     <div class="mb-4">
+    <label class="block mb-1 font-bold">{{ __('messages.category_name_en') }}</label>
+    <input type="text" x-model="form.name_en" placeholder="{{ __('messages.enter_category_name_en') }}" class="border w-full px-3 py-3 rounded-xl">
+    <template x-if="errors.name_en">
+        <p class="text-red-600 text-sm" x-text="errors.name_en"></p>
+    </template>
+</div>
+</div>
+
+        <div class="grid grid-cols-1 md:grid-cols-1 gap-6">
+
             <!-- نوع الفئة -->
             <div class="mb-4">
                 <label class="block mb-1 font-bold">{{ __('messages.category_type') }}</label>
@@ -98,6 +109,7 @@ document.addEventListener('alpine:init', () => {
         preview: null,
         form: {
             name: '',
+            'name_en': '', // ✅ added
             type: '',
             category_id: '',
             description: '',
@@ -107,6 +119,7 @@ document.addEventListener('alpine:init', () => {
         init(data) {
             this.form = {
                 name: data.name,
+                name_en: data.name_en, // ✅ added
                 type: data.type,
                 category_id: data.category_id ? data.category_id.toString() : '',
                 description: data.description ?? '',
@@ -133,6 +146,7 @@ document.addEventListener('alpine:init', () => {
             formData.append('_method', 'PUT');
             formData.append('_token', '{{ csrf_token() }}');
             formData.append('name', this.form.name);
+            formData.append('name_en', this.form.name_en); // ✅ added
             formData.append('type', this.form.type);
             formData.append('category_id', this.form.category_id);
             formData.append('description', this.form.description);

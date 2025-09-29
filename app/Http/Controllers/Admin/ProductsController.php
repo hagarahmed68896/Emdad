@@ -29,11 +29,16 @@ $unavailablePercentage = $totalProducts > 0
             // 👈 Loads supplier (BusinessData) + subCategory + parent category
 
         // ✅ Search
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
-        }
+if ($request->filled('search')) {
+    $search = $request->input('search');
+
+    $query->where(function ($q) use ($search) {
+        $q->where('name', 'like', "%{$search}%")
+          ->orWhere('name_en', 'like', "%{$search}%")
+          ->orWhere('description', 'like', "%{$search}%");
+    });
+}
+
 
         // ✅ Availability filter
         if ($request->has('status')) {

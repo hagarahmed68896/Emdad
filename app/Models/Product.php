@@ -41,6 +41,7 @@ class Product extends Model
         'sizes',   
         'colors',  
         'product_status', 
+        'name_en',
 
     ];
 

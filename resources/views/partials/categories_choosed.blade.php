@@ -34,7 +34,9 @@
                     </div>
 
                     <div class="p-4 text-center flex-grow flex items-center justify-center mb-4">
-                        <h3 class="text-[24px] font-bold text-gray-700">{{ $category->name }}</h3>
+<h3 class="text-[24px] font-bold text-gray-700">
+    {{ app()->getLocale() === 'ar' ? $category->name : $category->name_en }}
+</h3>
                     </div>
                 </div>
             @endforeach

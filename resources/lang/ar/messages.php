@@ -244,7 +244,7 @@ return [
     'to' => ' الي',
     'contact_supplier' =>'تواصل مع المورد',
     'place_order' => 'ابدأ الطلب',
-    'reviews' => 'تقييمًا',
+    'reviews' => 'التقييمات',
     'stars' => 'نجوم',
     'pieces' => 'قطعة',
     'selectable' => 'قابل للتخصيص',
@@ -1108,7 +1108,16 @@ return [
     'upload_products_button' => 'رفع المنتجات',
     'download_template' => 'تحميل القالب',
     'edit_offer' => 'تعديل العرض',
-
+    'search_with_image' => 'نتائج البحث بالصورة',
+    'no_search_image' => 'لا توجد نتائج بحث مطابقة لصورتك',
+    'read_error'      => 'حدث خطأ في قراءة الرد من الخادم.',
+    'unexpected'      => 'حدث خطأ غير متوقع.',
+    'reset_sent'      => 'تم إرسال رابط إعادة التعيين إلى بريدك الإلكتروني.',
+    'send_error'      => 'حدث خطأ أثناء إرسال البريد الإلكتروني.',
+    'category_name_en' => 'اسم الفئة بالإنجليزية',
+    'enter_category_name_en' => 'أدخل اسم الفئة بالإنجليزية',
+    'product_name_en' => 'اسم المنتج بالإنجليزية',
+    'product_name_en_placeholder' => 'أدخل اسم المنتج بالإنجليزية',
 
 
 

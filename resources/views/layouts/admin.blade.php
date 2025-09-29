@@ -475,7 +475,7 @@
                         <img src="{{ asset('images/Vector (2).svg') }}" alt="Language Icon"
                             class="w-[16px] h-[16px] rtl:ml-2 ltr:mr-2">
                         <span class="text-[#212121] text-sm md:text-base">
-                            {{ $currentLang == 'ar' ? 'العربية' : 'English' }}
+                            {{ $currentLang == 'ar' ? 'العربية' : 'En' }}
                         </span>
                     </div>
 

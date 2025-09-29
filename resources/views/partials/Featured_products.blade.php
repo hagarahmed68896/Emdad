@@ -99,9 +99,12 @@
                                     <span class="text-[18px]">{{ $featuredProduct->rating ?? '4.5' }}</span>
                                 </div>
                             </div>
-                            <span
-                                class="text-[#696969] text-[20px]">{{ $featuredProduct->subCategory->category->name ?? 'غير مصنف' }}</span>
-                            <div class="flex mt-2">
+                           <span class="text-[#696969] text-[20px]">
+    {{ app()->getLocale() === 'ar' 
+        ? ($featuredProduct->subCategory->category->name ?? 'غير مصنف') 
+        : ($featuredProduct->subCategory->category->name_en ?? 'Uncategorized') }}
+</span>
+ <div class="flex mt-2">
                                 @if ($featuredProduct->supplier->supplier_confirmed)
                                     <span class="flex items-center text-[#185D31]">
                                         <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]"

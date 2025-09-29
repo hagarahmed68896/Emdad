@@ -1118,6 +1118,16 @@ return [
     'upload_products_button' => 'رفع المنتجات',
     'download_template' => 'Download Template',
     'edit_offer' => 'Edit Offer',
+    'search_with_image' => 'Results for search with image',
+    'no_search_image' => 'No search image provided.',
+    'read_error'      => 'An error occurred while reading the server response.',
+    'unexpected'      => 'An unexpected error occurred.',
+    'reset_sent'      => 'A reset link has been sent to your email.',
+    'send_error'      => 'An error occurred while sending the email.',
+    'category_name_en' => 'Category Name (EN)',
+    'enter_category_name_en' => 'Enter category name in English',
+    'product_name_en' => 'Product Name (EN)',
+    'product_name_en_placeholder' => 'Enter the product name in English',
 
 
 

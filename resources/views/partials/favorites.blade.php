@@ -103,8 +103,12 @@
                                         <span class="text-[18px]">{{ $favorite->product->rating ?? '4.5' }}</span>
                                     </div>
                                 </div>
-                                <span
-                                    class="text-[#696969] text-[20px]">{{ $favorite->product->subCategory->category->name ?? 'غير مصنف' }}</span>
+<span class="text-[#696969] text-[20px]">
+    {{ app()->getLocale() === 'ar' 
+        ? ($favorite->product->subCategory->category->name ?? 'غير مصنف') 
+        : ($favorite->product->subCategory->category->name_en ?? 'Uncategorized') }}
+</span>
+
                                 <div class="flex mt-2">
                                     @if ($favorite->product->supplier->supplier_confirmed)
                                         <span class="flex items-center text-[#185D31]">

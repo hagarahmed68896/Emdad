@@ -9,7 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Category extends Model
 {
     use HasFactory;
-    protected $fillable = ['name', 'slug','iconUrl','description'];
+    protected $fillable = ['name',    'name_en',
+ 'slug','iconUrl','description'];
     // public function getNameAttribute()
     // {
     //     return app()->getLocale() === 'ar' ? $this->name : $this->name;

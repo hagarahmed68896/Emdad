@@ -13,106 +13,112 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class CategoriesController extends Controller
 {
-    public function index(Request $request)
-    {
-        $totalCategories = Category::count();
-        $totalSubCategories = SubCategory::count();
-        $availableProducts = Product::where('is_available', true)->count();
-        $unavailableProducts = Product::where('is_available', false)->count();
-   $totalProducts = $availableProducts + $unavailableProducts;
+  public function index(Request $request)
+{
+    $totalCategories = Category::count();
+    $totalSubCategories = SubCategory::count();
+    $availableProducts = Product::where('is_available', true)->count();
+    $unavailableProducts = Product::where('is_available', false)->count();
+    $totalProducts = $availableProducts + $unavailableProducts;
 
     // ✅ حساب النسب
     $availablePercentage = $totalProducts > 0 ? round(($availableProducts / $totalProducts) * 100, 2) : 0;
     $unavailablePercentage = $totalProducts > 0 ? round(($unavailableProducts / $totalProducts) * 100, 2) : 0;
-    $categoriesPercentage = $totalCategories > 0 ? round(($totalCategories / $totalCategories) * 100, 2) : 0;
+    $categoriesPercentage = $totalCategories > 0 ? 100 : 0;
 
-        $categoriesQuery = Category::query();
-        $subCategoriesQuery = SubCategory::with('category');
+    $categoriesQuery = Category::query();
+    $subCategoriesQuery = SubCategory::with('category');
 
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $categoriesQuery->where('name', 'like', "%{$search}%");
-            $subCategoriesQuery->where('name', 'like', "%{$search}%");
-        }
+    // ✅ تحديد العمود حسب اللغة
+    $column = app()->getLocale() === 'ar' ? 'name' : 'name_en';
 
-        if ($request->status === 'category') {
-            $categories = $categoriesQuery->get();
-            $subCategories = collect();
-        } elseif ($request->status === 'sub_category') {
-            $categories = collect();
-            $subCategories = $subCategoriesQuery->get();
-        } else {
-            $categories = $categoriesQuery->get();
-            $subCategories = $subCategoriesQuery->get();
-        }
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $categoriesQuery->where($column, 'like', "%{$search}%");
+        $subCategoriesQuery->where($column, 'like', "%{$search}%");
+    }
 
-        $items = collect();
+    if ($request->status === 'category') {
+        $categories = $categoriesQuery->get();
+        $subCategories = collect();
+    } elseif ($request->status === 'sub_category') {
+        $categories = collect();
+        $subCategories = $subCategoriesQuery->get();
+    } else {
+        $categories = $categoriesQuery->get();
+        $subCategories = $subCategoriesQuery->get();
+    }
+
+    $items = collect();
     $statusFilter = $request->status ?? '';
     $sortFilter = $request->sort ?? '';
-foreach ($categories as $category) {
-    $items->push((object)[
-        'type' => 'category',
-        'id' => $category->id,
-        'name' => $category->name,
-        'description' => $category->description ?? '-',
-        'parent' => '-',
-        'products_count' => $category->products()->count(),
-        'iconUrl' => $category->iconUrl,
-        'created_at' => $category->created_at,
-    ]);
-}
 
-foreach ($subCategories as $subCategory) {
-    $items->push((object)[
-        'type' => 'sub_category',
-        'id' => $subCategory->id,
-        'name' => $subCategory->name,
-        'description' => '-',
-        'parent' => $subCategory->category ? $subCategory->category->name : '-',
-        'products_count' => $subCategory->products()->count(),
-        'iconUrl' => $subCategory->iconUrl,
-        'created_at' => $subCategory->created_at,
-        'statusFilter' => $statusFilter,
-        'sortFilter' => $sortFilter,
-    ]);
-}
-
-        if ($request->sort === 'name_asc') {
-            $items = $items->sortBy('name');
-        } elseif ($request->sort === 'name_desc') {
-            $items = $items->sortByDesc('name');
-        } elseif ($request->sort === 'oldest') {
-            $items = $items->sortBy('created_at');
-        } else {
-            $items = $items->sortByDesc('created_at');
-        }
-
-        // ✅ إضافة Pagination يدويًا
-        $perPage = 10;
-        $page = $request->get('page', 1);
-        $itemsPaginated = $items->forPage($page, $perPage);
-        $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
-            $itemsPaginated,
-            $items->count(),
-            $perPage,
-            $page,
-            ['path' => $request->url(), 'query' => $request->query()]
-        );
-
-        return view('admin.categories.index', [
-            'items' => $paginator,
-            'totalCategories' => $totalCategories,
-            'totalSubCategories' => $totalSubCategories,
-            'availableProducts' => $availableProducts,
-               'availablePercentage' => $availablePercentage,
-        'unavailablePercentage' => $unavailablePercentage,
-        'categoriesPercentage' => $categoriesPercentage,
-            'unavailableProducts' => $unavailableProducts,
-            'search' => $request->search,
-            'selectedStatus' => $request->status ?? 'all',
-            'sort' => $request->sort ?? 'latest',
+    foreach ($categories as $category) {
+        $items->push((object)[
+            'type' => 'category',
+            'id' => $category->id,
+            'name' => app()->getLocale() === 'ar' ? $category->name : $category->name_en,
+            'description' => $category->description ?? '-',
+            'parent' => '-',
+            'products_count' => $category->products()->count(),
+            'iconUrl' => $category->iconUrl,
+            'created_at' => $category->created_at,
         ]);
     }
+
+    foreach ($subCategories as $subCategory) {
+        $items->push((object)[
+            'type' => 'sub_category',
+            'id' => $subCategory->id,
+            'name' => app()->getLocale() === 'ar' ? $subCategory->name : $subCategory->name_en,
+            'description' => '-',
+            'parent' => $subCategory->category ? (app()->getLocale() === 'ar' ? $subCategory->category->name : $subCategory->category->name_en) : '-',
+            'products_count' => $subCategory->products()->count(),
+            'iconUrl' => $subCategory->iconUrl,
+            'created_at' => $subCategory->created_at,
+            'statusFilter' => $statusFilter,
+            'sortFilter' => $sortFilter,
+        ]);
+    }
+
+    // ✅ ترتيب النتائج
+    if ($request->sort === 'name_asc') {
+        $items = $items->sortBy('name');
+    } elseif ($request->sort === 'name_desc') {
+        $items = $items->sortByDesc('name');
+    } elseif ($request->sort === 'oldest') {
+        $items = $items->sortBy('created_at');
+    } else {
+        $items = $items->sortByDesc('created_at');
+    }
+
+    // ✅ إضافة Pagination يدويًا
+    $perPage = 10;
+    $page = $request->get('page', 1);
+    $itemsPaginated = $items->forPage($page, $perPage);
+    $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+        $itemsPaginated,
+        $items->count(),
+        $perPage,
+        $page,
+        ['path' => $request->url(), 'query' => $request->query()]
+    );
+
+    return view('admin.categories.index', [
+        'items' => $paginator,
+        'totalCategories' => $totalCategories,
+        'totalSubCategories' => $totalSubCategories,
+        'availableProducts' => $availableProducts,
+        'unavailableProducts' => $unavailableProducts,
+        'availablePercentage' => $availablePercentage,
+        'unavailablePercentage' => $unavailablePercentage,
+        'categoriesPercentage' => $categoriesPercentage,
+        'search' => $request->search,
+        'selectedStatus' => $request->status ?? 'all',
+        'sort' => $request->sort ?? 'latest',
+    ]);
+}
+
 
     public function create()
     {
@@ -127,6 +133,7 @@ foreach ($subCategories as $subCategory) {
         $request->validate([
             'type' => 'required|in:category,sub_category',
             'name' => 'required|string|max:255',
+            'name_en' => 'nullable|string|max:255', // ✅ added
             'iconUrl' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'description' => 'nullable|string',
             'category_id' => 'nullable|exists:categories,id',
@@ -145,6 +152,7 @@ foreach ($subCategories as $subCategory) {
         if ($request->type === 'category') {
             Category::create([
                 'name' => $request->name,
+                'name_en' => $request->name_en, // ✅
                 'slug' => $slug,
                 'description' => $request->description,
                 'iconUrl' => $iconPath,
@@ -152,6 +160,7 @@ foreach ($subCategories as $subCategory) {
         } elseif ($request->type === 'sub_category') {
             SubCategory::create([
                 'name' => $request->name,
+                'name_en' => $request->name_en, // ✅
                 'slug' => $slug,
                 'iconUrl' => $iconPath,
                 'category_id' => $request->category_id,
@@ -230,6 +239,7 @@ public function editSubCategory($id)
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'name_en' => 'nullable|string|max:255', // ✅ added
             'description' => 'nullable|string',
             'iconUrl' => 'nullable|image|mimes:jpeg,png|max:2048',
         ]);
@@ -252,6 +262,7 @@ public function editSubCategory($id)
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'name_en' => 'nullable|string|max:255', // ✅ added
             'category_id' => 'required|exists:categories,id',
             'iconUrl' => 'nullable|image|mimes:jpeg,png|max:2048',
         ]);
@@ -273,10 +284,20 @@ public function editSubCategory($id)
         $categories = Category::query();
         $subCategories = SubCategory::query();
 
-        if ($request->filled('search')) {
-            $categories->where('name', 'like', "%{$request->search}%");
-            $subCategories->where('name', 'like', "%{$request->search}%");
-        }
+     if ($request->filled('search')) {
+    $search = $request->search;
+
+    $categories->where(function ($q) use ($search) {
+        $q->where('name', 'like', "%{$search}%")
+          ->orWhere('name_en', 'like', "%{$search}%"); // ✅ added
+    });
+
+    $subCategories->where(function ($q) use ($search) {
+        $q->where('name', 'like', "%{$search}%")
+          ->orWhere('name_en', 'like', "%{$search}%"); // ✅ added
+    });
+}
+
 
         $categories = $categories->get();
         $subCategories = $subCategories->with('category')->get();

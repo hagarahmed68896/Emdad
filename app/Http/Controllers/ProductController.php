@@ -402,6 +402,7 @@ public function offers()
         // Validate the incoming request data
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
+            'name_en' => 'required|string|max:255',
             'slug' => 'required|string|unique:products,slug|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
@@ -507,6 +508,7 @@ public function offers()
         // Create the product
         $product = Product::create([
             'name' => $validatedData['name'],
+            'name_en' => $validatedData['name_en'],
             'slug' => $validatedData['slug'],
             'description' => $validatedData['description'] ?? null,
             'price' => $validatedData['price'],

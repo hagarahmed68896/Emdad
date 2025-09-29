@@ -70,9 +70,10 @@
                 </td>
 
                 {{-- ✅ اسم المنتج --}}
-                <td class="px-4 py-3 text-right text-gray-800">
-                    {{ $product->name }}
-                </td>
+            <td class="px-4 py-3 text-right text-gray-800">
+    {{ app()->getLocale() === 'ar' ? $product->name : $product->name_en }}
+</td>
+
 
                 {{-- ✅ اسم المورد --}}
                 <td class="px-4 py-3 text-right text-gray-800">

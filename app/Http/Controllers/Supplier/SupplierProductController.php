@@ -45,6 +45,7 @@ class SupplierProductController extends Controller
         // ✅ Validate product + offer fields with max size rule
         $data = $request->validate([
             'name'              => 'required|string|max:255',
+            'name_en'           => 'required|string|max:255',
             'price'             => 'required|numeric|min:0',
             'model_number'      => ['nullable', 'string', Rule::unique('products', 'model_number')],
             'sub_category_id'   => 'required|exists:sub_categories,id',
@@ -268,6 +269,7 @@ public function update(Request $request, Product $product)
         // ✅ Validate input
         $data = $request->validate([
             'name'               => 'required|string|max:255',
+            'name_en'            => 'required|string|max:255',
             'price'              => 'required|numeric|min:0',
             'model_number'       => 'nullable|string',
             'sub_category_id'    => 'required|exists:sub_categories,id',
@@ -312,8 +314,8 @@ public function update(Request $request, Product $product)
         $productData = $data;
 
         // ✅ Slug update if name changes
-        if ($product->name !== $data['name']) {
-            $productData['slug'] = Str::slug($data['name']) . '-' . Str::random(8);
+        if ($product->name !== $data['name_en']) {
+            $productData['slug'] = Str::slug($data['name_en']) . '-' . Str::random(8);
         }
 
         // ✅ Main image

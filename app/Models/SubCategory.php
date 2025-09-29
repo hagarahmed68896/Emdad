@@ -25,6 +25,7 @@ class SubCategory extends Model
      */
     protected $fillable = [
         'name',
+        'name_en',   // ✅ added
         'slug',
         'iconUrl',
         'category_id', // Ensure category_id is fillable as it's a foreign key

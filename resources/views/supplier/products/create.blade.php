@@ -151,6 +151,13 @@ class="absolute top-1 left-1 bg-red-500 text-white rounded-full p-1 leading-none
                 <input type="text" name="name" placeholder="{{ __('messages.product_name_placeholder') }}" class="border p-2 w-full rounded-xl" value="{{ old('name') }}">
                 @error('name') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
             </div>
+              <div>
+                <label class="block mb-1 font-bold">{{ __('messages.product_name_en') }}</label>
+                <input type="text" name="name_en" placeholder="{{ __('messages.product_name_en_placeholder') }}" class="border p-2 w-full rounded-xl" value="{{ old('name_en') }}">
+                @error('name_en') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+            </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-1 gap-4">
 
             <div>
                 <label class="block mb-1 font-bold">{{ __('messages.model_number') }}</label>
@@ -169,50 +176,88 @@ class="absolute top-1 left-1 bg-red-500 text-white rounded-full p-1 leading-none
     }" 
     @click.away="openCategory = false; openSubCategory = false"
 >
+    <!-- Category -->
     <div class="relative">
         <label class="block mb-1 font-bold">{{ __('messages.select_category') }}</label>
-        <div @click="openCategory = !openCategory" class="border p-2 w-full rounded-xl cursor-pointer flex justify-between items-center bg-white">
-            <span x-text="selectedCategory ? selectedCategory.name : '{{ __('messages.select_category') }}'"></span>
-            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+        <div @click="openCategory = !openCategory" 
+             class="border p-2 w-full rounded-xl cursor-pointer flex justify-between items-center bg-white">
+            <span 
+                x-text="selectedCategory ? selectedCategory.name : '{{ __('messages.select_category') }}'">
+            </span>
+            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                <path fill-rule="evenodd" 
+                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 
+                         1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" 
+                      clip-rule="evenodd" />
             </svg>
         </div>
- <ul x-show="openCategory" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-xl max-h-60 overflow-y-auto">
-    @foreach ($categories as $category)
-        <li @click="selectedCategory = {id: {{ $category->id }}, name: '{{ $category->name }}'}; selectedSubCategory = null; openCategory = false;" 
-            class="p-2 cursor-pointer hover:bg-gray-100 flex items-center">
-    <img src="{{ asset('storage/' . $category->iconUrl) }}"
-                                class="w-10 h-10 mx-2 rounded-xl p-1 bg-gray-100 object-cover" />
-                                            <span>{{ $category->name }}</span>
-        </li>
-    @endforeach
-</ul>
+
+        <ul x-show="openCategory" 
+            class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-xl max-h-60 overflow-y-auto">
+            @foreach ($categories as $category)
+                <li 
+                    @click="selectedCategory = {
+                        id: {{ $category->id }}, 
+                        name: '{{ app()->getLocale() === 'ar' ? $category->name : $category->name_en }}'
+                    }; 
+                    selectedSubCategory = null; 
+                    openCategory = false;" 
+                    class="p-2 cursor-pointer hover:bg-gray-100 flex items-center"
+                >
+                    <img src="{{ asset('storage/' . $category->iconUrl) }}"
+                         class="w-10 h-10 mx-2 rounded-xl p-1 bg-gray-100 object-cover" />
+
+                    <span>
+                        {{ app()->getLocale() === 'ar' ? $category->name : $category->name_en }}
+                    </span>
+                </li>
+            @endforeach
+        </ul>
+
         <input type="hidden" name="category_id" x-model="selectedCategory.id">
     </div>
 
+    <!-- Subcategory -->
     <div class="relative">
         <label class="block mb-1 font-bold">{{ __('messages.select_subcategory') }}</label>
         <div @click="if (selectedCategory) openSubCategory = !openSubCategory" 
              :class="{'opacity-50 cursor-not-allowed': !selectedCategory}" 
              class="border p-2 w-full rounded-xl cursor-pointer flex justify-between items-center bg-white">
-            <span x-text="selectedSubCategory ? selectedSubCategory.name : '{{ __('messages.select_subcategory') }}'"></span>
-            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            <span 
+                x-text="selectedSubCategory ? selectedSubCategory.name : '{{ __('messages.select_subcategory') }}'">
+            </span>
+            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                <path fill-rule="evenodd" 
+                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 
+                         111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 
+                         010-1.414z" 
+                      clip-rule="evenodd" />
             </svg>
         </div>
-        <ul x-show="openSubCategory" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-xl max-h-60 overflow-y-auto">
+
+        <ul x-show="openSubCategory" 
+            class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-xl max-h-60 overflow-y-auto">
             <template x-for="sub in window.subCategories[selectedCategory.id]" :key="sub.id">
-           <li @click="selectedSubCategory = {id: sub.id, name: sub.name}; openSubCategory = false" 
-            class="p-2 cursor-pointer hover:bg-gray-100 flex items-center">
-            <img :src="'{{ asset('storage/') }}' + '/' + sub.iconUrl"
-                class="w-10 h-10 mx-2 rounded-xl p-1 bg-gray-100 object-cover" />
-            <span x-text="sub.name"></span>
-        </li>
+                <li 
+                    @click="selectedSubCategory = {
+                        id: sub.id, 
+                        name: ('{{ app()->getLocale() }}' === 'ar') ? sub.name : sub.name_en
+                    }; 
+                    openSubCategory = false" 
+                    class="p-2 cursor-pointer hover:bg-gray-100 flex items-center"
+                >
+                    <img :src="'{{ asset('storage/') }}' + '/' + sub.iconUrl"
+                         class="w-10 h-10 mx-2 rounded-xl p-1 bg-gray-100 object-cover" />
+
+                    <span x-text="'{{ app()->getLocale() }}' === 'ar' ? sub.name : sub.name_en"></span>
+                </li>
             </template>
         </ul>
+
         <input type="hidden" name="sub_category_id" x-model="selectedSubCategory.id">
     </div>
 </div>
+
 {{--السعر الاساسي--}}
 
         <div>
