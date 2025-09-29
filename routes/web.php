@@ -327,7 +327,7 @@ Route::post('/reviews/{review}/action', [ReviewController::class, 'takeAction'])
                // ادارة الاعدادات بالكامل
                Route::get('/settings/profile', [SettingsController::class, 'index'])->name('admin.profile.index');
                Route::post('/profile/photo/upload', [SettingsController::class, 'updateProfilePicture'])->name('profile.photo.upload');
-               Route::post('/profile/photo/delete', [SettingsController::class, 'removeProfilePicture'])->name('profile.photo.delete');
+               Route::delete('/profile/photo/delete', [SettingsController::class, 'removeProfilePicture'])->name('profile.photo.delete');
 
                Route::put('/profile/update', [SettingsController::class, 'updateProfile'])->name('profile.update');
           

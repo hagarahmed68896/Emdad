@@ -228,11 +228,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // Choose new photo
     changePhotoBtn.addEventListener('click', () => profilePictureInput.click());
 
-    // File selection
+    // File selection + preview
     profilePictureInput.addEventListener('change', function(e) {
         if (e.target.files.length > 0) {
             saveProfilePhotoBtn.classList.remove('hidden');
             uploadMessage.textContent = '{{ __("messages.new_photo_selected") }}';
+
+            // Show preview in modal immediately
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                modalProfileImage.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
         }
     });
 
@@ -373,12 +381,12 @@ function togglePassword(fieldId, iconContainer) {
 
     if (field.type === 'password') {
         field.type = 'text';
-        eyeOpen.classList.add('hidden');
-        eyeClosed.classList.remove('hidden');
+        if (eyeOpen) eyeOpen.classList.add('hidden');
+        if (eyeClosed) eyeClosed.classList.remove('hidden');
     } else {
         field.type = 'password';
-        eyeClosed.classList.add('hidden');
-        eyeOpen.classList.remove('hidden');
+        if (eyeClosed) eyeClosed.classList.add('hidden');
+        if (eyeOpen) eyeOpen.classList.remove('hidden');
     }
 }
 </script>
