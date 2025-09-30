@@ -484,6 +484,9 @@ Route::put('site_texts/{site_text}', [\App\Http\Controllers\Admin\SiteTextContro
     Route::get('ads', [AdminAdController::class, 'index'])->name('admin.ads.index');
     Route::post('ads/{id}/approve', [AdminAdController::class, 'approve'])->name('admin.ads.approve');
     Route::post('ads/{id}/reject', [AdminAdController::class, 'reject'])->name('admin.ads.reject');
+
+    Route::get('/contact-messages', [\App\Http\Controllers\Admin\ContactMessageController::class, 'index'])->name('admin.contact_messages.index');
+
 });
                Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 

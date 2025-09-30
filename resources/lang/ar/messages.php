@@ -1118,6 +1118,9 @@ return [
     'enter_category_name_en' => 'أدخل اسم الفئة بالإنجليزية',
     'product_name_en' => 'اسم المنتج بالإنجليزية',
     'product_name_en_placeholder' => 'أدخل اسم المنتج بالإنجليزية',
+    'tech_support' => 'الدعم الفني',
+    'message' => 'الرسالة',
+    'search_msg' => 'بحث في الرسائل',
 
 
 

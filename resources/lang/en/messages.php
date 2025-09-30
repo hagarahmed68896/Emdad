@@ -1128,6 +1128,9 @@ return [
     'enter_category_name_en' => 'Enter category name in English',
     'product_name_en' => 'Product Name (EN)',
     'product_name_en_placeholder' => 'Enter the product name in English',
+    'tech_support' => 'Technical Support',
+    'message' => 'Message',
+    'search_msg' => 'Search Message',
 
 
 
