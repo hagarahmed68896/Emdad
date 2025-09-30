@@ -67,23 +67,24 @@ public function saveLocation(Request $request)
     $user = Auth::user();
 
     try {
-        // prefer filled() so empty strings are rejected
         if ($request->filled('city')) {
+            // Save only city name as address
             $user->address = $request->input('city');
+            $user->lat = null;
+            $user->lng = null;
         } elseif ($request->filled('address') && $request->filled('lat') && $request->filled('lng')) {
             $address = $request->input('address');
             $lat = $request->input('lat');
             $lng = $request->input('lng');
 
-            // ensure numeric lat/lng (extra safety server-side)
-            $lat = is_numeric($lat) ? $lat : null;
-            $lng = is_numeric($lng) ? $lng : null;
-
-            if ($lat === null || $lng === null) {
+            // ensure numeric lat/lng (server safety)
+            if (!is_numeric($lat) || !is_numeric($lng)) {
                 return response()->json(['success' => false, 'message' => 'Invalid coordinates'], 400);
             }
 
-            $user->address = $address . " (" . $lat . "," . $lng . ")";
+            $user->address = $address;
+            $user->lat = (float) $lat;
+            $user->lng = (float) $lng;
         } else {
             return response()->json(['success' => false, 'message' => 'Invalid data'], 400);
         }
@@ -92,15 +93,16 @@ public function saveLocation(Request $request)
 
         return response()->json(['success' => true]);
     } catch (\Exception $e) {
-        // log details to help debugging
-        Log::error('saveLocation error: '.$e->getMessage(), [
-            'trace' => $e->getTraceAsString(),
+        Log::error('saveLocation error: ' . $e->getMessage(), [
+            'trace'   => $e->getTraceAsString(),
             'payload' => $request->all(),
             'user_id' => optional($user)->id,
         ]);
 
         return response()->json(['success' => false, 'message' => 'Server error'], 500);
-    }}
+    }
+}
+
 
 
 

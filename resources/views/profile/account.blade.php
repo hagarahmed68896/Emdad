@@ -114,9 +114,17 @@
             <aside class="w-full md:w-1/4 bg-gray-50 p-6 border-b md:border-b-0 md:border-l border-gray-200">
                 <div class="flex flex-col items-center pb-6 border-b border-gray-200 mb-6">
                     <div class="relative w-28 h-28 mb-4">
+
                         <img id="profilePageImage"
                             src="{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : asset('images/Unknown_person.jpg') }}"
                             class="w-full h-full rounded-full object-cover shadow-md border-2 border-gray-300">
+{{-- @dd(Auth::check(), Auth::user()) --}}
+
+                        {{-- @dd(asset('storage/' . Auth::user()->profile_picture)) --}}
+
+
+
+
                         <button id="openProfileModalBtn"
                             class="absolute bottom-0 left-0 bg-[#185D31] rounded-full p-2 shadow-md hover:bg-green-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-400">
                             {{-- SVG Pen Icon --}}
@@ -128,6 +136,8 @@
                                     clip-rule="evenodd" />
                             </svg>
                         </button>
+
+
                         <input type="file" id="profilePictureInput" accept="image/*" class="hidden">
                     </div>
                     <button id="saveProfilePhotoBtn"
@@ -337,6 +347,18 @@
             <div id="modalMessage" class="mt-4 text-sm text-center"></div>
         </div>
     </div>
+<div id="confirmRemoveModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
+    <div class="bg-white rounded-lg p-6 w-80 text-center shadow-lg">
+        <h3 class="text-xl font-semibold mb-4 text-gray-800">{{ __('messages.confirm_delete') }}</h3>
+        <p class="text-gray-600 mb-6">{{ __('messages.confirm_delete_message') }}</p>
+        <div class="flex justify-around">
+            <button id="confirmRemoveBtn" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">{{ __('messages.yes_remove') }}</button>
+            <button id="cancelRemoveBtn" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">{{ __('messages.cancel') }}</button>
+        </div>
+    </div>
+</div>
+
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Get references to main page elements
@@ -607,45 +629,62 @@
 
         // --- Handle Remove Photo Button Click (AJAX removal) ---
         @if (Auth::user()->profile_picture)
-            if (removePhotoBtn) {
-                removePhotoBtn.addEventListener('click', async function() {
-                    if (!confirm('{{ __('messages.confirm_delete_image') }}')) {
-                        return;
-                    }
-                    modalMessage.textContent = '';
-                    uploadLoading.classList.remove('hidden');
-                    try {
-                        const response = await fetch('{{ route('profile.removeProfilePicture') }}', {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                'Accept': 'application/json'
-                            }
-                        });
-                        const data = await response.json();
-                        uploadLoading.classList.add('hidden');
-                        if (response.ok) {
-                            const defaultImageUrl = '{{ asset('images/Unknown_person.jpg') }}';
-                            profileImage.src = defaultImageUrl;
-                            modalProfileImage.src = defaultImageUrl;
-                            modalMessage.className = 'mt-4 text-sm text-green-500 text-center';
-                            modalMessage.textContent = data.message || 'تم حذف الصورة الشخصية بنجاح.';
-                            removePhotoBtn.classList.add('hidden');
-                            saveProfilePhotoBtn.classList.add('hidden');
-                            profilePictureInput.value = '';
-                            selectedFile = null;
-                        } else {
-                            modalMessage.className = 'mt-4 text-sm text-red-500 text-center';
-                            modalMessage.textContent = data.message || 'حدث خطأ أثناء حذف الصورة.';
-                        }
-                    } catch (error) {
-                        console.error('Error removing profile picture:', error);
-                        uploadLoading.classList.add('hidden');
-                        modalMessage.className = 'mt-4 text-sm text-red-500 text-center';
-                        modalMessage.textContent = 'حدث خطأ غير متوقع أثناء الحذف.';
-                    }
-                });
+          if (removePhotoBtn) {
+    const confirmRemoveModal = document.getElementById('confirmRemoveModal');
+    const confirmRemoveBtn = document.getElementById('confirmRemoveBtn');
+    const cancelRemoveBtn = document.getElementById('cancelRemoveBtn');
+
+    // Open confirmation modal when clicking "Remove Photo"
+    removePhotoBtn.addEventListener('click', () => {
+        confirmRemoveModal.classList.remove('hidden');
+    });
+
+    // Cancel button closes the modal
+    cancelRemoveBtn.addEventListener('click', () => {
+        confirmRemoveModal.classList.add('hidden');
+    });
+
+    // Confirm button triggers AJAX removal
+    confirmRemoveBtn.addEventListener('click', async () => {
+        confirmRemoveModal.classList.add('hidden'); // close modal
+        modalMessage.textContent = '';
+        uploadLoading.classList.remove('hidden');
+
+        try {
+            const response = await fetch('{{ route('profile.removeProfilePicture') }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+            uploadLoading.classList.add('hidden');
+
+            if (response.ok) {
+                const defaultImageUrl = '{{ asset('images/Unknown_person.jpg') }}';
+                profileImage.src = defaultImageUrl;
+                modalProfileImage.src = defaultImageUrl;
+                modalMessage.className = 'mt-4 text-sm text-green-500 text-center';
+                modalMessage.textContent = data.message || 'تم حذف الصورة الشخصية بنجاح.';
+                removePhotoBtn.classList.add('hidden');
+                saveProfilePhotoBtn.classList.add('hidden');
+                profilePictureInput.value = '';
+                selectedFile = null;
+            } else {
+                modalMessage.className = 'mt-4 text-sm text-red-500 text-center';
+                modalMessage.textContent = data.message || 'حدث خطأ أثناء حذف الصورة.';
             }
+        } catch (error) {
+            console.error('Error removing profile picture:', error);
+            uploadLoading.classList.add('hidden');
+            modalMessage.className = 'mt-4 text-sm text-red-500 text-center';
+            modalMessage.textContent = 'حدث خطأ غير متوقع أثناء الحذف.';
+        }
+    });
+}
+
         @endif
     });
 

@@ -564,7 +564,7 @@ return [
 'manage_categories'     => 'إدارة الفئات',
 'selected'              => 'محدد',
 'confirm_bulk_delete'   => 'تأكيد الحذف الجماعي',
-'confirm_delete_message'=> 'هل أنت متأكد أنك تريد حذف',
+'confirm_delete_message'=> 'هل أنت متأكد أنك تريد الحذف',
 'name_asc'              => 'الاسم (أ-ي)',
 'name_desc'             => 'الاسم (ي-أ)',
 'oldest'                => 'الأقدم',

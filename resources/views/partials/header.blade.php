@@ -11,54 +11,69 @@
     </div>
 
 <!-- Google Maps API -->
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDUUMjGzzsoinenATBytoscF54qWQc_q0w&libraries=places&callback=initMap" async defer></script>
+<!-- Load Leaflet CSS + JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<!-- (Optional) Leaflet geosearch library for search -->
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"/>
 
 <script>
 let map, marker, selectedLocation;
+let currentLocale = "{{ app()->getLocale() }}";
 
-// Pull saved location from backend (if any)
-let savedLocation = @json(Auth::user()->address ?? null);
+// Pull saved location (address, lat, lng)
+let savedAddress = @json(Auth::user()->address ?? null);
+let savedLat = @json(Auth::user()->lat ?? null);
+let savedLng = @json(Auth::user()->lng ?? null);
 
 function initMap() {
     if (map) return;
 
-    let center = { lat: 24.7136, lng: 46.6753 };
+    let center = [24.7136, 46.6753]; // Riyadh default
 
-    if (savedLocation && savedLocation.includes("(") && savedLocation.includes(")")) {
-        try {
-            const coords = savedLocation.match(/\(([^)]+)\)/)[1].split(",");
-            center = { lat: parseFloat(coords[0]), lng: parseFloat(coords[1]) };
-        } catch (e) {}
+    if (savedLat && savedLng) {
+        center = [parseFloat(savedLat), parseFloat(savedLng)];
     }
 
-    map = new google.maps.Map(document.getElementById('map'), {
-        center,
-        zoom: 10
+    map = L.map('map').setView(center, 10);
+
+    // Add OSM tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Add draggable marker
+    marker = L.marker(center, { draggable: true }).addTo(map);
+
+    selectedLocation = { lat: center[0], lng: center[1] };
+
+    marker.on('dragend', function (e) {
+        let latlng = marker.getLatLng();
+        selectedLocation = latlng;
     });
 
-    marker = new google.maps.Marker({
-        position: center,
-        map,
-        draggable: true
-    });
-
-    selectedLocation = center;
-
-    marker.addListener('dragend', e => {
-        selectedLocation = e.latLng;
-    });
-
+    // Search box using Leaflet Control Geocoder
     const input = document.getElementById('searchInput');
     if (input) {
-        const autocomplete = new google.maps.places.Autocomplete(input);
-        autocomplete.bindTo('bounds', map);
+        input.addEventListener("keydown", async function(e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                let query = input.value;
+                if (!query) return;
 
-        autocomplete.addListener('place_changed', () => {
-            const place = autocomplete.getPlace();
-            if (place.geometry) {
-                map.setCenter(place.geometry.location);
-                marker.setPosition(place.geometry.location);
-                selectedLocation = place.geometry.location;
+                // Use Nominatim search
+                let res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&accept-language=${currentLocale}`);
+                let data = await res.json();
+                if (data && data.length > 0) {
+                    let loc = data[0];
+                    let lat = parseFloat(loc.lat);
+                    let lng = parseFloat(loc.lon);
+                    map.setView([lat, lng], 14);
+                    marker.setLatLng([lat, lng]);
+                    selectedLocation = { lat, lng };
+                }
             }
         });
     }
@@ -67,18 +82,29 @@ function initMap() {
 function deliveryDropdown() {
     return {
         open: false,
-        selectedLocationText: savedLocation ?? '{{ __("messages.chooseLocation") }}',
+        selectedLocationText: savedAddress ?? '{{ __("messages.chooseLocation") }}',
         showMapModal: false,
 
         toggleDropdown() {
             this.open = !this.open;
         },
 
+        truncateText(text) {
+            if (!text) return '';
+            return text.length > 15 ? text.substring(0, 15) + '…' : text;
+        },
+
+        getLocalizedAddress(text) {
+            if (!text) return '';
+            return text; // Already localized when fetched
+        },
+
         openMapModal() {
             this.showMapModal = true;
             setTimeout(() => {
-                google.maps.event.trigger(map, "resize");
-                map.setCenter(marker.getPosition());
+                if (!map) initMap();
+                map.invalidateSize();
+                map.setView(marker.getLatLng(), 12);
             }, 300);
         },
 
@@ -112,45 +138,41 @@ function deliveryDropdown() {
                 return;
             }
 
-            const lat = selectedLocation.lat ? selectedLocation.lat() : selectedLocation.lat;
-            const lng = selectedLocation.lng ? selectedLocation.lng() : selectedLocation.lng;
+            const lat = selectedLocation.lat;
+            const lng = selectedLocation.lng;
 
-            const geocoder = new google.maps.Geocoder();
-            geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-                let address = null;
-
-                if (status === "OK" && results[0]) {
-                    address = results[0].formatted_address;
-                }
-
-                // Fallback: if no address, just use lat/lng
-                if (!address) {
-                    address = `Lat: ${lat}, Lng: ${lng}`;
-                }
-
-                fetch("{{ route('user.saveLocation') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': "{{ csrf_token() }}"
-                    },
-                    body: JSON.stringify({ address, lat, lng })
-                })
+            // Reverse geocode with language preference
+            fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=${currentLocale}`)
                 .then(res => res.json())
                 .then(data => {
-                    if (data.success) {
-                        this.selectedLocationText = address;
-                    } else {
-                        alert("Failed to save location.");
-                    }
-                    this.closeMapModal();
-                })
-                .catch(() => this.closeMapModal());
-            });
+                    let address = data.display_name || `Lat: ${lat}, Lng: ${lng}`;
+
+                    fetch("{{ route('user.saveLocation') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                        },
+                        body: JSON.stringify({ address, lat, lng })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            this.selectedLocationText = address;
+                        } else {
+                            alert("Failed to save location.");
+                        }
+                        this.closeMapModal();
+                    })
+                    .catch(() => this.closeMapModal());
+                });
         }
     }
 }
 </script>
+
+
+
 
 
 
@@ -165,7 +187,12 @@ function deliveryDropdown() {
     <img src="{{ asset('images/Flag Pack.svg') }}" alt="Location" class="w-[24px] h-[24px] ml-2">
 
     <!-- Only show text on medium screens and above -->
-    <span x-text="selectedLocationText" class="hidden sm:inline"></span>
+<span 
+  x-text="truncateText(getLocalizedAddress(selectedLocationText))" 
+  :title="getLocalizedAddress(selectedLocationText)" 
+  class="hidden sm:inline">
+</span>
+
 
     <!-- Arrow icon, can also hide on very small screens if desired -->
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -189,7 +216,7 @@ function deliveryDropdown() {
         <div x-data="{ cityOpen: false, selectedCity: '{{ __('messages.chooseCity') }}' }" class="relative mb-4">
             <div @click="cityOpen = !cityOpen"
                  class="w-full h-[40px] bg-white px-4 py-2 rounded-[12px] flex items-center justify-between border border-gray-400 text-gray-600 cursor-pointer">
-               {{ __('messages.deliver_to') }} <span x-text="selectedCity" class="flex-1"></span>
+               <span x-text="selectedCity" class="flex-1"></span>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                      stroke="currentColor" class="w-5 h-5 ml-2 shrink-0" :class="{ 'rotate-180': cityOpen }">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
