@@ -92,6 +92,12 @@ bussnissdata: false,
                       localStorage.setItem('otp_email', this.formData.email || ''); // user email
 localStorage.setItem('otp_phone', response.data.phone_number || '');
 
+ // ✅ Store OTP if backend sends it
+        if (response.data.otp) {
+            console.log('OTP:', response.data.otp);                  // show in console
+            localStorage.setItem('otp_code', response.data.otp);      // store in localStorage
+        }
+
                       this.$dispatch('open-otp');  // 🔔 show OTP modal
                   }
               })
