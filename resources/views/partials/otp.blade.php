@@ -98,11 +98,8 @@ function otpComponent() {
             this.timer = 30;
             clearInterval(this.interval);
             this.interval = setInterval(() => {
-                if (this.timer > 0) {
-                    this.timer--;
-                } else {
-                    clearInterval(this.interval);
-                }
+                if (this.timer > 0) this.timer--;
+                else clearInterval(this.interval);
             }, 1000);
         },
 
@@ -110,9 +107,7 @@ function otpComponent() {
             this.errorMessage = '';
             e.target.value = e.target.value.replace(/[^0-9]/g, '');
             this.digits[i-1] = e.target.value;
-            if (e.target.value && i < 4) {
-                e.target.nextElementSibling.focus();
-            }
+            if (e.target.value && i < 4) e.target.nextElementSibling.focus();
         },
 
         handleBackspace(e, i) {
@@ -133,40 +128,63 @@ function otpComponent() {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
                 },
-                body: JSON.stringify({ otp: this.digits.join('') ,          
-                                       guest_cart: guestCart // ⬅️ مهم
-})
+                body: JSON.stringify({
+                    otp: this.digits.join(''),
+                    guest_cart: guestCart
+                })
             })
-            .then(response => response.json().then(data => ({ status: response.status, body: data })))
+            .then(res => res.json())
             .then(data => {
-                if (data.status === 200 && data.body.success) {
-                            localStorage.removeItem("guestCart");
-                    window.location.href = data.body.redirect;
+                if (data.success) {
+                    localStorage.removeItem("guestCart");
+                    window.location.href = data.redirect || '/';
                 } else {
-                    this.errorMessage = data.body.message || 'An unknown error occurred.';
+                    this.errorMessage = data.message || 'An unknown error occurred.';
                 }
             })
-            .catch(error => {
-                console.error('Error:', error);
+            .catch(err => {
+                console.error('Error:', err);
                 this.errorMessage = 'An error occurred while verifying the OTP.';
             });
         },
 
-        resendOTP() {
-            this.errorMessage = '';
-            fetch("{{ route('sendOtp') }}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            })
-            .then(r => r.json())
-            .then(data => {
-                this.digits = ['', '', '', ''];
-                this.startTimer();
-            });
+   resendOTP() {
+    this.errorMessage = '';
+
+    let authMethod = 'resend';  // always 'resend' here
+    let phone = localStorage.getItem("otp_phone");
+    let email = localStorage.getItem("otp_email");
+
+    if (!phone && !email) {
+        this.errorMessage = "Cannot resend OTP: missing phone or email.";
+        return;
+    }
+
+    fetch("{{ route('sendOtp') }}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ auth_method: authMethod, phone_number: phone, email: email })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            this.digits = ['', '', '', ''];
+            this.startTimer();
+            console.log("Resent OTP:", data.otp);
+        } else {
+            this.errorMessage = data.message || "Failed to resend OTP.";
         }
+    })
+    .catch(err => {
+        console.error("Error resending OTP:", err);
+        this.errorMessage = "Failed to resend OTP. Please try again.";
+    });
+}
+
     }
 }
 </script>
+

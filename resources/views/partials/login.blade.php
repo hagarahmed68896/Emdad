@@ -69,38 +69,44 @@ bussnissdata: false,
                 ✕
             </button>
 
-    <form method="POST" action="{{ route('sendOtp') }}"
-    x-data="{
-        formData: { email: '',password:'', remember: false },
-        errors: {},
-        loading: false,
-        submitForm() {
-            this.loading = true;
-            this.errors = {};
+<form method="POST" action="{{ route('sendOtp') }}"
+      x-data="{
+          formData: { email: '', password:'', remember: false },
+          errors: {},
+          loading: false,
+          submitForm() {
+              this.loading = true;
+              this.errors = {};
 
-            axios.post(this.$el.action, {
-                email: this.formData.email,  
-                password: this.formData.password,   
-                auth_method: 'login'
-            })
-            .then(response => {
-                this.loading = false;
-                if (response.data.status) {
-                       this.$dispatch('open-otp');  // 🔔 tell root to switch modals
+              axios.post(this.$el.action, {
+                  email: this.formData.email,  
+                  password: this.formData.password,   
+                  auth_method: 'login'
+              })
+              .then(response => {
+                  this.loading = false;
 
-                }
-            })
-            .catch(error => {
-                this.loading = false;
-                if (error.response && error.response.status === 422) {
-                    this.errors = error.response.data.errors;
-                }
-            });
-        }
-    }"
-    @submit.prevent="submitForm"
-    class="relative bg-white w-full max-w-[588px] mx-auto p-6 rounded-[12px] shadow-xl max-h-[90vh] overflow-y-auto"
+                  if (response.data.status) {
+                      // ✅ Store data for OTP resend
+                      localStorage.setItem('otp_auth_method', 'login'); // login flow
+                      localStorage.setItem('otp_email', this.formData.email || ''); // user email
+localStorage.setItem('otp_phone', response.data.phone_number || '');
+
+                      this.$dispatch('open-otp');  // 🔔 show OTP modal
+                  }
+              })
+              .catch(error => {
+                  this.loading = false;
+                  if (error.response && error.response.status === 422) {
+                      this.errors = error.response.data.errors;
+                  }
+              });
+          }
+      }"
+      @submit.prevent="submitForm"
+      class="relative bg-white w-full max-w-[588px] mx-auto p-6 rounded-[12px] shadow-xl max-h-[90vh] overflow-y-auto"
 >
+
     @csrf
 
     <p class="text-2xl font-bold text-[#212121]">{{ __('messages.login') }}</p>

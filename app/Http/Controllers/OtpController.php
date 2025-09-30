@@ -22,6 +22,52 @@ class OtpController extends Controller
     public function sendOtp(Request $request)
     {
         $authMethod = $request->auth_method;
+        
+    // ------------------ RESEND OTP ------------------
+    if ($authMethod === 'resend') {
+        $email = $request->email ?? null;
+        $phone = $request->phone_number ?? null;
+
+        if (!$email && !$phone) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot resend OTP: no user info provided.'
+            ], 422);
+        }
+
+        $user = null;
+        if ($email) {
+            $user = User::where('email', $email)->first();
+        } elseif ($phone) {
+            $user = User::where('phone_number', $phone)->first();
+        }
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not found.'
+            ], 404);
+        }
+
+        $clean_phone_number = $user->phone_number;
+        $otp = rand(1000, 9999);
+
+        session([
+            'otp' => $otp,
+            'otp_expires_at' => now()->addMinutes(5),
+        ]);
+
+        Log::info("Resent OTP for {$clean_phone_number}: {$otp}");
+
+        $taqnyatService = new TaqnyatOTP();
+        $taqnyatService->sendOTP('+966' . $clean_phone_number, $otp);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'OTP resent successfully',
+            'otp' => $otp,
+        ]);
+    }
 
         if ($authMethod === 'login') {
             $request->validate([
@@ -136,6 +182,7 @@ class OtpController extends Controller
             'message' => 'OTP sent successfully',
             'show_otp' => true,
             'otp' => $otp,
+            'phone_number' => $clean_phone_number,  // ✅ add this
         ]);
     }
     
