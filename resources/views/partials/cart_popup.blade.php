@@ -13,7 +13,7 @@
          @click.away="showCartPopup = false"
          x-transition:enter="transition ease-out duration-200"
          x-transition:leave="transition ease-in duration-150"
-         class="absolute left-0 mt-3 w-80 sm:w-96 bg-white shadow-xl rounded-lg z-20 overflow-hidden border border-gray-200">
+         class="absolute rtl:left-0 ltr:right-0 mt-3 w-80 sm:w-96 bg-white shadow-xl rounded-lg z-50 overflow-hidden border border-gray-200">
 
         {{-- Header --}}
         <h3 class="text-lg font-bold text-gray-900 px-4 py-3 border-b">{{ __('messages.Cart') }}</h3>

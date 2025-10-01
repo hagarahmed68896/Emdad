@@ -31,10 +31,11 @@ class SettingsController extends Controller
             Storage::disk('public')->delete($user->profile_picture);
         }
 
-        $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+        // $path = $request->file('profile_picture')->store('profile_pictures', 'public');
 
-        $user->update(['profile_picture' => $path]);
-
+        $filename = time() . '.' . $request->file('profile_picture')->getClientOriginalExtension();
+        $request->file('profile_picture')->move(public_path('storage/profile_pictures'), $filename);
+        $path = 'profile_pictures/' . $filename;
         return response()->json([
             'success' => true,
             'message' => 'تم تحديث صورة الملف الشخصي بنجاح!',

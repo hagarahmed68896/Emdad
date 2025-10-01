@@ -83,7 +83,7 @@
     {{ $siteTexts['main_categories'] ?? __('messages.main_categories') }}
 </h2>
 
-<p class="text-[#696969] text-[20px] mb-8 sm:text-right">
+<p class="text-[#696969] text-[20px] mb-8  ">
     {{ $siteTexts['cosen_cat_description'] ?? __('messages.cosen_cat_description') }}
 </p>
 
@@ -264,7 +264,7 @@
     </p>
 </div>
 
-    <a href="#"
+    <a href="{{ route('products.index') }}"
             class="text-[#FFFFFF] bg-[#185D31] h-[48px] text-[16px] px-[20px] py-[12px] rounded-[12px]">{{ __('messages.show_more') }}</a>
     </div>
  

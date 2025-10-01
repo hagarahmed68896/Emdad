@@ -51,9 +51,12 @@
                         onclick="window.location='{{ route('order.show', $order->id) }}'">
                             <td class="p-3 border">#{{ $order->order_number }}</td>
                             <td class="p-3 flex items-center gap-2">
-                                <img src="{{ Storage::url($item->product->image ?? '') }}"
-                                     onerror="this.onerror=null;this.src='https://via.placeholder.com/80x80?text=Image+Error';"
-                                     class="w-12 h-12 object-contain">
+                           <img src="{{ $item->product && $item->product->image 
+                ? asset('storage/' . $item->product->image) 
+                : 'https://via.placeholder.com/80x80?text=No+Image' }}"
+     onerror="this.onerror=null;this.src='https://via.placeholder.com/80x80?text=Image+Error';"
+     class="w-12 h-12 object-contain">
+
                                 <div>
                                     <div class="font-bold">{{ $item->product->name }}</div>
                                     <div class="text-xs text-gray-500">{{ __('messages.quantity') }}: {{ $item->quantity }}</div>

@@ -374,7 +374,7 @@
 
                 </p>
                 <!-- ✅ Alpine.js custom dropdown that submits form on select -->
-                <div x-data="{
+                {{-- <div x-data="{
                     open: false,
                     selected: '{{ request('sort_by') ? __('messages.' . str_replace('_', '', request('sort_by'))) : __('messages.sort_by') }}',
                     value: '{{ request('sort_by') ?? '' }}'
@@ -418,7 +418,7 @@
 
                     <!-- Hidden input that the form reads -->
                     <input type="hidden" name="sort_by" id="sort_by_hidden" :value="value" form="filterForm">
-                </div>
+                </div> --}}
 
             </div>
 
@@ -439,20 +439,19 @@
     <!-- زر المقارنة -->
     <button x-show="selectedProducts.length > 1"
             @click="openCompareModal = true"
-            class="bg-green-600 text-white px-4 py-2 rounded mb-4">
-        قارن المنتجات
-    </button>
+            class="bg-[#185D31] text-white px-4 py-2 rounded mb-4">
+{{__('messages.compare_products')}}    </button>
 
     <!-- المودال -->
     <div x-show="openCompareModal" x-cloak
          class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white rounded-lg w-11/12 max-w-5xl p-6">
-            <h2 class="text-xl font-bold mb-4">جدول المقارنة</h2>
+            <h2 class="text-xl font-bold mb-4"> {{ __('messages.comparison_table') }}</h2>
 
             <table class="w-full text-center border border-gray-200">
                 <thead>
                     <tr class="bg-gray-100">
-                        <th>الخاصية</th>
+                        <th>{{ __('messages.feature') }}</th>
                         <template x-for="id in selectedProducts" :key="id">
                             <th x-text="getProductName(id)"></th>
                         </template>
@@ -460,31 +459,31 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>السعر</td>
+                        <td>{{ __('messages.price') }}</td>
                         <template x-for="id in selectedProducts" :key="id">
                             <td x-text="getProductPrice(id)"></td>
                         </template>
                     </tr>
                     <tr>
-                        <td>الكمية</td>
+                        <td>{{ __('messages.quantaty') }}</td>
                         <template x-for="id in selectedProducts" :key="id">
                             <td x-text="getProductQuantity(id)"></td>
                         </template>
                     </tr>
                           <tr>
-                <td>مدة التوصيل</td>
+                <td> {{ __('messages.delivery_time') }}</td>
                 <template x-for="id in selectedProducts" :key="id">
                     <td x-text="getProductDelivery(id)"></td>
                 </template>
             </tr>
             <tr>
-                <td>الشركة</td>
+                <td>{{ __('messages.supplier') }}</td>
                 <template x-for="id in selectedProducts" :key="id">
                     <td x-text="getProductCompany(id)"></td>
                 </template>
             </tr>
                     <tr>
-                        <td>الشهادات</td>
+                        <td>{{ __('messages.certificates') }}</td>
                         <template x-for="id in selectedProducts" :key="id">
                             <td x-text="getProductCertifications(id)"></td>
                         </template>

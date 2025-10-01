@@ -345,26 +345,16 @@ function deliveryDropdown() {
             {{-- Favorites Popup --}}
             <div x-show="showPopup" x-cloak @click.away="showPopup = false"
                 x-transition:enter="transition ease-out duration-300"
-                class="bg-white shadow-lg rounded-lg p-4
-fixed inset-x-0 top-[5%] w-[calc(100%-4rem)] max-w-[360px] mx-auto z-20 overflow-auto max-h-[90vh]
-sm:absolute sm:top-full sm:mt-2 sm:w-[404px] sm:h-auto sm:max-h-none sm:mx-0
-rtl:sm:left-0 rtl:sm:right-auto {{-- For RTL, position to the left --}}
-ltr:sm:right-0 ltr:sm:left-auto {{-- For LTR, position to the right --}}
-md:absolute md:top-full md:mt-2 md:w-[404px] md:h-auto md:max-h-none md:mx-0
-rtl:md:left-0 rtl:md:right-auto {{-- For RTL, position to the left --}}
-ltr:md:right-0 ltr:md:left-auto {{-- For LTR, position to the right --}}
-lg:absolute lg:top-full lg:mt-2 lg:w-[404px] lg:h-auto lg:max-h-none lg:mx-0
-rtl:lg:left-0 rtl:lg:right-auto {{-- For RTL, position to the left --}}
-ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
-">
-                <h3 class="text-xl font-bold text-right text-gray-900 mb-4">{{ __('المفضلة') }}</h3>
+                class=" p-4 absolute rtl:left-0 ltr:right-0 mt-3 w-80 sm:w-96 bg-white shadow-xl rounded-lg z-50 overflow-hidden border border-gray-200">
+
+                <h3 class="text-xl font-bold  text-gray-900 mb-4">{{ __('messages.favorites') }}</h3>
                 <div id="favorites-content-area" class="w-full flex flex-col items-center">
                     @if ($favorites->isEmpty())
                         <div class="flex flex-col justify-center items-center w-full py-10 text-gray-600">
                             <img src="{{ asset('images/Illustrations.svg') }}" alt="No favorites illustration"
                                 class="w-[156px] h-[163px] mb-10 ">
-                            <p class="text-[#696969] text-[20px] text-center">لم تقم باضافة أي منتج الي المفضلة بعد</p>
-                            <a href="{{ route('products.index') }}" class="px-[20px] py-[12px] bg-[#185D31] text-[white] rounded-[12px] mt-3">تصفح المنتجات
+                            <p class="text-[#696969] text-[20px] text-center">{{ __('messages.empty_favorites') }}</p>
+                            <a href="{{ route('products.index') }}" class="px-[20px] py-[12px] bg-[#185D31] text-[white] rounded-[12px] mt-3">{{ __('messages.browse_products') }}
                             </a>
                         </div>
                     @else
@@ -374,16 +364,19 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
                                 <div class="flex items-center justify-between bg-[#F8F9FA] rounded-lg shadow-md p-3">
                                     {{-- Product Image Container --}}
                                      <div class="w-16 h-16 bg-white rounded-md flex-shrink-0 overflow-hidden mx-2">
-                                <img src="{{ Storage::url($favorite->product->image ?? '') }}"
+                              <img src="{{ $favorite->product->image 
+                ? asset('storage/' . $favorite->product->image) 
+                : 'https://via.placeholder.com/80x80?text=No+Image' }}"
      onerror="this.onerror=null;this.src='https://via.placeholder.com/80x80?text=Image+Error';"
      class="w-full h-full object-contain">
+
 
                             </div>
                                     {{-- Product Details (Text Content) --}}
                                     <div class="flex flex-col flex-grow rtl:ml-3 ltr:mr-3">
                                         {{-- Product Name --}}
                                         <p class="text-[16x] font-semibold text-[#212121] mb-1">
-                                            {{ $favorite->product->name }}
+{{ app()->getLocale() === 'en' ? $favorite->product->name_en : $favorite->product->name }}
                                         </p>
                                         <div class="flex items-center text-[16px] text-[#212121] mb-1">
                                             @if($favorite->product->supplier->supplier_confirmed)
@@ -468,7 +461,9 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
                         <div class="flex items-center space-x-2 rtl:space-x-reverse">
                             <img src="{{ $category->iconUrl ? asset('storage/'.$category->iconUrl) : asset('images/default_avatar.png') }}"
                                  class="w-10 h-10 rounded-md object-cover">
-                            <span class="font-semibold">{{ $category->name }}</span>
+<span class="font-semibold">
+    {{ app()->getLocale() === 'en' ? $category->name_en : $category->name }}
+</span>
                         </div>
                         <svg class="h-4 w-4 text-gray-400"
                              :class="{ 'rotate-90': openCategory === {{ $category->id }} }"
@@ -484,13 +479,15 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
                     <div x-show="openCategory === {{ $category->id }}" x-transition x-cloak
                          class="absolute top-0 {{ app()->getLocale() === 'ar' ? 'right-full mr-2' : 'left-full ml-2' }}
                                 w-[280px] bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 z-[1002]">
-                        <div class="p-3 border-b font-semibold text-gray-800">{{ $category->name }}</div>
+<div class="p-3 border-b font-semibold text-gray-800">
+    {{ app()->getLocale() === 'en' ? $category->name_en : $category->name }}
+</div>
                         <div class="max-h-[300px] overflow-y-auto">
                             @if($category->subCategories && $category->subCategories->isNotEmpty())
                                 @foreach($category->subCategories as $subCategory)
                                     <button @click="openSubCategory = (openSubCategory === {{ $subCategory->id }} ? null : {{ $subCategory->id }})"
                                             class="w-full flex items-center justify-between px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                        <span>{{ $subCategory->name }}</span>
+<span>{{ app()->getLocale() === 'en' ? $subCategory->name_en : $subCategory->name }}</span>
                                         <svg class="h-4 w-4 text-gray-400"
                                              :class="{ 'rotate-90': openSubCategory === {{ $subCategory->id }} }"
                                              xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
@@ -506,7 +503,9 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
                                     <div x-show="openSubCategory === {{ $subCategory->id }}" x-transition x-cloak
                                          class="absolute top-0 {{ app()->getLocale() === 'ar' ? 'right-full mr-2' : 'left-full ml-2' }}
                                                 w-[280px] bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 z-[1003]">
-                                        <div class="p-3 border-b font-semibold text-gray-800">{{ $subCategory->name }}</div>
+<div class="p-3 border-b font-semibold text-gray-800">
+    {{ app()->getLocale() === 'en' ? $subCategory->name_en : $subCategory->name }}
+</div>
                                         <div class="max-h-[300px] overflow-y-auto p-2 space-y-2">
                                             @if($subCategory->products && $subCategory->products->isNotEmpty())
                                                 @foreach($subCategory->products as $product)
@@ -514,7 +513,9 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
                                                        class="flex items-center space-x-2 rtl:space-x-reverse px-2 py-1 hover:bg-gray-100 rounded">
                                                         <img src="{{ $product->image ? asset('storage/'.$product->image) : asset('images/default_product.png') }}"
                                                              class="w-12 h-12 rounded-md border object-cover">
-                                                        <span class="text-gray-700">{{ $product->name }}</span>
+<span class="text-gray-700">
+    {{ app()->getLocale() === 'en' ? $product->name_en : $product->name }}
+</span>
                                                     </a>
                                                 @endforeach
                                             @else
@@ -540,7 +541,7 @@ ltr:lg:right-0 ltr:lg:left-auto {{-- For LTR, position to the right --}}
         @if ($loop->iteration <= 10)
             <a href="{{ route('products.filterByCategory', $category->slug) }}"
                class="category-button rtl:px-[21.5px] py-[8px] ltr:px-[17px] {{ isset($selectedCategory) && $selectedCategory->slug === $category->slug ? 'active' : '' }}">
-                {{ $category->name }}
+{{ app()->getLocale() === 'en' ? $category->name_en : $category->name }}
             </a>
         @endif
     @endforeach

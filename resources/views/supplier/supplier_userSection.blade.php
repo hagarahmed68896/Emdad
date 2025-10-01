@@ -8,13 +8,13 @@
                             class="w-10 h-10 rounded-full object-cover" id="profileImage" style="cursor: pointer;">
                     </a>
 
-                    <ul x-show="profile" @click.away="profile = false" x-cloak
-                        class="profile-menu shadow h-auto rounded-lg p-3 absolute
-                        top-[24px]  left-[50px]
-                            w-[calc(100vw-30px)] max-w-[296px]     {{-- Full width minus padding, with max cap --}}
-                            sm:left-0 sm:transform-none sm:w-[296px] {{-- Revert to right-aligned fixed width for larger screens --}}
-                            mt-2 bg-white z-50"
-                        style="min-width: 220px;">
+                       <ul x-show="profile" @click.away="profile = false" x-cloak
+    class=" shadow h-auto rounded-lg p-3 absolute
+           top-[30px]   
+           w-[calc(100vw-30px)] max-w-[296px]   
+           rtl:left-0 ltr:right-0  sm:w-[296px] 
+           mt-2 bg-white z-50"
+    style="min-width: 220px;"> 
                         <style>
                             @media (max-width: 640px) {
 

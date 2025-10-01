@@ -1131,6 +1131,51 @@ return [
     'tech_support' => 'Technical Support',
     'message' => 'Message',
     'search_msg' => 'Search Message',
+    'dont_have_account' => 'Don\'t have an account?',
+    'confirm_account' => 'Confirm Account',
+    'second' => 'Second',
+    'passwordMSG' => 'Enter your password',
+    'arrive_within' => 'Arrive within',
+    'compare_products' => 'Compare Products',
+    'comparison_table' => 'Comparison Table',
+    'feature' => 'Feature',
+    'delivery_time' => 'Delivery Time',
+    'company' => 'Company',
+    'certifications' => 'Certifications',
+    'empty_favorites' => 'Your favorites list is empty.',
+       'full_name_required' => 'Full name is required.',
+    'company_name_required' => 'Company name is required.',
+
+    'email_email' => 'Please enter a valid email address.',
+
+    'phone_required' => 'Phone number is required.',
+    'phone_digits' => 'Phone number must be exactly 9 digits.',
+    'phone_unique' => 'This phone number is already in use.',
+
+    'password_required' => 'Password is required.',
+    'password_min' => 'Password must be at least 8 characters.',
+    'password_confirmed' => 'Password confirmation does not match.',
+
+    'national_id_required' => 'National ID is required.',
+    'national_id_digits' => 'National ID must be exactly 10 digits.',
+    'national_id_regex' => 'National ID must start with 1 or 2.',
+
+    'cr_required' => 'Commercial registration number is required.',
+    'cr_digits' => 'Commercial registration number must be 10 digits.',
+
+    'address_required' => 'National address is required.',
+
+    'iban_required' => 'IBAN is required.',
+    'iban_regex' => 'IBAN must start with SA and be 24 characters long.',
+
+    'tax_required' => 'Tax certificate is required.',
+    'tax_digits' => 'Tax certificate must be exactly 15 digits.',
+    'tax_regex' => 'Tax certificate must start with 3.',
+
+    'terms_accepted' => 'You must accept the terms and conditions.',
+    'account_type_invalid' => 'Invalid account type.',
+
+    'attach_required' => 'The required file must be uploaded.',
 
 
 

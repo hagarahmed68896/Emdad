@@ -19,11 +19,15 @@ class OfferController extends Controller
     }
 
     // Show create form
-    public function create()
-    {
-        $products = Product::all();
-        return view('supplier.offers.create', compact('products'));
-    }
+   public function create()
+{
+    $businessDataId = \App\Models\BusinessData::where('user_id', auth()->id())->value('id');
+
+    $products = Product::where('business_data_id', $businessDataId)->get();
+
+    return view('supplier.offers.create', compact('products'));
+}
+
 
     // Store new offer
 public function store(Request $request)
@@ -50,9 +54,12 @@ public function store(Request $request)
     $offer->description      = $validated['description'] ?? null;
     // $offer->user_id          = Auth::id();
 
-    if ($request->hasFile('image')) {
-        $offer->image = $request->file('image')->store('offers', 'public');
-    }
+  if ($request->hasFile('image')) {
+    $filename = time() . '_' . uniqid() . '.' . $request->file('image')->getClientOriginalExtension();
+    $request->file('image')->move(public_path('storage/offers'), $filename);
+    $offer->image = 'offers/' . $filename;
+}
+
 
     $offer->save();
 
@@ -83,12 +90,18 @@ public function store(Request $request)
 
 
     // Show edit form
-    public function edit($id)
-    {
-        $offer = Offer::findOrFail($id);
-        $products = Product::all();
-        return view('supplier.offers.edit', compact('offer', 'products'));
-    }
+public function edit($id)
+{
+    $offer = Offer::findOrFail($id);
+
+    $businessDataId = \App\Models\BusinessData::where('user_id', auth()->id())->value('id');
+
+    $products = Product::where('business_data_id', $businessDataId)->get();
+
+    return view('supplier.offers.edit', compact('offer', 'products'));
+}
+
+
 
     // Update offer
     public function update(Request $request, $id)
@@ -117,9 +130,17 @@ public function store(Request $request)
         $offer->discount_percent = $validated['discount_percent'];
         $offer->description      = $validated['description'] ?? null;
 
-        if ($request->hasFile('image')) {
-            $offer->image = $request->file('image')->store('offers', 'public');
+     if ($request->hasFile('image')) {
+        // اختياري: لو عايز تحذف الصورة القديمة من السيرفر
+        if ($offer->image && file_exists(public_path('storage/' . $offer->image))) {
+            unlink(public_path('storage/' . $offer->image));
         }
+
+        // رفع الصورة الجديدة
+        $filename = time() . '_' . uniqid() . '.' . $request->file('image')->getClientOriginalExtension();
+        $request->file('image')->move(public_path('storage/offers'), $filename);
+        $offer->image = 'offers/' . $filename;
+    }
 
         if ($offer->product) {
         $offer->product->update([

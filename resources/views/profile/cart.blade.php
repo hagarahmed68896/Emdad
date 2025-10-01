@@ -480,11 +480,14 @@ function cartManager() {
                     <div class="relative flex flex-col md:flex-row justify-center items-center">
                         <!-- Image wrapper -->
                         <div class="w-20 h-20 bg-gray-50 rounded-md flex items-center justify-center overflow-hidden">
-                            <img src="{{ Storage::url($item->product->image ?? '') }}"
-                                 onerror="this.onerror=null;this.src='https://via.placeholder.com/80x80?text=No+Image';"
-                                 alt="{{ $item->product->name }}"
-                                 class="w-full h-full object-contain">
-                        </div>
+    <img src="{{ $item->product->image 
+                    ? asset('storage/' . $item->product->image) 
+                    : 'https://via.placeholder.com/80x80?text=No+Image' }}"
+         onerror="this.onerror=null;this.src='https://via.placeholder.com/80x80?text=No+Image';"
+         alt="{{ $item->product->name }}"
+         class="w-full h-full object-contain">
+</div>
+
 
                         <!-- Quantity badge -->
                         <span class="absolute top-0 right-0 bg-[#C62525] text-white text-xs font-bold px-2 py-0.5 rounded-full">

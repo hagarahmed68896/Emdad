@@ -93,37 +93,18 @@
 @php
     $user = Auth::user();
 
-    // Only show ad if user is not a supplier or not logged in
+    // Only get ads if user is not a supplier or not logged in
+    $ads = [];
     if (!$user || $user->account_type !== 'supplier') {
-        $ad = \App\Models\Ad::where('status', 'approved')
+        $ads = \App\Models\Ad::where('status', 'approved')
             ->where('start_date', '<=', now())
             ->where('end_date', '>=', now())
-            ->inRandomOrder()
-            ->first(); // get only one random ad
-    } else {
-        $ad = null;
+            ->get();
     }
 @endphp
 
-@if($ad)
-    <div class="modal fade modal-top-right" id="adsModal{{ $ad->id }}" tabindex="-1" aria-labelledby="adsModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-sm modal-dialog-scrollable">
-            <div class="modal-content shadow-lg border-0 rounded-3">
-                <div class="modal-header p-2 relative">
-                    <button type="button" class="btn-close absolute start-2" data-bs-dismiss="modal"></button>
-                    <h1 class="text-center w-full">{{ __('messages.ad') }}</h1>
-                    <h6 class="text-center w-full mt-1">{{ $ad->title }}</h6>
-                </div>
-
-                <div class="modal-body text-center p-2">
-                    @if($ad->image)
-                        <img src="{{ asset('storage/'.$ad->image) }}" class="img-fluid rounded mb-2" alt="Ad">
-                    @endif
-                    <p class="small">{{ $ad->description }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
+@if($ads->count() > 0)
+    <div id="adsModalContainer"></div>
 
     <style>
         .modal.modal-top-right .modal-dialog {
@@ -137,15 +118,63 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            var adsModalEl = document.getElementById('adsModal{{ $ad->id }}');
-            var adsModal = new bootstrap.Modal(adsModalEl, {
-                backdrop: false,
-                keyboard: true
-            });
-            adsModal.show();
+            const ads = @json($ads);
+            let currentModal = null;
+
+            function showRandomAd() {
+                if (ads.length === 0) return;
+
+                const ad = ads[Math.floor(Math.random() * ads.length)];
+
+                // Close previous modal if open
+                if (currentModal) {
+                    currentModal.hide();
+                }
+
+                // Build modal HTML
+                const modalHtml = `
+                    <div class="modal fade modal-top-right" id="adsModal${ad.id}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-sm modal-dialog-scrollable">
+                            <div class="modal-content shadow-lg border-0 rounded-3">
+                                <div class="modal-header p-2 relative">
+                                    <button type="button" class="btn-close absolute start-2" data-bs-dismiss="modal"></button>
+                                    <h1 class="text-center w-full">Ad</h1>
+                                    <h6 class="text-center w-full mt-1">${ad.title}</h6>
+                                </div>
+                                <div class="modal-body text-center p-2">
+                                    ${ad.image ? `<img src="/storage/${ad.image}" class="img-fluid rounded mb-2" alt="Ad">` : ''}
+                                    <p class="small">${ad.description}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Inject into container
+                document.getElementById('adsModalContainer').innerHTML = modalHtml;
+
+                // Wait for next tick to initialize modal
+                setTimeout(() => {
+                    const modalEl = document.getElementById(`adsModal${ad.id}`);
+                    currentModal = new bootstrap.Modal(modalEl, { backdrop: false, keyboard: true });
+                    currentModal.show();
+                }, 100);
+            }
+
+            // Only show ad after 30 minutes
+            const adShown = sessionStorage.getItem('adShown');
+            if (!adShown) {
+                // Set a timeout to show first ad after 30 minutes
+                setTimeout(() => {
+                    showRandomAd();
+                    sessionStorage.setItem('adShown', 'true'); // mark as shown
+                }, 1800000); // 30 minutes in ms
+            }
         });
     </script>
 @endif
+
+
 
 
 

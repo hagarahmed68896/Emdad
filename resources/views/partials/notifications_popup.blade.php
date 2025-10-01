@@ -29,9 +29,9 @@
      @click.away="showNotificationPopup = false"
      x-transition:enter="transition ease-out duration-300"
      class="bg-white shadow-lg rounded-lg p-4
-            absolute top-full left-1/2 -translate-x-1/2 mt-2
+            absolute top-full rtl:left-0 ltr:right-0  mt-2
             w-[300px] max-w-[360px] z-50
-            sm:left-0 sm:translate-x-0 sm:w-[404px] sm:mx-0
+            rtl:sm:left-0 ltr:sm:right-0 sm:translate-x-0 sm:w-[404px] sm:mx-0
             max-h-[420px] overflow-y-auto">
 
 

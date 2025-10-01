@@ -75,7 +75,7 @@
 
 
     {{-- Countdown Timer --}}
-    <div class="countdown-timer ltr-timer bg-[#EDEDED] flex font-extrabold text-[#1F2B45] 
+    <div class="countdown-timer hidden ltr-timer bg-[#EDEDED] flex font-extrabold text-[#1F2B45] 
                 p-2 sm:p-4 text-[20px] sm:text-[32px] h-[60px] sm:h-[78px] rounded-[12px] 
                 w-fit mx-auto sm:mx-0 mt-4 sm:mt-0 ml-auto"
          data-last-offer-end="{{ $onOfferProducts->max(fn($p) => $p->offer?->offer_end) }}">

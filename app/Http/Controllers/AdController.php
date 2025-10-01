@@ -31,8 +31,11 @@ class AdController extends Controller
     ]);
 
     if ($request->hasFile('image')) {
-        $data['image'] = $request->file('image')->store('ads', 'public');
-    }
+    $filename = time() . '_' . uniqid() . '.' . $request->file('image')->getClientOriginalExtension();
+    $request->file('image')->move(public_path('storage/ads'), $filename);
+    $data['image'] = 'ads/' . $filename;
+}
+
 
     $data['supplier_id'] = Auth::id();
     $data['status'] = 'pending';
@@ -71,10 +74,12 @@ class AdController extends Controller
             'image' => 'nullable|image|max:2048',
         ]);
 
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('ads', 'public');
-            $validated['image'] = $path;
-        }
+    if ($request->hasFile('image')) {
+    $filename = time() . '_' . uniqid() . '.' . $request->file('image')->getClientOriginalExtension();
+    $request->file('image')->move(public_path('storage/ads'), $filename);
+    $validated['image'] = 'ads/' . $filename;
+}
+
 
         $ad->update($validated);
 

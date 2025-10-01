@@ -35,19 +35,22 @@
                                     $images = collect(is_string($favorite->product->images) ? json_decode($favorite->product->images, true) : ($favorite->product->images ?? []));
                                 @endphp
 
-                                @forelse ($images as $image)
-                                    <div class="swiper-slide">
-                                        <img src="{{ Storage::url($image) }}"
-                                             onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
-                                             class="w-full h-full object-contain">
-                                    </div>
-                                @empty
-                                    <div class="swiper-slide">
-                                        <img src="{{ asset($favorite->product->image ?? 'https://placehold.co/300x200/F0F0F0/ADADAD?text=No+Image') }}"
-                                             onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
-                                             class="w-full h-full object-contain">
-                                    </div>
-                                @endforelse
+                           @forelse ($images as $image)
+    <div class="swiper-slide">
+        <img src="{{ asset('storage/' . $image) }}"
+             onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
+             class="w-full h-full object-contain">
+    </div>
+@empty
+    <div class="swiper-slide">
+        <img src="{{ $favorite->product && $favorite->product->image 
+                        ? asset('storage/' . $favorite->product->image) 
+                        : 'https://placehold.co/300x200/F0F0F0/ADADAD?text=No+Image' }}"
+             onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
+             class="w-full h-full object-contain">
+    </div>
+@endforelse
+
                             </div>
                                 {{-- Inner Swiper Pagination --}}
                                 @php

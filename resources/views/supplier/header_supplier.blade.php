@@ -656,7 +656,7 @@ function deliveryDropdown() {
     <!-- Dropdown content -->
     <div x-show="open" @click.away="open = false" x-cloak
          class="absolute z-50 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg p-4
-                w-[250px] sm:w-[350px] md:left-auto sm:right-0 -right-25 md:translate-x-0">
+                w-[250px] sm:w-[350px] ltr:sm:left-0 rtl:sm:right-0 -right-25 md:translate-x-0">
 
         <div class="flex flex-col mb-4">
             <p class="font-bold text-[20px] mb-2">{{ __('messages.deliverySite') }}</p>

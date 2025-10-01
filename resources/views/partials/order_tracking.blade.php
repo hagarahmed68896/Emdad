@@ -62,10 +62,13 @@
             <div class="flex items-center justify-center gap-4 mb-6">
                 @foreach($order->orderItems as $item)
                     <div class="relative w-20 h-20 bg-gray-50 rounded-md flex items-center justify-center">
-                        <img src="{{ Storage::url($item->product->image ?? '') }}"
-                             onerror="this.onerror=null;this.src='https://via.placeholder.com/80x80?text=No+Image';"
-                             alt="{{ $item->product->name }}"
-                             class="w-full h-full object-contain">
+                      <img src="{{ $item->product && $item->product->image 
+                ? asset('storage/' . $item->product->image) 
+                : 'https://via.placeholder.com/80x80?text=No+Image' }}"
+     onerror="this.onerror=null;this.src='https://via.placeholder.com/80x80?text=No+Image';"
+     alt="{{ $item->product->name }}"
+     class="w-full h-full object-contain">
+
                         <span class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
                             {{ $item->quantity }}
                         </span>

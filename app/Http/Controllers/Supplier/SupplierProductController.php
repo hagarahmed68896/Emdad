@@ -98,35 +98,60 @@ class SupplierProductController extends Controller
             $data['attachments'] = $request->file('attachments')->store('attachments', 'public');
         }
 
-        // ✅ Multiple images
-        $images = [];
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $file) {
-                $images[] = $file->store('products', 'public');
-            }
-        }
-        $data['images'] = $images;
+        // // ✅ Multiple images
+        // $images = [];
+        // if ($request->hasFile('images')) {
+        //     foreach ($request->file('images') as $file) {
+        //         $images[] = $file->store('products', 'public');
+        //     }
+        // }
+        // $data['images'] = $images;
 
-        // ✅ Main image
-        if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('products', 'public');
-        } elseif (!empty($images)) {
-            $data['image'] = $images[0];
-        }
+        // // ✅ Main image
+        // if ($request->hasFile('image')) {
+        //     $data['image'] = $request->file('image')->store('products', 'public');
+        // } elseif (!empty($images)) {
+        //     $data['image'] = $images[0];
+        // }
 
-        $hasher = new ImageHash(new PerceptualHash());
+        // ✅ Multiple images (gallery)
+$images = [];
+if ($request->hasFile('images')) {
+    foreach ($request->file('images') as $file) {
+        // اسم مميز للملف
+        $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+        // نقل الملف للمجلد public/storage/products
+        $file->move(public_path('storage/products'), $filename);
+        // تخزين المسار
+        $images[] = 'products/' . $filename;
+    }
+}
+$data['images'] = $images;
+
+// ✅ Main image
+if ($request->hasFile('image')) {
+    $filename = time() . '_' . uniqid() . '.' . $request->file('image')->getClientOriginalExtension();
+    $request->file('image')->move(public_path('storage/products'), $filename);
+    $data['image'] = 'products/' . $filename;
+} elseif (!empty($images)) {
+    // لو مفيش صورة رئيسية لكن فيه صور معرض → خليه أول صورة
+    $data['image'] = $images[0];
+}
+
+
+$hasher = new ImageHash(new PerceptualHash());
 $phashes = [];
 
 // ✅ Main image
 if (!empty($data['image'])) {
-    $path = Storage::disk('public')->path($data['image']);
+    $path = public_path('storage/' . $data['image']);
     $hash = $hasher->hash($path);
     $phashes[] = (string)$hash;
 }
 
 // ✅ Gallery images
 foreach ($images as $imgPath) {
-    $path = Storage::disk('public')->path($imgPath);
+    $path = public_path('storage/' . $imgPath);
     $hash = $hasher->hash($path);
     $phashes[] = (string)$hash;
 }
@@ -334,45 +359,62 @@ public function update(Request $request, Product $product)
             $productData['attachments'] = $request->file('attachments')->store('attachments', 'public');
         }
 
-        // ✅ Gallery images
-        $existingImages = $request->input('existing_images', []);
-        $updatedImages = $existingImages;
+    // ✅ Gallery images
+$existingImages = $request->input('existing_images', []); // صور قديمة جاية من الفورم
+$updatedImages = $existingImages;
 
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $file) {
-                $updatedImages[] = $file->store('products', 'public');
-            }
+// رفع صور جديدة
+if ($request->hasFile('images')) {
+    foreach ($request->file('images') as $file) {
+        $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+        $file->move(public_path('storage/products'), $filename);
+        $updatedImages[] = 'products/' . $filename;
+    }
+}
+
+// حذف الصور اللي اتشالت
+if ($product->images) {
+    $imagesToDelete = array_diff($product->images, $existingImages);
+    foreach ($imagesToDelete as $imagePath) {
+        $oldPath = public_path('storage/' . $imagePath);
+        if (file_exists($oldPath)) {
+            unlink($oldPath);
         }
+    }
+}
 
-        if ($product->images) {
-            $imagesToDelete = array_diff($product->images, $existingImages);
-            foreach ($imagesToDelete as $imagePath) {
-                Storage::disk('public')->delete($imagePath);
-            }
-        }
+// ✅ حفظ الصور المحدثة
+$productData['images'] = $updatedImages;
 
-        $productData['images'] = $updatedImages;
-        if (!isset($productData['image']) && count($productData['images'])) {
-            $productData['image'] = $productData['images'][0];
-        }
+// لو مفيش صورة رئيسية اتحددت → أول صورة من الجاليري
+if (empty($productData['image']) && count($productData['images'])) {
+    $productData['image'] = $productData['images'][0];
+}
 
-        // ✅ pHashes
-        $hasher = new ImageHash(new PerceptualHash());
-        $phashes = [];
+// ✅ pHashes
+$hasher = new ImageHash(new PerceptualHash());
+$phashes = [];
 
-        if (!empty($productData['image'])) {
-            $path = Storage::disk('public')->path($productData['image']);
-            $hash = $hasher->hash($path);
-            $phashes[] = (string)$hash;
-        }
+// Main image
+if (!empty($productData['image'])) {
+    $path = public_path('storage/' . $productData['image']);
+    if (file_exists($path)) {
+        $hash = $hasher->hash($path);
+        $phashes[] = (string)$hash;
+    }
+}
 
-        foreach ($updatedImages as $imgPath) {
-            $path = Storage::disk('public')->path($imgPath);
-            $hash = $hasher->hash($path);
-            $phashes[] = (string)$hash;
-        }
+// Gallery images (avoid duplicate of main image)
+foreach ($updatedImages as $imgPath) {
+    if ($imgPath === $productData['image']) continue; // تخطي الرئيسية
+    $path = public_path('storage/' . $imgPath);
+    if (file_exists($path)) {
+        $hash = $hasher->hash($path);
+        $phashes[] = (string)$hash;
+    }
+}
 
-        $productData['phashes'] = json_encode($phashes);
+$productData['phashes'] = json_encode($phashes);
 
         // ✅ Wholesale tiers
         $wholesaleTiers = [];

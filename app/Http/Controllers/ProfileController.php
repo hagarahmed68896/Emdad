@@ -441,7 +441,10 @@ foreach ($request->file('documents') as $key => $file) {
             Storage::disk('public')->delete($user->profile_picture);
         }
 
-        $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+        // $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+        $filename = time() . '.' . $request->file('profile_picture')->getClientOriginalExtension();
+        $request->file('profile_picture')->move(public_path('storage/profile_pictures'), $filename);
+        $path = 'profile_pictures/' . $filename;
 
         $user->update(['profile_picture' => $path]);
 

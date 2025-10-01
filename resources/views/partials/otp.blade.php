@@ -23,10 +23,10 @@
         </button>
 
         <div class="bg-white w-full max-w-[300px] sm:max-w-[400px] md:max-w-[500px] lg:max-w-[588px] xl:max-w-[650px] p-6 sm:p-8 md:p-10 rounded-lg shadow-xl overflow-y-auto">
-            <h2 class="text-xl sm:text-2xl font-bold mb-4 text-gray-800 text-center">تحقق من هويتك</h2>
+            <h2 class="text-xl sm:text-2xl font-bold mb-4 text-gray-800 text-center"> {{ __('messages.confirm_account') }} </h2>
 
             <p class="text-gray-500 text-sm sm:text-base mb-6 text-center">
-                (سيصلك خلال <span x-text="formattedTimer"></span> ثانية)
+                (سيصلك خلال <span x-text="formattedTimer"></span> {{ __('messages.second') }})
             </p>
 
             @foreach (['status', 'success', 'info'] as $msg)

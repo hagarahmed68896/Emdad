@@ -114,11 +114,12 @@
             <aside class="w-full md:w-1/4 bg-gray-50 p-6 border-b md:border-b-0 md:border-l border-gray-200">
                 <div class="flex flex-col items-center pb-6 border-b border-gray-200 mb-6">
                     <div class="relative w-28 h-28 mb-4">
+<img id="profilePageImage"
+     src="{{ Auth::user()->profile_picture 
+            ? asset('storage/' . Auth::user()->profile_picture) 
+            : asset('images/Unknown_person.jpg') }}"
+     class="w-full h-full rounded-full object-cover shadow-md border-2 border-gray-300">
 
-                        <img id="profilePageImage"
-                            src="{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : asset('images/Unknown_person.jpg') }}"
-                            class="w-full h-full rounded-full object-cover shadow-md border-2 border-gray-300">
-{{-- @dd(Auth::check(), Auth::user()) --}}
 
                         {{-- @dd(asset('storage/' . Auth::user()->profile_picture)) --}}
 

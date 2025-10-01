@@ -118,30 +118,90 @@ class OtpController extends Controller
                 $clean_phone_number = substr($clean_phone_number, 3);
             }
         } elseif ($authMethod === 'register_supplier') {
-            $request->validate([
-                'full_name' => 'required|string|max:255',
-                'company_name' => 'required|string|max:255',
-                'email' => 'required|string|email|max:255|unique:users',
-                'phone_number' => 'required|string|digits:9|unique:users,phone_number',
-                'password' => 'required|string|min:8|confirmed',
-                'national_id' => 'required|string|max:255',
-                'commercial_registration' => 'required|string|max:255',
-                'national_address' => 'required|string|max:255',
-                'iban' => 'required|string|max:255',
-                'tax_certificate' => 'required|string|max:255',
-                'terms' => 'accepted',
-                'account_type' => 'required|in:supplier',
-                'national_id_attach' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
-                'commercial_registration_attach' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
-                'national_address_attach' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
-                'iban_attach' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
-                'tax_certificate_attach' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
-            ]);
-            $clean_phone_number = preg_replace('/\D/', '', $request->phone_number);
-            if (str_starts_with($clean_phone_number, '966')) {
-                $clean_phone_number = substr($clean_phone_number, 3);
-            }
-        }
+    $request->validate([
+        'full_name' => 'required|string|max:255',
+        'company_name' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255|unique:users',
+        'phone_number' => 'required|string|digits:9|unique:users,phone_number',
+        'password' => 'required|string|min:8|confirmed',
+
+        // الهوية الوطنية (10 أرقام تبدأ بـ1 أو 2)
+        'national_id' => 'required|digits:10|regex:/^[12]\d{9}$/',
+
+        // السجل التجاري (10 أرقام)
+        'commercial_registration' => 'required|digits:10',
+
+        // العنوان الوطني
+        'national_address' => 'required|string|max:255',
+
+        // الآيبان السعودي (24 خانة يبدأ بـ SA)
+        'iban' => 'required|string|regex:/^SA\d{22}$/',
+
+        // الشهادة الضريبية (15 رقم يبدأ بـ 3)
+        'tax_certificate' => 'required|digits:15|regex:/^3\d{14}$/',
+
+        // الشروط
+        'terms' => 'accepted',
+
+        // نوع الحساب
+        'account_type' => 'required|in:supplier',
+
+        // الملفات المرفقة
+        'national_id_attach' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
+        'commercial_registration_attach' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
+        'national_address_attach' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
+        'iban_attach' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
+        'tax_certificate_attach' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
+    ], [
+        // ✅ custom messages
+        'full_name.required' => __('messages.full_name_required'),
+        'company_name.required' => __('messages.company_name_required'),
+
+        'email.required' => __('messages.email_required'),
+        'email.email' => __('messages.email_email'),
+        'email.unique' => __('messages.email_unique'),
+
+        'phone_number.required' => __('messages.phone_required'),
+        'phone_number.digits' => __('messages.phone_digits'),
+        'phone_number.unique' => __('messages.phone_unique'),
+
+        'password.required' => __('messages.password_required'),
+        'password.min' => __('messages.password_min'),
+        'password.confirmed' => __('messages.password_confirmed'),
+
+        'national_id.required' => __('messages.national_id_required'),
+        'national_id.digits' => __('messages.national_id_digits'),
+        'national_id.regex' => __('messages.national_id_regex'),
+
+        'commercial_registration.required' => __('messages.cr_required'),
+        'commercial_registration.digits' => __('messages.cr_digits'),
+
+        'national_address.required' => __('messages.address_required'),
+
+        'iban.required' => __('messages.iban_required'),
+        'iban.regex' => __('messages.iban_regex'),
+
+        'tax_certificate.required' => __('messages.tax_required'),
+        'tax_certificate.digits' => __('messages.tax_digits'),
+        'tax_certificate.regex' => __('messages.tax_regex'),
+
+        'terms.accepted' => __('messages.terms_accepted'),
+        'account_type.in' => __('messages.account_type_invalid'),
+
+        'national_id_attach.required' => __('messages.attach_required'),
+        'commercial_registration_attach.required' => __('messages.attach_required'),
+        'national_address_attach.required' => __('messages.attach_required'),
+        'iban_attach.required' => __('messages.attach_required'),
+        'tax_certificate_attach.required' => __('messages.attach_required'),
+    ]);
+
+    // ✅ تنسيق رقم الهاتف
+    $clean_phone_number = preg_replace('/\D/', '', $request->phone_number);
+    if (str_starts_with($clean_phone_number, '966')) {
+        $clean_phone_number = substr($clean_phone_number, 3);
+    }
+}
+
 
         $otp = rand(1000, 9999);
         $dataToStore = $request->except(['_token']);

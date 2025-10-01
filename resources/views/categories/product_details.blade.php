@@ -229,19 +229,22 @@
                                     );
                                 @endphp
 
-                                @forelse ($images as $image)
-                                    <div class="swiper-slide">
-                                        <img src="{{ Storage::url($image) }}"
-                                            onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
-                                            class="w-full h-full object-cover">
-                                    </div>
-                                @empty
-                                    <div class="swiper-slide">
-                                        <img src="{{ asset($product->image ?? 'https://placehold.co/300x200/F0F0F0/ADADAD?text=No+Image') }}"
-                                            onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
-                                            class="w-full h-full object-cover">
-                                    </div>
-                                @endforelse
+                             @forelse ($images as $image)
+    <div class="swiper-slide">
+        <img src="{{ asset('storage/' . $image) }}"
+             onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
+             class="w-full h-full object-cover">
+    </div>
+@empty
+    <div class="swiper-slide">
+        <img src="{{ $product && $product->image 
+                        ? asset('storage/' . $product->image) 
+                        : 'https://placehold.co/300x200/F0F0F0/ADADAD?text=No+Image' }}"
+             onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
+             class="w-full h-full object-cover">
+    </div>
+@endforelse
+
                             </div>
 
                             {{-- Swiper Controls --}}

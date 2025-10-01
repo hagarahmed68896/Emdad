@@ -73,19 +73,24 @@
                                     $images = collect(is_string($product->images) ? json_decode($product->images, true) : ($product->images ?? []));
                                 @endphp
 
-                                @forelse ($images as $image)
-                                    <div class="swiper-slide">
-                                        <img src="{{ Storage::url($image) }}"
-                                             onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
-                                             class="w-full h-full object-contain bg-[#F8F9FA]">
-                                    </div>
-                                @empty
-                                    <div class="swiper-slide">
-                                        <img src="{{ asset($product->image ?? 'https://placehold.co/300x200/F0F0F0/ADADAD?text=No+Image') }}"
-                                             onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
-                                             class="w-full h-full object-contain bg-[#F8F9FA]">
-                                    </div>
-                                @endforelse
+@forelse ($images as $image)
+    <div class="swiper-slide">
+        <img src="{{ asset('storage/' . $image) }}"
+             onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
+             class="w-full h-full object-cover" alt="Product image">
+    </div>
+@empty
+    <div class="swiper-slide">
+        <img src="{{ $favorite->product && $favorite->product->image
+                        ? asset('storage/' . $favorite->product->image)
+                        : 'https://placehold.co/300x200/F0F0F0/ADADAD?text=No+Image' }}"
+             onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
+             class="w-full h-full object-cover" alt="No image">
+    </div>
+@endforelse
+
+
+
                             </div>
 
                             <div class="swiper-pagination image-pagination"
