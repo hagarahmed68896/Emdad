@@ -54,7 +54,7 @@
 
                 <form action="{{ route('admin.site_texts.index') }}" method="GET">
                     <select name="page_name" onchange="this.form.submit()"
-                        class="pl-2 pr-4 py-2 border border-gray-300 rounded-xl 
+                        class="pl-2 pr-4 py-2 border border-gray-300 rounded-xl bg-[#185D31] text-white
                                focus:outline-none focus:ring-green-500 focus:border-green-500">
                         <option value="">{{ __('messages.all_pages') }}</option>
                         @foreach($pages as $page)
@@ -121,7 +121,7 @@
     </div>
 
     {{-- Pagination --}}
-    <div class="mt-4">
+    <div class=" bg-gray-50 p-2">
         {{ $texts->links('pagination::tailwind') }}
     </div>
 </div>

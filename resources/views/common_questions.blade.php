@@ -31,10 +31,15 @@
             <!-- العمود الأيسر -->
             <div class="col-lg-6 p-2">
                 <div class="flex-grow-2 mt-1">
-                    <h1 class="text-[#212121] text-[32px] mb-3 text-right font-bold">الأسئلة الشائعة</h1>
-                    <p class="text-[#767676] text-lg text-right">هل لديك سؤال؟</p>
-                    <p class="text-[#767676] text-base text-right">اعثر على إجابات للاستفسارات الشائعة حول منتجاتنا
-                        وخدماتنا</p>
+                    <h1 class="text-[#212121] text-[32px] mb-3 text-right font-bold">{{ __('messages.common_questions') }}</h1>
+                 <p class="text-[#767676] text-lg text-right">
+    {{ $siteTexts['faq_heading'] ?? __('messages.faq_heading') }}
+</p>
+
+<p class="text-[#767676] text-base text-right">
+    {{ $siteTexts['faq_subheading'] ?? __('messages.faq_subheading') }}
+</p>
+
                 </div>
 
                 <div class="flex justify-center items-center relative overflow-hidden mt-4">
@@ -63,7 +68,7 @@
 
         <div class="bg-white p-8 rounded-lg shadow-xl w-[588px]">
             <h2 class="text-[32px] text-[#212121] font-bold mb-4">{{ __('messages.contactUs') }}</h2>
-            <p class="mb-6">{{ __('messages.contactDescription') }}</p>
+            <p class="mb-6">{{ $siteTexts['contact_description'] ?? __('messages.contactDescription') }}</p>
 
             <!-- success message (AJAX) -->
             <div id="contactSuccess" class="hidden bg-green-100 text-green-700 p-3 rounded-md mb-4"></div>
@@ -93,14 +98,15 @@
 
                 <div class="mb-3">
                     <label class="block font-bold text-[20px] text-[#212121]">{{ __('messages.expType') }}</label>
-                    <select name="type"
-                            class="w-full px-3 py-2 border border-[#767676] rounded-[12px] focus:outline-none">
-                        <option value="">-- اختر النوع --</option>
-                        <option value="استفسار عام">استفسار عام</option>
-                        <option value="استفسار عن منتج">استفسار عن منتج</option>
-                        <option value="مشكلة في الطلب أو التوصيل">مشكلة في الطلب أو التوصيل</option>
-                        <option value="أخرى">أخرى</option>
-                    </select>
+                 <select name="type"
+        class="w-full px-3 py-2 border border-[#767676] rounded-[12px] focus:outline-none">
+    <option value="">{{ __('messages.select_type') }}</option>
+    <option value="general_inquiry">{{ __('messages.general_inquiry') }}</option>
+    <option value="product_inquiry">{{ __('messages.product_inquiry') }}</option>
+    <option value="order_issue">{{ __('messages.order_issue') }}</option>
+    <option value="other">{{ __('messages.other') }}</option>
+</select>
+
                     <p id="error-type" class="text-red-500 text-sm mt-1 hidden"></p>
                 </div>
 
@@ -221,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
                 @empty
-                    <p class="text-gray-500 text-center">لا توجد أسئلة شائعة حالياً</p>
+        <p class="text-gray-500 text-center">{{ __('messages.no_faqs') }}</p>
                 @endforelse
             </div>
         </div>

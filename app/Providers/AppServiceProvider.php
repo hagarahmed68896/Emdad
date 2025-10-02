@@ -38,7 +38,7 @@ $activePolicies = Term::where('is_active', 1)
     ->latest('updated_at')
     ->get();
       //faqs
-    $Faqs = Faq::where('user_type', Auth::check() ? Auth::user()->type : 'customer')
+    $faqs = Faq::where('user_type', Auth::check() ? Auth::user()->type : 'customer')
            ->latest()
            ->get();
 $lang = app()->getLocale(); // 'ar' or 'en'
@@ -48,7 +48,7 @@ $valueColumn = $lang === 'ar' ? 'value_ar' : 'value_en';
 $texts = SiteText::pluck($valueColumn, 'key_name');
 
 $view->with('activeTerms', $activeTerms)
-      ->with('Faqs', $Faqs)
+      ->with('faqs', $faqs)
      ->with('activePolicies', $activePolicies)
      ->with('siteTexts', $texts);
 

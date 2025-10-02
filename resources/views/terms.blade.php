@@ -27,15 +27,19 @@
         }
     </style>
 <div class="container py-5">
-    <p class="py-[8px] px-[16px] bg-[#F3F4F5] rounded-[40px] mb-4 w-[123px] text-[16px]">
-        {{ __('messages.platform_terms') }}
-    </p>
-    <h2 class="mb-4 text-[#212121] font-bold text-[40px]">
-        {{ __('messages.terms_and_conditions') }}
-    </h2>
-    <p class="text-[16px] mb-4 text-[#696969]">
-        {{ __('messages.terms_description') }}
-    </p>
+<p class="py-[8px] px-[16px] bg-[#F3F4F5] rounded-[40px] mb-4 w-[123px] text-[16px]">
+    {{ $siteTexts['platform_rules'] ?? __('messages.platform_terms') }}
+</p>
+
+<h2 class="mb-4 text-[#212121] font-bold text-[40px]">
+    {{ $siteTexts['terms_platform'] ?? __('messages.terms_and_conditions') }}
+</h2>
+
+<p class="text-[16px] mb-4 text-[#696969]">
+    {{ $siteTexts['terms_description'] ?? __('messages.terms_description') }}
+</p>
+
+
 
     @forelse($activeTerms as $term)
         <div class="faq-item border-b border-gray-200 p-[24px] rounded-[20px] bg-[#F8F9FA] mb-3">

@@ -1176,6 +1176,14 @@ return [
     'account_type_invalid' => 'Invalid account type.',
 
     'attach_required' => 'The required file must be uploaded.',
+    'no_faqs' => 'No FAQs available currently',
+        // FAQ Section
+    'faq_heading' => 'Have a Question?',
+    'faq_subheading' => 'Find answers to common questions about our products and services',
+      'select_type' => '-- Select Type --',
+    'general_inquiry' => 'General Inquiry',
+    'product_inquiry' => 'Product Inquiry',
+
 
 
 

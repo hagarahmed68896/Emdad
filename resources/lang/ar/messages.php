@@ -1165,7 +1165,14 @@ return [
     'account_type_invalid' => 'نوع الحساب غير صحيح.',
 
     'attach_required' => 'رفع الملف المطلوب إجباري.',
-
+    'no_faqs' => 'لا توجد أسئلة شائعة حالياً',
+        // FAQ Section
+    'faq_heading' => 'هل لديك سؤال؟',
+    'faq_subheading' => 'اعثر على إجابات للاستفسارات الشائعة حول منتجاتنا وخدماتنا',
+    'select_type' => '-- اختر النوع --',
+    'general_inquiry' => 'استفسار عام',
+    'product_inquiry' => 'استفسار عن منتج',
+   
 
 
 
