@@ -1172,6 +1172,7 @@ return [
     'select_type' => '-- اختر النوع --',
     'general_inquiry' => 'استفسار عام',
     'product_inquiry' => 'استفسار عن منتج',
+    
    
 
 

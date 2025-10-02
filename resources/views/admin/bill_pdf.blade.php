@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <title>فاتورة</title>
     <style>
+            /* @font-face {
+        font-family: 'Amiri';
+        font-style: normal;
+        font-weight: 400; 
+        src: url('{{ storage_path('fonts/Amiri-Regular.ttf') }}') format('truetype');
+    } */
         body {
               font-family: 'Amiri', serif;
     direction: rtl;
@@ -12,6 +18,7 @@
             font-size: 14px;
             line-height: 1.6;
         }
+
         .invoice-box {
             max-width: 800px;
             margin: auto;
@@ -60,7 +67,7 @@
             padding-bottom: 20px;
         }
 
-        table tr.item td{
+        table tr.item td {
             border-bottom: 1px solid #eee;
         }
 
@@ -85,12 +92,11 @@
                         <tr>
                             <td>
                                 رقم الفاتورة: {{ $invoice->bill_number }}<br>
-                                التاريخ: {{ $invoice->created_at->format('Y-m-d') }}
+                                التاريخ: {{ \Carbon\Carbon::parse($invoice->created_at)->format('Y-m-d') }}
                             </td>
-
                             <td>
-                                اسم العميل: {{ $invoice->user->name }}<br>
-                                البريد: {{ $invoice->user->email }}
+                                اسم العميل: {{ $invoice->user->full_name }}<br>
+                                البريد الإلكتروني: {{ $invoice->user->email }}
                             </td>
                         </tr>
                     </table>
@@ -102,7 +108,7 @@
                 <td>السعر</td>
             </tr>
 
-@foreach($invoice->order->orderItems as $item)
+            @foreach($invoice->order->orderItems as $item)
             <tr class="item">
                 <td>{{ $item->product->name }}</td>
                 <td>{{ number_format($item->unit_price, 2) }} ريال</td>

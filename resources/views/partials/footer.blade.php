@@ -63,13 +63,25 @@
         </div>
         <div class="text-center md:text-right">
             <h4 class="font-bold text-lg mb-2 underline">{{__('messages.categories')}}</h4>
-            <ul>
-                <li class="mb-2"><a href="#" class="hover:text-white transition-colors duration-300">{{__('messages.Electronics')}}</a></li>
-                <li class="mb-2"><a href="#" class="hover:text-white transition-colors duration-300">{{__('messages.clothing')}}</a></li>
-                <li class="mb-2"><a href="#" class="hover:text-white transition-colors duration-300">{{__('messages.electrical-appliances')}}</a></li>
-                <li class="mb-2"><a href="#" class="hover:text-white transition-colors duration-300">{{__('messages.Office_supplies')}}</a></li>
-                <li class="mb-2"><a href="#" class="hover:text-white transition-colors duration-300">{{__('messages.browse_all_categories')}}</a></li>
-            </ul>
+         <ul>
+    @foreach($categories->take(4) as $category)
+        <li class="mb-2">
+            <a href="{{ route('products.filterByCategory', $category->slug) }}"
+               class="hover:text-white transition-colors duration-300
+                      {{ isset($selectedCategory) && $selectedCategory->slug === $category->slug ? 'active' : '' }}">
+                {{ app()->getLocale() === 'en' ? $category->name_en : $category->name }}
+            </a>
+        </li>
+    @endforeach
+
+    <!-- Optional: Browse all categories link -->
+    <li class="mb-2">
+        <a href="{{ route('products.index') }}" class="hover:text-white transition-colors duration-300">
+            {{ __('messages.browse_all_categories') }}
+        </a>
+    </li>
+</ul>
+
         </div>
         <div class="text-center md:text-right">
             <h4 class="font-bold text-lg mb-2 underline">{{__('messages.important_informations')}}</h4>
@@ -83,7 +95,12 @@
             <h4 class="font-bold text-lg mb-2 underline">{{__('messages.suppliers')}}</h4>
             <ul>
                 <li class="mb-2"><a href="#" class="hover:text-white transition-colors duration-300">{{__('messages.login_as_supplier')}}</a></li>
-                <li class="mb-2"><a href="#" class="hover:text-white transition-colors duration-300">{{__('messages.add_product')}}</a></li>
+<li class="mb-2">
+    <a href="{{ (Auth::check() && Auth::user()->account_type === 'supplier') ? route('products.create') : '#' }}"
+       class="hover:text-white transition-colors duration-300">
+        {{ __('messages.add_product') }}
+    </a>
+</li>
             </ul>
         </div>
     </div>

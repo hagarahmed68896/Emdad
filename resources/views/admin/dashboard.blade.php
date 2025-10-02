@@ -124,7 +124,9 @@
                 @foreach($latestOrders as $order)
                     <tr class="hover:bg-gray-50">
                         <td class="border px-4 py-2">{{ $order->user->full_name ?? '---' }}</td>
-                        <td class="border px-4 py-2">{{ $order->status ?? '---' }}</td>
+                        <td class="border px-4 py-2">
+                            {{ __('messages.' . ($order->status ?? '')) ?? '---' }}
+                        </td>
                         <td class="border px-4 py-2">{{ $order->total_amount }}</td>
                         <td class="border px-4 py-2">{{ $order->payment_way }}</td>
                         <td class="border px-4 py-2">{{ $order->created_at->format('d M Y') }}</td>

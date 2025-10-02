@@ -12,6 +12,8 @@ use App\Models\ContactSetting;
 use App\Models\Term;
 use App\Models\Faq;
 use App\Models\SiteText;
+use App\Models\Category;
+
 
 
 class AppServiceProvider extends ServiceProvider
@@ -47,10 +49,13 @@ $valueColumn = $lang === 'ar' ? 'value_ar' : 'value_en';
 
 $texts = SiteText::pluck($valueColumn, 'key_name');
 
+$categories = Category::all();
+
 $view->with('activeTerms', $activeTerms)
       ->with('faqs', $faqs)
      ->with('activePolicies', $activePolicies)
-     ->with('siteTexts', $texts);
+     ->with('siteTexts', $texts)
+     ->with('categories', $categories);
 
   
 
