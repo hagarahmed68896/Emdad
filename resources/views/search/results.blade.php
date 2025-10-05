@@ -24,7 +24,7 @@
         {{ __('messages.no_search_image') }}
     </p>
 @else
-    <div class="grid grid-cols-1 px-[64px] sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 px-[64px] sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-6">
         @foreach ($results as $item)
             @if ($item['type'] === 'product')
                 @php
@@ -58,38 +58,33 @@
                 <div class="swiper-slide mb-8">
                     <div class="product-card bg-white rounded-xl overflow-hidden shadow-md flex flex-col">
                         {{-- Product Image Carousel --}}
-                        <div class="relative w-full h-64 overflow-hidden product-image-swiper inner-swiper">
-                            <div class="swiper-wrapper">
-                             @forelse ($images as $image)
-    <div class="swiper-slide">
-        <img src="{{ asset('storage/' . $image) }}"
-             onerror="this.onerror=null;this.src='https://placehold.co/600x400/F0F0F0/ADADAD?text=Image+Error';"
-             class="w-full h-full object-cover">
+ <div class="relative w-full h-64 overflow-hidden product-image-swiper inner-swiper bg-[#F8F9FA]">
+    <div class="swiper-wrapper">
+        @forelse ($images as $image)
+            <div class="swiper-slide flex items-center justify-center bg-[#F8F9FA]">
+                <img src="{{ asset('storage/' . $image) }}"
+                     onerror="this.onerror=null;this.src='https://placehold.co/600x400/F0F0F0/ADADAD?text=Image+Error';"
+                     class="object-contain max-h-64 max-w-full">
+            </div>
+        @empty
+            <div class="swiper-slide flex items-center justify-center bg-[#F8F9FA]">
+                <img src="{{ $item['data']->image
+                                ? (Str::startsWith($item['data']->image, ['http://', 'https://'])
+                                    ? $item['data']->image
+                                    : asset('storage/' . $item['data']->image))
+                                : 'https://placehold.co/600x400/F0F0F0/ADADAD?text=No+Image' }}"
+                     onerror="this.onerror=null;this.src='https://placehold.co/600x400/F0F0F0/ADADAD?text=Image+Error';"
+                     class="object-contain max-h-64 max-w-full">
+            </div>
+        @endforelse
     </div>
-@empty
-    <div class="swiper-slide">
-        <img src="{{ $item['data']->image
-                        ? (Str::startsWith($item['data']->image, ['http://', 'https://'])
-                            ? $item['data']->image
-                            : asset('storage/' . $item['data']->image))
-                        : 'https://placehold.co/600x400/F0F0F0/ADADAD?text=No+Image' }}"
-             onerror="this.onerror=null;this.src='https://placehold.co/600x400/F0F0F0/ADADAD?text=Image+Error';"
-             class="w-full h-full object-cover">
-    </div>
-@endforelse
 
-                            </div>
+    {{-- Pagination --}}
+    <div class="swiper-pagination image-pagination"
+         style="{{ $images->count() <= 1 ? 'display:none;' : '' }}"></div>
+</div>
 
-                            {{-- Pagination --}}
-                            <div class="swiper-pagination image-pagination" style="{{ $images->count() <= 1 ? 'display:none;' : '' }}"></div>
 
-                            {{-- Discount Badge --}}
-                            @if (isset($item['data']->offer) && $item['data']->offer->is_offer && $item['data']->offer->discount_percent)
-                                <span class="absolute top-3 rtl:right-3 ltr:left-3 bg-[#FAE1DF] text-[#C62525] text-xs font-bold px-[16px] py-[8px] rounded-full z-10">
-                                    {{ __('messages.discount_percentage', ['percent' => $item['data']->offer->discount_percent]) }}
-                                </span>
-                            @endif
-                        </div>
 
                         {{-- Product Details --}}
                         <div class="p-4 flex flex-col flex-grow">

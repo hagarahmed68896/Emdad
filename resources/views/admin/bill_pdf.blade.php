@@ -1,125 +1,149 @@
+
+
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html dir="rtl" lang="ar">
 <head>
     <meta charset="UTF-8">
-    <title>فاتورة</title>
+    <title>{{ __('messages.bill') }}</title>
     <style>
-            /* @font-face {
-        font-family: 'Amiri';
-        font-style: normal;
-        font-weight: 400; 
-        src: url('{{ storage_path('fonts/Amiri-Regular.ttf') }}') format('truetype');
-    } */
-        body {
-              font-family: 'Amiri', serif;
-    direction: rtl;
+        @font-face {
+            font-family: 'Amiri';
+            src: url('{{ storage_path('fonts/Amiri-Regular.ttf') }}') format('truetype');
+            font-weight: normal;
+        }
+        
+        * {
+            font-family: 'Amiri', sans-serif;
+            direction: rtl;
             text-align: right;
+        }
+        
+        body {
+            margin: 0;
             padding: 20px;
             font-size: 14px;
-            line-height: 1.6;
+            color: #333;
         }
-
-        .invoice-box {
-            max-width: 800px;
-            margin: auto;
-            border: 1px solid #eee;
-            padding: 30px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
-        }
-
-        h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
+        
+        .header {
             text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 15px;
         }
-
+        
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            color: #2c3e50;
+        }
+        
+        .info-section {
+            margin-bottom: 20px;
+            display: table;
+            width: 100%;
+        }
+        
+        .info-row {
+            display: table-row;
+        }
+        
+        .info-label {
+            display: table-cell;
+            font-weight: bold;
+            padding: 5px 10px;
+            width: 30%;
+        }
+        
+        .info-value {
+            display: table-cell;
+            padding: 5px 10px;
+        }
+        
         table {
             width: 100%;
-            line-height: inherit;
-            text-align: right;
             border-collapse: collapse;
+            margin-top: 20px;
         }
-
-        table td {
-            padding: 5px;
-            vertical-align: top;
+        
+        th {
+            background-color: #34495e;
+            color: white;
+            padding: 12px;
+            text-align: right;
+            border: 1px solid #2c3e50;
         }
-
-        table tr td:nth-child(2) {
+        
+        td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: right;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .total-section {
+            margin-top: 30px;
             text-align: left;
-        }
-
-        table tr.top table td {
-            padding-bottom: 20px;
-        }
-
-        table tr.information table td {
-            padding-bottom: 40px;
-        }
-
-        table tr.heading td {
-            background: #eee;
-            border-bottom: 1px solid #ddd;
+            font-size: 18px;
             font-weight: bold;
         }
-
-        table tr.details td {
-            padding-bottom: 20px;
-        }
-
-        table tr.item td {
-            border-bottom: 1px solid #eee;
-        }
-
-        table tr.item.last td {
-            border-bottom: none;
-        }
-
-        table tr.total td:nth-child(2) {
-            border-top: 2px solid #eee;
-            font-weight: bold;
+        
+        .total-amount {
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-radius: 5px;
+            display: inline-block;
         }
     </style>
 </head>
 <body>
-    <div class="invoice-box">
+    <div class="header">
         <h1>فاتورة</h1>
-
-        <table>
-            <tr class="top">
-                <td colspan="2">
-                    <table>
-                        <tr>
-                            <td>
-                                رقم الفاتورة: {{ $invoice->bill_number }}<br>
-                                التاريخ: {{ \Carbon\Carbon::parse($invoice->created_at)->format('Y-m-d') }}
-                            </td>
-                            <td>
-                                اسم العميل: {{ $invoice->user->full_name }}<br>
-                                البريد الإلكتروني: {{ $invoice->user->email }}
-                            </td>
-                        </tr>
-                    </table>
-                </td>
+    </div>
+    
+    <div class="info-section">
+        <div class="info-row">
+            <div class="info-label">رقم الفاتورة:</div>
+            <div class="info-value">{{ $invoice->bill_number }}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">التاريخ:</div>
+            <div class="info-value">{{ \Carbon\Carbon::parse($invoice->created_at)->format('Y-m-d') }}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">اسم العميل:</div>
+            <div class="info-value">{{ $invoice->user->full_name }}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">البريد الإلكتروني:</div>
+            <div class="info-value">{{ $invoice->user->email }}</div>
+        </div>
+    </div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>المنتج</th>
+                <th>السعر</th>
             </tr>
-
-            <tr class="heading">
-                <td>المنتج</td>
-                <td>السعر</td>
-            </tr>
-
+        </thead>
+        <tbody>
             @foreach($invoice->order->orderItems as $item)
-            <tr class="item">
+            <tr>
                 <td>{{ $item->product->name }}</td>
                 <td>{{ number_format($item->unit_price, 2) }} ريال</td>
             </tr>
             @endforeach
-
-            <tr class="total">
-                <td></td>
-                <td>الإجمالي: {{ number_format($invoice->order->total_amount, 2) }} ريال</td>
-            </tr>
-        </table>
+        </tbody>
+    </table>
+    
+    <div class="total-section">
+        <div class="total-amount">
+            الإجمالي: {{ number_format($invoice->order->total_amount, 2) }} ريال
+        </div>
     </div>
 </body>
 </html>

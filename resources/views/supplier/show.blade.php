@@ -58,38 +58,40 @@
         <main class="lg:col-span-3">
             <h2 class="text-2xl font-bold text-[#212121] mb-6">{{ __('messages.products_from_supplier') }}</h2>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-4 gap-6">
                 @forelse ($products as $product)
                     {{-- Product Card --}}
                     <div class="product-card bg-white rounded-xl overflow-hidden shadow-md flex flex-col">
                         {{-- Inner Swiper --}}
-                        <div class="swiper-container relative w-full h-48 sm:h-56 overflow-hidden product-image-swiper inner-swiper">
-                            <div class="swiper-wrapper">
-                                @php
-                                    $images = collect(
-                                        is_string($product->images)
-                                            ? json_decode($product->images, true)
-                                            : $product->images ?? [],
-                                    );
-                                @endphp
+                     <div class="swiper-container relative w-full h-48 sm:h-56 overflow-hidden product-image-swiper inner-swiper">
+    <div class="swiper-wrapper">
+        @php
+            $images = collect(
+                is_string($product->images)
+                    ? json_decode($product->images, true)
+                    : $product->images ?? [],
+            );
+        @endphp
 
-                                @forelse ($images as $image)
-                                    <div class="swiper-slide">
-                                        <img src="{{ Storage::url($image) }}"
-                                            onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
-                                            class="w-full h-full bg-[#F8F9FA] object-contain">
-                                    </div>
-                                @empty
-                                    <div class="swiper-slide">
-                                        <img src="{{ asset($product->image ?? 'https://placehold.co/300x200/F0F0F0/ADADAD?text=No+Image') }}"
-                                            onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
-                                            class="w-full h-full bg-[#F8F9FA] object-cover">
-                                    </div>
-                                @endforelse
-                            </div>
-                            <div class="swiper-pagination image-pagination"
-                                style="{{ $images->count() <= 1 ? 'display:none;' : '' }}"></div>
-                        </div>
+        @forelse ($images as $image)
+            <div class="swiper-slide flex items-center justify-center bg-[#F8F9FA]">
+                <img src="{{ asset('storage/' . $image) }}"
+                     onerror="this.onerror=null;this.src='https://placehold.co/600x400/F0F0F0/ADADAD?text=Image+Error';"
+                     class="max-h-56 w-auto object-contain p-2">
+            </div>
+        @empty
+            <div class="swiper-slide flex items-center justify-center bg-[#F8F9FA]">
+                <img src="{{ asset($product->image ?? 'https://placehold.co/600x400/F0F0F0/ADADAD?text=No+Image') }}"
+                     onerror="this.onerror=null;this.src='https://placehold.co/600x400/F0F0F0/ADADAD?text=Image+Error';"
+                     class="max-h-56 w-auto object-contain p-2">
+            </div>
+        @endforelse
+    </div>
+
+    <div class="swiper-pagination image-pagination"
+         style="{{ $images->count() <= 1 ? 'display:none;' : '' }}"></div>
+</div>
+
 
                         {{-- Product Details --}}
                         <div class="p-4 flex flex-col flex-grow">
@@ -110,29 +112,35 @@
                             </div>
 
                             {{-- Price --}}
-                            <div class="flex items-center mb-2">
-                                @php $offer = $product->offer; @endphp
-                                @if ($offer && $offer->discount_percent)
-                                    <span class="flex text-lg font-bold text-gray-800">
-                                        {{ number_format($product->price_range['min'], 2) }}
-                                        @if($product->price_range['min'] != $product->price_range['max'])
-                                            - {{ number_format($product->price_range['max'], 2) }}
-                                        @endif
-                                        <img class="mx-1 w-[20px] h-[21px]" src="{{ asset('images/Vector (3).svg') }}" alt="">
-                                    </span>
-                                    <span class="flex text-sm text-gray-400 line-through mr-2">
-                                        {{ number_format($product->price, 2) }}
-                                        <img class="mx-1 w-[14px] h-[14px] mt-1 inline-block"
-                                            src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}" alt="currency">
-                                    </span>
-                                @else
-                                    <span class="flex text-lg font-bold text-gray-800">
-                                        {{ number_format($product->price, 2) }}
-                                        <img class="mx-1 w-[20px] h-[21px]"
-                                            src="{{ asset('images/Vector (3).svg') }}" alt="">
-                                    </span>
-                                @endif
-                            </div>
+                        <div class="mb-2">
+    @php $offer = $product->offer; @endphp
+
+    @if ($offer && $offer->discount_percent)
+        <!-- Discounted price -->
+        <div class="flex items-center text-lg font-extrabold text-gray-800">
+            <span>
+                {{ number_format($product->price_range['min'], 2) }}
+                @if($product->price_range['min'] != $product->price_range['max'])
+                    - {{ number_format($product->price_range['max'], 2) }}
+                @endif
+            </span>
+            <img class="ml-1 w-5 h-5" src="{{ asset('images/Vector (3).svg') }}" alt="">
+        </div>
+
+        <!-- Old price -->
+        <div class="flex items-center text-sm text-gray-400 line-through">
+            <span>{{ number_format($product->price, 2) }}</span>
+            <img class="ml-1 w-4 h-4" src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}" alt="currency">
+        </div>
+    @else
+        <!-- Normal price -->
+        <div class="flex items-center text-lg font-extrabold text-gray-800">
+            <span>{{ number_format($product->price, 2) }}</span>
+            <img class="ml-1 w-5 h-5" src="{{ asset('images/Vector (3).svg') }}" alt="">
+        </div>
+    @endif
+</div>
+
 
                             <p class="text-sm text-gray-600 mb-4">
                                 {{ __('messages.minimum_order_quantity', ['quantity' => $product->min_order_quantity ?? '1']) }}

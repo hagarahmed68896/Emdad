@@ -89,6 +89,9 @@
                 <li class="mb-2 "><a href="{{ route('common_questions') }}" class="hover:text-white transition-colors duration-300">{{__('messages.common_questions')}}</a></li>
                 <li class="mb-2"><a href="{{ route('terms') }}"  class="hover:text-white transition-colors duration-300">{{__('messages.terms_and_conditions')}}</a></li>
                 <li class="mb-2"><a href="{{ route('privacy') }}" class="hover:text-white transition-colors duration-300">{{__('messages.privacy_policy')}}</a></li>
+                <li>    <button type="button" onclick="openCookieSettings()" class=" hover:text-white transition-colors duration-300">
+        {{ __('messages.cookies_settings') }}
+    </button></li>
             </ul>
         </div>
         <div class="text-center md:text-right">

@@ -190,37 +190,43 @@ class BillsController extends Controller
      * @param bool $inline  True لعرض مباشر ('I'), False للتنزيل ('D')
      * @return Response|string
      */
-protected function generatePdf(Bill $invoice, $inline = true)
-{
-    $html = view('admin.bill_pdf', compact('invoice'))->render();
 
-    $pdf = Pdf::loadHtml($html);
 
-    // Ensure the options are set to allow loading from the file system
-    $pdf->setOptions([
-        'isHtml5ParserEnabled' => true,
-        'isRemoteEnabled' => true,    // CRUCIAL
-        'isPhpEnabled' => true,       // CRUCIAL (Allows Blade helpers like public_path() to work)
-        'defaultFont' => 'Amiri',
+    protected function generatePdf(Bill $invoice, $inline = true)
+    {
+        $html = view('admin.bill_pdf', compact('invoice'))->render();
         
-        // This is often needed when using public_path() paths
-        'chroot' => public_path(), 
+        // استخدام mPDF بدلاً من DomPDF
+        $mpdf = new \Mpdf\Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4',
+            'orientation' => 'P',
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_top' => 10,
+            'margin_bottom' => 10,
+            'margin_header' => 0,
+            'margin_footer' => 0,
+            'default_font' => 'amiri', // استخدام خط Amiri
+            'default_font_size' => 12,
+            'autoScriptToLang' => true,
+            'autoLangToFont' => true,
+            'baseScript' => 1,
+            'autoArabic' => true, // مهم جداً للعربية
+        ]);
         
-        // Keep these pointing to storage/fonts for Dompdf to save its cache files
-        'fontDir' => storage_path('fonts'),
-        'fontCache' => storage_path('fonts'), 
-    ]);
-
-    // *** REMOVE the manual font registration that was causing the exception ***
-    // $dompdf = $pdf->getDomPDF();
-    // $fontMetrics = $dompdf->getFontMetrics();
-    // $fontMetrics->getFont('Amiri', 'normal'); 
-    // *************************************************************************
-
-    $filename = 'فاتورة-' . $invoice->bill_number . '.pdf';
-
-    return $inline ? $pdf->stream($filename) : $pdf->download($filename);
-}
+        // إضافة الـ HTML
+        $mpdf->WriteHTML($html);
+        
+        $filename = 'فاتورة-' . $invoice->bill_number . '.pdf';
+        
+        // عرض أو تحميل
+        if ($inline) {
+            return $mpdf->Output($filename, 'I'); // I = Inline (في المتصفح)
+        } else {
+            return $mpdf->Output($filename, 'D'); // D = Download
+        }
+    }
 
     /**
      * عرض الفاتورة كملف PDF مباشر في المتصفح
@@ -244,3 +250,5 @@ protected function generatePdf(Bill $invoice, $inline = true)
         return $this->generatePdf($invoice, false); // false للتنزيل (Download)
     }
 }
+
+

@@ -1418,3 +1418,30 @@ $defaultSelectedColorName = $productColors[0]['name'] ?? null;
     });
 </script>
 <script src="//unpkg.com/alpinejs" defer></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const consent = JSON.parse(localStorage.getItem("cookieConsent")) || {};
+
+    // مثال: لو فعل التحليلات
+    if (consent.analytics) {
+        console.log("Send product view to Analytics:", "{{ $product->name }}");
+        // هنا تكتب كود GA أو أي خدمة تحليل
+    }
+
+    // مثال: لو فعل التسويق
+    if (consent.marketing) {
+        console.log("Trigger Facebook Pixel for product:", "{{ $product->id }}");
+        // fbq('track', 'ViewContent', { product_id: "{{ $product->id }}" });
+    }
+
+    // مثال: لو فعل التفضيلات
+    if (consent.preferences) {
+        let viewed = JSON.parse(localStorage.getItem("viewedProducts")) || [];
+        if (!viewed.includes("{{ $product->id }}")) {
+            viewed.push("{{ $product->id }}");
+            localStorage.setItem("viewedProducts", JSON.stringify(viewed));
+        }
+        console.log("Saved product to preferences:", viewed);
+    }
+});
+</script>

@@ -103,7 +103,7 @@
     }
 @endphp
 
-@if($ads->count() > 0)
+@if(count($ads) > 0)
     <div id="adsModalContainer"></div>
 
     <style>
@@ -265,6 +265,132 @@ document.getElementById('scrollToTopBtn').addEventListener('click', function(e) 
 
     {{-- Extra scripts for specific pages --}}
     @stack('scripts')
+
+
+
+<!-- Cookie Consent Banner -->
+<div id="cookieBanner" class="fixed bottom-0 left-0 w-full bg-white shadow-lg border-t border-gray-200 p-4 z-[9999] hidden">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+        <p class="text-sm text-gray-700">
+            {{ __('نستخدم ملفات تعريف الارتباط لتحسين تجربتك على موقعنا. يمكنك قبول الكل أو تخصيص اختياراتك.') }}
+        </p>
+        <div class="flex gap-2">
+            <button onclick="acceptAllCookies()" class="btn btn-success btn-sm">قبول الكل</button>
+            <button onclick="rejectAllCookies()" class="btn btn-danger btn-sm">رفض الكل</button>
+            <button onclick="openCookieSettings()" class="btn btn-secondary btn-sm">تخصيص</button>
+        </div>
+    </div>
+</div>
+
+<!-- Cookie Settings Modal -->
+<div id="cookieSettingsModal" class="modal fade" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-content">
+<div class="modal-header flex justify-between gap-[70%]">
+    <h5 class="modal-title">{{ __('messages.cookie_settings') }}</h5>
+    <button type="button" class="btn-close " data-bs-dismiss="modal"></button>
+</div>
+    <div class="modal-body">
+        {{-- Necessary Cookies --}}
+        <label class="d-block mb-2">
+            <input type="checkbox" disabled checked> {{ __('messages.necessary_cookies') }} ({{ __('messages.cannot_be_disabled') }})
+        </label>
+        
+        {{-- Analytics Cookies --}}
+        <label class="d-block mb-2">
+            <input type="checkbox" id="cookieAnalytics"> {{ __('messages.analytics_cookies') }}
+        </label>
+        
+        {{-- Marketing Cookies --}}
+        <label class="d-block mb-2">
+            <input type="checkbox" id="cookieMarketing"> {{ __('messages.marketing_cookies') }}
+        </label>
+        
+        {{-- Preferences Cookies --}}
+        <label class="d-block">
+            <input type="checkbox" id="cookiePreferences"> {{ __('messages.preferences_cookies') }}
+        </label>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="bg-[#185D31] text-white py-2 px-3 rounded-lg" onclick="saveCookieSettings()">{{ __('messages.save') }}</button>
+    </div>
+</div>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("Cookie script loaded");
+
+    const consent = JSON.parse(localStorage.getItem("cookieConsent"));
+    if (!consent) {
+        document.getElementById("cookieBanner").classList.remove("hidden");
+    } else {
+        activateCookies(consent);
+
+        // ضبط حالة الـ checkboxes عند تحميل الصفحة
+        document.getElementById("cookieAnalytics").checked = !!consent.analytics;
+        document.getElementById("cookieMarketing").checked = !!consent.marketing;
+        document.getElementById("cookiePreferences").checked = !!consent.preferences;
+    }
+});
+
+function acceptAllCookies() {
+    const consent = { analytics: true, marketing: true, preferences: true };
+    localStorage.setItem("cookieConsent", JSON.stringify(consent));
+    document.getElementById("cookieBanner").classList.add("hidden");
+    activateCookies(consent);
+}
+
+function rejectAllCookies() {
+    const consent = { analytics: false, marketing: false, preferences: false };
+    localStorage.setItem("cookieConsent", JSON.stringify(consent));
+    document.getElementById("cookieBanner").classList.add("hidden");
+}
+
+function openCookieSettings() {
+    const consent = JSON.parse(localStorage.getItem("cookieConsent")) || {};
+
+    // ارجاع القيم المخزنة للـ checkboxes
+    document.getElementById("cookieAnalytics").checked = !!consent.analytics;
+    document.getElementById("cookieMarketing").checked = !!consent.marketing;
+    document.getElementById("cookiePreferences").checked = !!consent.preferences;
+
+    const modal = new bootstrap.Modal(document.getElementById("cookieSettingsModal"));
+    modal.show();
+}
+
+function saveCookieSettings() {
+    const consent = {
+        analytics: document.getElementById("cookieAnalytics").checked,
+        marketing: document.getElementById("cookieMarketing").checked,
+        preferences: document.getElementById("cookiePreferences").checked,
+    };
+    localStorage.setItem("cookieConsent", JSON.stringify(consent));
+    document.getElementById("cookieBanner").classList.add("hidden");
+
+    const modalEl = document.getElementById("cookieSettingsModal");
+    const modal = bootstrap.Modal.getInstance(modalEl);
+    modal.hide();
+
+    activateCookies(consent);
+}
+
+function activateCookies(consent) {
+    if (consent.analytics) {
+        // Example: تشغيل Google Analytics
+        console.log("Analytics cookies enabled");
+    }
+    if (consent.marketing) {
+        // Example: تشغيل Facebook Pixel
+        console.log("Marketing cookies enabled");
+    }
+    if (consent.preferences) {
+        // مثال: حفظ اللغة أو المنتجات اللي شافها
+        console.log("Preferences cookies enabled");
+    }
+}
+</script>
+
 
 </body>
 </html>

@@ -147,10 +147,21 @@ public function store(Request $request, Conversation $conversation)
         ], 403); // Forbidden
     }
 
-    $path = null;
-    if ($request->hasFile('attachment')) {
-        $path = $request->file('attachment')->store('attachments', 'public');
-    }
+   $path = null;
+
+if ($request->hasFile('attachment')) {
+    $file = $request->file('attachment');
+
+    // اسم مميز للملف
+    $filename = uniqid() . '.' . $file->getClientOriginalExtension();
+
+    // نحرك الملف إلى public/storage/attachments
+    $file->move(public_path('storage/attachments'), $filename);
+
+    // نخزن المسار في قاعدة البيانات
+    $path = 'attachments/' . $filename;
+}
+
 
     // Save the user's message
     Message::create([
@@ -222,7 +233,16 @@ public function uploadAttachment(Request $request)
         'conversation_id' => 'required|exists:conversations,id'
     ]);
 
-    $path = $request->file('attachment')->store('attachments', 'public');
+    $file = $request->file('attachment');
+
+    // اسم الملف العشوائي
+    $filename = uniqid() . '.' . $file->getClientOriginalExtension();
+
+    // مسار الحفظ مباشرة في public/storage/attachments
+    $file->move(public_path('storage/attachments'), $filename);
+
+    // المسار اللي هيتخزن في الداتابيز
+    $path = 'attachments/' . $filename;
 
     $message = Message::create([
         'conversation_id' => $request->conversation_id,
@@ -232,6 +252,7 @@ public function uploadAttachment(Request $request)
 
     return response()->json($message);
 }
+
 
     // -----------------------------
     // 🔹 Ban / Unban Supplier Methods

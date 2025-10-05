@@ -270,13 +270,14 @@
                                     <button @click="closeModal" class="absolute top-3 right-3 text-gray-600 hover:text-black">&times;</button>
 
                                     <p class="text-[20px] font-bold">{{ __('messages.user') }}</p>
-                                    <div class="flex items-center py-2 mb-4 mt-4 bg-[#EDEDED]">
-                                        <img
-                                            :src="selectedUserImage || '{{ Storage::url('images/default.png') }}'"
-                                            alt="Supplier Image"
-                                            class="w-[55px] h-[55px] mx-3 rounded-full object-cover">
-                                        <h3 class="text-lg font-semibold" x-text="selectedUserName"></h3>
-                                    </div>
+                              <div class="flex items-center py-2 mb-4 mt-4 bg-[#EDEDED]">
+    <img
+        :src="selectedUserImage || '{{ asset('storage/images/default.png') }}'"
+        alt="Supplier Image"
+        class="w-[55px] h-[55px] mx-3 rounded-full object-cover">
+    <h3 class="text-lg font-semibold" x-text="selectedUserName"></h3>
+</div>
+
 
                                     <h2 class="text-xl font-bold mb-4 text-center">{{ __('messages.submit_report') }}</h2>
 
@@ -452,12 +453,15 @@
                                 <template x-if="msg.attachment">
                                     <div>
                                         {{-- Image attachments --}}
-                                        <template x-if="msg.attachment.startsWith('blob:') || msg.attachment.match(/\.(jpg|jpeg|png|gif|webp)$/i)">
-                                            <img
-                                                :src="msg.attachment.startsWith('blob:') ? msg.attachment : '/storage/' + msg.attachment"
-                                                alt="{{ __('messages.attachment') }}"
-                                                class="max-w-full h-auto rounded-lg mb-2 cursor-pointer object-contain">
-                                        </template>
+                               <template x-if="msg.attachment.startsWith('blob:') || msg.attachment.match(/\.(jpg|jpeg|png|gif|webp)$/i)">
+    <img
+        :src="msg.attachment.startsWith('blob:') 
+            ? msg.attachment 
+            : '{{ asset('storage') }}/' + msg.attachment"
+        alt="{{ __('messages.attachment') }}"
+        class="max-w-full h-auto rounded-lg mb-2 cursor-pointer object-contain">
+</template>
+
 
                                         {{-- File attachments --}}
                                         <template x-if="!msg.attachment.startsWith('blob:') && !msg.attachment.match(/\.(jpg|jpeg|png|gif|webp)$/i)">

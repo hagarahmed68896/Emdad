@@ -61,18 +61,19 @@
             </label>
 
             {{-- ✅ INDIVIDUAL CATEGORIES --}}
-            @foreach ($categories as $id => $name)
-                @if (in_array($id, $userSelectedCategories))
-                    <label class="flex items-center text-gray-700">
-                        <input type="checkbox" name="categories[]" value="{{ $id }}"
-                            class="form-checkbox h-5 w-5 text-[#185D31] focus:ring-[#185D31] rounded"
-                            {{ in_array($id, $selectedCategories) ? 'checked' : '' }}
-                            onchange="document.getElementById('filterForm').submit()"
-                            {{ $allSelected ? 'disabled' : '' }}>
-                        <span class="rtl:mr-3 ltr:ml-3">{{ $name }}</span>
-                    </label>
-                @endif
-            @endforeach
+       @foreach ($categories as $category)
+    @if (in_array($category->id, $userSelectedCategories ?? []))
+        <label class="flex items-center text-gray-700">
+            <input type="checkbox" name="categories[]" value="{{ $category->id }}"
+                class="form-checkbox h-5 w-5 text-[#185D31] focus:ring-[#185D31] rounded"
+                {{ in_array($category->id, $selectedCategories ?? []) ? 'checked' : '' }}
+                onchange="document.getElementById('filterForm').submit()"
+                {{ $allSelected ? 'disabled' : '' }}>
+            <span class="rtl:mr-3 ltr:ml-3">{{ $category->name }}</span>
+        </label>
+    @endif
+@endforeach
+
         </div>
     </div>
 @endif

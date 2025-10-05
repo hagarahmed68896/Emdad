@@ -29,7 +29,7 @@
                         {{ __('messages.no_items_in_cart') }}
                     </p>
                     <a href="{{ route('products.index') }}"
-                       class="px-4 py-2 bg-green-700 text-white rounded-lg mt-3 hover:bg-green-800 text-sm">
+                       class="px-4 py-2  bg-[#185D31] text-white rounded-lg mt-3 hover:bg-green-800 text-sm">
                         {{ __('messages.browse_products') }}
                     </a>
                 </div>

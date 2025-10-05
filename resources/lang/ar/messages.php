@@ -1172,7 +1172,13 @@ return [
     'select_type' => '-- اختر النوع --',
     'general_inquiry' => 'استفسار عام',
     'product_inquiry' => 'استفسار عن منتج',
-    
+    'cookies_settings' => 'إعدادات الكوكيز',
+    'cookie_settings'       => 'إعدادات الكوكيز',
+    'necessary_cookies'     => 'الضرورية',
+    'cannot_be_disabled'    => 'لا يمكن إيقافها',
+    'analytics_cookies'     => 'التحليلات',
+    'marketing_cookies'     => 'التسويق',
+    'preferences_cookies'   => 'التخصيص',
    
 
 

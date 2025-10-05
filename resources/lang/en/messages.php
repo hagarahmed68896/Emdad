@@ -1183,7 +1183,13 @@ return [
       'select_type' => '-- Select Type --',
     'general_inquiry' => 'General Inquiry',
     'product_inquiry' => 'Product Inquiry',
-
+    'cookies_settings' => 'Cookies Settings', 
+      'cookie_settings'       => 'Cookie Settings',
+    'necessary_cookies'     => 'Necessary',
+    'cannot_be_disabled'    => 'Cannot be disabled',
+    'analytics_cookies'     => 'Analytics',
+    'marketing_cookies'     => 'Marketing',
+    'preferences_cookies'   => 'Personalization',
 
 
 

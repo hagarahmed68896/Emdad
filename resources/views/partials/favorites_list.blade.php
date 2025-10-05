@@ -15,29 +15,31 @@
             {{-- Added product-card class for easier JS selection --}}
             <div class="bg-white rounded-xl overflow-hidden shadow-md flex flex-col product-card">
                 {{-- Product Image --}}
-              <div class="relative w-full h-48 sm:h-56 overflow-hidden product-image-swiper inner-swiper">
+<div class="relative w-full h-48 sm:h-56 overflow-hidden product-image-swiper inner-swiper">
     <div class="swiper-wrapper">
         @php
             $images = collect(
                 is_string($favorite->product->images)
                     ? json_decode($favorite->product->images, true)
-                    : $favorite->product->images ?? [],
+                    : $favorite->product->images ?? []
             );
         @endphp
 
         @forelse ($images as $image)
-            <div class="swiper-slide">
+            <div class="swiper-slide flex items-center justify-center bg-[#F8F9FA]">
                 <img src="{{ Storage::url($image) }}"
-                     onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
-                     class="w-full h-full object-cover" alt="Product image">
+                     onerror="this.onerror=null;this.src='https://placehold.co/600x400/F0F0F0/ADADAD?text=Image+Error';"
+                     class="max-h-56 w-auto object-contain p-2"
+                     alt="Product image">
             </div>
         @empty
-            <div class="swiper-slide">
+            <div class="swiper-slide flex items-center justify-center bg-[#F8F9FA]">
                 <img src="{{ $favorite->product->image 
                                 ? Storage::url($favorite->product->image) 
-                                : 'https://placehold.co/300x200/F0F0F0/ADADAD?text=No+Image' }}"
-                     onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
-                     class="w-full h-full object-cover" alt="No image">
+                                : 'https://placehold.co/600x400/F0F0F0/ADADAD?text=No+Image' }}"
+                     onerror="this.onerror=null;this.src='https://placehold.co/600x400/F0F0F0/ADADAD?text=Image+Error';"
+                     class="max-h-56 w-auto object-contain p-2"
+                     alt="No image">
             </div>
         @endforelse
     </div>
