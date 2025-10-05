@@ -1225,6 +1225,7 @@ return [
     'confirm_close_ticket_text' => 'Are you sure you want to close this ticket?',
     'confirm_close_ticket' => 'Confirm Close Ticket',
     'ticket_is_closed' => 'This ticket is closed',
+    'no_colors_available' => 'No colors available for this product.',
 
     
 
