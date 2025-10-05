@@ -50,9 +50,40 @@
                     <img class="absolute rounded-full w-[80px] h-[64px] flex justify-center items-center top-1/4 right-[55%]"
                          src="{{ asset('images/Group (6).svg') }}" alt="">
                 </div>
+      <div class="mt-6 flex justify-center">
+
+    @auth
+    {{-- Logged in → go to tickets --}}
+    <a href="{{ route('tickets.index') }}"
+       class="flex-1 bg-gradient-to-r from-[#185D31] to-[#1d7a45] text-white py-3 rounded-[12px] font-semibold transition duration-300 shadow-md flex items-center justify-center gap-2 hover:from-[#154a29] hover:to-[#166339]">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M8 10h.01M12 10h.01M16 10h.01M9 16h6m2 4H7a2 2 0 01-2-2V6a2 
+                     2 0 012-2h10a2 2 0 012 2v12a2 2 0 01-2 2z"/>
+        </svg>
+        {{ __('messages.contact_us') }}
+    </a>
+@else
+    {{-- Guest → show floating modal message --}}
+    <div x-data="{ show: false }" class="relative flex-1">
+        <a href="javascript:void(0)"
+           @click="show = true; setTimeout(() => show = false, 3000)"
+           class="w-full block bg-[#185D31] text-white py-3 rounded-[12px] font-semibold transition duration-300 shadow-md text-center hover:bg-green-800">
+            {{ __('messages.contact_us') }}
+        </a>
+
+        {{-- Floating message modal --}}
+        <div x-show="show" x-transition x-cloak
+             class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-xs bg-blue-500 text-white text-sm rounded-lg shadow-lg px-4 py-2">
+            {{ __('messages.you_need_login') }}
+        </div>
+    </div>
+@endauth
+
+</div>
 
            <!-- زر تواصل معنا + المودال -->
-<div x-data="{ showContactUs: false }" @close-contact.window="showContactUs = false" class="mt-4">
+{{-- <div x-data="{ showContactUs: false }" @close-contact.window="showContactUs = false" class="mt-4">
     <button @click="showContactUs = true"
             class="bg-[#185D31] w-full text-white px-4 py-2 rounded-xl text-lg font-semibold transition-colors duration-200 hover:bg-[#154a29]">
         {{ __('messages.contact_us') }}
@@ -127,7 +158,7 @@
             </form>
         </div>
     </div>
-</div>
+</div> --}}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('contactForm');

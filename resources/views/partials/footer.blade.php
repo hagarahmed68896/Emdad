@@ -85,14 +85,51 @@
         </div>
         <div class="text-center md:text-right">
             <h4 class="font-bold text-lg mb-2 underline">{{__('messages.important_informations')}}</h4>
-            <ul>
-                <li class="mb-2 "><a href="{{ route('common_questions') }}" class="hover:text-white transition-colors duration-300">{{__('messages.common_questions')}}</a></li>
-                <li class="mb-2"><a href="{{ route('terms') }}"  class="hover:text-white transition-colors duration-300">{{__('messages.terms_and_conditions')}}</a></li>
-                <li class="mb-2"><a href="{{ route('privacy') }}" class="hover:text-white transition-colors duration-300">{{__('messages.privacy_policy')}}</a></li>
-                <li>    <button type="button" onclick="openCookieSettings()" class=" hover:text-white transition-colors duration-300">
-        {{ __('messages.cookies_settings') }}
-    </button></li>
-            </ul>
+         <ul>
+    <li class="mb-2">
+        <a href="{{ route('common_questions') }}" class="hover:text-white transition-colors duration-300">
+            {{ __('messages.common_questions') }}
+        </a>
+    </li>
+    <li class="mb-2">
+        <a href="{{ route('terms') }}" class="hover:text-white transition-colors duration-300">
+            {{ __('messages.terms_and_conditions') }}
+        </a>
+    </li>
+    <li class="mb-2">
+        <a href="{{ route('privacy') }}" class="hover:text-white transition-colors duration-300">
+            {{ __('messages.privacy_policy') }}
+        </a>
+    </li>
+    <li class="mb-2">
+        <button type="button" onclick="openCookieSettings()" class="hover:text-white transition-colors duration-300">
+            {{ __('messages.cookies_settings') }}
+        </button>
+    </li>
+    <li>
+        @auth
+            <a href="{{ route('tickets.index') }}"
+              class="hover:text-white transition-colors duration-300">        
+                {{ __('messages.tech_support') }}
+            </a>
+        @else
+            <div x-data="{ show: false }" class="relative flex-1">
+                <a href="javascript:void(0)"
+                   @click="show = true; setTimeout(() => show = false, 3000)"
+class="hover:text-white transition-colors duration-300">
+         {{ __('messages.tech_support') }}
+                </a>
+
+                {{-- Floating message modal --}}
+                <div x-show="show" x-transition x-cloak
+                     class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-xs bg-blue-500 text-white text-sm rounded-lg shadow-lg px-4 py-2">
+                    {{ __('messages.you_need_login') }}
+                </div>
+            </div>
+        @endauth
+    </li>
+</ul>
+
         </div>
         <div class="text-center md:text-right">
             <h4 class="font-bold text-lg mb-2 underline">{{__('messages.suppliers')}}</h4>

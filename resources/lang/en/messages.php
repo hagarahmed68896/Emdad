@@ -1190,6 +1190,48 @@ return [
     'analytics_cookies'     => 'Analytics',
     'marketing_cookies'     => 'Marketing',
     'preferences_cookies'   => 'Personalization',
+    'my_tickets' => 'My Tickets',
+    'ticket_subject' => 'Ticket Subject',
+    'ticket_subject_placeholder' => 'Enter the ticket subject',
+    'ticket_type' => 'Ticket Type',
+    'ticket_select_type' => 'Select ticket type',
+    'General' => 'General Inquiry',
+    'Account' => 'Account Issue',
+    'Order' => 'Order Issue',
+    'Technical' => 'Technical Issue',
+    'ticket_message' => 'Ticket Message',
+    'ticket_message_placeholder' => 'Write your issue details here...',
+    'previous_tickets' => 'Previous Tickets',
+    'no_tickets' => 'No tickets yet',
+    'tickets'        => 'Tickets',
+    'ticket'         => 'Ticket',
+    'create_ticket'  => 'Create New Ticket',
+    'edit_ticket'    => 'Edit Ticket',
+    'view_ticket'    => 'View Ticket',
+    'ticket_list'    => 'Tickets List',
+    'ticket_details' => 'Ticket Details',
+
+    'subject'        => 'Subject',
+    'priority'       => 'Priority',
+    'updated_at'     => 'Updated At',
+
+    'low'            => 'Low',
+    'medium'         => 'Medium',
+    'high'           => 'High',
+    'original_message' => 'Original Message',
+    'send_reply' => 'Send Reply',
+    'close_ticket' => 'Close Ticket',
+    'add_tickets' => 'Add Tickets',
+    'confirm_close_ticket_text' => 'Are you sure you want to close this ticket?',
+    'confirm_close_ticket' => 'Confirm Close Ticket',
+    'ticket_is_closed' => 'This ticket is closed',
+
+    
+
+ 
+
+
+
 
 
 

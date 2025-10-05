@@ -55,6 +55,8 @@ use App\Http\Controllers\Admin\AdminAdController;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use App\Http\Controllers\TicketController;
+use App\Http\Controllers\Admin\AdminTicketController;
 
 
 
@@ -127,7 +129,13 @@ Route::post('/verify-otp', [OtpController::class, 'verifyOtp'])->name('verifyOtp
 Route::get('/products/{product}/download-attachment', [ProductController::class, 'downloadAttachment'])->name('products.download.attachment');
      // Authenticated routes
      Route::middleware('auth')->group(function () {
+    Route::get('/tickets', [TicketController::class, 'index'])->name('tickets.index');
+    Route::post('/tickets', [TicketController::class, 'store'])->name('tickets.store');
+    Route::get('/tickets/{ticket}', [TicketController::class, 'show'])->name('tickets.show');
+    Route::post('/tickets/{ticket}/reply', [TicketController::class, 'reply'])->name('tickets.reply');
 
+
+    
           Route::post('/user/save-location', [RegisterController::class, 'saveLocation'])
     ->name('user.saveLocation');
           
@@ -487,6 +495,11 @@ Route::put('site_texts/{site_text}', [\App\Http\Controllers\Admin\SiteTextContro
 
     Route::get('/contact-messages', [\App\Http\Controllers\Admin\ContactMessageController::class, 'index'])->name('admin.contact_messages.index');
 
+    //tickets
+    Route::get('/tickets', [AdminTicketController::class, 'index'])->name('admin.tickets.index');
+    Route::get('/tickets/{ticket}', [AdminTicketController::class, 'show'])->name('admin.tickets.show');
+    Route::post('/tickets/{ticket}/reply', [AdminTicketController::class, 'reply'])->name('admin.tickets.reply');
+    Route::post('/tickets/{ticket}/close', [AdminTicketController::class, 'close'])->name('admin.tickets.close');
 });
                Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 

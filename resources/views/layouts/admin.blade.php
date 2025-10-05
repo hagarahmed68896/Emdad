@@ -341,9 +341,9 @@
                 </a>
             </li>
                 <li class="mb-2">
-                <a href="{{ route('admin.contact_messages.index') }}"
+                <a href="{{ route('admin.tickets.index') }}"
                    class="sidebar-link flex items-center p-3 transition-colors duration-200
-                   {{ Request::is('admin/contact-messages*') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
+                   {{ Request::is('admin/tickets*') ? 'bg-[#185D31] text-white rounded-xl': 'text-gray-700 hover:bg-[#185D31] hover:text-white rounded-xl' }}">
                    <i class="fas fa-headset ml-3"></i>        
                     <span class="sidebar-text">{{ __('messages.tech_support') }}</span>
                 </a>
