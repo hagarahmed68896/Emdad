@@ -65,19 +65,20 @@
              class="w-10 h-10 rounded-full object-cover"
              alt="Reviewer Avatar">
 
-        <div>
-            <p class="text-[16px] rtl:text-right ltr:text-left">
-                <span class="font-bold">{{ __('إشعار جديد') }}: </span>
-                {{ __(':name أضاف مراجعة جديدة على منتج :product_name', [
-                    'name' => $notification->data['reviewer_name'] ?? 'مستخدم',
-                    'product_name' => $notification->data['product_name'] ?? 'المنتج',
-                ]) }}
-            </p>
-            <p class="text-sm text-gray-500 rtl:text-right ltr:text-left mt-1 truncate">
-                "{{ Str::limit($notification->data['comment'] ?? '', 50) }}" -
-                {{ $notification->data['rating'] ?? 0 }} / 5
-            </p>
-        </div>
+     <div>
+    <p class="text-[16px] rtl:text-right ltr:text-left">
+        <span class="font-bold">{{ __('messages.new_notification') }}: </span>
+        {{ __('messages.new_review_message', [
+            'name' => $notification->data['reviewer_name'] ?? __('messages.user'),
+            'product_name' => $notification->data['product_name'] ?? __('messages.product'),
+        ]) }}
+    </p>
+    <p class="text-sm text-gray-500 rtl:text-right ltr:text-left mt-1 truncate">
+        "{{ Str::limit($notification->data['comment'] ?? '', 50) }}" -
+        {{ $notification->data['rating'] ?? 0 }} / 5
+    </p>
+</div>
+
     </div>
 
 
@@ -112,12 +113,13 @@
 @endphp
 
 <p class="text-[16px] rtl:text-right ltr:text-left">
-    <span class="font-bold">{{ __('طلب جديد') }}: </span>
-    {{ __('لديك طلب جديد برقم :order_number', ['order_number' => $orderNumber]) }}
+    <span class="font-bold">{{ __('messages.new_order') }}: </span>
+    {{ __('messages.new_order_message', ['order_number' => $orderNumber]) }}
     {{-- @if($totalAmount !== null)
-        {{ __('بقيمة :total', ['total' => $totalAmount]) }}
+        {{ __('messages.order_total', ['total' => $totalAmount]) }}
     @endif --}}
 </p>
+
 
 
 
@@ -172,7 +174,7 @@ fetch(`{{ url('orders') }}/{{ $notification->data['order_id'] }}/products`)
 "
 
         class="px-3 py-1 mt-1 text-sm bg-[#185D31] text-white rounded-lg hover:bg-green-700">
-        {{ __('تقييم الطلب') }}
+{{ __('messages.order_review') }}
     </button>
     @endif
     </div>
@@ -191,16 +193,16 @@ fetch(`{{ url('orders') }}/{{ $notification->data['order_id'] }}/products`)
                                                  class="w-12 h-12 object-cover rounded-md">
                                         @endif
                                         <div>
-                                            <p class="text-[16px] rtl:text-right ltr:text-left">
-                                                {{ __('تم إضافة عرض جديد على المنتج :product_name بخصم :discount%', [
-                                                    'product_name' => $notification->data['product_name'] ?? 'المنتج',
-                                                    'discount' => $notification->data['discount_percent'] ?? 0
-                                                ]) }}
-                                            </p>
+<p class="text-[16px] rtl:text-right ltr:text-left">
+    {{ __('messages.new_offer_message', [
+        'product_name' => $notification->data['product_name'] ?? __('messages.product'),
+        'discount' => $notification->data['discount_percent'] ?? 0
+    ]) }}
+</p>
                                             @if(isset($notification->data['url']))
                                                 <a href="{{ $notification->data['url'] }}"
                                                    class="text-sm text-[#185D31] hover:underline block mt-1">
-                                                    {{ __('عرض التفاصيل') }}
+        {{ __('messages.view_details') }}
                                                 </a>
                                             @endif
                                         </div>
@@ -218,58 +220,54 @@ fetch(`{{ url('orders') }}/{{ $notification->data['order_id'] }}/products`)
             </svg>
         </div>
 
-        <div x-show="open" x-transition class="mt-3 space-y-2 text-sm text-gray-700">
-            @if (data_get($notification->data, 'rating'))
-                <p>⭐ التقييم: {{ $notification->data['rating'] }}</p>
-            @endif
+     <div x-show="open" x-transition class="mt-3 space-y-2 text-sm text-gray-700">
+    @if (data_get($notification->data, 'rating'))
+        <p>⭐ {{ __('messages.rating') }}: {{ $notification->data['rating'] }}</p>
+    @endif
 
-            @if (data_get($notification->data, 'comment'))
-                <p>📝 التعليق: {{ $notification->data['comment'] }}</p>
-            @endif
+    @if (data_get($notification->data, 'comment'))
+        <p>📝 {{ __('messages.comment') }}: {{ $notification->data['comment'] }}</p>
+    @endif
 
-            @if (data_get($notification->data, 'issue_type') === 'order')
-                <p>📦 رقم الطلب: {{ data_get($notification->data, 'order_number', '-') }}</p>
-            @endif
+    @if (data_get($notification->data, 'issue_type') === 'order')
+        <p>📦 {{ __('messages.order_number') }}: {{ data_get($notification->data, 'order_number', '-') }}</p>
+    @endif
 
-            @if (data_get($notification->data, 'product_name'))
-                <p>🛒 المنتج: {{ $notification->data['product_name'] }}</p>
-            @endif
-        </div>
+    @if (data_get($notification->data, 'product_name'))
+        <p>🛒 {{ __('messages.product_name') }}: {{ $notification->data['product_name'] }}</p>
+    @endif
+</div>
+
     </div>
 @elseif($notification->type === App\Notifications\AdminUserNotification::class)
-  @php
+@php
     $data = $notification->data;
 
-    $title = $data['title'] ?? 'بدون عنوان';
+    $title = $data['title'] ?? __('messages.no_title');
     $type  = $data['notification_type'] ?? 'info';
-    $cat   = $data['category'] ?? 'غير محدد';
-    $content = $data['content'] ?? 'بدون تفاصيل';
+    $cat   = $data['category'] ?? __('messages.uncategorized');
+    $content = $data['content'] ?? __('messages.no_details');
     
     // Default values for icon and display text
     $icon = '';
-    $displayText = 'إشعار جديد';
+    $displayText = __('messages.new_notification');
 
     switch ($type) {
         case 'alert':
             $icon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0M3.124 7.5A8.969 8.969 0 0 1 5.292 3m13.416 0a8.969 8.969 0 0 1 2.168 4.5" /></svg>';
-            $displayText = "تنبيه";
+            $displayText = __('messages.alert');
             break;
         case 'offer':
-            $icon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
-</svg>
-';
-            $displayText = "عرض جديد";
+            $icon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" /></svg>';
+            $displayText = __('messages.new_offer');
             break;
         case 'info':
-            $icon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
-</svg>
-';
-            $displayText = "إشعار";
+            $icon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" /></svg>';
+            $displayText = __('messages.notification');
             break;
     }
 @endphp
+
 
   <div x-data="{ open: false }" class="p-3 border rounded-lg">
     <button @click="open = !open"
@@ -294,10 +292,11 @@ fetch(`{{ url('orders') }}/{{ $notification->data['order_id'] }}/products`)
 
                                
                                     @else
-                                    <p class="text-[16px] rtl:text-right ltr:text-left">
-                                        <span class="font-bold">{{ __('إشعار جديد') }}: </span>
-                                        {{ $notification->data['message'] ?? 'رسالة إشعار' }}
-                                    </p>
+                               <p class="text-[16px] rtl:text-right ltr:text-left">
+    <span class="font-bold">{{ __('messages.new_notification') }}: </span>
+    {{ __($notification->data['message'] ?? __('messages.default_message')) }}
+</p>
+
                                 @endif
 
 
@@ -317,7 +316,7 @@ fetch(`{{ url('orders') }}/{{ $notification->data['order_id'] }}/products`)
                                 <button type="button"
                                         onclick="markAsRead('{{ route('notifications.markAsRead', $notification->id) }}')"
                                         class="text-xs text-[#185D31] hover:underline flex-shrink-0 rtl:mr-2 ltr:ml-2">
-                                    {{ __('قراءة') }}
+{{ __('messages.read') }}
                                 </button>
                             @endif
                         </div>
@@ -361,71 +360,73 @@ fetch(`{{ url('orders') }}/{{ $notification->data['order_id'] }}/products`)
     class="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50"
     x-cloak
 >
-    <div @click.away="open = false"
-        class="bg-white dark:bg-gray-800 w-full max-w-lg mx-4 rounded-xl shadow-lg p-6 rtl:text-right ltr:text-left space-y-4">
+<div @click.away="open = false"
+    class="bg-white dark:bg-gray-800 w-full max-w-lg mx-4 rounded-xl shadow-lg p-6 rtl:text-right ltr:text-left space-y-4">
 
-        <h2 class="text-lg font-semibold text-center">كيف كانت تجربتك مع هذا الطلب؟</h2>
+    <h2 class="text-lg font-semibold text-center">{{ __('messages.how_was_experience') }}</h2>
 
-        <div class="flex justify-center space-x-1 rtl:space-x-reverse">
-            <template x-for="i in 5" :key="i">
-                <button type="button" @click="rating = i"
-                        :class="i <= rating ? 'text-yellow-400' : 'text-gray-300'"
-                        class="text-3xl">★</button>
+    <div class="flex justify-center space-x-1 rtl:space-x-reverse">
+        <template x-for="i in 5" :key="i">
+            <button type="button" @click="rating = i"
+                    :class="i <= rating ? 'text-yellow-400' : 'text-gray-300'"
+                    class="text-3xl">★</button>
+        </template>
+    </div>
+
+    <div x-show="!successMessage">
+        <div x-show="rating <= 3 && rating > 0" class="space-y-4">
+            <div>
+                <label class="block font-semibold mb-2">{{ __('messages.problem_type_question') }}</label>
+                <select x-model="issue_type" class="w-full border rounded-lg p-2">
+                    <option value="">{{ __('messages.select_problem_type') }}</option>
+                    <option value="product">{{ __('messages.product_issue') }}</option>
+                    <option value="order">{{ __('messages.order_issue') }}</option>
+                </select>
+            </div>
+
+            <template x-if="issue_type === 'product'">
+                <div>
+                    <label class="block font-semibold mb-2">{{ __('messages.select_problem_product') }}</label>
+                    <select x-model="selected_product" class="w-full border rounded-lg p-2">
+                        <option value="">{{ __('messages.choose_product') }}</option>
+                        <template x-for="p in products" :key="p.id">
+                            <option :value="p.id" x-text="p.name"></option>
+                        </template>
+                    </select>
+                </div>
             </template>
-        </div>
 
-        <div x-show="!successMessage">
-            <div x-show="rating <= 3 && rating > 0" class="space-y-4">
-                <div>
-                    <label class="block font-semibold mb-2">هل واجهت مشكلة في المنتج أم في الطلب؟</label>
-                    <select x-model="issue_type" class="w-full border rounded-lg p-2">
-                        <option value="">حدد نوع المشكلة</option>
-                        <option value="product">مشكلة في المنتج</option>
-                        <option value="order">مشكلة في الطلب</option>
-                    </select>
-                </div>
-
-                <template x-if="issue_type === 'product'">
-                    <div>
-                        <label class="block font-semibold mb-2">حدد المنتج الذي واجهت فيه المشكلة</label>
-                        <select x-model="selected_product" class="w-full border rounded-lg p-2">
-                            <option value="">اختر المنتج</option>
-                            <template x-for="p in products" :key="p.id">
-                                <option :value="p.id" x-text="p.name"></option>
-                            </template>
-                        </select>
-                    </div>
-                </template>
-
-                <div>
-                    <label class="block font-semibold mb-2">ما المشكلة التي واجهتها؟</label>
-                    <textarea x-model="comment" rows="3" class="w-full border rounded-lg p-2"
-                              placeholder="برجاء توضيح المشكلة التي واجهتها"></textarea>
-                </div>
-
-                <div>
-                    <label class="block font-semibold mb-2">هل ترغب في تقديم شكوى حول هذه المشكلة؟</label>
-                    <select x-model="complaint" class="w-full border rounded-lg p-2">
-                        <option value="">اختر</option>
-                        <option value="yes">نعم</option>
-                        <option value="no">لا</option>
-                    </select>
-                </div>
+            <div>
+                <label class="block font-semibold mb-2">{{ __('messages.describe_problem') }}</label>
+                <textarea x-model="comment" rows="3" class="w-full border rounded-lg p-2"
+                          placeholder="{{ __('messages.problem_placeholder') }}"></textarea>
             </div>
 
-            <div class="flex justify-end mt-4">
-                <button type="button" @click="submitReview()"
-                        class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                    <span x-text="rating > 0 && rating <= 3 ? 'إرسال الشكوى' : 'إرسال التقييم'"></span>
-                </button>
+            <div>
+                <label class="block font-semibold mb-2">{{ __('messages.want_to_complain') }}</label>
+                <select x-model="complaint" class="w-full border rounded-lg p-2">
+                    <option value="">{{ __('messages.choose') }}</option>
+                    <option value="yes">{{ __('messages.yes') }}</option>
+                    <option value="no">{{ __('messages.no') }}</option>
+                </select>
             </div>
         </div>
 
-        <div x-show="successMessage"
-             class="p-3 rounded-lg bg-green-100 text-green-700 text-center font-semibold">
-            <span x-text="successMessage"></span>
+        <div class="flex justify-end mt-4">
+            <button type="button" @click="submitReview()"
+                    class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                <span x-text="rating > 0 && rating <= 3 ? '{{ __('messages.submit_complaint') }}' : '{{ __('messages.submit_review') }}'"></span>
+            </button>
         </div>
     </div>
+
+    <div x-show="successMessage"
+         class="p-3 rounded-lg bg-green-100 text-green-700 text-center font-semibold">
+        <span x-text="successMessage"></span>
+    </div>
+</div>
+
+
 </div>
 
     <script>
@@ -474,11 +475,12 @@ function reviewModal(orderId, initialProducts = []) {
                 const data = await res.json();
 
                 if (data.success) {
-                    if (this.rating <= 3) {
-                        this.successMessage = "✅ تم إرسال الشكوى بنجاح";
-                    } else {
-                        this.successMessage = "✅ تم إرسال التقييم بنجاح";
-                    }
+                 if (this.rating <= 3) {
+    this.successMessage = "{{ __('messages.complaint_submitted_successfully') }}";
+} else {
+    this.successMessage = "{{ __('messages.review_submitted_successfully') }}";
+}
+
 
                     setTimeout(() => {
                         this.open = false;

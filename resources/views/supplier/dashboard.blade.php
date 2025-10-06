@@ -115,14 +115,22 @@
                                      alt="{{ $sale->product->name }}">
                             </div>
                             <div>
-                                <p>{{ $sale->product->name }}</p>
+<p>{{ app()->getLocale() === 'en' ? $sale->product->name_en : $sale->product->name }}</p>
                                 <p class="text-sm text-gray-500">{{ __('messages.quantity') }}: {{ $sale->quantity }}</p>
                             </div>
                         </td>
-                        <td class="p-3"> 
-                            {{ $sale->product->subCategory->category->name ?? '-' }} / 
-                            {{ $sale->product->subCategory->name ?? '-' }} 
-                        </td>
+                   <td class="p-3">
+    {{ app()->getLocale() === 'en' 
+        ? ($sale->product->subCategory->category->name_en ?? '-') 
+        : ($sale->product->subCategory->category->name ?? '-') 
+    }}
+    /
+    {{ app()->getLocale() === 'en' 
+        ? ($sale->product->subCategory->name_en ?? '-') 
+        : ($sale->product->subCategory->name ?? '-') 
+    }}
+</td>
+
                         <td class="p-3">{{ $sale->order->total_amount }} 
                             <img src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}" class="inline w-4 h-4" alt="">
                         </td>

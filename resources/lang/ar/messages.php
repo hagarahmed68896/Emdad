@@ -1224,6 +1224,36 @@ return [
     'confirm_close_ticket_text' => 'لا يمكنك إعادة فتح التذكرة بعد إغلاقها.',
     'ticket_is_closed' => 'هذه التذكرة مغلقة ولا يمكن إضافة ردود جديدة.',
     'no_colors_available' => 'لا توجد ألوان متاحة لهذا المنتج',
+    'new_review_message' => ':name أضاف مراجعة جديدة على منتج :product_name',
+    'new_order' => 'طلب جديد',
+    'new_order_message' => 'لديك طلب جديد برقم :order_number',
+        'order_review' => 'تقييم الطلب',
+    'new_offer_message' => 'تم إضافة عرض جديد على المنتج :product_name بخصم :discount%',
+    'new_offer' => 'عرض جديد',
+    'notification' => 'إشعار',
+    'no_title' => 'بدون عنوان',
+    'no_details' => 'بدون تفاصيل',
+    'default_message' => 'رسالة إشعار',
+        'read' => 'قراءة',
+    'problem_type_question' => 'هل واجهت مشكلة في المنتج أم في الطلب؟',
+    'select_problem_type' => 'حدد نوع المشكلة',
+
+    'select_problem_product' => 'حدد المنتج الذي واجهت فيه المشكلة',
+    'choose_product' => 'اختر المنتج',
+    'describe_problem' => 'ما المشكلة التي واجهتها؟',
+    'problem_placeholder' => 'برجاء توضيح المشكلة التي واجهتها',
+    'want_to_complain' => 'هل ترغب في تقديم شكوى حول هذه المشكلة؟',
+    'choose' => 'اختر',
+    'yes' => 'نعم',
+    'submit_complaint' => 'إرسال الشكوى',
+    'complaint_submitted_successfully' => '✅ تم إرسال الشكوى بنجاح',
+    'review_submitted_successfully' => '✅ تم إرسال التقييم بنجاح',
+
+
+
+
+
+
 
    
 

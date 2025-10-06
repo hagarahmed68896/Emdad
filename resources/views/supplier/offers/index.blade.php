@@ -113,7 +113,9 @@
                         {{-- Product Details --}}
                         <div class="p-4 flex flex-col flex-grow">
                             <div class="flex w-full items-center text-sm mb-2 justify-between">
-                                <h3 class="text-[24px] font-bold text-[#212121] mb-1">{{ $offer->product->name }}</h3>
+<h3 class="text-[24px] font-bold text-[#212121] mb-1">
+    {{ app()->getLocale() === 'en' ? $offer->product->name_en : $offer->product->name }}
+</h3>
                                 <div class="flex items-center ">
                                     @if($offer->product->rating)
                                         <img class="mx-1" src="{{ asset('images/Vector (4).svg') }}" alt="">

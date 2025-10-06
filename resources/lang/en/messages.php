@@ -1226,6 +1226,33 @@ return [
     'confirm_close_ticket' => 'Confirm Close Ticket',
     'ticket_is_closed' => 'This ticket is closed',
     'no_colors_available' => 'No colors available for this product.',
+    'new_review_message' => ':name added a new review on product :product_name',
+        'new_order' => 'New Order',
+    'new_order_message' => 'You have a new order with number :order_number',
+    'order_review' => 'Order Review',
+    'new_offer_message' => 'A new offer has been added on product :product_name with a :discount% discount',
+    'new_offer' => 'New Offer',
+    'notification' => 'Notification',
+    'no_title' => 'No Title',
+    'no_details' => 'No Details',
+    'default_message' => 'Notification message',
+        'read' => 'Read',
+    'problem_type_question' => 'Did you encounter a problem with the product or the order?',
+    'select_problem_type' => 'Select problem type',
+    'select_problem_product' => 'Select the product you had an issue with',
+    'choose_product' => 'Choose product',
+    'describe_problem' => 'What problem did you encounter?',
+    'problem_placeholder' => 'Please describe the issue you faced',
+    'want_to_complain' => 'Would you like to file a complaint about this issue?',
+    'choose' => 'Choose',
+    'yes' => 'Yes',
+    'submit_complaint' => 'Submit Complaint',
+    'complaint_submitted_successfully' => '✅ Complaint submitted successfully',
+    'review_submitted_successfully' => '✅ Review submitted successfully',
+
+
+
+ 
 
     
 
