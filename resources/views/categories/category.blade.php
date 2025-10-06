@@ -179,15 +179,26 @@
                                     </div>
                                     <div class="p-4 flex flex-col flex-grow">
                                         <div class="flex w-full items-center text-sm mb-2 justify-between">
-                                            <h3 class="text-[24px] font-bold text-[#212121] mb-1">{{ $product->name }}</h3>
+<h3 class="text-[24px] font-bold text-[#212121] mb-1">
+    {{ app()->getLocale() === 'en' ? $product->name_en : $product->name }}
+</h3>
                                             <div class="flex items-center ">
                                                 <img class="mx-1" src="{{ asset('images/Vector (4).svg') }}"
                                                     alt="">
-                                                <span class="text-[18px]">{{ $product->rating ?? '4.5' }}</span>
+@php
+    $averageRating = round($product->reviews->avg('rating'), 1);
+@endphp
+
+@if($averageRating > 0)
+    <span class="text-[18px]">{{ $averageRating }}</span>
+@endif
                                             </div>
                                         </div>
-                                        <span
-                                            class="text-[#696969] text-[20px]">{{ $product->subCategory->category->name ?? 'غير مصنف' }}</span>
+ <span class="text-[#696969] text-[20px]">
+    {{ app()->getLocale() === 'ar' 
+        ? ($product->subCategory->category->name ?? 'غير مصنف') 
+        : ($product->subCategory->category->name_en ?? 'Uncategorized') }}
+</span>
                                         <div class="flex mt-2">
                                             @if ($product->supplier->supplier_confirmed)
                                                 <span class="flex items-center text-[#185D31]">
@@ -334,14 +345,25 @@
                         {{-- Product Details --}}
                         <div class="p-4 flex flex-col flex-grow">
                             <div class="flex w-full items-center text-sm mb-2 justify-between">
-                                <h3 class="text-[24px] font-bold text-[#212121] mb-1">{{ $featuredProduct->name }}</h3>
+<h3 class="text-[24px] font-bold text-[#212121] mb-1">
+    {{ app()->getLocale() === 'en' ? $featuredProduct->name_en : $featuredProduct->name }}
+</h3>
                                 <div class="flex items-center ">
                                     <img class="mx-1" src="{{ asset('images/Vector (4).svg') }}" alt="">
-                                    <span class="text-[18px]">{{ $featuredProduct->rating ?? '4.5' }}</span>
+@php
+    $averageRating = round($featuredProduct->reviews->avg('rating'), 1);
+@endphp
+
+@if($averageRating > 0)
+    <span class="text-[18px]">{{ $averageRating }}</span>
+@endif
                                 </div>
                             </div>
-                            <span
-                                class="text-[#696969] text-[20px]">{{ $featuredProduct->subCategory->category->name ?? 'غير مصنف' }}</span>
+<span class="text-[#696969] text-[20px]">
+    {{ app()->getLocale() === 'ar' 
+        ? ($featuredProduct->subCategory->category->name ?? 'غير مصنف') 
+        : ($featuredProduct->subCategory->category->name_en ?? 'Uncategorized') }}
+</span>
                             <div class="flex mt-2">
                                 @if ($featuredProduct->supplier_confirmed)
                                     <span class="flex items-center text-[#185D31]">

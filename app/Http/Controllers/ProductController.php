@@ -86,11 +86,12 @@ class ProductController extends Controller
         if ($request->has('colors') && is_array($request->input('colors'))) {
             $selectedColors = array_filter($request->input('colors'));
             if (!empty($selectedColors)) {
-                $productsQuery->where(function ($query) use ($selectedColors) {
-                    foreach ($selectedColors as $value) {
-                        $query->orWhereJsonContains('colors->name', $value);
-                    }
-                });
+              $productsQuery->where(function ($query) use ($selectedColors) {
+    foreach ($selectedColors as $value) {
+        $query->orWhereJsonContains('colors', ['name' => $value]);
+    }
+});
+
             }
         }
 
@@ -98,11 +99,12 @@ class ProductController extends Controller
         if ($request->has('sizes') && is_array($request->input('sizes'))) {
             $selectedSizes = array_filter($request->input('sizes'));
             if (!empty($selectedSizes)) {
-                $productsQuery->where(function ($query) use ($selectedSizes) {
-                    foreach ($selectedSizes as $size) {
-                        $query->orWhereJsonContains('sizes', $size);
-                    }
-                });
+             $productsQuery->where(function ($query) use ($selectedSizes) {
+    foreach ($selectedSizes as $size) {
+        $query->orWhereJsonContains('sizes', $size);
+    }
+});
+
             }
         }
 

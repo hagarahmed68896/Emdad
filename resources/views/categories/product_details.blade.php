@@ -1164,34 +1164,44 @@ $defaultSelectedColorName = $productColors[0]['name'] ?? null;
                                     </button>
                                 </div>
                                 <div class="p-4 flex flex-col flex-grow">
-                                    <div class="flex w-full items-center text-sm mb-2 justify-between">
-                                        <h3 class="text-[24px] font-bold text-[#212121] mb-1">{{ $product->name }}</h3>
-                                        <div class="flex items-center ">
-                                            @if ($product->rating)
-                                                <img class="mx-1" src="{{ asset('images/Vector (4).svg') }}"
-                                                    alt="">
-                                            @endif
-                                            <span class="text-[18px]">{{ $product->rating }}</span>
-                                        </div>
-                                    </div>
-                                    <span
-                                        class="text-[#696969] text-[20px]">{{ $product->subCategory->category->name ?? 'غير مصنف' }}</span>
+                           <div class="flex w-full items-center text-sm mb-2 justify-between">
+<h3 class="text-[24px] font-bold text-[#212121] mb-1">
+    {{ app()->getLocale() === 'en' ? $product->name_en : $product->name }}
+</h3>
+                           @php
+    $averageRating = round($product->reviews->avg('rating'), 1);
+@endphp
+
+@if($averageRating > 0)
+    <div class="flex items-center">
+        <img class="mx-1" src="{{ asset('images/Vector (4).svg') }}" alt="">
+        <span class="text-[18px]">{{ $averageRating }}</span>
+    </div>
+@endif
+
+                            </div>
+            <span class="text-[#696969] text-[20px]">
+    {{ app()->getLocale() === 'ar' 
+        ? ($product->subCategory->category->name ?? 'غير مصنف') 
+        : ($product->subCategory->category->name_en ?? 'Uncategorized') }}
+</span>
                                     <div class="flex mt-2">
-                                        @if ($product->supplier->supplier_confirmed)
-                                            <span class="flex items-center text-[#185D31]">
-                                                <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]"
-                                                    src="{{ asset('images/Success.svg') }}" alt="Confirmed Supplier">
-                                                <a href="{{ route('suppliers.show', $product->supplier->id) }}"
-   class="inline-block py-1 text-[#185D31] rounded-lg text-[18px] font-medium transition">
-    {{ $product->supplier->company_name }}
-</a>
-                                            </span>
-                                        @else
-                                           <a href="{{ route('suppliers.show', $product->supplier->id) }}"
-   class="inline-block py-1 text-[#185D31] rounded-lg text-[18px] font-medium transition">
-    {{ $product->supplier->company_name }}
-</a>
-                                        @endif
+                               @if ($product->supplier->supplier_confirmed)
+    <span class="flex items-center text-[#185D31]">
+        <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]"
+             src="{{ asset('images/Success.svg') }}" alt="Confirmed Supplier">
+        <a href="{{ route('suppliers.show', $product->supplier->id) }}"
+           class="inline-block py-1 text-[#185D31] rounded-lg text-[18px] font-medium transition">
+            {{ $product->supplier->company_name }}
+        </a>
+    </span>
+@else
+    <a href="{{ route('suppliers.show', $product->supplier->id) }}"
+       class="inline-block py-1 text-[#185D31] rounded-lg text-[18px] font-medium transition">
+        {{$product->supplier->company_name}}
+    </a>
+@endif
+
                                     </div>
                                     <div class="flex items-center mb-2">
                                    <span class="flex text-lg font-bold text-gray-800">

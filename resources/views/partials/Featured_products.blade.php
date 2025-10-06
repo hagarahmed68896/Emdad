@@ -99,8 +99,14 @@
                                 <h3 class="text-[24px] font-bold text-[#212121] mb-1">{{ $featuredProduct->name }}</h3>
                                 <div class="flex items-center ">
                                     <img class="mx-1" src="{{ asset('images/Vector (4).svg') }}" alt="">
-                                    <span class="text-[18px]">{{ $featuredProduct->rating ?? '4.5' }}</span>
-                                </div>
+@php
+    $averageRating = round($featuredProduct->reviews->avg('rating'), 1);
+@endphp
+
+@if($averageRating > 0)
+    <span class="text-[18px]">{{ $averageRating }}</span>
+@endif
+                                </div> 
                             </div>
                            <span class="text-[#696969] text-[20px]">
     {{ app()->getLocale() === 'ar' 

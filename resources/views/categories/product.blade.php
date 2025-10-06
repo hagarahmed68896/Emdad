@@ -99,9 +99,9 @@
                     </div>
                 </div>
 
-                {{-- COLORS --}}
-             @php
-    $selectedColors = (array) request('colors');
+{{-- COLORS --}}
+@php
+    $selectedColors = request()->input('colors', []);
 @endphp
 
 @if (!empty($availableSpecifications['colors']))
@@ -111,18 +111,17 @@
             @foreach ($availableSpecifications['colors'] as $color)
                 @php
                     $colorName = $color['name'] ?? '';
-                    $colorKey = mb_strtolower($colorName); // lowercase for matching
-                    $bgColor = $colorHexMap[$colorKey] ?? '#ccc'; // get from colors.php
+                    $colorKey = mb_strtolower($colorName); 
+                    $bgColor = $colorHexMap[$colorKey] ?? '#ccc';
                     $isSelected = in_array($colorName, $selectedColors);
                 @endphp
 
-                <label class="flex items-center justify-center">
+                <label class="flex items-center justify-center cursor-pointer">
                     <input type="checkbox" name="colors[]" value="{{ $colorName }}" class="hidden"
-                        {{ $isSelected ? 'checked' : '' }}
-                        onchange="document.getElementById('filterForm').submit()">
+                           {{ $isSelected ? 'checked' : '' }}>
                     <div class="color-swatch {{ $isSelected ? 'selected' : '' }} 
                         h-[37px] w-[37px] rounded-full border border-gray-300"
-                        style="background-color: {{ $bgColor }}; background-size: cover; background-position: center;"
+                        style="background-color: {{ $bgColor }};"
                         title="{{ $colorName }}">
                     </div>
                 </label>
@@ -131,32 +130,28 @@
     </div>
 @endif
 
+{{-- SIZES --}}
+@php
+    $selectedSizes = request()->input('sizes', []);
+@endphp
 
-
-                {{-- SIZES --}}
-                @php
-                    $selectedSizes = (array) request('sizes');
-                @endphp
-
-                @if (!empty($availableSpecifications['sizes']))
-                    <div class="mb-6 border-b pb-3">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-3">{{ __('messages.sizes') }}</h3>
-                        <div class="grid grid-cols-4 gap-2">
-                            @foreach ($availableSpecifications['sizes'] as $size)
-                                @php $isSelected = in_array($size, $selectedSizes); @endphp
-                                <label class="flex items-center justify-center">
-                                    <input type="checkbox" name="sizes[]" value="{{ $size }}" class="hidden"
-                                        {{ $isSelected ? 'checked' : '' }}
-                                        onchange="document.getElementById('filterForm').submit()">
-                                    <div
-                                        class="size-button w-[71px] bg-[#EDEDED] py-1 text-center px-2 rounded {{ $isSelected ? 'border border-[#185D31]' : '' }}">
-                                        {{ $size }}
-                                    </div>
-                                </label>
-                            @endforeach
-                        </div>
+@if (!empty($availableSpecifications['sizes']))
+    <div class="mb-6 border-b pb-3">
+        <h3 class="text-lg font-semibold text-gray-800 mb-3">{{ __('messages.sizes') }}</h3>
+        <div class="grid grid-cols-4 gap-2">
+            @foreach ($availableSpecifications['sizes'] as $size)
+                @php $isSelected = in_array($size, $selectedSizes); @endphp
+                <label class="flex items-center justify-center cursor-pointer">
+                    <input type="checkbox" name="sizes[]" value="{{ $size }}" class="hidden"
+                           {{ $isSelected ? 'checked' : '' }}>
+                    <div class="size-button w-[71px] bg-[#EDEDED] py-1 text-center px-2 rounded {{ $isSelected ? 'border border-[#185D31]' : '' }}">
+                        {{ $size }}
                     </div>
-                @endif
+                </label>
+            @endforeach
+        </div>
+    </div>
+@endif
 
 
                 {{-- MATERIAL TYPE --}}
@@ -461,7 +456,7 @@
                     <tr>
                         <td>{{ __('messages.price') }}</td>
                         <template x-for="id in selectedProducts" :key="id">
-                            <td x-text="getProductPrice(id)"></td>
+<td x-text="getProductPrice(id) + ' {{ __('messages.currency') }}'"></td>
                         </template>
                     </tr>
                     <tr>
@@ -492,8 +487,7 @@
             </table>
 
             <button @click="openCompareModal = false" class="mt-4 bg-red-500 text-white px-4 py-2 rounded">
-                اغلق
-            </button>
+{{__('messages.close')}}            </button>
         </div>
     </div>
 
@@ -580,13 +574,23 @@
                                    class="mx-2">
 
 
-                                    <h3 class="text-[24px] font-bold text-[#212121] mb-1">{{ $product->name }}</h3>
-                                    <div class="flex items-center ">
-                                        @if( $product->rating)
-                                        <img class="mx-1" src="{{ asset('images/Vector (4).svg') }}" alt="">
-                                        @endif
-                                        <span class="text-[18px]">{{ $product->rating }}</span>
-                                    </div>
+                     <div class="flex w-full items-center text-sm mb-2 justify-between">
+<h3 class="text-[24px] font-bold text-[#212121] mb-1">
+    {{ app()->getLocale() === 'en' ? $product->name_en : $product->name }}
+</h3>
+                           @php
+    $averageRating = round($product->reviews->avg('rating'), 1);
+@endphp
+
+@if($averageRating > 0)
+    <div class="flex items-center">
+        <img class="mx-1" src="{{ asset('images/Vector (4).svg') }}" alt="">
+        <span class="text-[18px]">{{ $averageRating }}</span>
+    </div>
+@endif
+
+                            </div>
+
                                 </div>
                                 <span
                                     class="text-[#696969] text-[20px]">{{ $product->subCategory->category->name ?? 'غير مصنف' }}</span>
