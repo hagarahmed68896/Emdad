@@ -158,177 +158,30 @@
 
     @if ($notification->data['status'] === 'delivered')
     <button 
-        @click='
-            fetch("{{ url('orders') }}/{{ $notification->data['order_id'] }}/products")
-                .then(res => res.json())
-                .then(data => {
-                    products = data;   // update Alpine variable
-                    open = true;       // ✅ open the modal
-                })
-        '
+      @click="
+fetch(`{{ url('orders') }}/{{ $notification->data['order_id'] }}/products`)
+    .then(res => res.json())
+    .then(data => {
+    const modal = document.getElementById('globalReviewModal');
+    const alpine = Alpine.$data(modal);
+    alpine.products = data;
+    alpine.orderId = {{ $notification->data['order_id'] }};
+    alpine.open = true;
+
+    })
+"
+
         class="px-3 py-1 mt-1 text-sm bg-[#185D31] text-white rounded-lg hover:bg-green-700">
         {{ __('تقييم الطلب') }}
     </button>
     @endif
     </div>
-    <div 
-        x-show="open"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-        x-cloak
-    >
-        <div @click.away="open = false"
-             class="bg-white dark:bg-gray-800 w-full max-w-lg mx-4 rounded-xl shadow-lg p-6 rtl:text-right ltr:text-left space-y-4">
-
-            <h2 class="text-lg font-semibold text-center">{{ __('كيف كانت تجربتك مع هذا الطلب؟') }}</h2>
-
-            <div class="flex justify-center space-x-1 rtl:space-x-reverse">
-                <template x-for="i in 5" :key="i">
-                    <button type="button" @click="rating = i"
-                            :class="i <= rating ? 'text-yellow-400' : 'text-gray-300'"
-                            class="text-3xl">★</button>
-                </template>
-            </div>
-            <p x-show="errors.rating" class="text-red-500 text-sm" x-text="errors.rating"></p>
-
-            <div x-show="!successMessage">
-                <div x-show="rating <= 3 && rating > 0" class="space-y-4">
-
-                    <div>
-                        <label class="block font-semibold mb-2">{{ __('هل واجهت مشكلة في المنتج أم في الطلب؟') }}</label>
-                        <select x-model="issue_type" class="w-full border rounded-lg p-2">
-                            <option value="">{{ __('حدد نوع المشكلة') }}</option>
-                            <option value="product">{{ __('مشكلة في المنتج') }}</option>
-                            <option value="order">{{ __('مشكلة في الطلب') }}</option>
-                        </select>
-                        <p x-show="errors.issue_type" class="text-red-500 text-sm" x-text="errors.issue_type"></p>
-                    </div>
-
-                    <template x-if="issue_type === 'product'">
-                        <div>
-                            <label class="block font-semibold mb-2">{{ __('حدد المنتج الذي واجهت فيه المشكلة') }}</label>
-                            <select x-model="selected_product" class="w-full border rounded-lg p-2">
-                                <option value="">{{ __('اختر المنتج') }}</option>
-                                <template x-for="p in products" :key="p.id">
-                                    <option :value="p.id" x-text="p.name"></option>
-                                </template>
-                            </select>
-                        <p x-show="errors.product_id" class="text-red-500 text-sm" x-text="errors.product_id"></p>
-                        </div>
-                    </template>
-
-                    <div>
-                        <label class="block font-semibold mb-2">{{ __('ما المشكلة التي واجهتها؟') }}</label>
-                        <textarea x-model="comment" rows="3"
-                                 class="w-full border rounded-lg p-2"
-                                 placeholder="{{ __('برجاء توضيح المشكلة التي واجهتها') }}"></textarea>
-                        <p x-show="errors.comment" class="text-red-500 text-sm" x-text="errors.comment"></p>
-                    </div>
-
-                    <div>
-                        <label class="block font-semibold mb-2">{{ __('هل ترغب في تقديم شكوى حول هذه المشكلة؟') }}</label>
-                        <select x-model="complaint" class="w-full border rounded-lg p-2">
-                            <option value="">{{ __('اختر') }}</option>
-                            <option value="yes">{{ __('نعم') }}</option>
-                            <option value="no">{{ __('لا') }}</option>
-                        </select>
-                        <p x-show="errors.complaint" class="text-red-500 text-sm" x-text="errors.complaint"></p>
-                    </div>
-                </div>
-
-                <div class="flex justify-end mt-4">
-                    <button type="button" @click="submitReview()"
-                            class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                        <span x-text="rating > 0 && rating <= 3 ? '{{ __('إرسال الشكوى') }}' : '{{ __('إرسال التقييم') }}'"></span>
-                    </button>
-                </div>
-            </div>
-
-            <div x-show="successMessage"
-                 class="p-3 rounded-lg bg-green-100 text-green-700 text-center font-semibold">
-                <span x-text="successMessage"></span>
-            </div>
-        </div>
-    </div>
+  
 </div>
 
 
 
-<script>
-function reviewModal(orderId, initialProducts = []) {
-    return {
-        open: false,
-        rating: 0,
-        issue_type: '',
-        selected_product: '',
-        comment: '',
-        complaint: '',
-        products: initialProducts,
-        errors: {},
-        successMessage: '',
 
-        async submitReview() {
-            this.errors = {};
-
-            try {
-                const res = await fetch(`/reviews`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": document
-                            .querySelector('meta[name="csrf-token"]')
-                            .getAttribute("content"),
-                    },
-                    body: JSON.stringify({
-                        product_id: this.selected_product || null,
-                        rating: this.rating,
-                        comment: this.comment,
-                        issue_type: this.issue_type || null,
-                        order_id: orderId || null,
-                        issues: this.issue_type ? { type: this.issue_type, complaint: this.complaint } : null,
-
-                    }),
-                });
-
-                if (res.status === 422) {
-                    // Laravel validation errors
-                    const errorData = await res.json();
-                    this.errors = errorData.errors || {};
-                    return;
-                }
-
-                const data = await res.json();
-
-                if (data.success) {
-                    if (this.rating <= 3) {
-                        this.successMessage = "✅ تم إرسال الشكوى بنجاح";
-                    } else {
-                        this.successMessage = "✅ تم إرسال التقييم بنجاح";
-                    }
-
-                    setTimeout(() => {
-                        this.open = false;
-                        this.resetForm();
-                    }, 2000);
-                } else {
-                    this.errors = data.errors || {};
-                }
-            } catch (e) {
-                console.error("Submit failed", e);
-            }
-        },
-
-        resetForm() {
-            this.rating = 0;
-            this.issue_type = '';
-            this.selected_product = '';
-            this.comment = '';
-            this.complaint = '';
-            this.errors = {};
-            this.successMessage = '';
-        }
-    }
-}
-</script>
 
 
                                 @elseif($notification->type === App\Notifications\NewOfferNotification::class)
@@ -501,3 +354,154 @@ function reviewModal(orderId, initialProducts = []) {
 </script>
 
 @endauth
+<div 
+    id="globalReviewModal"
+    x-data="reviewModal(null, [])"
+    x-show="open"
+    class="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50"
+    x-cloak
+>
+    <div @click.away="open = false"
+        class="bg-white dark:bg-gray-800 w-full max-w-lg mx-4 rounded-xl shadow-lg p-6 rtl:text-right ltr:text-left space-y-4">
+
+        <h2 class="text-lg font-semibold text-center">كيف كانت تجربتك مع هذا الطلب؟</h2>
+
+        <div class="flex justify-center space-x-1 rtl:space-x-reverse">
+            <template x-for="i in 5" :key="i">
+                <button type="button" @click="rating = i"
+                        :class="i <= rating ? 'text-yellow-400' : 'text-gray-300'"
+                        class="text-3xl">★</button>
+            </template>
+        </div>
+
+        <div x-show="!successMessage">
+            <div x-show="rating <= 3 && rating > 0" class="space-y-4">
+                <div>
+                    <label class="block font-semibold mb-2">هل واجهت مشكلة في المنتج أم في الطلب؟</label>
+                    <select x-model="issue_type" class="w-full border rounded-lg p-2">
+                        <option value="">حدد نوع المشكلة</option>
+                        <option value="product">مشكلة في المنتج</option>
+                        <option value="order">مشكلة في الطلب</option>
+                    </select>
+                </div>
+
+                <template x-if="issue_type === 'product'">
+                    <div>
+                        <label class="block font-semibold mb-2">حدد المنتج الذي واجهت فيه المشكلة</label>
+                        <select x-model="selected_product" class="w-full border rounded-lg p-2">
+                            <option value="">اختر المنتج</option>
+                            <template x-for="p in products" :key="p.id">
+                                <option :value="p.id" x-text="p.name"></option>
+                            </template>
+                        </select>
+                    </div>
+                </template>
+
+                <div>
+                    <label class="block font-semibold mb-2">ما المشكلة التي واجهتها؟</label>
+                    <textarea x-model="comment" rows="3" class="w-full border rounded-lg p-2"
+                              placeholder="برجاء توضيح المشكلة التي واجهتها"></textarea>
+                </div>
+
+                <div>
+                    <label class="block font-semibold mb-2">هل ترغب في تقديم شكوى حول هذه المشكلة؟</label>
+                    <select x-model="complaint" class="w-full border rounded-lg p-2">
+                        <option value="">اختر</option>
+                        <option value="yes">نعم</option>
+                        <option value="no">لا</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex justify-end mt-4">
+                <button type="button" @click="submitReview()"
+                        class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                    <span x-text="rating > 0 && rating <= 3 ? 'إرسال الشكوى' : 'إرسال التقييم'"></span>
+                </button>
+            </div>
+        </div>
+
+        <div x-show="successMessage"
+             class="p-3 rounded-lg bg-green-100 text-green-700 text-center font-semibold">
+            <span x-text="successMessage"></span>
+        </div>
+    </div>
+</div>
+
+    <script>
+function reviewModal(orderId, initialProducts = []) {
+    return {
+        open: false,
+        rating: 0,
+        issue_type: '',
+        selected_product: '',
+        comment: '',
+        complaint: '',
+        products: initialProducts,
+        errors: {},
+        successMessage: '',
+
+        async submitReview() {
+            this.errors = {};
+
+            try {
+                const res = await fetch(`/reviews`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document
+                            .querySelector('meta[name="csrf-token"]')
+                            .getAttribute("content"),
+                    },
+                    body: JSON.stringify({
+                        product_id: this.selected_product || null,
+                        rating: this.rating,
+                        comment: this.comment,
+                        issue_type: this.issue_type || null,
+                        order_id: orderId || null,
+                        issues: this.issue_type ? { type: this.issue_type, complaint: this.complaint } : null,
+
+                    }),
+                });
+
+                if (res.status === 422) {
+                    // Laravel validation errors
+                    const errorData = await res.json();
+                    this.errors = errorData.errors || {};
+                    return;
+                }
+
+                const data = await res.json();
+
+                if (data.success) {
+                    if (this.rating <= 3) {
+                        this.successMessage = "✅ تم إرسال الشكوى بنجاح";
+                    } else {
+                        this.successMessage = "✅ تم إرسال التقييم بنجاح";
+                    }
+
+                    setTimeout(() => {
+                        this.open = false;
+                        this.resetForm();
+                    }, 2000);
+                } else {
+                    this.errors = data.errors || {};
+                }
+            } catch (e) {
+                console.error("Submit failed", e);
+            }
+        },
+
+        resetForm() {
+            this.rating = 0;
+            this.issue_type = '';
+            this.selected_product = '';
+            this.comment = '';
+            this.complaint = '';
+            this.errors = {};
+            this.successMessage = '';
+        }
+    }
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>

@@ -25,21 +25,19 @@
             );
         @endphp
 
-        @forelse ($images as $image)
+          @forelse ($images as $image)
             <div class="swiper-slide flex items-center justify-center bg-[#F8F9FA]">
-                <img src="{{ Storage::url($image) }}"
+                <img src="{{ asset('storage/' . $image) }}"
                      onerror="this.onerror=null;this.src='https://placehold.co/600x400/F0F0F0/ADADAD?text=Image+Error';"
-                     class="max-h-56 w-auto object-contain p-2"
-                     alt="Product image">
+                     class="max-h-56 w-auto object-contain p-2">
             </div>
         @empty
             <div class="swiper-slide flex items-center justify-center bg-[#F8F9FA]">
-                <img src="{{ $favorite->product->image 
-                                ? Storage::url($favorite->product->image) 
+                <img src="{{ $favorite->product && $favorite->product->image 
+                                ? asset('storage/' . $favorite->product->image) 
                                 : 'https://placehold.co/600x400/F0F0F0/ADADAD?text=No+Image' }}"
                      onerror="this.onerror=null;this.src='https://placehold.co/600x400/F0F0F0/ADADAD?text=Image+Error';"
-                     class="max-h-56 w-auto object-contain p-2"
-                     alt="No image">
+                     class="max-h-56 w-auto object-contain p-2">
             </div>
         @endforelse
     </div>

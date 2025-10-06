@@ -79,7 +79,7 @@
             {{-- Order Info --}}
             <div class="border-t pt-4 space-y-2">
                 <p class="flex justify-between">
-                    <strong>{{ __('messages.order_number') }}:</strong>
+                    <strong>{{ __('messages.order_number') }}</strong>
                     <span class="text-gray-700">#{{ $order->order_number }}</span>
                 </p>
                 <p class="flex justify-between">

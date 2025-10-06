@@ -164,6 +164,15 @@
             </div>
 
             <div>
+                <label class="block mb-1 font-bold">{{ __('messages.product_name_en') }}</label>
+                <input type="text" name="name_en" placeholder="{{ __('messages.product_name_en_placeholder') }}" class="border p-2 w-full rounded-xl" value="{{ old('name_en', $product->name_en ) }}">
+                @error('name_en') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+            </div>
+
+         
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-1 gap-4">
+           <div>
                 <label class="block mb-1 font-bold">{{ __('messages.model_number') }}</label>
                 <input type="text" name="model_number" placeholder="{{ __('messages.model_number_placeholder') }}" class="border p-2 w-full rounded-xl" value="{{ old('model_number', $product->model_number) }}">
                 @error('model_number') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
@@ -450,7 +459,7 @@ colors: Array.isArray(window.productColors) ? window.productColors : [],
 </div>
             <div>
                 <label class="block mb-1 font-bold">{{ __('messages.discount_percent') }}</label>
-                <input type="number" min="0" name="discount_percent" placeholder="{{ __('messages.discount_percent') }}"
+                <input type="number" min="0" step="1" name="discount_percent" placeholder="{{ __('messages.discount_percent') }}"
                  class="border p-2 w-full rounded-xl" value="{{ old('discount_percent', $product->offer ? $product->offer->discount_percent:null ) }}">
             </div>
         </div>

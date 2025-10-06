@@ -47,8 +47,8 @@
     </div>
 @empty
     <div class="swiper-slide">
-        <img src="{{ $favorite->product && $favorite->product->image 
-                        ? asset('storage/' . $favorite->product->image) 
+        <img src="{{ $featuredProduct->product && $featuredProduct->product->image 
+                        ? asset('storage/' . $featuredProduct->product->image) 
                         : 'https://placehold.co/300x200/F0F0F0/ADADAD?text=No+Image' }}"
              onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
              class="w-full h-full object-contain">

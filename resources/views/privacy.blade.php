@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@section('page_title', __('messages.privacy_policy'))
 
 @section('content')
     <div class="container py-5">

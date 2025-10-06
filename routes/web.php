@@ -99,12 +99,10 @@ Route::post('/admin/password/reset', [AdminLoginController::class, 'resetPasswor
 
           Route::get('/auth/facebook/redirect', [SocialLoginController::class, 'redirectToFacebook'])->name('login.facebook');
           Route::get('/auth/facebook/callback', [SocialLoginController::class, 'handleFacebookCallback']);
-
-     //cart
-               Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
-               Route::get('/cart/last/{product_id}', [CartController::class, 'getLastOrder']);
-Route::get('/guest-products', [CartController::class, 'guestProducts'])
-    ->name('guest.products');
+ 
+               //cart
+               Route::get('/guest-products', [CartController::class, 'guestProducts'])
+               ->name('guest.products');
 
 
                Route::delete('/cart/remove-item/{id}', [CartController::class, 'removeItem'])->name('cart.removeItem');
@@ -134,6 +132,8 @@ Route::get('/products/{product}/download-attachment', [ProductController::class,
     Route::get('/tickets/{ticket}', [TicketController::class, 'show'])->name('tickets.show');
     Route::post('/tickets/{ticket}/reply', [TicketController::class, 'reply'])->name('tickets.reply');
 
+               Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
+               Route::get('/cart/last/{product_id}', [CartController::class, 'getLastOrder']);
 
     
           Route::post('/user/save-location', [RegisterController::class, 'saveLocation'])

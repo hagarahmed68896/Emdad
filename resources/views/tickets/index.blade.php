@@ -1,5 +1,5 @@
 @extends('layouts.app')
-
+@section('page_title', __('messages.tech_support'))
 @section('content')
 <div class="px-[64px] py-8">
     <h1 class="text-2xl font-bold mb-6 text-gray-800">{{ __('messages.add_tickets') }}</h1>

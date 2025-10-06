@@ -89,7 +89,8 @@ public function cancel(Order $order)
     $order->status = 'cancelled'; // must match your stepMap spelling
     $order->save();
 
-    return redirect()->route('order.show')->with('success', 'تم إلغاء الطلب بنجاح.');
+return redirect()->route('order.show', $order->id)
+                 ->with('success', 'تم إلغاء الطلب بنجاح.');
 }
 
 

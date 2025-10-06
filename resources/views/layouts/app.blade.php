@@ -10,8 +10,9 @@
     {{-- Page Title --}}
     <title>@yield('page_title', __('messages.home'))</title>
 
-    {{-- Favicon --}}
+      <!-- Favicon (works on all pages) -->
     <link rel="icon" type="image/png" href="{{ asset('images/2.png') }}">
+    <link rel="shortcut icon" href="{{ asset('images/2.png') }}">
 
     {{-- Styles --}}
     {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}

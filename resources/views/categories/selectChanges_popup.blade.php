@@ -149,31 +149,49 @@ handleAddToCart() {
         return; // stop here
     }
 
-    // Authenticated users: call backend
-    fetch('/cart', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name=\'csrf-token\']').content
-        },
-        body: JSON.stringify({
-            product_id: @json($product->id),
-            items: itemsToAdd
-        })
+// Authenticated users: call backend
+fetch('/cart', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name=\'csrf-token\']').content
+    },
+    body: JSON.stringify({
+        product_id: @json($product->id),
+        items: itemsToAdd
     })
-    .then(response => {
-        if (!response.ok) throw new Error('Network error');
-        return response.json();
-    })
-    .then(data => {
-        this.message = window.translations.added_to_cart;
-        this.messageType = 'success';
-    })
-    .catch(error => {
-        this.message = window.translations.error_adding_to_cart;
-        this.messageType = 'error';
-        console.error(error);
-    });
+})
+.then(async response => { 
+    if (!response.ok) {
+        
+        const text = await response.text(); 
+        
+        console.error('Server Status:', response.status);
+        console.error('Full Response Body (HTML/Text):', text); 
+
+        if (text.startsWith('<!DOCTYPE') || response.status === 401 || response.status === 403) {
+             throw new Error('Authentication failed');
+        }
+        
+        try {
+            const data = JSON.parse(text);
+            throw new Error(data.message || data.error || 'Server error.');
+        } catch (e) {
+            throw new Error(`Error ${response.status}: Failed to process request.`);
+        }
+    }
+    return response.json();
+})
+.then(data => {
+    this.message = window.translations.added_to_cart;
+    this.messageType = 'success';
+})
+.catch(error => {
+    this.message = error.message || window.translations.error_adding_to_cart;
+    this.messageType = 'error';
+    console.error('Add to Cart Failed:', error);
+});
 }
 
     

@@ -1,5 +1,5 @@
 @extends('layouts.app')
-
+@section('page_title', __('messages.terms_and_conditions'))
 @section('content')
     <script src="https://cdn.jsdelivr.net/npm/preline@1.9.0/dist/preline.js"></script>
     <style>

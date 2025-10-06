@@ -1,5 +1,5 @@
 @extends('layouts.app')
-
+@section('page_title', __('messages.messages'))
 @section('content')
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 

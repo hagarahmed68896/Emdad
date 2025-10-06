@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@section('page_title', $product->name ?? 'Product Details')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
@@ -773,21 +774,33 @@ $defaultSelectedColorName = $productColors[0]['name'] ?? null;
                         open: false,
                         rating: 0,
                         comment: '',
-                        errorMessage: ''
+                        errorMessage: '',
+                         showLoginMessage: false
                     }">
                         @if (!Auth::check() || Auth::user()->account_type !== 'supplier')
-                            <button
-                                @click="
-            @auth open = true;
-                errorMessage = ''; // Clear error message when opening the modal
-                rating = 0; // Reset rating when opening
-                comment = ''; // Reset comment when opening
-            @else 
-                window.location.href = '{{ route('login') }}' @endauth
-        "
-                                class="mt-3 bg-[#185D31] w-full hover:bg-green-800 text-white py-2 px-4 rounded-lg text-sm">
-                                {{ __('messages.add_review') }}
-                            </button>
+                         <button
+    @click="
+        @auth
+            open = true;
+            errorMessage = ''; // مسح الرسالة عند الفتح
+            rating = 0;       // إعادة ضبط التقييم
+            comment = '';      // إعادة ضبط التعليق
+        @else
+            showLoginMessage = true; 
+            setTimeout(() => showLoginMessage = false, 3000);
+        @endauth
+    "
+    class="mt-3 bg-[#185D31] w-full hover:bg-green-800 text-white py-2 px-4 rounded-lg text-sm relative"
+>
+    {{ __('messages.add_review') }}
+
+    {{-- Floating login message --}}
+    <div x-show="showLoginMessage" x-transition x-cloak
+         class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-max max-w-xs bg-blue-500 text-white text-sm rounded-lg shadow-lg px-4 py-2">
+        {{ __('messages.you_need_login') }}
+    </div>
+</button>
+
                         @endif
                         <div x-show="open" x-cloak
                             class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -1098,19 +1111,21 @@ $defaultSelectedColorName = $productColors[0]['name'] ?? null;
                                             );
                                         @endphp
 
-                                        @forelse ($images as $image)
-                                            <div class="swiper-slide">
-                                                <img src="{{ Storage::url($image) }}"
-                                                    onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
-                                                    class="w-full h-full object-contain">
-                                            </div>
-                                        @empty
-                                            <div class="swiper-slide">
-                                                <img src="{{ asset($offer->product->image ?? 'https://placehold.co/300x200/F0F0F0/ADADAD?text=No+Image') }}"
-                                                    onerror="this.onerror=null;this.src='https://placehold.co/300x200/F0F0F0/ADADAD?text=Image+Error';"
-                                                    class="w-full h-full object-contain">
-                                            </div>
-                                        @endforelse
+                               @forelse ($images as $image)
+            <div class="swiper-slide flex items-center justify-center bg-[#F8F9FA]">
+                <img src="{{ asset('storage/' . $image) }}"
+                     onerror="this.onerror=null;this.src='https://placehold.co/600x400/F0F0F0/ADADAD?text=Image+Error';"
+                     class="max-h-56 w-auto object-contain p-2">
+            </div>
+        @empty
+            <div class="swiper-slide flex items-center justify-center bg-[#F8F9FA]">
+                <img src="{{ $product && $product->image 
+                                ? asset('storage/' . $product->image) 
+                                : 'https://placehold.co/600x400/F0F0F0/ADADAD?text=No+Image' }}"
+                     onerror="this.onerror=null;this.src='https://placehold.co/600x400/F0F0F0/ADADAD?text=Image+Error';"
+                     class="max-h-56 w-auto object-contain p-2">
+            </div>
+        @endforelse
                                     </div>
                                     @php
                                         $images = is_string($product->images)
@@ -1166,13 +1181,16 @@ $defaultSelectedColorName = $productColors[0]['name'] ?? null;
                                             <span class="flex items-center text-[#185D31]">
                                                 <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]"
                                                     src="{{ asset('images/Success.svg') }}" alt="Confirmed Supplier">
-                                                <p class="text-[20px] text-[#212121] ">
-                                                    {{ $product->supplier->company_name }}
-                                                </p>
+                                                <a href="{{ route('suppliers.show', $product->supplier->id) }}"
+   class="inline-block py-1 text-[#185D31] rounded-lg text-[18px] font-medium transition">
+    {{ $product->supplier->company_name }}
+</a>
                                             </span>
                                         @else
-                                            <p class="text-[20px] text-[#212121] ">{{ $product->supplier->company_name }}
-                                            </p>
+                                           <a href="{{ route('suppliers.show', $product->supplier->id) }}"
+   class="inline-block py-1 text-[#185D31] rounded-lg text-[18px] font-medium transition">
+    {{ $product->supplier->company_name }}
+</a>
                                         @endif
                                     </div>
                                     <div class="flex items-center mb-2">
