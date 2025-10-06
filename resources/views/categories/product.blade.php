@@ -608,7 +608,7 @@
                                         @else
                                           <a href="{{ route('suppliers.show', $product->supplier->id) }}"
    class="inline-block py-1 rounded-lg text-[#185D31] text-[18px] font-medium  transition">
-    {{ $product->supplier->company_name }}
+    {{ $product->supplier->company_name }} 
 </a>
                                         @endif
                                     </div>

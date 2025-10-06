@@ -89,28 +89,45 @@
                         {{-- Product Details --}}
                         <div class="p-4 flex flex-col flex-grow">
                             <div class="flex w-full items-center text-sm mb-2 justify-between">
-                                <h3 class="text-[24px] font-bold text-[#212121] mb-1">{{ $item['data']->name }}</h3>
-                                <div class="flex items-center">
-                                    @if($item['data']->rating)
-                                        <img class="mx-1" src="{{ asset('images/Vector (4).svg') }}" alt="">
-                                    @endif
-                                    <span class="text-[18px]">{{ $item['data']->rating ?? '' }}</span>
-                                </div>
+<h3 class="text-[24px] font-bold text-[#212121] mb-1">
+    {{ app()->getLocale() === 'en' ? $item['data']->name_en : $item['data']->name }}
+</h3>
+                          @php
+    $averageRating = round($item['data']->reviews->avg('rating'), 1);
+@endphp
+
+@if($averageRating > 0)
+    <div class="flex items-center">
+        <img class="mx-1" src="{{ asset('images/Vector (4).svg') }}" alt="">
+        <span class="text-[18px]">{{ $averageRating }}</span>
+    </div>
+@endif
+
                             </div>
 
-                            <span class="text-[#696969] text-[20px]">
-                                {{ $item['data']->subCategory->category->name ?? 'غير مصنف' }}
-                            </span>
+                        <span class="text-[#696969] text-[20px]">
+    {{ app()->getLocale() === 'en' 
+        ? $item['data']->subCategory->category->name_en ?? 'Uncategorized' 
+        : $item['data']->subCategory->category->name ?? 'غير مصنف' }}
+</span>
+
 
                             <div class="flex mt-2">
-                                @if ($item['data']->supplier->supplier_confirmed)
-                                    <span class="flex items-center text-[#185D31]">
-                                        <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]" src="{{ asset('images/Success.svg') }}" alt="Confirmed Supplier">
-                                        <p class="text-[20px] text-[#212121] ">{{ $item['data']->supplier->company_name ?? '' }}</p>
-                                    </span>
-                                @else
-                                    <p class="text-[20px] text-[#212121] ">{{ $item['data']->supplier->company_name ?? '' }}</p>
-                                @endif
+                            @if ($item['data']->supplier->supplier_confirmed)
+    <span class="flex items-center text-[#185D31]">
+        <img class="rtl:ml-2 ltr:mr-2 w-[20px] h-[20px]" src="{{ asset('images/Success.svg') }}" alt="Confirmed Supplier">
+        <a href="{{ route('suppliers.show', $item['data']->supplier->id) }}"
+           class="inline-block py-1 rounded-lg text-[#185D31] text-[18px] font-medium transition">
+            {{ $item['data']->supplier->company_name ?? '' }}
+        </a>
+    </span>
+@else
+    <a href="{{ route('suppliers.show', $item['data']->supplier->id) }}"
+       class="inline-block py-1 rounded-lg text-[#185D31] text-[18px] font-medium transition">
+        {{ $item['data']->supplier->company_name ?? '' }}
+    </a>
+@endif
+
                             </div>
 
                             <div class="flex items-center mb-2">
@@ -122,7 +139,7 @@
                                     <img class="mx-1 w-[20px] h-[21px]" src="{{ asset('images/Vector (3).svg') }}" alt="">
                                 </span>
 
-                                @if (isset($item['data']->offer) && $item['data']->offer->is_offer && $item['data']->offer->discount_percent)
+                                @if ($item['data']->offer->discount_percent)
                                     <span class="flex text-sm text-gray-400 line-through mr-2">
                                         {{ number_format($item['data']->price ?? 0, 2) }}
                                         <img class="mx-1 w-[14px] h-[14px] mt-1 inline-block" src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}" alt="currency">
