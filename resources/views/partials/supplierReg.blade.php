@@ -1,4 +1,6 @@
 {{-- supplier section --}}
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
 <div x-show="formData.account_type === 'supplier'">
     <form method="POST" action="{{ route('sendOtp') }}" x-show="userType === 'supplier'"
         enctype="multipart/form-data"
@@ -452,11 +454,13 @@
                     <div class="text-[#d33] mt-1 text-xs" x-text="errors.terms[0]"></div>
                 </template>
             </div>
+                    <!-- ✅ reCAPTCHA -->
+<div class="mb-3" id="recaptcha_supplier"></div>
 
             <button type="submit"
                 class="w-full bg-[#185D31] text-white p-[12px] h-[48px] rounded-[12px] hover:bg-green-800"
                 :disabled="loading">
-                <span x-show="!loading">{{ __('messages.register') }}</span>
+                <span x-show="!loading">{{ __('messages.Register') }}</span>
                 <span x-show="loading">
                     <svg class="animate-spin h-5 w-5 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -471,3 +475,22 @@
         </div>
     </form>
 </div>
+{{-- <script>
+    // Make it global
+    let captchaWidgetId;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        function renderCaptcha() {
+            if (window.grecaptcha && document.getElementById('recaptcha_register')) {
+                captchaWidgetId = grecaptcha.render('recaptcha_register', {
+                    'sitekey': '6LcTZuErAAAAAI-idNNNcQzsYW0Ca-t782dVsvWJ',
+                    'theme': 'light'
+                });
+            } else {
+                setTimeout(renderCaptcha, 1000);
+            }
+        }
+
+        renderCaptcha();
+    });
+</script> --}}

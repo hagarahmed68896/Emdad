@@ -58,10 +58,10 @@
                         </div>
 
                         <!-- OR URL Input -->
-                        <div class="flex flex-col sm:flex-row mt-4 mb-4 items-center justify-between">
+                        {{-- <div class="flex flex-col sm:flex-row mt-4 mb-4 items-center justify-between">
                             <input type="text" x-model="imageUrl" placeholder="{{ __('messages.imageURL') }}"
                                 class="border border-gray-300 px-3 py-2 rounded w-full sm:w-[400px] text-sm mb-2 sm:mb-0" />
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
             </div>

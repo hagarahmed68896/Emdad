@@ -22,7 +22,8 @@ class OtpController extends Controller
     public function sendOtp(Request $request)
     {
         $authMethod = $request->auth_method;
-        
+        Log::info('Recaptcha value:', ['captcha' => $request->input('g-recaptcha-response')]);
+
     // ------------------ RESEND OTP ------------------
     if ($authMethod === 'resend') {
         $email = $request->email ?? null;
@@ -73,11 +74,14 @@ class OtpController extends Controller
             $request->validate([
                 'email' => 'required|email|exists:users,email',
                 'password' => 'required',
+                'g-recaptcha-response' => 'required|captcha'
             ], [
                 'email.required' => __('messages.emailError'),
                 'email.email' => __('messages.emailValid'),
                 'email.exists' => __('messages.email_failed'),
                 'password.required' => __('messages.passwordMSG'),
+                'g-recaptcha-response.required' => __('messages.recaptcha_required'),
+
             ]);
 
             $user = User::where('email', $request->email)->first();
@@ -99,6 +103,7 @@ class OtpController extends Controller
                 'phone_number' => 'required|digits:9|unique:users,phone_number',
                 'terms' => 'accepted',
                 'account_type' => 'required|in:supplier,customer',
+                'g-recaptcha-response' => 'required|captcha'
             ], [
                 'full_name.required' => __('messages.nameError'),
                 'email.required' => __('messages.emailError'),
@@ -112,6 +117,8 @@ class OtpController extends Controller
                 'phone_number.unique' => __('messages.phone_number_Unique'),
                 'phone_number.digits' => __('messages.phone_number_max'),
                 'terms.accepted' => __('messages.acceptTermsError'),
+                'g-recaptcha-response.required' => __('messages.recaptcha_required'),
+
             ]);
             $clean_phone_number = preg_replace('/\D/', '', $request->phone_number);
             if (str_starts_with($clean_phone_number, '966')) {
@@ -124,6 +131,8 @@ class OtpController extends Controller
         'email' => 'required|string|email|max:255|unique:users',
         'phone_number' => 'required|string|digits:9|unique:users,phone_number',
         'password' => 'required|string|min:8|confirmed',
+        'g-recaptcha-response' => 'required|captcha',
+
 
         // الهوية الوطنية (10 أرقام تبدأ بـ1 أو 2)
         'national_id' => 'required|digits:10|regex:/^[12]\d{9}$/',
@@ -193,6 +202,7 @@ class OtpController extends Controller
         'national_address_attach.required' => __('messages.attach_required'),
         'iban_attach.required' => __('messages.attach_required'),
         'tax_certificate_attach.required' => __('messages.attach_required'),
+        'g-recaptcha-response.required' => __('messages.recaptcha_required'),
     ]);
 
     // ✅ تنسيق رقم الهاتف

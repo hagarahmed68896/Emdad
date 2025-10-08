@@ -58,7 +58,13 @@ $view->with('activeTerms', $activeTerms)
      ->with('categories', $categories);
 
   
+   // ✅ Fix for cURL certificate issue on localhost
+    $certPath = 'C:\php-8.4.6\extras\ssl\cacert.pem';
 
+    if (file_exists($certPath)) {
+        putenv("CURL_CA_BUNDLE=$certPath");
+        putenv("SSL_CERT_FILE=$certPath");
+    }
 
 
             // ------------------------

@@ -45,6 +45,19 @@ return [
     'bearer_token' => env('TAQNYAT_BEARER_TOKEN'),
     'sender' => env('TAQNYAT_SENDER'),
 ],
+'recaptcha' => [
+    'sitekey' => env('NOCAPTCHA_SITEKEY'),
+    'secret' => env('NOCAPTCHA_SECRET'),
+
+    // أضف السطور التالية
+    'options' => [
+        'verify' => 'C:\php-8.4.6\extras\ssl\cacert.pem',
+        'curl' => [
+            CURLOPT_CAINFO => 'C:\php-8.4.6\extras\ssl\cacert.pem',
+        ],
+    ],
+],
+
 
 
 ];

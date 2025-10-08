@@ -123,6 +123,7 @@ return [
   'recommend' => 'اقتراحتنا لك',
   'refresh' => 'تحديث',
   'register' => 'تسجيل دخول',
+  'Register' => 'إنشاء حساب',
   'registerMSG' => 'اختر نوع حسابك وابدأ رحلتك معنا.',
   'register_failed' => 'فشل التسجيل، يرجى المحاولة مرة أخرى.',
   'register_success' => 'تم التسجيل بنجاح! مرحبًا بك.',
@@ -1248,6 +1249,8 @@ return [
     'submit_complaint' => 'إرسال الشكوى',
     'complaint_submitted_successfully' => '✅ تم إرسال الشكوى بنجاح',
     'review_submitted_successfully' => '✅ تم إرسال التقييم بنجاح',
+    'recaptcha_required' => 'يرجى تأكيد أنك لست روبوت!',
+
 
 
 

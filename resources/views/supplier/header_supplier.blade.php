@@ -1028,14 +1028,11 @@ function deliveryDropdown() {
                             <input type="file" id="imageInput" accept="image/*" class="hidden"
                               x-ref="imageFile"  @change="handleImageUpload">
                         </div>
-                        <div class="flex flex-col sm:flex-row mt-4 mb-4 items-center justify-between">
+                        {{-- <div class="flex flex-col sm:flex-row mt-4 mb-4 items-center justify-between">
                             <input type="text" x-model="imageUrl" placeholder="{{ __('messages.imageURL') }}"
                                 class="border border-gray-300 px-3 py-2 rounded w-full sm:w-[400px] text-sm mb-2 sm:mb-0" />
-                            {{-- <button type="button" @click="submitImage"
-                                class="bg-green-800 text-white px-6 py-2 rounded text-sm w-full sm:w-auto">
-                                {{ __('messages.Search') }}
-                            </button> --}}
-                        </div>
+                        
+                        </div> --}}
                     </div>
                 </div>
             </div>
@@ -1452,14 +1449,11 @@ function deliveryDropdown() {
                             <input type="file" id="imageInput" accept="image/*" class="hidden"
                               x-ref="imageFile"   @change="handleImageUpload">
                         </div>
-                        <div class="flex flex-col sm:flex-row mt-4 mb-4 items-center justify-between">
+                        {{-- <div class="flex flex-col sm:flex-row mt-4 mb-4 items-center justify-between">
                             <input type="text" x-model="imageUrl" placeholder="{{ __('messages.imageURL') }}"
                                 class="border border-gray-300 px-3 py-2 rounded w-full sm:w-[400px] text-sm mb-2 sm:mb-0" />
-                            {{-- <button type="button" @click="submitImage"
-                                class="bg-green-800 text-white px-6 py-2 rounded text-sm w-full sm:w-auto">
-                                {{ __('messages.Search') }}
-                            </button> --}}
-                        </div>
+                         
+                        </div> --}}
                     </div>
                 </div>
             </div>

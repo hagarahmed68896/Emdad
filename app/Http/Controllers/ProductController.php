@@ -78,9 +78,15 @@ class ProductController extends Controller
         if ($request->filled('max_price')) {
             $productsQuery->where('price', '<=', (float) $request->input('max_price'));
         }
-        if ($request->filled('rating')) {
-            $productsQuery->where('rating', '>=', (float) $request->input('rating'));
-        }
+      if ($request->filled('rating')) {
+    $selectedRating = (float) $request->input('rating');
+    $productsQuery->whereHas('reviews', function ($q) use ($selectedRating) {
+        $q->selectRaw('avg(rating) as avg_rating')
+          ->groupBy('product_id')
+          ->havingRaw('avg_rating >= ?', [$selectedRating]);
+    });
+}
+
 
         // === Filter by COLORS ===
         if ($request->has('colors') && is_array($request->input('colors'))) {

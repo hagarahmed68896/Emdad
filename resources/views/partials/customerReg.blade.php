@@ -16,6 +16,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
         </button>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
         {{-- Main Content Area - this is where the height responsiveness is crucial --}}
         <div class="relative bg-white w-full p-8 sm:p-10 md:p-12 rounded-lg shadow-xl
@@ -91,7 +92,24 @@ showOTP: false,
                 submitData.append('tax_certificate_attach', this.formData.tax_certificate_attach);
             }
 
-                    console.log('Submitting form with data (FormData object, cannot be directly logged):', submitData);
+            console.log('Submitting form with data (FormData object, cannot be directly logged):', submitData);
+       // ✅ أضف الكابتشا
+let captchaResponse;
+if (this.formData.account_type === 'customer') {
+    captchaResponse = grecaptcha.getResponse(captchaCustomerId);
+} else {
+    captchaResponse = grecaptcha.getResponse(captchaSupplierId);
+}
+
+if (!captchaResponse) {
+    this.loading = false;
+    this.errors['g-recaptcha-response'] = ['يرجى تأكيد أنك لست روبوت!'];
+    return;
+}
+
+submitData.append('g-recaptcha-response', captchaResponse);
+
+
 
                     axios.post(this.$el.action, submitData, {
                         headers: {
@@ -331,9 +349,12 @@ showOTP: false,
                             <div class="text-[#d33] mt-1 text-xs" x-text="errors.terms[0]"></div>
                         </template>
                     </div>
+                        <!-- ✅ reCAPTCHA -->
+<div class="mb-3" id="recaptcha_customer"></div>
+
                     <button type="submit" :disabled="loading"
                         class="w-full bg-[#185D31] text-white py-3 px-4 rounded-lg hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed text-base">
-                        <span x-show="!loading">{{ __('messages.register') }}</span>
+                        <span x-show="!loading">{{ __('messages.Register') }}</span>
                         <span x-show="loading">
                             <div class="animate-spin inline-block w-6 h-6 border-[3px] border-current border-t-transparent text-white rounded-full"
                                 role="status" aria-label="loading">
@@ -357,5 +378,35 @@ showOTP: false,
         </div>
     </div>
 </div>
+<script>
+   let captchaCustomerId, captchaSupplierId;
+
+function renderCaptcha() {
+    if (window.grecaptcha) {
+        const customerDiv = document.getElementById('recaptcha_customer');
+        const supplierDiv = document.getElementById('recaptcha_supplier');
+
+        if (customerDiv && !captchaCustomerId) {
+            captchaCustomerId = grecaptcha.render('recaptcha_customer', {
+                'sitekey': '6LcTZuErAAAAAI-idNNNcQzsYW0Ca-t782dVsvWJ',
+                'theme': 'light'
+            });
+        }
+
+        if (supplierDiv && !captchaSupplierId) {
+            captchaSupplierId = grecaptcha.render('recaptcha_supplier', {
+                'sitekey': '6LcTZuErAAAAAI-idNNNcQzsYW0Ca-t782dVsvWJ',
+                'theme': 'light'
+            });
+        }
+    } else {
+        setTimeout(renderCaptcha, 1000);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', renderCaptcha);
+
+</script>
+
 
 @include('partials.otp')
