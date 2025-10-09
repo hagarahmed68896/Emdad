@@ -20,7 +20,7 @@
 
 {{-- No results message --}}
 @if ($results->isEmpty())
-    <p class="text-center text-xl text-gray-600">
+    <p class="text-center text-xl mb-8 text-gray-600">
         {{ __('messages.no_search_image') }}
     </p>
 @else
@@ -139,7 +139,7 @@
                                     <img class="mx-1 w-[20px] h-[21px]" src="{{ asset('images/Vector (3).svg') }}" alt="">
                                 </span>
 
-                                @if ($item['data']->offer->discount_percent)
+@if ($item['data']->offer?->discount_percent)
                                     <span class="flex text-sm text-gray-400 line-through mr-2">
                                         {{ number_format($item['data']->price ?? 0, 2) }}
                                         <img class="mx-1 w-[14px] h-[14px] mt-1 inline-block" src="{{ asset('images/Saudi_Riyal_Symbol.svg') }}" alt="currency">

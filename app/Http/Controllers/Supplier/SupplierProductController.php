@@ -181,21 +181,30 @@ $colors = collect($request->input('colors'))
     ->map(function ($colorJson) {
         $color = json_decode($colorJson, true);
 
-        if (!empty($color['image']) && str_starts_with($color['image'], 'data:image')) {
-            // Extract base64 data
-            $image_parts = explode(";base64,", $color['image']);
-            $image_base64 = base64_decode($image_parts[1]);
-            
-            // Create a unique name for the file
-            $extension = explode('/', mime_content_type($color['image']))[1];
-            $fileName = 'color_images/' . uniqid() . '.' . $extension;
+    if (!empty($color['image']) && str_starts_with($color['image'], 'data:image')) {
+    // Extract base64 data
+    $image_parts = explode(";base64,", $color['image']);
+    $image_base64 = base64_decode($image_parts[1]);
+    
+    // Create a unique name for the file
+    $extension = explode('/', mime_content_type($color['image']))[1];
+    $fileName = 'color_images/' . uniqid() . '.' . $extension;
 
-            // Save file in storage
-            Storage::disk('public')->put($fileName, $image_base64);
+    // Define the full path inside public/storage
+    $directory = public_path('storage/color_images');
 
-            // Store the path instead of base64 text
-            $color['image'] = $fileName;
-        }
+    // Ensure the directory exists
+    if (!file_exists($directory)) {
+        mkdir($directory, 0775, true);
+    }
+
+    // Save the file directly to public/storage/color_images
+    file_put_contents($directory . '/' . basename($fileName), $image_base64);
+
+    // Store the path relative to "storage/"
+    $color['image'] = 'storage/' . $fileName;
+}
+
 
         return $color;
     })
@@ -343,21 +352,36 @@ public function update(Request $request, Product $product)
             $productData['slug'] = Str::slug($data['name_en']) . '-' . Str::random(8);
         }
 
-        // ✅ Main image
-        if ($request->hasFile('image')) {
-            if ($product->image) {
-                Storage::disk('public')->delete($product->image);
-            }
-            $productData['image'] = $request->file('image')->store('products', 'public');
+       // ✅ Main image
+if ($request->hasFile('image')) {
+    if (!empty($product->image)) {
+        $oldImagePath = public_path('storage/' . $product->image);
+        if (file_exists($oldImagePath)) {
+            unlink($oldImagePath);
         }
+    }
 
-        // ✅ Attachments
-        if ($request->hasFile('attachments')) {
-            if ($product->attachments) {
-                Storage::disk('public')->delete($product->attachments);
-            }
-            $productData['attachments'] = $request->file('attachments')->store('attachments', 'public');
+    // Move new file to public/storage/products
+    $imageName = time() . '_' . $request->file('image')->getClientOriginalName();
+    $request->file('image')->move(public_path('storage/products'), $imageName);
+    $productData['image'] = 'products/' . $imageName;
+}
+
+// ✅ Attachments
+if ($request->hasFile('attachments')) {
+    if (!empty($product->attachments)) {
+        $oldAttachmentPath = public_path('storage/' . $product->attachments);
+        if (file_exists($oldAttachmentPath)) {
+            unlink($oldAttachmentPath);
         }
+    }
+
+    // Move new file to public/storage/attachments
+    $attachmentName = time() . '_' . $request->file('attachments')->getClientOriginalName();
+    $request->file('attachments')->move(public_path('storage/attachments'), $attachmentName);
+    $productData['attachments'] = 'attachments/' . $attachmentName;
+}
+
 
     // ✅ Gallery images
 $existingImages = $request->input('existing_images', []); // صور قديمة جاية من الفورم
@@ -437,17 +461,19 @@ $productData['phashes'] = json_encode($phashes);
 
                 $image = $color['image'] ?? null;
 
-                if (!empty($image) && str_starts_with($image, 'data:image')) {
-                    $image_parts = explode(";base64,", $image);
-                    $image_base64 = base64_decode($image_parts[1]);
+             if (!empty($image) && str_starts_with($image, 'data:image')) {
+    $image_parts = explode(";base64,", $image);
+    $image_base64 = base64_decode($image_parts[1]);
 
-                    $extension = explode('/', mime_content_type($image))[1];
-                    $fileName = 'color_images/' . uniqid() . '.' . $extension;
+    $extension = explode('/', mime_content_type($image))[1];
+    $fileName = 'color_images/' . uniqid() . '.' . $extension;
 
-                    Storage::disk('public')->put($fileName, $image_base64);
+    // حفظ الصورة فعليًا في public/storage
+    file_put_contents(public_path('storage/' . $fileName), $image_base64);
 
-                    $image = $fileName;
-                }
+    $image = $fileName;
+}
+
 
                 return [
                     'name'  => $color['name'] ?? null,
@@ -466,37 +492,60 @@ $productData['phashes'] = json_encode($phashes);
         // ✅ Offer
         $hasOfferData = $request->filled('offer_name') || $request->filled('discount_percent') || $request->hasFile('offer_image');
 
-        if ($hasOfferData) {
-            $offerData = [
-                'name'             => $request->input('offer_name') ?? $product->offer->name ?? '',
-                'description'      => $request->input('offer_description'),
-                'discount_percent' => $request->input('discount_percent'),
-                'offer_start'      => $request->input('offer_start'),
-                'offer_end'        => $request->input('offer_end'),
-            ];
+     if ($hasOfferData) {
+    $offerData = [
+        'name'             => $request->input('offer_name') ?? $product->offer->name ?? '',
+        'description'      => $request->input('offer_description'),
+        'discount_percent' => $request->input('discount_percent'),
+        'offer_start'      => $request->input('offer_start'),
+        'offer_end'        => $request->input('offer_end'),
+    ];
 
-            if ($request->hasFile('offer_image')) {
-                if ($product->offer && $product->offer->image) {
-                    Storage::disk('public')->delete($product->offer->image);
-                }
-                $offerData['image'] = $request->file('offer_image')->store('offers', 'public');
+    if ($request->hasFile('offer_image')) {
+        // حذف الصورة القديمة إن وجدت
+        if ($product->offer && $product->offer->image) {
+            $oldImagePath = public_path('storage/' . $product->offer->image);
+            if (file_exists($oldImagePath)) {
+                unlink($oldImagePath);
             }
-
-            if ($product->offer) {
-                $product->offer->update($offerData);
-                Log::info('Offer updated successfully.');
-            } else {
-                $offerData['product_id'] = $product->id;
-                Offer::create($offerData);
-                Log::info('Offer created successfully.');
-            }
-        } elseif ($product->offer) {
-            if ($product->offer->image) {
-                Storage::disk('public')->delete($product->offer->image);
-            }
-            $product->offer->delete();
-            Log::info('Offer deleted successfully.');
         }
+
+        // حفظ الصورة الجديدة داخل public/storage/offers
+        $image      = $request->file('offer_image');
+        $extension  = $image->getClientOriginalExtension();
+        $fileName   = 'offers/' . uniqid() . '.' . $extension;
+        $savePath   = public_path('storage/' . $fileName);
+
+        // إنشاء مجلد العروض لو مش موجود
+        if (!file_exists(dirname($savePath))) {
+            mkdir(dirname($savePath), 0777, true);
+        }
+
+        file_put_contents($savePath, file_get_contents($image->getRealPath()));
+
+        $offerData['image'] = $fileName;
+    }
+
+    if ($product->offer) {
+        $product->offer->update($offerData);
+        Log::info('Offer updated successfully.');
+    } else {
+        $offerData['product_id'] = $product->id;
+        Offer::create($offerData);
+        Log::info('Offer created successfully.');
+    }
+} elseif ($product->offer) {
+    // حذف الصورة لو مفيش عرض جديد
+    if ($product->offer->image) {
+        $oldImagePath = public_path('storage/' . $product->offer->image);
+        if (file_exists($oldImagePath)) {
+            unlink($oldImagePath);
+        }
+    }
+    $product->offer->delete();
+    Log::info('Offer deleted successfully.');
+}
+
 
         return response()->json(['success' => 'تم تحديث المنتج بنجاح']);
     } catch (\Throwable $e) {

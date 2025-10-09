@@ -21,138 +21,125 @@
         {{-- Main Content Area - this is where the height responsiveness is crucial --}}
         <div class="relative bg-white w-full p-8 sm:p-10 md:p-12 rounded-lg shadow-xl
                     flex-grow overflow-y-auto max-h-[90vh] my-4 sm:my-8"
-            x-data="{
-                formData: {
-                    full_name: '',
-                    email: '',
-                    phone_number: '',
-                    password: '',
-                    password_confirmation: '',
-                    account_type: 'customer', // Default to customer
-                    // --- New Supplier Specific Inputs ---
-                    company_name: '',
-                    national_id: '',
-                    national_id_attach: null, // For file inputs, usually store the File object or its name
-                    commercial_registration: '',
-                    commercial_registration_attach: null,
-                    national_address: '',
-                    national_address_attach: null,
-                    iban: '',
-                    iban_attach: null,
-                    tax_certificate: '',
-                    tax_certificate_attach: null,
-                    terms: false,
-                    showLogin: false,
-showRegister: true,
-showOTP: false,
+          <div x-data="{
+    formData: {
+        full_name: '',
+        email: '',
+        phone_number: '',
+        password: '',
+        password_confirmation: '',
+        account_type: 'customer', // Default to customer
+        company_name: '',
+        national_id: '',
+        national_id_attach: null,
+        commercial_registration: '',
+        commercial_registration_attach: null,
+        national_address: '',
+        national_address_attach: null,
+        iban: '',
+        iban_attach: null,
+        tax_certificate: '',
+        tax_certificate_attach: null,
+        terms: false,
+        showLogin: false,
+        showRegister: true,
+        showOTP: false,
+    },
+    errors: {},
+    loading: false,
+    showPassword: false, // For password toggle
+    submitForm() {
+        this.loading = true;
+        this.errors = {}; // Clear previous errors
 
-                },
-                errors: {},
-                loading: false,
-                showPassword: false, // For password visibility toggle
-                submitForm() {
-                    this.loading = true;
-                    this.errors = {}; // Clear previous errors
-             const submitData = new FormData();
-               // ✅ الحقول النصية
-// Decide auth_method based on account type
-    if (this.formData.account_type === 'supplier') {
-        submitData.append('auth_method', 'register_supplier');
-    } else {
-        submitData.append('auth_method', 'register');
-    }            submitData.append('full_name', this.formData.full_name);
-            submitData.append('email', this.formData.email);
-            submitData.append('phone_number', this.formData.phone_number);
-            submitData.append('password', this.formData.password);
-            submitData.append('password_confirmation', this.formData.password_confirmation);
-            submitData.append('account_type', this.formData.account_type);
+        const submitData = new FormData();
 
-            submitData.append('company_name', this.formData.company_name);
-            submitData.append('national_id', this.formData.national_id);
-            submitData.append('commercial_registration', this.formData.commercial_registration);
-            submitData.append('national_address', this.formData.national_address);
-            submitData.append('iban', this.formData.iban);
-            submitData.append('tax_certificate', this.formData.tax_certificate);
-            submitData.append('terms', this.formData.terms ? '1' : '0');
+        // ------------------ 1️⃣ تحديد auth_method ------------------
+        submitData.append('auth_method', this.formData.account_type === 'supplier' ? 'register_supplier' : 'register');
 
-            // ✅ الملفات
-            if (this.formData.national_id_attach instanceof File) {
-                submitData.append('national_id_attach', this.formData.national_id_attach);
+        // ------------------ 2️⃣ الحقول النصية ------------------
+        const fields = [
+            'full_name', 'email', 'phone_number', 'password', 'password_confirmation', 'account_type',
+            'company_name', 'national_id', 'commercial_registration', 'national_address', 'iban', 'tax_certificate'
+        ];
+        fields.forEach(field => {
+            submitData.append(field, this.formData[field]);
+        });
+
+        submitData.append('terms', this.formData.terms ? '1' : '0');
+
+        // ------------------ 3️⃣ الملفات ------------------
+        const fileFields = [
+            'national_id_attach', 'commercial_registration_attach', 
+            'national_address_attach', 'iban_attach', 'tax_certificate_attach'
+        ];
+        fileFields.forEach(field => {
+            if (this.formData[field] instanceof File) {
+                submitData.append(field, this.formData[field]);
             }
-            if (this.formData.commercial_registration_attach instanceof File) {
-                submitData.append('commercial_registration_attach', this.formData.commercial_registration_attach);
-            }
-            if (this.formData.national_address_attach instanceof File) {
-                submitData.append('national_address_attach', this.formData.national_address_attach);
-            }
-            if (this.formData.iban_attach instanceof File) {
-                submitData.append('iban_attach', this.formData.iban_attach);
-            }
-            if (this.formData.tax_certificate_attach instanceof File) {
-                submitData.append('tax_certificate_attach', this.formData.tax_certificate_attach);
-            }
+        });
 
-            console.log('Submitting form with data (FormData object, cannot be directly logged):', submitData);
-       // ✅ أضف الكابتشا
-let captchaResponse;
-if (this.formData.account_type === 'customer') {
-    captchaResponse = grecaptcha.getResponse(captchaCustomerId);
-} else {
-    captchaResponse = grecaptcha.getResponse(captchaSupplierId);
-}
+        // ------------------ 4️⃣ الكابتشا ------------------
+        let captchaResponse = this.formData.account_type === 'customer' 
+            ? grecaptcha.getResponse(captchaCustomerId)
+            : grecaptcha.getResponse(captchaSupplierId);
 
-if (!captchaResponse) {
-    this.loading = false;
-    this.errors['g-recaptcha-response'] = ['يرجى تأكيد أنك لست روبوت!'];
-    return;
-}
+        if (!captchaResponse) {
+            this.loading = false;
+            this.errors['g-recaptcha-response'] = ['يرجى تأكيد أنك لست روبوت!'];
+            return;
+        }
+        submitData.append('g-recaptcha-response', captchaResponse);
 
-submitData.append('g-recaptcha-response', captchaResponse);
+        // ------------------ 5️⃣ إرسال البيانات ------------------
+        axios.post(this.$el.action, submitData, { headers: { 'Content-Type': 'multipart/form-data' } })
+            .then(response => {
+                this.loading = false;
 
+                if (response.data.success) {
+                    // فتح نافذة OTP
+                    window.dispatchEvent(new CustomEvent('open-otp'));
 
+                    // إعادة تعيين الكابتشا
+                    if (this.formData.account_type === 'customer') grecaptcha.reset(captchaCustomerId);
+                    else grecaptcha.reset(captchaSupplierId);
 
-                    axios.post(this.$el.action, submitData, {
-                        headers: {
-                            'Content-Type': 'multipart/form-data'
-                        }
-                    })
-                    .then(response => {
-                        this.loading = false;
-                        if (response.data.success) {
-        window.dispatchEvent(new CustomEvent('open-otp')); // ✅ always bubbles
-    // 🔔 tell root to switch modals
-
-
-                            this.formData = {
-                                full_name: '', email: '', phone_number: '',
-                                password: '', password_confirmation: '',
-                                company_name: '', national_id: '', national_id_attach: null,
-                                commercial_registration: '', commercial_registration_attach: null,
-                                national_address: '', national_address_attach: null,
-                                iban: '', iban_attach: null,
-                                tax_certificate: '', tax_certificate_attach: null,
-                                terms: false,
-                                account_type: 'customer'
-                            };
-                        } else {
-                            console.log('Registration not successful, but no 422 error:', response.data);
-                        }
-                    })
-                    .catch(error => {
-                        this.loading = false;
-                        if (error.response) {
-                            if (error.response.status === 422) {
-                                this.errors = error.response.data.errors;
-                                console.error('Validation errors:', this.errors);
-                            } else {
-                                console.error('Server error:', error.response.data);
-                            }
-                        } else {
-                            console.error('Network or other error:', error);
-                        }
-                    });
+                    // إعادة تعيين الفورم
+                    this.formData = {
+                        full_name: '', email: '', phone_number: '',
+                        password: '', password_confirmation: '',
+                        company_name: '', national_id: '', national_id_attach: null,
+                        commercial_registration: '', commercial_registration_attach: null,
+                        national_address: '', national_address_attach: null,
+                        iban: '', iban_attach: null,
+                        tax_certificate: '', tax_certificate_attach: null,
+                        terms: false, account_type: 'customer',
+                        showLogin: false, showRegister: true, showOTP: false
+                    };
+                } else {
+                    console.log('Registration not successful:', response.data);
                 }
-            }" @set-show-otp.window="showOTP = $event.detail"
+            })
+            .catch(error => {
+                this.loading = false;
+                if (error.response) {
+                    if (error.response.status === 422) {
+                        this.errors = error.response.data.errors;
+                        console.error('Validation errors:', this.errors);
+                    } else {
+                        console.error('Server error:', error.response.data);
+                    }
+                } else {
+                    console.error('Network or other error:', error);
+                }
+
+                // إعادة تعيين الكابتشا بعد الفشل
+                if (this.formData.account_type === 'customer') grecaptcha.reset(captchaCustomerId);
+                else grecaptcha.reset(captchaSupplierId);
+            });
+    }
+}"
+ @set-show-otp.window="showOTP = $event.detail"
              @set-show-register.window="showRegister = $event.detail"
 @open-otp.window="showOTP = true; showLogin = false; showRegister = false"             
         >
@@ -176,6 +163,9 @@ submitData.append('g-recaptcha-response', captchaResponse);
                 <form method="POST" action="{{ route('sendOtp') }}" x-cloak @submit.prevent="submitForm">
 
                     @csrf
+                    <!-- 🧠 Honeypot (Bot Trap) -->
+                    <input type="text" name="nickname" style="display:none" autocomplete="off">
+
                     <p class="text-xl sm:text-2xl font-bold mb-4 mt-3"> {{ __('messages.account_data') }}</p>
 
                     <input type="hidden" name="account_type" x-model="formData.account_type">

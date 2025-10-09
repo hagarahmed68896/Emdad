@@ -117,8 +117,9 @@ class CheckoutController extends Controller
             }
 
             // Step 5: Clear the cart
-            $cart->items()->delete();
-            $cart->delete();
+         // بدل الحذف: حدث حالة الكارت إلى "ordered"
+$cart->update(['status' => 'ordered']);
+
 
             DB::commit();
 

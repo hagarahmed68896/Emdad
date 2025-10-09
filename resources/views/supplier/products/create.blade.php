@@ -504,12 +504,19 @@ class="absolute top-1 left-1 bg-red-500 text-white rounded-full p-1 leading-none
                 <label class="block mb-1 font-bold">{{ __('messages.offer_end') }}</label>
                 <input type="date" name="offer_end" class="border p-2 w-full rounded-xl">
             </div>
-       <div>
-        <label class="block mb-1 font-bold">{{ __('messages.discount_percent') }}</label>
-        <input type="number" min="0" step="1" name="discount_percent"
-            placeholder="{{ __('messages.discount_percent') }}"
-            class="border p-2 w-full rounded-xl">
-        </div>
+    <div>
+    <label class="block mb-1 font-bold">{{ __('messages.discount_percent') }}</label>
+    <input 
+        type="number" 
+        name="discount_percent" 
+        min="0" 
+        max="100" 
+        step="1"
+        placeholder="{{ __('messages.discount_percent') }}"
+        class="border p-2 w-full rounded-xl"
+        value="{{ old('discount_percent', isset($product) && $product->offer ? (int) $product->offer->discount_percent : null) }}">
+</div>
+
 
         </div>
 

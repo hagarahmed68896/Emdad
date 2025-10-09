@@ -457,11 +457,19 @@ colors: Array.isArray(window.productColors) ? window.productColors : [],
         value="{{ old('offer_end', $product->offer ? \Carbon\Carbon::parse($product->offer->offer_end)->format('Y-m-d'):null) }}"
     >
 </div>
-            <div>
-                <label class="block mb-1 font-bold">{{ __('messages.discount_percent') }}</label>
-                <input type="number" min="0" step="1" name="discount_percent" placeholder="{{ __('messages.discount_percent') }}"
-                 class="border p-2 w-full rounded-xl" value="{{ old('discount_percent', $product->offer ? $product->offer->discount_percent:null ) }}">
-            </div>
+         <div>
+    <label class="block mb-1 font-bold">{{ __('messages.discount_percent') }}</label>
+    <input 
+        type="number" 
+        name="discount_percent" 
+        min="0" 
+        max="100" 
+        step="1"
+        placeholder="{{ __('messages.discount_percent') }}"
+        class="border p-2 w-full rounded-xl"
+        value="{{ old('discount_percent', $product->offer ? (int) $product->offer->discount_percent : null) }}">
+</div>
+
         </div>
 
         <p class="font-bold text-[24px]">{{ __('messages.manufacturing_delivery_time') }}</p>

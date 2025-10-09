@@ -37,7 +37,7 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\supplierrController;
 use App\Http\Controllers\ReportController;
-use App\Http\Controllers\supplier\SupplierDashboardController;
+use App\Http\Controllers\Supplier\SupplierDashboardController;
 use App\Http\Controllers\Admin\FinancialSettlementController;
 use App\Http\Controllers\Admin\UserBlocksController;
 use App\Http\Controllers\Admin\MessagesController;

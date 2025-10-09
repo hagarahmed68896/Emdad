@@ -119,19 +119,23 @@
                 </div>
 
                 <ul x-show="open" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-xl max-h-60 overflow-y-auto">
-                    @foreach($products as $product)
-                        @php
-                            $productImages = is_string($product->images) ? json_decode($product->images, true) : ($product->images ?? []);
-                            $imageUrl = !empty($productImages) ? Storage::url($productImages[0]) : 'https://placehold.co/40x40/F0F0F0/ADADAD?text=No+Img';
-                        @endphp
-                        <li @click="selectedProduct = {id: {{ $product->id }}, name: '{{ $product->name }}', image: '{{ $imageUrl }}'}; open = false;"
-                            class="p-2 cursor-pointer hover:bg-gray-100 flex items-center">
-                            <img src="{{ $imageUrl }}"
-                                 onerror="this.onerror=null;this.src='https://placehold.co/40x40/F0F0F0/ADADAD?text=No+Img';"
-                                 class="w-10 h-10 mx-2 rounded-xl p-1 bg-gray-100 object-cover" />
-                            <span>{{ $product->name }}</span>
-                        </li>
-                    @endforeach
+                @foreach($products as $product)
+    @php
+        $productImages = is_string($product->images) ? json_decode($product->images, true) : ($product->images ?? []);
+        $imageUrl = !empty($productImages)
+            ? asset('storage/' . $productImages[0])
+            : 'https://placehold.co/40x40/F0F0F0/ADADAD?text=No+Img';
+    @endphp
+
+    <li @click="selectedProduct = {id: {{ $product->id }}, name: '{{ $product->name }}', image: '{{ $imageUrl }}'}; open = false;"
+        class="p-2 cursor-pointer hover:bg-gray-100 flex items-center">
+        <img src="{{ $imageUrl }}"
+             onerror="this.onerror=null;this.src='https://placehold.co/40x40/F0F0F0/ADADAD?text=No+Img';"
+             class="w-10 h-10 mx-2 rounded-xl p-1 bg-gray-100 object-cover" />
+        <span>{{ $product->name }}</span>
+    </li>
+@endforeach
+
                 </ul>
 
                 <input type="hidden" name="product_id" x-model="selectedProduct.id">

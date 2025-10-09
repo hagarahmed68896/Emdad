@@ -21,6 +21,13 @@ class OtpController extends Controller
      */
     public function sendOtp(Request $request)
     {
+          // 🛡 Honeypot check
+    if ($request->filled('nickname')) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Bot detected.'
+        ], 403);
+    }
         $authMethod = $request->auth_method;
         Log::info('Recaptcha value:', ['captcha' => $request->input('g-recaptcha-response')]);
 
@@ -74,13 +81,11 @@ class OtpController extends Controller
             $request->validate([
                 'email' => 'required|email|exists:users,email',
                 'password' => 'required',
-                'g-recaptcha-response' => 'required|captcha'
             ], [
                 'email.required' => __('messages.emailError'),
                 'email.email' => __('messages.emailValid'),
                 'email.exists' => __('messages.email_failed'),
                 'password.required' => __('messages.passwordMSG'),
-                'g-recaptcha-response.required' => __('messages.recaptcha_required'),
 
             ]);
 
@@ -120,6 +125,12 @@ class OtpController extends Controller
                 'g-recaptcha-response.required' => __('messages.recaptcha_required'),
 
             ]);
+            Log::info('Recaptcha verification result:', [
+    'response' => $request->input('g-recaptcha-response'),
+    'env_secret' => env('NOCAPTCHA_SECRET'),
+    'env_sitekey' => env('NOCAPTCHA_SITEKEY'),
+]);
+
             $clean_phone_number = preg_replace('/\D/', '', $request->phone_number);
             if (str_starts_with($clean_phone_number, '966')) {
                 $clean_phone_number = substr($clean_phone_number, 3);
@@ -244,6 +255,7 @@ class OtpController extends Controller
         Log::info('OtpController reached');
 
         $taqnyatService = new TaqnyatOTP();
+        
         $taqnyatService->sendOTP('+966' . $clean_phone_number, $otp);
 
         return response()->json([

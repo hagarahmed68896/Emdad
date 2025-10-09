@@ -19,8 +19,9 @@
                 {{ __('messages.messages') }}
             </p>
         </div>
-        <input type="text" placeholder="{{ __('messages.search') }}" x-model="searchTerm"
-               class="w-full p-2 border bg-[#EDEDED] rounded mb-4">
+        <input type="text" placeholder="{{ __('messages.search') }}"
+         x-model="searchTermConversations"
+         class="w-full p-2 border bg-[#EDEDED] rounded mb-4">
 
 
         <template x-if="conversations.length > 0">
@@ -398,8 +399,10 @@
 
         {{-- Search --}}
         <div x-show="isSearching" class="p-4 border-b flex items-center gap-2">
-            <input type="text" x-model="searchTerm" placeholder="{{ __('messages.type_to_search') }}" class="flex-1 p-2 border rounded">
-            <button @click="isSearching=false; searchTerm=''" class="bg-gray-200 px-3 py-2 rounded">✖</button>
+            <input type="text"
+             x-model="searchTermMessages"
+              placeholder="{{ __('messages.type_to_search') }}" class="flex-1 p-2 border rounded">
+            <button @click="isSearching=false; searchTermMessages=''" class="bg-gray-200 px-3 py-2 rounded">✖</button>
         </div>
 
       {{-- Chat box --}}
@@ -663,7 +666,8 @@ function chatApp(initialConversations, initialQuickReplies, initialConversationI
         messages: [],
         product: null,
         currentUserId: @json(auth()->id()),
-        searchTerm: '',
+        searchTermConversations: '',
+        searchTermMessages: '',
         isSearching: false,
         modalType: null,
         reportReason: '',
@@ -690,8 +694,8 @@ filteredConversations() {
     let filtered = this.conversations;
 
     // Apply search filter
-    if (this.searchTerm) {
-        const term = this.searchTerm.toLowerCase();
+if (this.searchTermConversations) {
+    const term = this.searchTermConversations.toLowerCase();
         filtered = filtered.filter(c =>
             c.product?.supplier?.user?.full_name?.toLowerCase().includes(term) ||
             c.product?.supplier?.company_name?.toLowerCase().includes(term) ||
@@ -740,8 +744,8 @@ filteredConversations() {
         startSearch() { this.isSearching = true; },
 
         highlightText(text) {
-            if (!this.searchTerm) return text;
-            const safe = this.searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            if (!this.searchTermMessages) return text;
+            const safe = this.searchTermMessages.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             return text.
             replace(new RegExp(`(${safe})`, 'gi'), '<mark class="bg-yellow-300">$1</mark>');
         },

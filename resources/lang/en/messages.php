@@ -1250,6 +1250,7 @@ return [
     'complaint_submitted_successfully' => '✅ Complaint submitted successfully',
     'review_submitted_successfully' => '✅ Review submitted successfully',
     'recaptcha_required' => 'Please confirm that you are not a robot!',
+    'help_support' => 'Help & Support',
 
 
 

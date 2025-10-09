@@ -7,6 +7,8 @@
         @submit.prevent="submitForm" {{-- Prevent default form submission and call Alpine's submitForm --}}
     >
         @csrf
+                            <!-- 🧠 Honeypot (Bot Trap) -->
+       <input type="text" name="nickname" style="display:none" autocomplete="off">
         <div x-show="accountData" x-cloak>
             <p class="text-[24px] font-bold mb-4 mt-3"> {{ __('messages.account_data') }}
             </p>

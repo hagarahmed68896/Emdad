@@ -110,9 +110,10 @@
                         <td class="p-3">#{{ $sale->order->order_number }}</td>
                         <td class="p-3 flex items-center gap-2">
                             <div class="w-10 h-10 rounded overflow-hidden">
-                                <img src="{{ Storage::url($sale->product->image) }}" 
-                                     class="w-full h-full object-cover" 
-                                     alt="{{ $sale->product->name }}">
+                       <img src="{{ $sale->product->image ? asset('storage/' . $sale->product->image) : asset('images/no-image.png') }}"
+     class="w-full h-full object-cover"
+     alt="{{ $sale->product->name }}">
+
                             </div>
                             <div>
 <p>{{ app()->getLocale() === 'en' ? $sale->product->name_en : $sale->product->name }}</p>

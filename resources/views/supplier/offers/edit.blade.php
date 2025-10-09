@@ -28,7 +28,7 @@
         {{-- Alpine.js Image Upload and Preview Section --}}
         <div 
             x-data="{
-                previews: {{ json_encode($offer->image ? [Storage::url($offer->image)] : []) }},
+               previews: {{ json_encode($offer->image ? [asset('storage/' . $offer->image)] : []) }},
                 files: [],
                 handleFileDrop(e) {
                     const droppedFiles = Array.from(e.dataTransfer.files);
@@ -120,17 +120,22 @@
                 </div>
 
                 <ul x-show="open" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-xl max-h-60 overflow-y-auto">
-                    @foreach($products as $product)
-                        @php
-                            $productImages = is_string($product->images) ? json_decode($product->images, true) : ($product->images ?? []);
-                            $imageUrl = !empty($productImages) ? Storage::url($productImages[0]) : 'https://placehold.co/40x40/F0F0F0/ADADAD?text=No+Img';
-                        @endphp
-                        <li @click="selectedProduct = {id: {{ $product->id }}, name: '{{ $product->name }}'}; open = false;"
-                            class="p-2 cursor-pointer hover:bg-gray-100 flex items-center">
-                            <img src="{{ $imageUrl }}" class="w-10 h-10 mx-2 rounded-xl p-1 bg-gray-100 object-cover" />
-                            <span>{{ $product->name }}</span>
-                        </li>
-                    @endforeach
+                   @foreach($products as $product)
+    @php
+        $productImages = is_string($product->images) ? json_decode($product->images, true) : ($product->images ?? []);
+        $imageUrl = !empty($productImages)
+            ? asset('storage/' . $productImages[0])
+            : 'https://placehold.co/40x40/F0F0F0/ADADAD?text=No+Img';
+    @endphp
+    <li @click="selectedProduct = {id: {{ $product->id }}, name: '{{ $product->name }}'}; open = false;"
+        class="p-2 cursor-pointer hover:bg-gray-100 flex items-center">
+        <img src="{{ $imageUrl }}"
+             onerror="this.onerror=null;this.src='https://placehold.co/40x40/F0F0F0/ADADAD?text=No+Img';"
+             class="w-10 h-10 mx-2 rounded-xl p-1 bg-gray-100 object-cover" />
+        <span>{{ $product->name }}</span>
+    </li>
+@endforeach
+
                 </ul>
 
                 <input type="hidden" name="product_id" x-model="selectedProduct.id">
@@ -142,17 +147,31 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
                 <label class="block font-bold mb-1">{{ __('messages.offer_start') }}</label>
-                <input type="date" name="offer_start" value="{{ old('offer_start', $offer->offer_start) }}" class="border p-2 w-full rounded-xl">
-                @error('offer_start') <p class="text-red-600 text-sm">{{ $message }}</p> @enderror
+<input 
+    type="date" 
+    name="offer_start" 
+    value="{{ old('offer_start', optional($offer->offer_start)->format('Y-m-d')) }}" 
+    class="border p-2 w-full rounded-xl">                @error('offer_start') <p class="text-red-600 text-sm">{{ $message }}</p> @enderror
             </div>
             <div>
                 <label class="block font-bold mb-1">{{ __('messages.offer_end') }}</label>
-                <input type="date" name="offer_end" value="{{ old('offer_end', $offer->offer_end) }}" class="border p-2 w-full rounded-xl">
-                @error('offer_end') <p class="text-red-600 text-sm">{{ $message }}</p> @enderror
+<input 
+    type="date" 
+    name="offer_end" 
+    value="{{ old('offer_end', optional($offer->offer_end)->format('Y-m-d')) }}" 
+    class="border p-2 w-full rounded-xl">                @error('offer_end') <p class="text-red-600 text-sm">{{ $message }}</p> @enderror
             </div>
             <div>
                 <label class="block font-bold mb-1">{{ __('messages.discount_percentage') }}</label>
-                <input type="number" name="discount_percent" value="{{ old('discount_percent', $offer->discount_percent) }}" class="border p-2 w-full rounded-xl" placeholder="{{ __('messages.enter_discount_percentage') }}">
+<input 
+    type="number" 
+    name="discount_percent" 
+    value="{{ old('discount_percent', (int) $offer->discount_percent) }}" 
+    class="border p-2 w-full rounded-xl" 
+    placeholder="{{ __('messages.enter_discount_percentage') }}"
+    step="1" 
+    min="0" 
+    max="100">
                 @error('discount_percent') <p class="text-red-600 text-sm">{{ $message }}</p> @enderror
             </div>
         </div>

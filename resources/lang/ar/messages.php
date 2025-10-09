@@ -1250,6 +1250,7 @@ return [
     'complaint_submitted_successfully' => '✅ تم إرسال الشكوى بنجاح',
     'review_submitted_successfully' => '✅ تم إرسال التقييم بنجاح',
     'recaptcha_required' => 'يرجى تأكيد أنك لست روبوت!',
+    'help_support' => 'المساعدة والدعم',
 
 
 
